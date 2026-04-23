@@ -47,7 +47,7 @@ export function EmergencyCtaWidget() {
   );
 }
 
-function EmergencyConfirmDialog({ onClose }: { onClose: () => void }) {
+export function EmergencyConfirmDialog({ onClose }: { onClose: () => void }) {
   // P4 C5 polish:
   //  - Escape 키로 닫기 (키보드 네비 사용자)
   //  - body scroll lock (모달 뒤 배경 고정)

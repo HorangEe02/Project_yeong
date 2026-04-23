@@ -29,6 +29,20 @@
   "action.checkin": "접수 하기",
   "action.call-hospital": "병원에 전화 걸기",
 
+  "senior.tile.book": "병원 예약하기",
+  "senior.tile.book-sub": "새로운 진료를 잡아요",
+  "senior.tile.find-way": "길 안내",
+  "senior.tile.find-way-sub": "병원 안에서 가는 길",
+  "senior.tile.my-turn": "내 순번 보기",
+  "senior.tile.my-turn-sub": "기다리는 순번을 확인해요",
+  "senior.tile.family": "가족 연락",
+  "senior.tile.family-sub": "가족이 함께 봐요 (곧 공개)",
+  "senior.emergency.title": "응급 도움 받기",
+  "senior.emergency.sub": "버튼을 누르면 응급실 안내나 119 전화로 연결돼요",
+  "senior.next-visit.title": "다음 방문",
+  "senior.next-visit.empty": "예약된 진료가 없어요",
+
+
   "status.scheduled": "예약 되어 있어요",
   "status.cancelled": "취소 되었어요",
   "status.completed": "끝났어요",

@@ -36,6 +36,17 @@ vi.mock('@/services/waitQueue', () => ({
   },
 }));
 
+vi.mock('@/services/appointments', () => ({
+  subscribeMyAppointmentIndex: (
+    _h: string,
+    _u: string,
+    cb: (list: unknown[]) => void,
+  ) => {
+    cb([]);
+    return () => {};
+  },
+}));
+
 import { HomeTab } from '../HomeTab';
 
 function renderWithRouter(ui: React.ReactElement) {
@@ -90,7 +101,7 @@ describe('HomeTab 분기', () => {
     expect(screen.getByText('AI 진료과 추천')).toBeTruthy();
   });
 
-  it('senior ON → SeniorHome (AI 위젯 숨김 + 인사 섹션 노출, Greeting/QuickActions 없음)', () => {
+  it('senior ON → SeniorHome (4 타일 런처, AI 위젯 숨김, StandardHome 요소 없음)', () => {
     useSeniorModeMock.mockReturnValue({
       enabled: true,
       pending: false,
@@ -102,11 +113,18 @@ describe('HomeTab 분기', () => {
       hospital: { features: { aiTriage: true } },
     });
     renderWithRouter(<HomeTab />);
-    expect(screen.getByLabelText('오늘 날짜 인사')).toBeTruthy();
-    expect(screen.getByText('오늘 일정')).toBeTruthy();
+    // SeniorHome 신규 구성 (U1)
+    expect(screen.getByLabelText('오늘 인사 + 다음 방문')).toBeTruthy();
+    expect(screen.getByText('병원 예약하기')).toBeTruthy();
+    expect(screen.getByText('가족 연락')).toBeTruthy();
+    expect(screen.getByText('응급 도움 받기')).toBeTruthy();
+    // AI 인지부하 요소 숨김
     expect(screen.queryByText('AI 진료과 추천')).toBeNull();
     // StandardHome 전용 요소는 없음
     expect(screen.queryByRole('group', { name: '빠른 작업' })).toBeNull();
     expect(screen.queryByText('최근 검사 결과')).toBeNull();
+    // 이전 SeniorHome의 위젯 3개 구성도 사라졌어야 함 (런처로 교체)
+    expect(screen.queryByText('오늘 일정')).toBeNull();
+    expect(screen.queryByText('진료 대기')).toBeNull();
   });
 });

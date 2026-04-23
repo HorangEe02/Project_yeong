@@ -1,16 +1,49 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
-// 위젯 내부 훅 의존성 무력화 (렌더 smoke만 검증)
+// 훅·서비스 mock
 vi.mock('@/hooks/useHospital', () => ({
   useHospital: () => ({ slug: 'demo', hospital: { features: {} } }),
 }));
-vi.mock('@/stores/authStore', () => ({
-  useAuthStore: <T,>(sel: (s: { user: { uid: string } }) => T) =>
-    sel({ user: { uid: 'uid-a' } }),
+
+const useSeniorModeMock = vi.fn().mockReturnValue({
+  enabled: true,
+  pending: false,
+  toggle: vi.fn(),
+  setEnabled: vi.fn(),
+});
+vi.mock('@/hooks/useSeniorMode', () => ({
+  useSeniorMode: () => useSeniorModeMock(),
 }));
+
+vi.mock('@/stores/authStore', () => ({
+  useAuthStore: <T,>(
+    sel: (s: {
+      user: { uid: string; email: string; displayName: string };
+      profile: { displayName: string };
+    }) => T,
+  ) =>
+    sel({
+      user: { uid: 'uid-a', email: 'a@example.com', displayName: '홍길동' },
+      profile: { displayName: '홍길동' },
+    }),
+}));
+
+let activeEntries: unknown[] = [];
 vi.mock('@/services/waitQueue', () => ({
   subscribeMyEntries: (
+    _h: string,
+    _u: string,
+    cb: (list: unknown[]) => void,
+  ) => {
+    cb(activeEntries);
+    return () => {};
+  },
+}));
+
+vi.mock('@/services/appointments', () => ({
+  subscribeMyAppointmentIndex: (
     _h: string,
     _u: string,
     cb: (list: unknown[]) => void,
@@ -22,27 +55,54 @@ vi.mock('@/services/waitQueue', () => ({
 
 import { SeniorHome } from '../SeniorHome';
 
-describe('SeniorHome', () => {
-  it('오늘 날짜 인사 섹션 + 3개 위젯 렌더', () => {
-    render(<SeniorHome />);
-    expect(screen.getByLabelText('오늘 날짜 인사')).toBeTruthy();
-    expect(screen.getByText('오늘도 건강하세요')).toBeTruthy();
-    expect(screen.getByText('오늘 일정')).toBeTruthy();
-    expect(screen.getByText('진료 대기')).toBeTruthy();
-    expect(screen.getByText('응급실 바로가기')).toBeTruthy();
+function renderWithRouter() {
+  return render(
+    <MemoryRouter initialEntries={['/h/demo/patient/home']}>
+      <SeniorHome />
+    </MemoryRouter>,
+  );
+}
+
+beforeEach(() => {
+  activeEntries = [];
+});
+
+describe('SeniorHome (U1)', () => {
+  it('인사 카드 + 4 타일 + 응급 버튼 렌더', () => {
+    renderWithRouter();
+    expect(screen.getByLabelText('오늘 인사 + 다음 방문')).toBeTruthy();
+    expect(screen.getByText('홍길동')).toBeTruthy();
+    expect(screen.getByText('병원 예약하기')).toBeTruthy();
+    expect(screen.getByText('길 안내')).toBeTruthy();
+    expect(screen.getByText('내 순번 보기')).toBeTruthy();
+    expect(screen.getByText('가족 연락')).toBeTruthy();
+    expect(screen.getByText('응급 도움 받기')).toBeTruthy();
   });
 
-  it('오늘 날짜가 ko-KR long 포맷으로 표시', () => {
-    render(<SeniorHome />);
-    const greeting = screen.getByLabelText('오늘 날짜 인사');
-    // "2026년 4월 23일 목요일" 같은 패턴 — 년/월/일 모두 포함
-    expect(greeting.textContent).toMatch(/\d{4}년/);
-    expect(greeting.textContent).toMatch(/월/);
-    expect(greeting.textContent).toMatch(/일/);
+  it('가족 연락 타일은 disabled (aria-disabled true)', () => {
+    renderWithRouter();
+    const familyBtn = screen.getByRole('button', { name: /가족 연락/ });
+    expect(familyBtn.getAttribute('aria-disabled')).toBe('true');
   });
 
-  it('AI triage 위젯은 렌더되지 않음 (인지부하 제외)', () => {
-    render(<SeniorHome />);
-    expect(screen.queryByText('AI 진료과 추천')).toBeNull();
+  it('활성 wait entry가 있으면 내 순번 타일에 뱃지 노출', () => {
+    activeEntries = [
+      {
+        id: 'e-1',
+        department: '내과',
+        date: '2026-04-23',
+        number: 7,
+        status: 'waiting',
+      },
+    ];
+    renderWithRouter();
+    expect(screen.getByLabelText('알림 7건')).toBeTruthy();
+  });
+
+  it('응급 버튼 클릭 → 확인 모달', () => {
+    renderWithRouter();
+    fireEvent.click(screen.getByText('응급 도움 받기'));
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(screen.getByText('어떻게 도와드릴까요?')).toBeTruthy();
   });
 });
