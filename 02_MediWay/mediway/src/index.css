@@ -16,10 +16,13 @@
     -moz-osx-font-smoothing: grayscale;
     color-scheme: light;
 
-    /* P1 Multi-Tenant 화이트라벨 — 런타임에 applyHospitalTheme()로 덮어씀 */
-    --color-primary: #004e9f;
-    --color-primary-container: #0066cc;
-    --color-primary-light: #3b82f6;
+    /* P1 Multi-Tenant 화이트라벨 — 런타임에 applyHospitalTheme()로 덮어씀.
+     * P4.U U-color (UIUX_INTEGRATION_PLAN §13/§15): 시안 PlusUltra SaaS 톤에
+     * 맞춰 primary 계열을 짙은 파랑(#0B4EBA) 베이스로 재정렬. 화이트라벨이
+     * 적용된 병원은 dynamic override로 자기 themeColor를 사용. */
+    --color-primary: #0B4EBA;
+    --color-primary-container: #1E5FD9;
+    --color-primary-light: #3D7BD9;
   }
 
   body {

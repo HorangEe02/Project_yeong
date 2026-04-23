@@ -64,8 +64,9 @@ export default {
         glass: '20px',
       },
       boxShadow: {
-        ambient: '0 4px 60px rgba(0, 78, 159, 0.06)',
-        'ambient-lg': '0 8px 60px rgba(0, 78, 159, 0.08)',
+        // P4.U U-color: primary #0B4EBA(rgb 11,78,186) 톤에 맞춘 ambient 그림자
+        ambient: '0 4px 60px rgba(11, 78, 186, 0.06)',
+        'ambient-lg': '0 8px 60px rgba(11, 78, 186, 0.08)',
       },
       keyframes: {
         'dash-move': {
