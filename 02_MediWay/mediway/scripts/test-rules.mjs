@@ -49,6 +49,8 @@ async function run() {
     projectId: PROJECT_ID,
     database: {
       rules: JSON.stringify(parsed),
+      host: process.env.RTDB_EMULATOR_HOST ?? '127.0.0.1',
+      port: Number(process.env.RTDB_EMULATOR_PORT ?? 9000),
     },
   });
 
@@ -113,50 +115,57 @@ async function run() {
     role: 'platformAdmin',
   });
 
+  // rules-unit-testing v5: database() 호출 시마다 useEmulator 중복 호출되어 FATAL.
+  // context별 단일 db 인스턴스 캐싱으로 우회.
+  const demoPatientDb = demoPatient.database();
+  const demoStaffDb = demoStaff.database();
+  const smchPatientDb = smchPatient.database();
+  const platAdminDb = platAdmin.database();
+
   console.log('\n[Read tests]');
 
-  await assertSucceeds(demoPatient.database().ref('hospitals/demo/profile').get())
+  await assertSucceeds(demoPatientDb.ref('hospitals/demo/profile').get())
     .then(() => pass('demo 환자 → demo profile 읽기'))
     .catch((e) => fail('demo 환자 → demo profile 읽기', e));
 
-  await assertSucceeds(demoPatient.database().ref('hospitals/demo/pois').get())
+  await assertSucceeds(demoPatientDb.ref('hospitals/demo/pois').get())
     .then(() => pass('demo 환자 → demo pois 읽기'))
     .catch((e) => fail('demo 환자 → demo pois 읽기', e));
 
   // profile은 공개 읽기 (SelectHospitalPage를 위해)
-  await assertSucceeds(demoPatient.database().ref('hospitals/smch/profile').get())
+  await assertSucceeds(demoPatientDb.ref('hospitals/smch/profile').get())
     .then(() => pass('demo 환자 → smch profile 읽기 (공개)'))
     .catch((e) => fail('demo 환자 → smch profile 읽기', e));
 
   // pois는 tenant-scoped → 차단
-  await assertFails(demoPatient.database().ref('hospitals/smch/pois').get())
+  await assertFails(demoPatientDb.ref('hospitals/smch/pois').get())
     .then(() => pass('demo 환자 → smch pois 읽기 차단 ★'))
     .catch((e) => fail('demo 환자 → smch pois 읽기 차단', e));
 
   // 교차 visit_plan
   await assertFails(
-    demoPatient.database().ref('hospitals/smch/visit_plans/fake').get(),
+    demoPatientDb.ref('hospitals/smch/visit_plans/fake').get(),
   )
     .then(() => pass('demo 환자 → smch visit_plans 읽기 차단 ★'))
     .catch((e) => fail('demo 환자 → smch visit_plans 읽기 차단', e));
 
   // 같은 병원 내 staff이 다른 환자 plan 읽기
   await assertSucceeds(
-    demoStaff.database().ref('hospitals/demo/visit_plans/user-a').get(),
+    demoStaffDb.ref('hospitals/demo/visit_plans/user-a').get(),
   )
     .then(() => pass('demo staff → demo visit_plans/user-a 읽기'))
     .catch((e) => fail('demo staff → demo visit_plans/user-a 읽기', e));
 
   // 같은 병원 환자가 다른 환자 plan 읽기 — 차단
   await assertFails(
-    smchPatient.database().ref('hospitals/demo/visit_plans/user-a').get(),
+    smchPatientDb.ref('hospitals/demo/visit_plans/user-a').get(),
   )
     .then(() => pass('smch 환자 → demo visit_plans/user-a 차단 ★'))
     .catch((e) => fail('smch 환자 → demo visit_plans/user-a 차단', e));
 
   // platformAdmin은 아무 병원이나
   await assertSucceeds(
-    platAdmin.database().ref('hospitals/smch/pois').get(),
+    platAdminDb.ref('hospitals/smch/pois').get(),
   )
     .then(() => pass('platformAdmin → smch pois 읽기'))
     .catch((e) => fail('platformAdmin → smch pois 읽기', e));
@@ -165,9 +174,7 @@ async function run() {
 
   // 일반 유저 → profile 쓰기 차단
   await assertFails(
-    demoPatient
-      .database()
-      .ref('hospitals/demo/profile/themeColor')
+    demoPatientDb.ref('hospitals/demo/profile/themeColor')
       .set('#hack'),
   )
     .then(() => pass('demo 환자 → demo profile 쓰기 차단 ★'))
@@ -175,9 +182,7 @@ async function run() {
 
   // platformAdmin → profile 쓰기
   await assertSucceeds(
-    platAdmin
-      .database()
-      .ref('hospitals/demo/profile/themeColor')
+    platAdminDb.ref('hospitals/demo/profile/themeColor')
       .set('#009688'),
   )
     .then(() => pass('platformAdmin → demo profile 쓰기'))
@@ -185,7 +190,7 @@ async function run() {
 
   // 레거시 visit_plans 쓰기 (P2까지 호환) — 본인 uid
   await assertSucceeds(
-    demoPatient.database().ref('visit_plans/user-a').set({
+    demoPatientDb.ref('visit_plans/user-a').set({
       waypoints: { w1: { poiId: 'p1' } },
       source: 'patient',
       updatedBy: 'user-a',
@@ -198,7 +203,7 @@ async function run() {
 
   // 타 환자 visit_plan 쓰기 차단 (환자 역할)
   await assertFails(
-    demoPatient.database().ref('hospitals/demo/visit_plans/other-uid').set({
+    demoPatientDb.ref('hospitals/demo/visit_plans/other-uid').set({
       waypoints: { w1: { poiId: 'p1' } },
       source: 'patient',
       updatedBy: 'user-a',
@@ -215,7 +220,7 @@ async function run() {
 
   // 환자가 자기 병원 예약 생성
   await assertSucceeds(
-    demoPatient.database().ref('hospitals/demo/appointments/appt-1').set({
+    demoPatientDb.ref('hospitals/demo/appointments/appt-1').set({
       id: 'appt-1',
       hospitalId: 'demo',
       patientUid: 'user-a',
@@ -232,7 +237,7 @@ async function run() {
 
   // 환자가 타 병원 예약 생성 차단 (hospitalId 불일치)
   await assertFails(
-    demoPatient.database().ref('hospitals/smch/appointments/appt-x').set({
+    demoPatientDb.ref('hospitals/smch/appointments/appt-x').set({
       id: 'appt-x',
       hospitalId: 'smch',
       patientUid: 'user-a',
@@ -249,23 +254,21 @@ async function run() {
 
   // 환자가 본인 예약 읽기
   await assertSucceeds(
-    demoPatient.database().ref('hospitals/demo/appointments/appt-1').get(),
+    demoPatientDb.ref('hospitals/demo/appointments/appt-1').get(),
   )
     .then(() => pass('demo 환자 → 본인 appointments 읽기'))
     .catch((e) => fail('demo 환자 → 본인 appointments 읽기', e));
 
   // 같은 병원 staff이 해당 환자 예약 읽기
   await assertSucceeds(
-    demoStaff.database().ref('hospitals/demo/appointments/appt-1').get(),
+    demoStaffDb.ref('hospitals/demo/appointments/appt-1').get(),
   )
     .then(() => pass('demo staff → demo appointments 읽기'))
     .catch((e) => fail('demo staff → demo appointments 읽기', e));
 
   // 환자가 역인덱스 본인 엔트리 쓰기
   await assertSucceeds(
-    demoPatient
-      .database()
-      .ref('hospitals/demo/appointments_by_patient/user-a/appt-1')
+    demoPatientDb.ref('hospitals/demo/appointments_by_patient/user-a/appt-1')
       .set({
         scheduledAt: future,
         status: 'scheduled',
@@ -276,9 +279,7 @@ async function run() {
 
   // 환자가 다른 환자 역인덱스 쓰기 차단
   await assertFails(
-    demoPatient
-      .database()
-      .ref('hospitals/demo/appointments_by_patient/other-uid/appt-z')
+    demoPatientDb.ref('hospitals/demo/appointments_by_patient/other-uid/appt-z')
       .set({
         scheduledAt: future,
         status: 'scheduled',
@@ -289,7 +290,7 @@ async function run() {
 
   // 과거 시각 scheduledAt 차단
   await assertFails(
-    demoPatient.database().ref('hospitals/demo/appointments/appt-past').set({
+    demoPatientDb.ref('hospitals/demo/appointments/appt-past').set({
       id: 'appt-past',
       hospitalId: 'demo',
       patientUid: 'user-a',
@@ -303,6 +304,152 @@ async function run() {
   )
     .then(() => pass('demo 환자 → 과거 시각 예약 validate 차단 ★'))
     .catch((e) => fail('demo 환자 → 과거 시각 예약 validate 차단', e));
+
+  console.log('\n[Wait queue tests — P3 C2]');
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  // ① 환자가 본인 병원 대기 entry 생성 (접수)
+  await assertSucceeds(
+    demoPatientDb.ref(`hospitals/demo/wait_queue/내과/${today}/entry-1`)
+      .set({
+        id: 'entry-1',
+        hospitalId: 'demo',
+        department: '내과',
+        date: today,
+        number: 1,
+        patientUid: 'user-a',
+        status: 'waiting',
+        createdAt: Date.now(),
+      }),
+  )
+    .then(() => pass('demo 환자 → 본인 wait_queue 생성 (접수)'))
+    .catch((e) => fail('demo 환자 → 본인 wait_queue 생성', e));
+
+  // ② 타 병원에 자기 entry 생성 차단 (hospitalId 불일치)
+  await assertFails(
+    demoPatientDb.ref(`hospitals/smch/wait_queue/내과/${today}/entry-x`)
+      .set({
+        id: 'entry-x',
+        hospitalId: 'smch',
+        department: '내과',
+        date: today,
+        number: 1,
+        patientUid: 'user-a',
+        status: 'waiting',
+        createdAt: Date.now(),
+      }),
+  )
+    .then(() => pass('demo 환자 → smch wait_queue 생성 차단 ★'))
+    .catch((e) => fail('demo 환자 → smch wait_queue 생성 차단', e));
+
+  // ③ 환자가 본인 entry 읽기
+  await assertSucceeds(
+    demoPatientDb.ref(`hospitals/demo/wait_queue/내과/${today}/entry-1`)
+      .get(),
+  )
+    .then(() => pass('demo 환자 → 본인 wait_queue entry 읽기'))
+    .catch((e) => fail('demo 환자 → 본인 wait_queue entry 읽기', e));
+
+  // ④ 환자가 부서·date 전체 구독 차단 (본인 여부 무관하게 전체 노출 금지)
+  await assertFails(
+    demoPatientDb.ref(`hospitals/demo/wait_queue/내과/${today}`)
+      .get(),
+  )
+    .then(() => pass('demo 환자 → 부서 전체 wait_queue 구독 차단 ★'))
+    .catch((e) => fail('demo 환자 → 부서 전체 wait_queue 구독 차단', e));
+
+  // ⑤ 의료진이 부서 전체 대기열 구독 허용
+  await assertSucceeds(
+    demoStaffDb.ref(`hospitals/demo/wait_queue/내과/${today}`)
+      .get(),
+  )
+    .then(() => pass('demo staff → 부서 전체 wait_queue 구독'))
+    .catch((e) => fail('demo staff → 부서 전체 wait_queue 구독', e));
+
+  // ⑥ 환자가 다른 환자의 entry 생성 차단 (newData.patientUid !== auth.uid)
+  await assertFails(
+    demoPatientDb.ref(`hospitals/demo/wait_queue/내과/${today}/entry-spoof`)
+      .set({
+        id: 'entry-spoof',
+        hospitalId: 'demo',
+        department: '내과',
+        date: today,
+        number: 2,
+        patientUid: 'other-uid',
+        status: 'waiting',
+        createdAt: Date.now(),
+      }),
+  )
+    .then(() => pass('demo 환자 → 타 환자 wait_queue entry 생성 차단 ★'))
+    .catch((e) => fail('demo 환자 → 타 환자 wait_queue entry 생성 차단', e));
+
+  // ⑦ 환자가 본인 역인덱스 쓰기
+  await assertSucceeds(
+    demoPatientDb.ref(`hospitals/demo/wait_queue_by_patient/user-a/entry-1`)
+      .set({
+        department: '내과',
+        date: today,
+        number: 1,
+        status: 'waiting',
+      }),
+  )
+    .then(() => pass('demo 환자 → 본인 역인덱스 쓰기'))
+    .catch((e) => fail('demo 환자 → 본인 역인덱스 쓰기', e));
+
+  // ⑧ 환자가 counter 증가 (runTransaction의 단일 write 시뮬레이션)
+  await assertSucceeds(
+    demoPatientDb.ref(`hospitals/demo/wait_queue_counters/내과/${today}/current`)
+      .set(5),
+  )
+    .then(() => pass('demo 환자 → counter current 증가 (enqueue)'))
+    .catch((e) => fail('demo 환자 → counter current 증가', e));
+
+  // ⑨ 타 병원 counter 차단
+  await assertFails(
+    demoPatientDb.ref(`hospitals/smch/wait_queue_counters/내과/${today}/current`)
+      .set(1),
+  )
+    .then(() => pass('demo 환자 → smch counter 차단 ★'))
+    .catch((e) => fail('demo 환자 → smch counter 차단', e));
+
+  console.log('\n[FCM tokens tests — P3 C5]');
+
+  const longToken =
+    'fake-fcm-token-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+
+  // ⓐ 본인 FCM 토큰 쓰기 허용
+  await assertSucceeds(
+    demoPatientDb.ref('user_fcm_tokens/user-a/tok1').set({
+      token: longToken,
+      createdAt: Date.now(),
+      userAgent: 'Mozilla/5.0 test',
+    }),
+  )
+    .then(() => pass('demo 환자 → 본인 fcm token 쓰기'))
+    .catch((e) => fail('demo 환자 → 본인 fcm token 쓰기', e));
+
+  // ⓑ 타 uid FCM 토큰 쓰기 차단
+  await assertFails(
+    demoPatientDb.ref('user_fcm_tokens/other-uid/tok1').set({
+      token: longToken,
+      createdAt: Date.now(),
+      userAgent: 'hack',
+    }),
+  )
+    .then(() => pass('demo 환자 → 타 uid fcm token 쓰기 차단 ★'))
+    .catch((e) => fail('demo 환자 → 타 uid fcm token 쓰기 차단', e));
+
+  // ⓒ 짧은 토큰 validate 차단
+  await assertFails(
+    demoPatientDb.ref('user_fcm_tokens/user-a/tok2').set({
+      token: 'short',
+      createdAt: Date.now(),
+      userAgent: 'ua',
+    }),
+  )
+    .then(() => pass('demo 환자 → 짧은 fcm token validate 차단 ★'))
+    .catch((e) => fail('demo 환자 → 짧은 fcm token validate 차단', e));
 
   await env.cleanup();
 

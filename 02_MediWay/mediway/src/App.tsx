@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Header } from '@/components/common/Header';
 import { LandingPage } from '@/pages/LandingPage';
 import { StaffPage } from '@/pages/StaffPage';
+import { StaffQueuePage } from '@/pages/staff/StaffQueuePage';
 import { PatientPage } from '@/pages/PatientPage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { SignupChoicePage } from '@/pages/auth/SignupChoicePage';
@@ -224,6 +225,14 @@ export default function App() {
               element={
                 <ProtectedRoute requireRole={['staff', 'admin']}>
                   <StaffPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="staff/queue"
+              element={
+                <ProtectedRoute requireRole={['staff', 'admin']}>
+                  <StaffQueuePage />
                 </ProtectedRoute>
               }
             />

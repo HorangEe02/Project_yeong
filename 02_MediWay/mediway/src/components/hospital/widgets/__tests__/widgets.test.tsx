@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MAX_WIDGETS, WidgetSlot } from '../WidgetSlot';
 import { TodayScheduleWidget } from '../TodayScheduleWidget';
-import { WaitQueueWidget } from '../WaitQueueWidget';
 import { EmergencyCtaWidget } from '../EmergencyCtaWidget';
+// WaitQueueWidget은 실데이터 훅을 사용하므로 WaitQueueWidget.test.tsx에서 별도 검증.
 
 describe('WidgetSlot', () => {
   beforeEach(() => {
@@ -53,14 +53,6 @@ describe('TodayScheduleWidget', () => {
     render(<TodayScheduleWidget />);
     expect(screen.getByText('오늘 일정')).toBeTruthy();
     expect(screen.getByText(/예정된 진료나 검사가 없습니다/)).toBeTruthy();
-  });
-});
-
-describe('WaitQueueWidget', () => {
-  it('타이틀 + placeholder 메시지', () => {
-    render(<WaitQueueWidget />);
-    expect(screen.getByText('진료 대기')).toBeTruthy();
-    expect(screen.getByText(/대기 순번/)).toBeTruthy();
   });
 });
 

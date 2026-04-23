@@ -12,6 +12,12 @@ admin.initializeApp();
 // P1 Multi-Tenant Custom Claims — refreshMyClaims, setUserClaims export
 export { refreshMyClaims, setUserClaims } from './setClaims';
 
+// P3 대기열 호출 → FCM Push
+export { onQueueCall } from './onQueueCall';
+
+// P3 AI 증상 triage (Claude Haiku) — LLM_API_KEY secret 필요
+export { triageSymptoms } from './triage';
+
 const region = 'asia-northeast3';
 
 /** 카카오 인가 코드 → Firebase Custom Token */

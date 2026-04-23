@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,7 +11,14 @@ import {
   isCancellable,
   subscribeMyAppointmentIndex,
 } from '@/services/appointments';
+import {
+  enqueue,
+  getTodayDateKst,
+  subscribeMyEntries,
+} from '@/services/waitQueue';
+import { isActiveStatus } from '@/types/wait-queue';
 import type { AppointmentIndexEntry } from '@/types/appointment';
+import type { WaitEntryIndex } from '@/types/wait-queue';
 
 const formSchema = z.object({
   department: z
@@ -33,8 +40,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 /**
- * 외래 탭 — 예약 목록 + 신규 폼 + 취소.
- * P2 C4 MVP (실시간 대기 · 결제 · 처방전은 P3).
+ * 외래 탭 — 예약 목록 + 신규 폼 + 취소 + 당일 접수(P3 C3).
  * 안내 탭(PatientPage)과 동일한 max-w 컨테이너 패턴.
  */
 export function AppointmentsTab() {
@@ -46,8 +52,12 @@ export function AppointmentsTab() {
   const [list, setList] = useState<
     Array<AppointmentIndexEntry & { id: string }>
   >([]);
+  const [activeWait, setActiveWait] = useState<
+    Array<WaitEntryIndex & { id: string }>
+  >([]);
   const [showForm, setShowForm] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [busyApptId, setBusyApptId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!hospitalId || !patientUid) {
@@ -63,6 +73,31 @@ export function AppointmentsTab() {
     return () => unsub();
   }, [hospitalId, patientUid]);
 
+  useEffect(() => {
+    if (!hospitalId || !patientUid) {
+      setActiveWait([]);
+      return;
+    }
+    const unsub = subscribeMyEntries(hospitalId, patientUid, (entries) => {
+      setActiveWait(entries.filter((e) => isActiveStatus(e.status)));
+    });
+    return () => unsub();
+  }, [hospitalId, patientUid]);
+
+  const todayKst = useMemo(() => getTodayDateKst(), []);
+
+  const isTodayAppt = (scheduledAt: number) => {
+    const kst = new Date(scheduledAt + 9 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    return kst === todayKst;
+  };
+
+  const alreadyEnqueued = (department: string) =>
+    activeWait.some(
+      (e) => e.department === department && e.date === todayKst,
+    );
+
   const onCancel = async (apptId: string) => {
     if (!hospitalId || !patientUid) return;
     setErr(null);
@@ -70,6 +105,23 @@ export function AppointmentsTab() {
       await cancelAppointment(hospitalId, patientUid, apptId);
     } catch (e) {
       setErr(e instanceof Error ? e.message : String(e));
+    }
+  };
+
+  const onCheckIn = async (appt: AppointmentIndexEntry & { id: string }) => {
+    if (!hospitalId || !patientUid) return;
+    setErr(null);
+    setBusyApptId(appt.id);
+    try {
+      await enqueue(hospitalId, patientUid, {
+        department: appt.department,
+        date: todayKst,
+        appointmentId: appt.id,
+      });
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusyApptId(null);
     }
   };
 
@@ -122,38 +174,61 @@ export function AppointmentsTab() {
             예약된 진료가 없습니다.
           </li>
         ) : (
-          list.map((a) => (
-            <li
-              key={a.id}
-              className="flex items-start justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest p-3"
-            >
-              <div className="flex items-start gap-3">
-                <Calendar
-                  className="mt-1 h-5 w-5 text-primary"
-                  aria-hidden="true"
-                />
-                <div>
-                  <div className="font-medium">{a.department}</div>
-                  <div className="text-sm text-on-surface-variant">
-                    {new Date(a.scheduledAt).toLocaleString('ko-KR')}
-                  </div>
-                  <div className="mt-1 text-xs">
-                    <StatusBadge status={a.status} />
+          list.map((a) => {
+            const canCancel = isCancellable(a.status);
+            const today = isTodayAppt(a.scheduledAt);
+            const enqueued = alreadyEnqueued(a.department);
+            const showCheckIn = canCancel && today;
+            return (
+              <li
+                key={a.id}
+                className="flex items-start justify-between gap-3 rounded-xl border border-outline-variant bg-surface-container-lowest p-3"
+              >
+                <div className="flex items-start gap-3">
+                  <Calendar
+                    className="mt-1 h-5 w-5 text-primary"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <div className="font-medium">{a.department}</div>
+                    <div className="text-sm text-on-surface-variant">
+                      {new Date(a.scheduledAt).toLocaleString('ko-KR')}
+                    </div>
+                    <div className="mt-1 text-xs">
+                      <StatusBadge status={a.status} />
+                    </div>
                   </div>
                 </div>
-              </div>
-              {isCancellable(a.status) && (
-                <button
-                  type="button"
-                  onClick={() => onCancel(a.id)}
-                  aria-label="예약 취소"
-                  className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </li>
-          ))
+                <div className="flex items-center gap-2">
+                  {showCheckIn &&
+                    (enqueued ? (
+                      <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                        접수됨
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onCheckIn(a)}
+                        disabled={busyApptId === a.id}
+                        className="rounded-lg border border-primary px-3 py-1 text-xs font-medium text-primary disabled:opacity-50"
+                      >
+                        {busyApptId === a.id ? '접수 중…' : '접수'}
+                      </button>
+                    ))}
+                  {canCancel && (
+                    <button
+                      type="button"
+                      onClick={() => onCancel(a.id)}
+                      aria-label="예약 취소"
+                      className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </li>
+            );
+          })
         )}
       </ul>
     </main>

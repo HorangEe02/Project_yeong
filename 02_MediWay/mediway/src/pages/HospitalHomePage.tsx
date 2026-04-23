@@ -8,6 +8,7 @@ import { GuideTab } from '@/components/hospital/tabs/GuideTab';
 import { MoreTab } from '@/components/hospital/tabs/MoreTab';
 import { useHospital } from '@/hooks/useHospital';
 import { useTabState } from '@/hooks/useTabState';
+import { useFcmToken } from '@/hooks/useFcmToken';
 import type { TabId } from '@/types/tabs';
 import type { ReactNode } from 'react';
 
@@ -24,6 +25,7 @@ import type { ReactNode } from 'react';
 export function HospitalHomePage() {
   const { hospital } = useHospital();
   const { activeTab, visibleTabs, setTab } = useTabState(hospital?.features);
+  useFcmToken();
 
   return (
     <div className="flex min-h-[calc(100vh-64px)] flex-col">
