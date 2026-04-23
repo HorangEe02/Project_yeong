@@ -17,12 +17,31 @@ import {
   type VisitPlanSource,
 } from '@/types/visit-plan';
 
-/** 계획 조회 (만료 여부와 무관하게 raw 반환) */
+/**
+ * RTDB에서 읽은 plan을 정규화한다.
+ * Firebase RTDB는 array를 저장할 때 sparse·인덱스 비연속이면 object로 반환한다.
+ * 호환을 위해 모든 read 경로에서 waypoints를 array로 강제한다.
+ * (P4 QA에서 /account/visits 빈 화면(useMemo의 draft.map 호출 throw)으로 드러남)
+ */
+function normalizeWaypoints(raw: unknown): PlannedWaypoint[] {
+  if (Array.isArray(raw)) return raw as PlannedWaypoint[];
+  if (raw && typeof raw === 'object') {
+    return Object.values(raw as Record<string, PlannedWaypoint>);
+  }
+  return [];
+}
+
+function normalizePlan(raw: VisitPlan | null): VisitPlan | null {
+  if (!raw) return null;
+  return { ...raw, waypoints: normalizeWaypoints(raw.waypoints) };
+}
+
+/** 계획 조회 (만료 여부와 무관하게 raw 반환, waypoints는 array 정규화) */
 export async function getVisitPlan(uid: string): Promise<VisitPlan | null> {
   if (!isFirebaseConfigured()) return null;
   const snap = await get(ref(db, `visit_plans/${uid}`));
   if (!snap.exists()) return null;
-  return snap.val() as VisitPlan;
+  return normalizePlan(snap.val() as VisitPlan);
 }
 
 /** 계획 설정 — 24h 기본 TTL + 감사 로그(의료진/관리자 주체 시) */
@@ -89,14 +108,25 @@ export async function setAutoSendOptIn(
 export function subscribeVisitPlan(
   uid: string,
   callback: (plan: VisitPlan | null) => void,
+  onError?: (err: Error) => void,
 ): Unsubscribe {
   if (!isFirebaseConfigured()) {
     callback(null);
     return () => {};
   }
-  return onValue(ref(db, `visit_plans/${uid}`), (snap) => {
-    callback(snap.exists() ? (snap.val() as VisitPlan) : null);
-  });
+  return onValue(
+    ref(db, `visit_plans/${uid}`),
+    (snap) => {
+      callback(
+        snap.exists() ? normalizePlan(snap.val() as VisitPlan) : null,
+      );
+    },
+    (err) => {
+      // 권한 거부·네트워크 실패 시 호출. onError 미등록이면 무시되어 loading이
+      // 영구 true가 되던 버그 (P4 QA에서 빈 /account/visits 화면으로 드러남).
+      onError?.(err);
+    },
+  );
 }
 
 /** 만료 여부 — now 기준 expiresAt 지났는지 */

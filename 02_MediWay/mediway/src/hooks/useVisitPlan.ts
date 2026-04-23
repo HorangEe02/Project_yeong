@@ -36,10 +36,20 @@ export function useVisitPlan(uid: string | null | undefined): UseVisitPlan {
       return;
     }
     setLoading(true);
-    const unsub = subscribeVisitPlan(uid, (p) => {
-      setPlan(p);
-      setLoading(false);
-    });
+    setError(null);
+    const unsub = subscribeVisitPlan(
+      uid,
+      (p) => {
+        setPlan(p);
+        setLoading(false);
+      },
+      (err) => {
+        // 권한 거부·네트워크 실패 시 loading을 풀고 에러 표면화
+        console.error('[useVisitPlan] subscribe error', err);
+        setError(err.message || '방문 계획을 불러오지 못했습니다');
+        setLoading(false);
+      },
+    );
     return () => unsub();
   }, [uid]);
 

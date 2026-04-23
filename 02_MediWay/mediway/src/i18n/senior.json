@@ -1,0 +1,44 @@
+{
+  "$schema": "senior-copy-v1",
+  "$description": "고령자 모드 전용 카피 사전. key는 안정적이고 의미 기반; value는 한자어·외래어 최소, 긍정문, 친숙한 표현. 의료 정확성이 필요한 용어(진단·처방·검진 등)는 그대로 유지한다.",
+  "greeting.today": "오늘은",
+  "greeting.wellbeing": "오늘도 건강하세요",
+
+  "tab.home": "홈",
+  "tab.appointments": "병원 예약",
+  "tab.inpatient": "입원 안내",
+  "tab.checkup": "건강 검진",
+  "tab.guide": "길 안내",
+  "tab.more": "설정",
+
+  "widget.schedule.title": "오늘 일정",
+  "widget.schedule.empty": "오늘 예약이 없어요",
+  "widget.wait.title": "진료 대기",
+  "widget.wait.empty": "아직 접수 전이에요",
+  "widget.wait.waiting": "기다리는 중이에요",
+  "widget.wait.called": "진료실로 가세요",
+  "widget.wait.in-progress": "진료 중이에요",
+  "widget.emergency.title": "응급실 바로가기",
+  "widget.emergency.cta": "응급 도움 받기",
+
+  "action.new-appointment": "병원 예약 하기",
+  "action.cancel": "그만두기",
+  "action.confirm": "네 맞아요",
+  "action.back": "뒤로 가기",
+  "action.save": "저장하기",
+  "action.checkin": "접수 하기",
+  "action.call-hospital": "병원에 전화 걸기",
+
+  "status.scheduled": "예약 되어 있어요",
+  "status.cancelled": "취소 되었어요",
+  "status.completed": "끝났어요",
+
+  "empty.no-appointments": "예약된 진료가 없어요",
+  "empty.no-results": "결과가 없어요",
+
+  "prompt.confirm-cancel": "이 예약을 취소할까요?",
+  "prompt.emergency-119": "119에 전화할까요?",
+
+  "error.required": "이 칸을 채워 주세요",
+  "error.network": "연결이 끊긴 것 같아요. 잠시 후 다시 해 주세요."
+}

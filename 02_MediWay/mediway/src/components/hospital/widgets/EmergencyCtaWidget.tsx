@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Phone, Siren } from 'lucide-react';
 
 /**
@@ -48,6 +48,23 @@ export function EmergencyCtaWidget() {
 }
 
 function EmergencyConfirmDialog({ onClose }: { onClose: () => void }) {
+  // P4 C5 polish:
+  //  - Escape 키로 닫기 (키보드 네비 사용자)
+  //  - body scroll lock (모달 뒤 배경 고정)
+  //  - 초기 focus를 "취소" 버튼에 (Enter 실수로 119 발신 방지)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [onClose]);
+
   return (
     <div
       role="dialog"
@@ -87,6 +104,8 @@ function EmergencyConfirmDialog({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
+            // 초기 focus — Enter 실수로 119 발신 방지 (취소가 디폴트)
+            autoFocus
             className="rounded-lg border border-outline-variant px-4 py-3 text-sm"
           >
             취소

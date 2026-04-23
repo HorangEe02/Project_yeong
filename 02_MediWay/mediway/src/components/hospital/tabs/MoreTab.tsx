@@ -93,25 +93,26 @@ export function MoreTab() {
         <p className="mb-3 text-sm text-on-surface-variant">
           글자와 버튼이 커지고, 화면이 더 단순해집니다.
         </p>
-        <label className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <span className="text-sm">활성화</span>
           <button
             type="button"
             role="switch"
             aria-checked={senior.enabled}
+            aria-label="고령자 모드 활성화"
             onClick={onToggleSenior}
-            className={`relative h-6 w-11 rounded-full transition-colors ${
-              senior.enabled ? 'bg-primary' : 'bg-surface-container-high'
+            className={`inline-flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors ${
+              senior.enabled
+                ? 'justify-end bg-primary'
+                : 'justify-start bg-surface-container-high'
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-surface-container-lowest shadow transition-transform ${
-                senior.enabled ? 'translate-x-5' : 'translate-x-0.5'
-              }`}
+              className="block h-5 w-5 rounded-full bg-surface-container-lowest shadow"
               aria-hidden="true"
             />
           </button>
-        </label>
+        </div>
       </section>
 
       {/* 기타 항목 (placeholder) */}

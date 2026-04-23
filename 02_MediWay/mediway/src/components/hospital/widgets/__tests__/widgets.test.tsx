@@ -90,4 +90,28 @@ describe('EmergencyCtaWidget', () => {
     fireEvent.click(screen.getByText('취소'));
     expect(screen.queryByRole('dialog')).toBeNull();
   });
+
+  it('Escape 키로 모달 닫힘 (P4 C5)', () => {
+    render(<EmergencyCtaWidget />);
+    fireEvent.click(screen.getByRole('button', { name: '응급 도움 받기' }));
+    expect(screen.queryByRole('dialog')).toBeTruthy();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('모달 열릴 때 초기 focus는 "취소" — 실수 Enter로 119 발신 방지 (P4 C5)', () => {
+    render(<EmergencyCtaWidget />);
+    fireEvent.click(screen.getByRole('button', { name: '응급 도움 받기' }));
+    const cancelBtn = screen.getByText('취소');
+    expect(document.activeElement).toBe(cancelBtn);
+  });
+
+  it('모달 열릴 때 body scroll lock, 닫으면 복구 (P4 C5)', () => {
+    render(<EmergencyCtaWidget />);
+    const before = document.body.style.overflow;
+    fireEvent.click(screen.getByRole('button', { name: '응급 도움 받기' }));
+    expect(document.body.style.overflow).toBe('hidden');
+    fireEvent.click(screen.getByText('취소'));
+    expect(document.body.style.overflow).toBe(before);
+  });
 });

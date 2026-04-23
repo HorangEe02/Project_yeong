@@ -1,8 +1,12 @@
+/* CSS 사양상 @import는 다른 모든 규칙보다 앞에 와야 한다.
+ * PostCSS는 @tailwind 뒤의 @import를 무시/경고하므로 최상단으로 올린다.
+ * (P2에서 senior.css 도입 시 뒤에 배치된 탓에 빌드 번들에 포함되지 않아
+ *  고령자 모드 토글이 시각적으로만 동작하던 잠복 버그 — P4 QA에서 드러남) */
+@import './styles/senior.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import './styles/senior.css';
 
 @layer base {
   :root {

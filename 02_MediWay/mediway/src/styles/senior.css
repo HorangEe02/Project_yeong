@@ -51,6 +51,15 @@ html.ui-senior button:has(> svg:only-child) {
   min-width: 2.5rem;
 }
 
+/* 토글 스위치는 Tailwind가 이미 고정 크기(h-6 w-11 + absolute thumb)를
+ * 가정하고 있으므로 min-height·padding 강제는 thumb 정렬을 깨뜨린다.
+ * senior 모드에서도 Tailwind 원본 크기를 유지한다. */
+html.ui-senior button[role='switch'],
+html.ui-senior [role='switch'] {
+  min-height: 0;
+  padding: 0;
+}
+
 /* 포커스 링 더 두껍게 — 키보드 사용자 가시성 */
 html.ui-senior *:focus-visible {
   outline: 3px solid currentColor;
@@ -73,4 +82,86 @@ html.ui-senior label {
 html.ui-senior table th,
 html.ui-senior table td {
   padding: 0.75rem 1rem;
+}
+
+/* ---------------------------------------------------------------------
+ * P4 C1 확장 — 가독성·고대비·모션 민감 사용자 대응
+ *
+ * 목표:
+ *   - Tailwind 작은 텍스트(text-xs ~ 0.75rem)가 ui-senior에서도 "작게 느껴지지"
+ *     않도록 1rem 수준으로 승격
+ *   - 경계선·테두리 가시성 강화 (outline-variant 기본 1px → 2px)
+ *   - 포커스 가시성 개선 (ring 두께 확대)
+ *   - prefers-reduced-motion 존중은 senior 모드 여부와 무관하게 전역 적용
+ *   - 리스트·카드 간격을 더 넉넉하게 (손가락·시선 이동 여유)
+ *
+ * 원칙:
+ *   - 고정 px에 의존하는 컴포넌트는 우선 em/rem으로 재작성 후 스타일 변경
+ *     (이 파일은 "클래스 정의"만 담당)
+ *   - Tailwind 토큰 덮어쓰기는 과격한 변경을 유발하므로 최소화
+ *   - 회귀 주의 — senior 모드 OFF 상태 화면은 절대 변경되지 않아야 함
+ * --------------------------------------------------------------------- */
+
+/* text-xs(0.75rem) / text-sm(0.875rem)은 senior 모드에서 가독성 하한선을
+   밑돈다. 각각 0.95rem · 1rem 으로 승격해 본문 기준과 근접시킨다. */
+html.ui-senior .text-xs {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+html.ui-senior .text-sm {
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+/* 테두리·경계선 두께 증가 — outline-variant를 명시적으로 쓰는 카드에 적용 */
+html.ui-senior .border,
+html.ui-senior .border-t,
+html.ui-senior .border-b,
+html.ui-senior .border-l,
+html.ui-senior .border-r {
+  border-width: 2px;
+}
+
+/* 리스트·카드 간격 여유 (space-y-2 → 0.75rem 대신 1rem) */
+html.ui-senior .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 1rem;
+}
+html.ui-senior .gap-2 {
+  gap: 1rem;
+}
+
+/* 라벨과 인풋 사이 여유 — display:block은 Tailwind `flex` label을 깨뜨리므로
+ * margin-bottom만 적용한다. 순수 텍스트 label은 브라우저 기본으로 inline이지만
+ * 폼 컴포넌트는 대부분 Tailwind 클래스로 block/flex를 명시하므로 문제 없음. */
+html.ui-senior label {
+  margin-bottom: 0.25rem;
+}
+
+/* 카드 padding 여유 — p-3 기본 0.75rem은 senior에서 답답 */
+html.ui-senior .p-3 {
+  padding: 1rem;
+}
+html.ui-senior .p-4 {
+  padding: 1.25rem;
+}
+
+/* 응급 CTA처럼 색으로만 구분되는 요소는 더 굵은 테두리로 보강 */
+html.ui-senior [role='alert'],
+html.ui-senior .emergency-cta {
+  border: 2px solid currentColor;
+}
+
+/* ---------------------------------------------------------------------
+ * 전역 prefers-reduced-motion 대응
+ * senior 모드 여부와 무관하게 시스템 설정을 존중한다.
+ * --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

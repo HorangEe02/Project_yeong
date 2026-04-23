@@ -48,6 +48,12 @@ export interface UserPreferences {
   notificationChannels?: NotificationChannel[];
   /** 선호 언어 — P5 i18n */
   language?: SupportedLanguage;
+  /** TTS 음성 안내 — P4 F17 (지도 길찾기 전용, v2 축소 스코프) */
+  tts?: {
+    enabled: boolean;
+    /** 재생 속도 0.5~2.0 (기본 1.0) */
+    rate?: number;
+  };
 }
 
 /**
