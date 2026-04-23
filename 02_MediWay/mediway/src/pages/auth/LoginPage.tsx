@@ -27,7 +27,11 @@ export function LoginPage() {
     if (profile.role === 'staff' || profile.role === 'admin') {
       navigate('/staff', { replace: true });
     } else {
-      navigate('/patient', { replace: true });
+      // P2: tenant-aware 환자 홈. primaryHospitalId 없으면 병원 선택으로.
+      const hid = profile.primaryHospitalId ?? profile.hospitalId;
+      navigate(hid ? `/h/${hid}/patient/home` : '/hospitals/select', {
+        replace: true,
+      });
     }
   };
 

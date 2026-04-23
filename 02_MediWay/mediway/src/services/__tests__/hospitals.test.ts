@@ -73,26 +73,36 @@ describe('isValidSlug', () => {
   });
 });
 
-describe('listHospitals', () => {
+describe('listHospitals (hospital_index)', () => {
   it('빈 상태 → 빈 배열', async () => {
     getMock.mockResolvedValueOnce({ exists: () => false });
     const result = await listHospitals();
     expect(result).toEqual([]);
   });
 
-  it('프로필 있는 병원만 요약으로 반환', async () => {
+  it('index 엔트리를 요약으로 반환', async () => {
     getMock.mockResolvedValueOnce({
       exists: () => true,
       val: () => ({
-        demo: { profile: baseProfile },
-        smch: { profile: { ...baseProfile, slug: 'smch', name: 'SMC' } },
-        empty: {}, // profile 없음 — 제외
+        demo: {
+          slug: 'demo',
+          name: 'Demo',
+          themeColor: '#004e9f',
+          contractStatus: 'active',
+        },
+        smch: {
+          slug: 'smch',
+          name: 'SMC',
+          themeColor: '#009688',
+          contractStatus: 'pilot',
+        },
       }),
     });
     const result = await listHospitals();
     expect(result).toHaveLength(2);
     expect(result[0].id).toBe('demo');
     expect(result[1].slug).toBe('smch');
+    expect(getMock).toHaveBeenCalledWith('hospital_index');
   });
 });
 
@@ -101,9 +111,24 @@ describe('listActiveHospitals', () => {
     getMock.mockResolvedValueOnce({
       exists: () => true,
       val: () => ({
-        a: { profile: { ...baseProfile, contractStatus: 'active' } },
-        b: { profile: { ...baseProfile, contractStatus: 'pilot' } },
-        c: { profile: { ...baseProfile, contractStatus: 'paused' } },
+        a: {
+          slug: 'a',
+          name: 'A',
+          themeColor: '#000',
+          contractStatus: 'active',
+        },
+        b: {
+          slug: 'b',
+          name: 'B',
+          themeColor: '#000',
+          contractStatus: 'pilot',
+        },
+        c: {
+          slug: 'c',
+          name: 'C',
+          themeColor: '#000',
+          contractStatus: 'paused',
+        },
       }),
     });
     const result = await listActiveHospitals();
@@ -155,26 +180,28 @@ describe('subscribeHospitalProfile', () => {
 });
 
 describe('createHospital', () => {
-  it('유효한 slug로 신규 생성', async () => {
+  it('유효한 slug로 신규 생성 — profile + index fan-out', async () => {
     getMock.mockResolvedValueOnce({ exists: () => false });
-    setMock.mockResolvedValueOnce(undefined);
+    updateMock.mockResolvedValueOnce(undefined);
     const result = await createHospital({ slug: 'new-h', name: 'New' });
     expect(result.slug).toBe('new-h');
     expect(result.contractStatus).toBe('pilot');
     expect(result.features).toEqual(DEFAULT_HOSPITAL_FEATURES);
-    expect(setMock).toHaveBeenCalledWith(
-      'hospitals/new-h/profile',
-      expect.objectContaining({ slug: 'new-h', name: 'New' }),
-    );
+    const [, fan] = updateMock.mock.calls[0] as [unknown, Record<string, unknown>];
+    expect(fan).toHaveProperty('hospitals/new-h/profile');
+    expect(fan).toHaveProperty('hospital_index/new-h');
   });
 
   it('slug 정규화 (공백·대문자 제거)', async () => {
     getMock.mockResolvedValueOnce({ exists: () => false });
-    setMock.mockResolvedValueOnce(undefined);
+    updateMock.mockResolvedValueOnce(undefined);
     await createHospital({ slug: '  DEMO2  ', name: 'D2' });
-    expect(setMock).toHaveBeenCalledWith(
-      'hospitals/demo2/profile',
-      expect.any(Object),
+    const [, fan] = updateMock.mock.calls[0] as [unknown, Record<string, unknown>];
+    expect(Object.keys(fan)).toEqual(
+      expect.arrayContaining([
+        'hospitals/demo2/profile',
+        'hospital_index/demo2',
+      ]),
     );
   });
 
@@ -193,20 +220,21 @@ describe('createHospital', () => {
 });
 
 describe('updateHospitalProfile / setHospitalContractStatus', () => {
-  it('updatedAt 자동 갱신', async () => {
+  it('updatedAt 자동 갱신 + index name 동기화', async () => {
     updateMock.mockResolvedValueOnce(undefined);
     const before = Date.now();
     await updateHospitalProfile('demo', { name: 'Renamed' });
-    const callArg = updateMock.mock.calls[0]![1] as { updatedAt: number };
-    expect(callArg.updatedAt).toBeGreaterThanOrEqual(before);
+    const [, fan] = updateMock.mock.calls[0] as [unknown, Record<string, unknown>];
+    expect(fan['hospitals/demo/profile/updatedAt']).toBeGreaterThanOrEqual(before);
+    expect(fan['hospitals/demo/profile/name']).toBe('Renamed');
+    expect(fan['hospital_index/demo/name']).toBe('Renamed');
   });
 
-  it('setHospitalContractStatus도 업데이트 경유', async () => {
+  it('setHospitalContractStatus도 main + index 동기 업데이트', async () => {
     updateMock.mockResolvedValueOnce(undefined);
     await setHospitalContractStatus('demo', 'paused');
-    expect(updateMock).toHaveBeenCalledWith(
-      'hospitals/demo/profile',
-      expect.objectContaining({ contractStatus: 'paused' }),
-    );
+    const [, fan] = updateMock.mock.calls[0] as [unknown, Record<string, unknown>];
+    expect(fan['hospitals/demo/profile/contractStatus']).toBe('paused');
+    expect(fan['hospital_index/demo/contractStatus']).toBe('paused');
   });
 });

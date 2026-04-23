@@ -25,7 +25,8 @@ export function PatientSignupPage() {
         password: form.password,
         displayName: form.name,
       });
-      navigate('/patient', { replace: true });
+      // 신규 가입자는 아직 primaryHospitalId가 없으므로 병원 선택으로 보냄
+      navigate('/hospitals/select', { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {

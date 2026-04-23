@@ -39,7 +39,10 @@ export function SocialCallbackPage() {
         if (profile.role === 'staff' || profile.role === 'admin') {
           navigate('/staff', { replace: true });
         } else {
-          navigate('/patient', { replace: true });
+          const hid = profile.primaryHospitalId ?? profile.hospitalId;
+          navigate(hid ? `/h/${hid}/patient/home` : '/hospitals/select', {
+            replace: true,
+          });
         }
       } catch (err) {
         setStatus({

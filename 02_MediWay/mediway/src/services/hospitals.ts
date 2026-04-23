@@ -1,4 +1,4 @@
-import { ref, get, set, update, onValue, type Unsubscribe } from 'firebase/database';
+import { ref, get, update, onValue, type Unsubscribe } from 'firebase/database';
 import { db, isFirebaseConfigured } from '@/config/firebase';
 import {
   DEFAULT_HOSPITAL_FEATURES,
@@ -30,15 +30,36 @@ export function isValidSlug(slug: string): boolean {
 // 조회
 // ============================================================================
 
-/** 모든 병원의 요약 목록 (병원 선택 UI · 플랫폼 관리자용) */
+/**
+ * 모든 병원의 요약 목록 (병원 선택 UI · 플랫폼 관리자용).
+ *
+ * 구현: `/hospital_index/` 공개 denormalization 읽기.
+ * `/hospitals/` 루트는 rules cascade 때문에 공개할 수 없어서
+ * 별도 인덱스 테이블을 유지함 (`createHospital`, `updateHospitalProfile`이
+ * 쓰기 시점에 동기화).
+ */
 export async function listHospitals(): Promise<HospitalSummary[]> {
   if (!isFirebaseConfigured()) return [];
-  const snapshot = await get(ref(db, 'hospitals'));
+  const snapshot = await get(ref(db, 'hospital_index'));
   if (!snapshot.exists()) return [];
-  const all = snapshot.val() as Record<string, HospitalRecord>;
-  return Object.entries(all)
-    .filter(([, record]) => record?.profile)
-    .map(([id, record]) => toSummary(id, record.profile));
+  const entries = snapshot.val() as Record<
+    string,
+    {
+      slug: string;
+      name: string;
+      themeColor: string;
+      contractStatus: HospitalSummary['contractStatus'];
+      logoUrl?: string;
+    }
+  >;
+  return Object.entries(entries).map(([id, e]) => ({
+    id,
+    slug: e.slug,
+    name: e.name,
+    themeColor: e.themeColor,
+    contractStatus: e.contractStatus,
+    ...(e.logoUrl ? { logoUrl: e.logoUrl } : {}),
+  }));
 }
 
 /** 활성(active)·파일럿(pilot) 병원만 — 환자 가입 시 선택 가능 목록 */
@@ -145,11 +166,15 @@ export async function createHospital(
     ...(input.location ? { location: input.location } : {}),
   };
 
-  await set(ref(db, `hospitals/${slug}/profile`), profile);
+  // fan-out: 전체 프로필 + 공개 인덱스
+  await update(ref(db), {
+    [`hospitals/${slug}/profile`]: profile,
+    [`hospital_index/${slug}`]: buildIndexEntry(slug, profile),
+  });
   return profile;
 }
 
-/** 병원 프로필 부분 업데이트 */
+/** 병원 프로필 부분 업데이트 — index에 반영되는 필드는 자동 동기화 */
 export async function updateHospitalProfile(
   id: string,
   patch: Partial<
@@ -159,11 +184,24 @@ export async function updateHospitalProfile(
   if (!isFirebaseConfigured()) {
     throw new Error('Firebase 미설정');
   }
-  const updates: Record<string, unknown> = {
-    ...patch,
-    updatedAt: Date.now(),
-  };
-  await update(ref(db, `hospitals/${id}/profile`), updates);
+  const now = Date.now();
+  const profileUpdates: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(patch)) {
+    profileUpdates[`hospitals/${id}/profile/${k}`] = v;
+  }
+  profileUpdates[`hospitals/${id}/profile/updatedAt`] = now;
+
+  // index에도 반영되는 필드
+  if (patch.name !== undefined)
+    profileUpdates[`hospital_index/${id}/name`] = patch.name;
+  if (patch.themeColor !== undefined)
+    profileUpdates[`hospital_index/${id}/themeColor`] = patch.themeColor;
+  if (patch.logoUrl !== undefined)
+    profileUpdates[`hospital_index/${id}/logoUrl`] = patch.logoUrl;
+  if (patch.contractStatus !== undefined)
+    profileUpdates[`hospital_index/${id}/contractStatus`] = patch.contractStatus;
+
+  await update(ref(db), profileUpdates);
 }
 
 /** 병원 계약 상태만 변경 (활성/파일럿/일시정지) */
@@ -178,11 +216,11 @@ export async function setHospitalContractStatus(
 // 내부 헬퍼
 // ============================================================================
 
-function toSummary(id: string, profile: HospitalProfile): HospitalSummary {
+/** `/hospital_index/{id}` 엔트리 모양 생성 */
+function buildIndexEntry(id: string, profile: HospitalProfile) {
   return {
-    id,
+    slug: id,
     name: profile.name,
-    slug: profile.slug,
     themeColor: profile.themeColor,
     contractStatus: profile.contractStatus,
     ...(profile.logoUrl ? { logoUrl: profile.logoUrl } : {}),

@@ -36,6 +36,17 @@
       }
     },
 
+    "hospital_index": {
+      ".read": "auth != null",
+      "$hospitalId": {
+        ".write": "auth != null && auth.token.role === 'platformAdmin'",
+        "slug": { ".validate": "newData.isString() && newData.val() === $hospitalId" },
+        "name": { ".validate": "newData.isString()" },
+        "themeColor": { ".validate": "newData.isString()" },
+        "contractStatus": { ".validate": "newData.val() === 'active' || newData.val() === 'pilot' || newData.val() === 'paused'" }
+      }
+    },
+
     "hospitals": {
       "$hospitalId": {
         "profile": {
