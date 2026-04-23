@@ -78,10 +78,13 @@ function defaultDeps(): QueueCallDeps {
  * 트리거: `/hospitals/{hospitalId}/wait_queue/{department}/{date}/{entryId}` 업데이트.
  * 실제 FCM 발송은 dispatchCallNotification으로 위임.
  */
+// RTDB onValueUpdated 트리거는 asia-northeast3에서 미지원.
+// `mediway-demo-default-rtdb.firebaseio.com` 인스턴스는 us-central1에 위치하므로
+// Cloud Function 리전도 us-central1로 맞춘다.
 export const onQueueCall = onValueUpdated(
   {
     ref: '/hospitals/{hospitalId}/wait_queue/{department}/{date}/{entryId}',
-    region: 'asia-northeast3',
+    region: 'us-central1',
   },
   async (event) => {
     const result = await dispatchCallNotification(
