@@ -56,7 +56,7 @@ export function SelectHospitalPage() {
     hospitals &&
     hospitals.some((h) => h.slug === bootstrapSlug)
   ) {
-    return <Navigate to={`/h/${bootstrapSlug}/patient`} replace />;
+    return <Navigate to={`/h/${bootstrapSlug}/patient/home`} replace />;
   }
 
   return (
@@ -106,7 +106,7 @@ export function SelectHospitalPage() {
           {filtered.map((h) => (
             <li key={h.id}>
               <Link
-                to={`/h/${h.slug}/patient`}
+                to={`/h/${h.slug}/patient/home`}
                 className="flex items-center gap-4 p-4 rounded-xl bg-surface-container-lowest border border-outline-variant hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary transition"
               >
                 <HospitalLogo logoUrl={h.logoUrl} name={h.name} />

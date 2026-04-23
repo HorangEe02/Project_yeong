@@ -32,7 +32,7 @@ function renderAt(url: string) {
       <Routes>
         <Route path="/hospitals/select" element={<SelectHospitalPage />} />
         <Route
-          path="/h/:slug/patient"
+          path="/h/:slug/patient/home"
           element={<div>REDIRECTED patient</div>}
         />
       </Routes>

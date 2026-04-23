@@ -113,7 +113,7 @@ export function AdminHospitalsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <Link
-                      to={`/h/${h.slug}/patient`}
+                      to={`/h/${h.slug}/patient/home`}
                       className="text-primary underline"
                     >
                       앱 열기 ↗

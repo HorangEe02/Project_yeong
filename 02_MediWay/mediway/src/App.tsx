@@ -209,8 +209,15 @@ export default function App() {
           <Route path="/h/:slug" element={<HospitalRouteWrapper />}>
             {/* P2 신규 대시보드 홈 (6탭 셸) */}
             <Route path="patient/home" element={<HospitalHomePage />} />
-            {/* 레거시 /h/:slug/patient — P2 C6까지 유지, 이후 HospitalHomePage로 흡수 */}
-            <Route path="patient" element={<PatientPage />} />
+            {/*
+              P2 이후: /h/:slug/patient 접근은 대시보드 홈으로 자동 리다이렉트.
+              PatientPage는 GuideTab 내부에 흡수되었으므로 동일 UX 유지.
+              sessionId가 있는 deep link는 레거시 PatientPage로 유지 (QR 세션 복원).
+            */}
+            <Route
+              path="patient"
+              element={<Navigate to="home" replace />}
+            />
             <Route path="patient/:sessionId" element={<PatientPage />} />
             <Route
               path="staff"
