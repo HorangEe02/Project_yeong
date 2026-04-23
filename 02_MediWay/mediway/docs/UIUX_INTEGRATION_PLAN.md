@@ -356,7 +356,83 @@ WaitQueueWidget에 `variant='prominent'` 추가 → 딥블루 배경 + 숫자 �
 
 ---
 
-## 13. 참조
+## 13. 결정 사항 (2026-04-23 사용자 확정)
+
+§12의 4가지 결정 포인트에 대해 권장안을 그대로 채택.
+
+| # | 결정 | 이행 |
+|---|---|---|
+| ① | **primary 색 `#0B4EBA` 채택** | tailwind.config 기본값 변경 + RTDB `hospitals/demo/profile/themeColor` 동기화 |
+| ② | **"가족 연락" 대체 타일 (placeholder)** | P4.U U1에서 disabled "곧 공개" 라벨, P4 가족 대리(C6-C10) merge 후 활성화 |
+| ③ | **P4.U 즉시 착수** | P4 PR #4 merge 직후 `mediway/plusultra/p4.u` 분기 |
+| ④ | **핵심 시안 5개 추가 분석** | §14 결과 (clinical 1건 read 실패, 보류) |
+
+---
+
+## 14. 추가 분석된 시안 (2026-04-23)
+
+§10 후속 검토 항목 중 5개를 분석. 결과를 P4.U 작업 단위(U7~U12)로 반영.
+
+### 14.1 web `mediway_staff_v2_1` — 의료진 동선 전송 콘솔 ("Patient Flow")
+- 좌측 환자 식별(QR 카메라 + 수동 토큰), 우측 동선 템플릿 + 커스텀 경로 빌더 + "환자 기기로 동선 전송하기" primary CTA
+- 하단 식별된 환자 카드(이름·생년월일)
+- **현재 매핑**: `StaffPage` + `StaffDashboard`
+- **U8 재정의**: P3 C4 `StaffQueuePage`와 결합 — 환자 식별 후 동선 + 호출 통합 콘솔
+
+### 14.2 web `mediway_staff_v2_2` — 의료진 종합 대시보드
+- 상단 KPI 3카드(PENDING/IN PROGRESS/COMPLETED) + 오늘 방문자 카드
+- 좌측 실시간 환자 대기·동선 테이블 + 진행률 bar
+- 우측 시스템 로그(검사 결과 자동 연동·예약 알림·로그인·보안 업데이트)
+- **현재 매핑**: 신규 `StaffOverviewPage` (또는 `/h/:slug/staff` 진입점 재구성)
+- **U12 신규 제안**: 의료진 메인 진입을 **Overview → Patient Flow → Queue** 3단계로 재배열
+
+### 14.3 mobile `mediway_qr` — 환자 QR 디스플레이
+- 환자 정보 카드 + 큰 QR 코드 + "이 QR 코드를 간호사에게 보여주세요"
+- 보안 안내(3분 갱신·밝기 권장) + "진료실 위치 확인하기" CTA
+- 하단 탭(홈·가이드·편의시설·내 건강)
+- **현재 매핑**: `PatientPage` QR 디스플레이 부분
+- **U9 신규**: QR 화면을 **풀스크린 모달 또는 별도 라우트**로 분리 + 보안 안내 표준화
+
+### 14.4 mobile `mediway_4` — 모바일 편의시설/길안내
+- 검색 바 + 카테고리 4 chip(CAFE·ATM·DINING·PHARMACY)
+- Parking Location 카드(Level 02 Zone B-14 + Get Directions CTA)
+- Current Location + 지도 + Nearby Services 리스트
+- 하단 탭(HOME·PULSE·GUIDE·FACILITY)
+- **현재 매핑**: `GuideTab` 모바일 변형 + P3 C12 주차 어댑터 시각화
+- **U10 신규**: GuideTab에 **카테고리 chip 필터** + **주차 위치 카드**(P3 parking adapter 호출 결과 표시)
+
+### 14.5 web `mediway_select` — 표준 환자 홈 변형 (Proxy Payment 포함)
+- 폴더명은 select지만 실제 내용은 **표준 환자 데스크톱 홈의 또 다른 변형**
+- "Good morning, {name}" + Today's Schedule + 안내문 + Quick Actions 4(Find a Doctor·Book Appt·Timetable·Parking Info)
+- **Proxy Payment 강조 카드**(파란 배경) "Pay bills for a family member"
+- **U11 신규**: Proxy Payment 카드는 P3 Track 2 C9(대리결제) + P4 가족 대리(MOAT) 결합 영역으로 placeholder 구현 후 두 PR merge 시점에 활성화
+
+### 14.6 미확인 잔여
+- `web_page_uiux/mediway_clinical/screen.png` — 파일 read 반복 실패(네이밍 또는 권한 이슈). P4.U 착수 시 macOS Finder 등으로 직접 검토 후 추가 반영.
+
+---
+
+## 15. 색 마이그레이션 작업 노트 (결정 ① 이행)
+
+### 15.1 변경 대상
+- `tailwind.config.js`의 `theme.extend.colors.primary`
+- `src/index.css`의 `:root { --color-primary: ... }` 기본값
+- RTDB `/hospital_index/demo/themeColor`(있다면) + `/hospitals/demo/profile/themeColor`
+
+### 15.2 단계
+1. `tailwind.config.js` `primary: "#004e9f"` → `"#0B4EBA"`
+2. `index.css`의 `--color-primary` 기본값 동시 변경
+3. `firebase database:set` 또는 Console로 demo 병원 themeColor 업데이트
+4. 빌드 후 시각 회귀 스크린샷(홈·외래·응급 CTA 등 primary 사용처 5곳)
+5. 화이트라벨 다른 병원(smch)은 `themeColor` 그대로 유지 — 검증 필요
+
+### 15.3 리스크
+- primary와 함께 파생색(`primary-container`, `primary-light`)도 톤 매칭 필요. 현재 0066/3b82 패턴에서 한 톤 다 어둡게 조정.
+- 화이트라벨 시스템이 `applyHospitalTheme()`으로 dynamic override하므로 default 변경은 첫 paint와 데모 환경에만 영향.
+
+---
+
+## 16. 참조
 
 - 시안 경로: `/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/05_mediway/uiux/`
 - 현재 코드: `mediway/plusultra/p4 @ 50e35d6`
