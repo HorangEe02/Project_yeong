@@ -1,6 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { Calendar, MapPin, Ticket, Siren } from 'lucide-react';
-import type { ComponentType } from 'react';
+import { Calendar, MapPin, Ticket, Siren, type LucideIcon } from 'lucide-react';
 
 /**
  * 홈 하단 Quick Actions — 시안 PlusUltra SaaS 1의 하단 4개 원형 아이콘 행.
@@ -12,7 +11,7 @@ import type { ComponentType } from 'react';
  */
 interface Action {
   id: 'appointments' | 'guide' | 'home' | 'emergency';
-  icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+  icon: LucideIcon;
   label: string;
   tab: 'appointments' | 'guide' | 'home';
   tone?: 'default' | 'error';
