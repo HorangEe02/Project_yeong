@@ -1,0 +1,76 @@
+/*
+ * 고령자 모드 — P2 기본 스케일 (C10 확장).
+ *
+ * v2 §Phase 2는 토글 인프라만 제공. P4에서 전용 레이아웃(단어 치환·
+ * 위젯 단순화·홈 위젯 수 추가 축소)까지 확장될 예정이며 이 파일이
+ * 그 확장의 기반이 된다.
+ *
+ * 전략:
+ *   1. root font-size 22px (+37%) — em/rem 자동 스케일
+ *   2. 버튼·입력·탭 최소 터치 타겟 48px (WCAG 2.5.5 enhanced)
+ *   3. 행간·줄간 여유 (가독성)
+ *   4. 애니메이션 사실상 중단 (prefers-reduced-motion 의도)
+ *   5. 포커스 링 굵게 — 키보드 네비 가시성
+ *
+ * 주의: .ui-senior 범위에서 고정 px에 의존하는 컴포넌트는 스케일 X.
+ *   스크린샷 회귀는 P4에서 본격 검증.
+ */
+
+html.ui-senior {
+  font-size: 22px;
+  line-height: 1.6;
+}
+
+/* 애니메이션 최소화 */
+html.ui-senior *,
+html.ui-senior *::before,
+html.ui-senior *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* 상호작용 요소 최소 크기 — WCAG 2.5.5 Target Size (Enhanced) 44x44
+   + 엄지손가락 편의 48x48 */
+html.ui-senior button,
+html.ui-senior a[role='button'],
+html.ui-senior [role='tab'],
+html.ui-senior [role='switch'],
+html.ui-senior input:not([type='checkbox']):not([type='radio']):not([type='color']),
+html.ui-senior select,
+html.ui-senior textarea {
+  min-height: 2.5rem; /* 22 * 2.5 ≈ 55px */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* 아이콘 버튼 — width도 확보 */
+html.ui-senior button[aria-label*='취소'],
+html.ui-senior button:has(> svg:only-child) {
+  min-width: 2.5rem;
+}
+
+/* 포커스 링 더 두껍게 — 키보드 사용자 가시성 */
+html.ui-senior *:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* 링크 밑줄 고정 — 고령자는 색만으로 구분 어려움 */
+html.ui-senior a:not([role='button']) {
+  text-decoration: underline;
+}
+
+/* 글자 간격 약간 여유 */
+html.ui-senior p,
+html.ui-senior li,
+html.ui-senior label {
+  letter-spacing: 0.01em;
+}
+
+/* 테이블 cell padding 확대 (관리자 콘솔 병원 목록 등) */
+html.ui-senior table th,
+html.ui-senior table td {
+  padding: 0.75rem 1rem;
+}

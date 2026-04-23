@@ -28,6 +28,7 @@ import { ForbiddenPage } from '@/pages/ForbiddenPage';
 import { SharedPlanPage } from '@/pages/share/SharedPlanPage';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { HospitalRouteWrapper } from '@/components/hospital/HospitalRouteWrapper';
+import { HospitalHomePage } from '@/pages/HospitalHomePage';
 import { SelectHospitalPage } from '@/pages/SelectHospitalPage';
 import { initAnonymousAuth } from '@/services/auth';
 import { isFirebaseConfigured } from '@/config/firebase';
@@ -206,6 +207,9 @@ export default function App() {
             - P2+에서 각 페이지가 useHospital()로 병원별 동작 전환
           */}
           <Route path="/h/:slug" element={<HospitalRouteWrapper />}>
+            {/* P2 신규 대시보드 홈 (6탭 셸) */}
+            <Route path="patient/home" element={<HospitalHomePage />} />
+            {/* 레거시 /h/:slug/patient — P2 C6까지 유지, 이후 HospitalHomePage로 흡수 */}
             <Route path="patient" element={<PatientPage />} />
             <Route path="patient/:sessionId" element={<PatientPage />} />
             <Route

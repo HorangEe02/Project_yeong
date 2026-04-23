@@ -61,6 +61,29 @@
             ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && (auth.token.role === 'admin' || auth.token.role === 'staff')))"
           }
         },
+        "appointments": {
+          ".indexOn": ["scheduledAt", "patientUid"],
+          "$apptId": {
+            ".read": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && (data.child('patientUid').val() === auth.uid || auth.token.role === 'staff' || auth.token.role === 'admin')))",
+            ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && ((newData.child('patientUid').val() === auth.uid && (!data.exists() || data.child('patientUid').val() === auth.uid)) || auth.token.role === 'staff' || auth.token.role === 'admin')))",
+            "hospitalId": { ".validate": "newData.val() === $hospitalId" },
+            "patientUid": { ".validate": "newData.isString()" },
+            "department": { ".validate": "newData.isString() && newData.val().length > 0" },
+            "scheduledAt": { ".validate": "newData.isNumber() && newData.val() > now - 86400000" },
+            "durationMin": { ".validate": "newData.isNumber() && newData.val() > 0 && newData.val() <= 480" },
+            "status": { ".validate": "newData.val() === 'scheduled' || newData.val() === 'cancelled' || newData.val() === 'completed'" }
+          }
+        },
+        "appointments_by_patient": {
+          "$uid": {
+            ".read": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && ($uid === auth.uid || auth.token.role === 'staff' || auth.token.role === 'admin')))",
+            ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && ($uid === auth.uid || auth.token.role === 'staff' || auth.token.role === 'admin')))",
+            "$apptId": {
+              "scheduledAt": { ".validate": "newData.isNumber()" },
+              "status": { ".validate": "newData.val() === 'scheduled' || newData.val() === 'cancelled' || newData.val() === 'completed'" }
+            }
+          }
+        },
         "visit_plans": {
           "$uid": {
             ".read": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && ($uid === auth.uid || auth.token.role === 'staff' || auth.token.role === 'admin')))",

@@ -209,6 +209,101 @@ async function run() {
     .then(() => pass('demo 환자 → demo visit_plans/other-uid 쓰기 차단 ★'))
     .catch((e) => fail('demo 환자 → demo visit_plans/other-uid 쓰기 차단', e));
 
+  console.log('\n[Appointments tests]');
+
+  const future = Date.now() + 86_400_000;
+
+  // 환자가 자기 병원 예약 생성
+  await assertSucceeds(
+    demoPatient.database().ref('hospitals/demo/appointments/appt-1').set({
+      id: 'appt-1',
+      hospitalId: 'demo',
+      patientUid: 'user-a',
+      department: '내과',
+      scheduledAt: future,
+      durationMin: 30,
+      status: 'scheduled',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }),
+  )
+    .then(() => pass('demo 환자 → demo appointments 본인 예약 생성'))
+    .catch((e) => fail('demo 환자 → demo appointments 본인 예약 생성', e));
+
+  // 환자가 타 병원 예약 생성 차단 (hospitalId 불일치)
+  await assertFails(
+    demoPatient.database().ref('hospitals/smch/appointments/appt-x').set({
+      id: 'appt-x',
+      hospitalId: 'smch',
+      patientUid: 'user-a',
+      department: '내과',
+      scheduledAt: future,
+      durationMin: 30,
+      status: 'scheduled',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }),
+  )
+    .then(() => pass('demo 환자 → smch appointments 생성 차단 ★'))
+    .catch((e) => fail('demo 환자 → smch appointments 생성 차단', e));
+
+  // 환자가 본인 예약 읽기
+  await assertSucceeds(
+    demoPatient.database().ref('hospitals/demo/appointments/appt-1').get(),
+  )
+    .then(() => pass('demo 환자 → 본인 appointments 읽기'))
+    .catch((e) => fail('demo 환자 → 본인 appointments 읽기', e));
+
+  // 같은 병원 staff이 해당 환자 예약 읽기
+  await assertSucceeds(
+    demoStaff.database().ref('hospitals/demo/appointments/appt-1').get(),
+  )
+    .then(() => pass('demo staff → demo appointments 읽기'))
+    .catch((e) => fail('demo staff → demo appointments 읽기', e));
+
+  // 환자가 역인덱스 본인 엔트리 쓰기
+  await assertSucceeds(
+    demoPatient
+      .database()
+      .ref('hospitals/demo/appointments_by_patient/user-a/appt-1')
+      .set({
+        scheduledAt: future,
+        status: 'scheduled',
+      }),
+  )
+    .then(() => pass('demo 환자 → 역인덱스 본인 엔트리 쓰기'))
+    .catch((e) => fail('demo 환자 → 역인덱스 본인 엔트리 쓰기', e));
+
+  // 환자가 다른 환자 역인덱스 쓰기 차단
+  await assertFails(
+    demoPatient
+      .database()
+      .ref('hospitals/demo/appointments_by_patient/other-uid/appt-z')
+      .set({
+        scheduledAt: future,
+        status: 'scheduled',
+      }),
+  )
+    .then(() => pass('demo 환자 → 다른 환자 역인덱스 차단 ★'))
+    .catch((e) => fail('demo 환자 → 다른 환자 역인덱스 차단', e));
+
+  // 과거 시각 scheduledAt 차단
+  await assertFails(
+    demoPatient.database().ref('hospitals/demo/appointments/appt-past').set({
+      id: 'appt-past',
+      hospitalId: 'demo',
+      patientUid: 'user-a',
+      department: '내과',
+      scheduledAt: Date.now() - 2 * 86_400_000,
+      durationMin: 30,
+      status: 'scheduled',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }),
+  )
+    .then(() => pass('demo 환자 → 과거 시각 예약 validate 차단 ★'))
+    .catch((e) => fail('demo 환자 → 과거 시각 예약 validate 차단', e));
+
   await env.cleanup();
 
   const passed = results.filter((r) => r.ok).length;
