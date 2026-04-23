@@ -53,35 +53,37 @@ export function HospitalTabs({ tabs, activeTab, onChange }: HospitalTabsProps) {
   };
 
   return (
-    <div
-      ref={tablistRef}
-      role="tablist"
-      aria-label="병원 대시보드 탭"
-      onKeyDown={onKeyDown}
-      className="flex gap-1 overflow-x-auto border-b border-outline-variant bg-surface-container-lowest px-2"
-    >
-      {tabs.map((t) => {
-        const active = t.id === activeTab;
-        return (
-          <button
-            key={t.id}
-            type="button"
-            role="tab"
-            aria-selected={active}
-            aria-controls={`tabpanel-${t.id}`}
-            id={`tab-${t.id}`}
-            tabIndex={active ? 0 : -1}
-            onClick={() => onChange(t.id)}
-            className={`shrink-0 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-              active
-                ? 'border-primary text-primary'
-                : 'border-transparent text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            {t.label}
-          </button>
-        );
-      })}
+    <div className="mx-auto max-w-2xl px-4 py-3 lg:max-w-5xl">
+      <div
+        ref={tablistRef}
+        role="tablist"
+        aria-label="병원 대시보드 탭"
+        onKeyDown={onKeyDown}
+        className="mx-auto inline-flex max-w-full gap-1 overflow-x-auto rounded-xl bg-surface-container-high p-1 lg:flex lg:justify-center"
+      >
+        {tabs.map((t) => {
+          const active = t.id === activeTab;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              aria-controls={`tabpanel-${t.id}`}
+              id={`tab-${t.id}`}
+              tabIndex={active ? 0 : -1}
+              onClick={() => onChange(t.id)}
+              className={`shrink-0 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                active
+                  ? 'bg-surface-container-lowest text-primary shadow-ambient'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
