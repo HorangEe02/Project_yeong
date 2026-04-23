@@ -46,7 +46,7 @@ export function MoreTab() {
   };
 
   return (
-    <div className="p-4">
+    <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
       <h2 className="sr-only">더보기</h2>
 
       {/* 계정 정보 요약 */}
@@ -144,7 +144,7 @@ export function MoreTab() {
         <LogOut className="h-4 w-4" aria-hidden="true" />
         로그아웃
       </button>
-    </div>
+    </main>
   );
 }
 

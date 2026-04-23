@@ -12,14 +12,16 @@ export function InpatientTab() {
 
   if (!hospital?.features?.inpatient) {
     return (
-      <div className="p-6 text-center text-on-surface-variant">
-        이 병원은 입원 기능을 아직 활성화하지 않았습니다.
-      </div>
+      <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
+        <div className="p-6 text-center text-on-surface-variant">
+          이 병원은 입원 기능을 아직 활성화하지 않았습니다.
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="p-4">
+    <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
       <h2 className="sr-only">입원</h2>
       <div className="mb-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-4">
         <header className="mb-2 flex items-center gap-2">
@@ -53,7 +55,7 @@ export function InpatientTab() {
           />
         </ul>
       </section>
-    </div>
+    </main>
   );
 }
 

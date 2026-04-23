@@ -19,7 +19,7 @@ export function WidgetSlot({ children }: { children: ReactNode }) {
   }
   return (
     <div
-      className="flex flex-col gap-3 p-4"
+      className="flex flex-col gap-3"
       role="list"
       aria-label="홈 위젯 목록"
     >

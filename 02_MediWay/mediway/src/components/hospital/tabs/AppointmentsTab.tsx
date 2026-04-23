@@ -35,6 +35,7 @@ type FormValues = z.infer<typeof formSchema>;
 /**
  * 외래 탭 — 예약 목록 + 신규 폼 + 취소.
  * P2 C4 MVP (실시간 대기 · 결제 · 처방전은 P3).
+ * 안내 탭(PatientPage)과 동일한 max-w 컨테이너 패턴.
  */
 export function AppointmentsTab() {
   const { slug, hospital } = useHospital();
@@ -74,14 +75,16 @@ export function AppointmentsTab() {
 
   if (!hospital?.features?.appointments) {
     return (
-      <div className="p-6 text-center text-on-surface-variant">
-        이 병원은 외래 예약 기능을 아직 활성화하지 않았습니다.
-      </div>
+      <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
+        <div className="p-6 text-center text-on-surface-variant">
+          이 병원은 외래 예약 기능을 아직 활성화하지 않았습니다.
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="p-4">
+    <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
       <h2 className="sr-only">외래</h2>
 
       <div className="mb-4 flex items-center justify-between">
@@ -153,7 +156,7 @@ export function AppointmentsTab() {
           ))
         )}
       </ul>
-    </div>
+    </main>
   );
 }
 

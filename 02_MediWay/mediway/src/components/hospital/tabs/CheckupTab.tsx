@@ -12,14 +12,16 @@ export function CheckupTab() {
 
   if (!hospital?.features?.checkup) {
     return (
-      <div className="p-6 text-center text-on-surface-variant">
-        이 병원은 건강검진 기능을 아직 활성화하지 않았습니다.
-      </div>
+      <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
+        <div className="p-6 text-center text-on-surface-variant">
+          이 병원은 건강검진 기능을 아직 활성화하지 않았습니다.
+        </div>
+      </main>
     );
   }
 
   return (
-    <div className="p-4">
+    <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
       <h2 className="sr-only">건강검진</h2>
 
       <div className="mb-4 rounded-xl border border-outline-variant bg-surface-container-lowest p-4">
@@ -54,7 +56,7 @@ export function CheckupTab() {
           />
         </ul>
       </section>
-    </div>
+    </main>
   );
 }
 

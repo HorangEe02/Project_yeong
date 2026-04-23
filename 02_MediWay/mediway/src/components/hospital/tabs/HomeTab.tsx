@@ -7,20 +7,17 @@ import { EmergencyCtaWidget } from '@/components/hospital/widgets/EmergencyCtaWi
  * 홈 탭 — 개인화 대시보드.
  *
  * v2 §Phase 2: 위젯 정확히 3개 (+1 선택 슬롯은 병원별 커스터마이즈 추후).
- *
- * 1. TodayScheduleWidget — 오늘 일정 (C4 appointments 연동 전 placeholder)
- * 2. WaitQueueWidget — 대기 순번 (P3 F1 실시간 연동 전 placeholder)
- * 3. EmergencyCtaWidget — 응급실 CTA (P4 F10을 P2로 당김)
+ * 안내 탭(PatientPage)과 동일한 max-w 컨테이너 패턴.
  */
 export function HomeTab() {
   return (
-    <>
+    <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
       <h2 className="sr-only">홈</h2>
       <WidgetSlot>
         <TodayScheduleWidget />
         <WaitQueueWidget />
         <EmergencyCtaWidget />
       </WidgetSlot>
-    </>
+    </main>
   );
 }
