@@ -9,6 +9,9 @@ import { handleCreateStaff, type CreateStaffInput } from './adminCreateStaff';
 
 admin.initializeApp();
 
+// P1 Multi-Tenant Custom Claims — refreshMyClaims, setUserClaims export
+export { refreshMyClaims, setUserClaims } from './setClaims';
+
 const region = 'asia-northeast3';
 
 /** 카카오 인가 코드 → Firebase Custom Token */

@@ -1,15 +1,15 @@
 {
   "rules": {
     "users": {
-      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
       "$uid": {
-        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
-        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && (auth.uid === $uid || auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
         "role": {
-          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && auth.uid === $uid))"
+          ".write": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && auth.uid === $uid))"
         },
         "status": {
-          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && auth.uid === $uid))"
+          ".write": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && auth.uid === $uid))"
         },
         "createdAt": {
           ".write": "auth != null && !data.exists() && auth.uid === $uid"
@@ -17,16 +17,16 @@
       }
     },
     "staff_codes": {
-      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
       "$code": {
         ".read": "auth != null",
-        ".write": "auth != null && ((!data.child('usedBy').exists() && newData.child('usedBy').val() === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')"
+        ".write": "auth != null && ((!data.child('usedBy').exists() && newData.child('usedBy').val() === auth.uid) || auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin')"
       }
     },
     "sessions": {
       "$sessionId": {
         ".write": "auth != null",
-        ".read": "auth != null && (data.child('staffUid').val() === auth.uid || data.child('patientUid').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')"
+        ".read": "auth != null && (data.child('staffUid').val() === auth.uid || data.child('patientUid').val() === auth.uid || auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin')"
       }
     },
     "qr_tokens": {
@@ -35,21 +35,65 @@
         ".read": "auth != null"
       }
     },
+
     "hospitals": {
-      ".read": true,
-      ".write": false
+      "$hospitalId": {
+        "profile": {
+          ".read": "auth != null",
+          ".write": "auth != null && auth.token.role === 'platformAdmin'"
+        },
+        "floor-plans": {
+          ".read": "auth != null && (auth.token.hospitalId === $hospitalId || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('primaryHospitalId').val() === $hospitalId)",
+          ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && auth.token.role === 'admin'))"
+        },
+        "pois": {
+          ".read": "auth != null && (auth.token.hospitalId === $hospitalId || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('primaryHospitalId').val() === $hospitalId)",
+          ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && auth.token.role === 'admin'))"
+        },
+        "departments": {
+          ".read": "auth != null && (auth.token.hospitalId === $hospitalId || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('primaryHospitalId').val() === $hospitalId)",
+          ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && auth.token.role === 'admin'))"
+        },
+        "announcements": {
+          ".read": "auth != null && (auth.token.hospitalId === $hospitalId || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('primaryHospitalId').val() === $hospitalId)",
+          ".indexOn": ["startAt"],
+          "$id": {
+            ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && (auth.token.role === 'admin' || auth.token.role === 'staff')))"
+          }
+        },
+        "visit_plans": {
+          "$uid": {
+            ".read": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && ($uid === auth.uid || auth.token.role === 'staff' || auth.token.role === 'admin')))",
+            ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.hospitalId === $hospitalId && ($uid === auth.uid || auth.token.role === 'staff' || auth.token.role === 'admin')))",
+            "updatedBy": {
+              ".validate": "newData.val() === auth.uid"
+            },
+            "expiresAt": {
+              ".validate": "newData.isNumber() && newData.val() <= now + 172800000"
+            },
+            "waypoints": {
+              ".validate": "newData.hasChildren()"
+            },
+            "hospitalId": {
+              ".validate": "newData.val() === $hospitalId"
+            }
+          }
+        }
+      }
     },
+
     "audit_logs": {
-      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
       ".indexOn": ["timestamp"],
       "$id": {
         ".write": "auth != null && !data.exists() && newData.child('actorUid').val() === auth.uid"
       }
     },
+
     "visit_plans": {
       "$uid": {
-        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'staff' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
-        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'staff' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'staff' || auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'staff' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && (auth.uid === $uid || auth.token.role === 'staff' || auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'staff' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
         "updatedBy": {
           ".validate": "newData.val() === auth.uid"
         },
@@ -61,6 +105,7 @@
         }
       }
     },
+
     "shared_plans": {
       "$code": {
         ".read": "auth != null",
@@ -73,11 +118,12 @@
         }
       }
     },
+
     "staff_invitations": {
-      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
       "$token": {
         ".read": "auth != null",
-        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (data.child('email').val() === auth.token.email && newData.child('status').val() === 'accepted' && newData.child('claimedBy').val() === auth.uid))"
+        ".write": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || root.child('users').child(auth.uid).child('role').val() === 'admin' || (data.child('email').val() === auth.token.email && newData.child('status').val() === 'accepted' && newData.child('claimedBy').val() === auth.uid))"
       }
     }
   }

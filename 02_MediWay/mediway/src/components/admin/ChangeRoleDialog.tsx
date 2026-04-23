@@ -19,7 +19,12 @@ const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
   { value: 'admin', label: '관리자' },
 ];
 
-const ROLE_RANK: Record<UserRole, number> = { patient: 1, staff: 2, admin: 3 };
+const ROLE_RANK: Record<UserRole, number> = {
+  patient: 1,
+  staff: 2,
+  admin: 3,
+  platformAdmin: 4,
+};
 
 export function ChangeRoleDialog({
   open,

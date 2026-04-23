@@ -16,6 +16,7 @@ import { ProfilePage } from '@/pages/account/ProfilePage';
 import { EmailPage } from '@/pages/account/EmailPage';
 import { VisitPlanPage } from '@/pages/account/VisitPlanPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
+import { AdminHospitalsPage } from '@/pages/admin/AdminHospitalsPage';
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
 import { AdminUserDetailPage } from '@/pages/admin/AdminUserDetailPage';
 import { AdminRequestsPage } from '@/pages/admin/AdminRequestsPage';
@@ -26,6 +27,8 @@ import { AdminAuditPage } from '@/pages/admin/AdminAuditPage';
 import { ForbiddenPage } from '@/pages/ForbiddenPage';
 import { SharedPlanPage } from '@/pages/share/SharedPlanPage';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { HospitalRouteWrapper } from '@/components/hospital/HospitalRouteWrapper';
+import { SelectHospitalPage } from '@/pages/SelectHospitalPage';
 import { initAnonymousAuth } from '@/services/auth';
 import { isFirebaseConfigured } from '@/config/firebase';
 import { useAuthStore } from '@/stores/authStore';
@@ -66,6 +69,9 @@ export default function App() {
           {/* 공유 방문 계획 (익명 포함 로그인 허용) */}
           <Route path="/share/plan" element={<SharedPlanPage />} />
           <Route path="/share/plan/:code" element={<SharedPlanPage />} />
+
+          {/* P1 병원 선택 페이지 — 가입 직후 · 로비 QR 부트스트랩 */}
+          <Route path="/hospitals/select" element={<SelectHospitalPage />} />
 
           {/* 계정 관리 (로그인 필요) */}
           <Route
@@ -121,6 +127,14 @@ export default function App() {
             element={
               <ProtectedRoute requireRole={['admin']}>
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/hospitals"
+            element={
+              <ProtectedRoute requireRole={['admin']}>
+                <AdminHospitalsPage />
               </ProtectedRoute>
             }
           />
@@ -181,9 +195,38 @@ export default function App() {
             }
           />
 
-          {/* 환자 — 익명+로그인 모두 허용 (원 설계 유지) */}
+          {/* 환자 — 익명+로그인 모두 허용 (레거시 경로, P1 호환 유지) */}
           <Route path="/patient" element={<PatientPage />} />
           <Route path="/patient/:sessionId" element={<PatientPage />} />
+
+          {/*
+            P1 신규 Multi-Tenant 라우트 (/h/:slug/*)
+            - HospitalRouteWrapper가 slug 유효성 · 프로필 로딩을 처리
+            - 기존 페이지 컴포넌트를 그대로 재사용 (P1 범위)
+            - P2+에서 각 페이지가 useHospital()로 병원별 동작 전환
+          */}
+          <Route path="/h/:slug" element={<HospitalRouteWrapper />}>
+            <Route path="patient" element={<PatientPage />} />
+            <Route path="patient/:sessionId" element={<PatientPage />} />
+            <Route
+              path="staff"
+              element={
+                <ProtectedRoute requireRole={['staff', 'admin']}>
+                  <StaffPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="admin"
+              element={
+                <ProtectedRoute requireRole={['admin']}>
+                  <AdminDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            {/* 빈 경로 접근 시 patient로 */}
+            <Route index element={<Navigate to="patient" replace />} />
+          </Route>
         </Routes>
       </div>
     </BrowserRouter>

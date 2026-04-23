@@ -1,0 +1,84 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        "role": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && auth.uid === $uid))"
+        },
+        "status": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (!data.exists() && auth.uid === $uid))"
+        },
+        "createdAt": {
+          ".write": "auth != null && !data.exists() && auth.uid === $uid"
+        }
+      }
+    },
+    "staff_codes": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null && ((!data.child('usedBy').exists() && newData.child('usedBy').val() === auth.uid) || root.child('users').child(auth.uid).child('role').val() === 'admin')"
+      }
+    },
+    "sessions": {
+      "$sessionId": {
+        ".write": "auth != null",
+        ".read": "auth != null && (data.child('staffUid').val() === auth.uid || data.child('patientUid').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')"
+      }
+    },
+    "qr_tokens": {
+      "$token": {
+        ".write": "auth != null",
+        ".read": "auth != null"
+      }
+    },
+    "hospitals": {
+      ".read": true,
+      ".write": false
+    },
+    "audit_logs": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["timestamp"],
+      "$id": {
+        ".write": "auth != null && !data.exists() && newData.child('actorUid').val() === auth.uid"
+      }
+    },
+    "visit_plans": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'staff' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'staff' || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        "updatedBy": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "expiresAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 172800000"
+        },
+        "waypoints": {
+          ".validate": "newData.hasChildren()"
+        }
+      }
+    },
+    "shared_plans": {
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('uid').val() === auth.uid)",
+        "uid": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "expiresAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 1800000"
+        }
+      }
+    },
+    "staff_invitations": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$token": {
+        ".read": "auth != null",
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || (data.child('email').val() === auth.token.email && newData.child('status').val() === 'accepted' && newData.child('claimedBy').val() === auth.uid))"
+      }
+    }
+  }
+}

@@ -12,6 +12,22 @@ dist
 dist-ssr
 *.local
 
+# Firebase
+.firebase/
+firebase-debug.log*
+database-debug.log*
+firestore-debug.log*
+# Service account keys — NEVER commit
+*adminsdk*.json
+service-account*.json
+
+# Cloud Functions build output
+functions/lib/
+
+# OMC local state
+.omc/
+.claude/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

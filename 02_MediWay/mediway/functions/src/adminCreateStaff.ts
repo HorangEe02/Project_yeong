@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin';
 import { HttpsError } from 'firebase-functions/v2/https';
+import { applyClaimsFromProfile } from './setClaims';
 
 export type CreateStaffMode = 'email_reset' | 'temp_password';
 
@@ -86,6 +87,7 @@ export async function handleCreateStaff(
   });
 
   // 5. RTDB 프로필 생성 (role=staff + 소속)
+  // P1: primaryHospitalId(신규) + hospitalId(레거시 호환) 모두 세팅
   const now = Date.now();
   await db.ref(`users/${user.uid}`).set({
     uid: user.uid,
@@ -94,11 +96,20 @@ export async function handleCreateStaff(
     role: 'staff',
     status: 'active',
     providers: ['password'],
-    hospitalId,
+    hospitalId, // legacy 호환
+    primaryHospitalId: hospitalId,
+    hospitalIds: [hospitalId],
     department,
     createdAt: now,
     updatedAt: now,
   });
+
+  // P1: 프로필 작성 직후 Claim 주입 — 스태프가 첫 로그인 시 hospitalId가 토큰에 실림
+  try {
+    await applyClaimsFromProfile(user.uid);
+  } catch (err) {
+    console.warn('[handleCreateStaff] claim 주입 실패 (non-fatal)', user.uid, err);
+  }
 
   // 6. 감사 로그
   await db.ref('audit_logs').push({

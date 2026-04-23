@@ -36,21 +36,21 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 
-const config = {
-  apiKey: 'REPLACE_WITH_YOUR_FIREBASE_API_KEY',
-  authDomain: 'mediway-demo.firebaseapp.com',
-  databaseURL: 'https://mediway-demo-default-rtdb.firebaseio.com',
-  projectId: 'mediway-demo',
-  storageBucket: 'mediway-demo.firebasestorage.app',
-  messagingSenderId: '805996216710',
-  appId: '1:805996216710:web:caee81623cd2fbc5baac07',
-};
-
 const banner = document.getElementById('banner');
 const meta = document.getElementById('meta');
 const runBtn = document.getElementById('run');
 const cleanupBtn = document.getElementById('cleanup');
 const result = document.getElementById('result');
+
+// Firebase Hosting auto-config — /__/firebase/init.json returns the
+// project's firebaseConfig at runtime. No API key hardcoded in source.
+const configRes = await fetch('/__/firebase/init.json');
+if (!configRes.ok) {
+  banner.className = 'banner error';
+  banner.textContent = 'Firebase Hosting init.json을 로드하지 못했습니다.';
+  throw new Error('init.json fetch failed');
+}
+const config = await configRes.json();
 
 const app = initializeApp(config);
 const auth = getAuth(app);

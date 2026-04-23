@@ -33,7 +33,9 @@ export type AuditAction =
   | 'user.role.request'
   | 'user.role.approve'
   | 'user.role.reject'
-  | 'user.account.create';
+  | 'user.account.create'
+  // P1 Multi-Tenant
+  | 'user.claims.refresh';
 
 export interface AuditLogEntry {
   id: string;

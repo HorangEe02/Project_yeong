@@ -11,10 +11,12 @@ import {
   Menu,
   X,
   ChevronDown,
+  Building2,
 } from 'lucide-react';
 
 const NAV = [
   { to: '/admin', label: '대시보드', icon: LayoutDashboard, end: true },
+  { to: '/admin/hospitals', label: '병원 관리', icon: Building2, end: false },
   { to: '/admin/users', label: '사용자', icon: Users, end: false },
   { to: '/admin/requests', label: '승인 대기', icon: UserCheck, end: false },
   { to: '/admin/invitations', label: '초대', icon: Mail, end: false },

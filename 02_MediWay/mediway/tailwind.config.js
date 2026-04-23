@@ -5,10 +5,11 @@ export default {
     extend: {
       colors: {
         // MediWay Design System — "Editorial Clinical Excellence"
+        // P1 화이트라벨: CSS custom properties 기반 (applyHospitalTheme에서 런타임 주입)
         primary: {
-          DEFAULT: '#004e9f',
-          container: '#0066cc',
-          light: '#3b82f6',
+          DEFAULT: 'var(--color-primary)',
+          container: 'var(--color-primary-container)',
+          light: 'var(--color-primary-light)',
         },
         surface: {
           DEFAULT: '#f9f9fb',

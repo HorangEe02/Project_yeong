@@ -1,9 +1,47 @@
 import { create } from 'zustand';
 import type { User } from 'firebase/auth';
+import { httpsCallable } from 'firebase/functions';
 import { onAuthChange, syncEmailToProfile } from '@/services/auth';
 import { subscribeUserProfile } from '@/services/userProfile';
-import { isFirebaseConfigured } from '@/config/firebase';
+import { functions, isFirebaseConfigured } from '@/config/firebase';
 import type { UserProfile, UserRole } from '@/types/auth';
+
+/**
+ * P1 Multi-Tenant: 프로필 로드 시 Custom Claim 일치성 검사.
+ * 불일치하면 refreshMyClaims + getIdToken(true)로 즉시 최신화.
+ * 무한 루프 방지를 위해 module-level In-flight set 사용.
+ */
+const refreshInFlight = new Set<string>();
+
+async function refreshClaimsIfStale(
+  user: User,
+  profile: UserProfile,
+): Promise<void> {
+  if (user.isAnonymous) return;
+  if (refreshInFlight.has(user.uid)) return;
+
+  const token = await user.getIdTokenResult();
+  const claimsRole = token.claims.role as string | undefined;
+  const claimsHospitalId = token.claims.hospitalId as string | null | undefined;
+  const profileHospitalId =
+    profile.primaryHospitalId ?? profile.hospitalId ?? null;
+
+  const mismatch =
+    claimsRole !== profile.role ||
+    (claimsHospitalId ?? null) !== profileHospitalId;
+  if (!mismatch) return;
+
+  refreshInFlight.add(user.uid);
+  try {
+    const callable = httpsCallable(functions, 'refreshMyClaims');
+    await callable();
+    await user.getIdToken(true);
+  } catch (err) {
+    console.warn('[authStore] claim 자동 갱신 실패', err);
+  } finally {
+    refreshInFlight.delete(user.uid);
+  }
+}
 
 interface AuthState {
   user: User | null;
@@ -60,6 +98,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         // ensureUserProfile로 완전한 프로필을 생성하도록 맡긴다. (race condition 방지)
         if (profile) {
           void syncEmailToProfile(user, profile.email ?? null).catch(() => {});
+          // P1: claim이 프로필과 불일치하면 refreshMyClaims로 동기화
+          void refreshClaimsIfStale(user, profile).catch(() => {});
         }
         set({ profile, initialized: true });
       });

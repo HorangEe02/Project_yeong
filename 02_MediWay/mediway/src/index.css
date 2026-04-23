@@ -9,6 +9,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color-scheme: light;
+
+    /* P1 Multi-Tenant 화이트라벨 — 런타임에 applyHospitalTheme()로 덮어씀 */
+    --color-primary: #004e9f;
+    --color-primary-container: #0066cc;
+    --color-primary-light: #3b82f6;
   }
 
   body {

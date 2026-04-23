@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>MediWay · hospital 격리 규칙 E2E</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;max-width:860px;margin:24px auto;padding:16px;color:#1a1a1a}
+  h1{font-size:20px;margin:0 0 12px}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #eee}
+  th{background:#f6f6f6;font-weight:600}
+  .ok{color:#0a7}
+  .fail{color:#c33}
+  .muted{color:#888;font-size:12px}
+  button{padding:10px 16px;font-size:14px;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f6f6;padding:2px 6px;border-radius:4px}
+  .banner{padding:10px 14px;border-radius:8px;margin-bottom:12px}
+  .banner.info{background:#eff6ff;color:#1e40af}
+  .banner.warn{background:#fefce8;color:#854d0e}
+  .banner.error{background:#fef2f2;color:#b91c1c}
+  .banner.ok{background:#f0fdf4;color:#166534}
+</style>
+</head>
+<body>
+<h1>🧪 Hospital 격리 규칙 E2E (post-deploy)</h1>
+<div id="banner" class="banner info">Firebase 초기화 중...</div>
+<div id="meta" class="muted"></div>
+
+<p class="muted">
+  이 페이지는 <strong>RTDB 보안 규칙 배포 후</strong> 교차 병원 데이터 접근이 차단되는지 검증합니다.
+  로그인된 사용자의 Custom Claim에 기반해 접근 여부가 판정됩니다.
+</p>
+
+<p><button id="run" disabled>테스트 실행</button></p>
+<div id="result"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
+
+const banner = document.getElementById('banner');
+const meta = document.getElementById('meta');
+const runBtn = document.getElementById('run');
+const result = document.getElementById('result');
+
+// Firebase Hosting auto-config — /__/firebase/init.json returns the
+// project's firebaseConfig at runtime. No API key hardcoded in source.
+const configRes = await fetch('/__/firebase/init.json');
+if (!configRes.ok) {
+  banner.className = 'banner error';
+  banner.textContent = 'Firebase Hosting init.json을 로드하지 못했습니다. Firebase Hosting 위에서만 동작하는 페이지입니다.';
+  throw new Error('init.json fetch failed');
+}
+const config = await configRes.json();
+
+const app = initializeApp(config);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let currentToken = null;
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    banner.className = 'banner warn';
+    banner.textContent = '로그인이 필요합니다. 먼저 앱에서 로그인 후 다시 열어주세요.';
+    return;
+  }
+  const tokenResult = await user.getIdTokenResult();
+  currentToken = tokenResult.claims;
+  meta.innerHTML = `로그인 uid: <code>${user.uid}</code> · role: <code>${currentToken.role || '(none)'}</code> · hospitalId: <code>${currentToken.hospitalId || '(none)'}</code>`;
+  banner.className = 'banner ok';
+  banner.textContent = '준비 완료. 테스트 실행을 눌러주세요.';
+  runBtn.disabled = false;
+});
+
+async function tryOp(label, op) {
+  try {
+    await op();
+    return { label, ok: true, detail: 'success' };
+  } catch (e) {
+    return { label, ok: false, detail: e.code || e.message };
+  }
+}
+
+runBtn.addEventListener('click', async () => {
+  runBtn.disabled = true;
+  result.innerHTML = '실행 중...';
+  const myHospital = currentToken?.hospitalId || 'demo';
+  const otherHospital = myHospital === 'demo' ? 'smch' : 'demo';
+  const uid = auth.currentUser.uid;
+
+  const tests = [
+    {
+      category: '자기 병원 profile 읽기',
+      expected: true,
+      run: () => get(ref(db, `hospitals/${myHospital}/profile`)),
+    },
+    {
+      category: '자기 병원 pois 읽기',
+      expected: true,
+      run: () => get(ref(db, `hospitals/${myHospital}/pois`)),
+    },
+    {
+      category: '자기 병원 visit_plans 자기 uid 읽기',
+      expected: true,
+      run: () => get(ref(db, `hospitals/${myHospital}/visit_plans/${uid}`)),
+    },
+    {
+      category: '타 병원 pois 읽기 (차단되어야 함)',
+      expected: false,
+      run: () => get(ref(db, `hospitals/${otherHospital}/pois`)),
+    },
+    {
+      category: '타 병원 visit_plans 읽기 (차단)',
+      expected: false,
+      run: () => get(ref(db, `hospitals/${otherHospital}/visit_plans/${uid}`)),
+    },
+    {
+      category: '타 병원 visit_plans 다른 uid 읽기 (차단)',
+      expected: false,
+      run: () => get(ref(db, `hospitals/${otherHospital}/visit_plans/fake-uid`)),
+    },
+    {
+      category: '자기 병원 profile 쓰기 (platformAdmin 아니면 차단)',
+      expected: currentToken?.role === 'platformAdmin',
+      run: () => set(ref(db, `hospitals/${myHospital}/profile/themeColor`), '#deadbe'),
+    },
+    {
+      category: '레거시 visit_plans 자기 uid 쓰기 (P2까지 허용)',
+      expected: true,
+      run: () =>
+        set(ref(db, `visit_plans/${uid}`), {
+          waypoints: { w1: { poiId: 'p-test' } },
+          source: 'patient',
+          updatedBy: uid,
+          expiresAt: Date.now() + 86400000,
+          updatedAt: Date.now(),
+        }),
+    },
+  ];
+
+  const rows = [];
+  for (const t of tests) {
+    const r = await tryOp(t.category, t.run);
+    const passed = r.ok === t.expected;
+    rows.push({
+      category: t.category,
+      expected: t.expected ? '성공' : '차단',
+      actual: r.ok ? '성공' : '차단',
+      passed,
+      detail: r.detail,
+    });
+  }
+  renderResult(rows);
+  runBtn.disabled = false;
+});
+
+function renderResult(rows) {
+  const passed = rows.filter((r) => r.passed).length;
+  const total = rows.length;
+  const allPass = passed === total;
+  result.innerHTML = `
+    <div class="banner ${allPass ? 'ok' : 'error'}">
+      ${passed}/${total} 통과 ${allPass ? '✅' : '— 실패가 있습니다. 규칙 재검토 필요'}
+    </div>
+    <table>
+      <thead><tr><th>시나리오</th><th>기대</th><th>실제</th><th>판정</th><th>상세</th></tr></thead>
+      <tbody>
+        ${rows
+          .map(
+            (r) =>
+              `<tr><td>${r.category}</td><td>${r.expected}</td><td>${r.actual}</td><td class="${r.passed ? 'ok' : 'fail'}">${r.passed ? 'PASS' : 'FAIL'}</td><td class="muted">${r.detail}</td></tr>`,
+          )
+          .join('')}
+      </tbody>
+    </table>`;
+}
+</script>
+</body>
+</html>
