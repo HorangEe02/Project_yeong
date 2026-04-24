@@ -1,10 +1,26 @@
 # Local ↔ Production Sync Gaps — 분석 보고서
 
-> **작성일**: 2026-04-24 (Phase A-2)
+> **작성일**: 2026-04-24 (Phase A-2 / Phase B-1·B-2 완료 시점 업데이트)
 > **분석 근거**: Firebase Hosting REST API로 다운로드한 production bundle
-> - `assets_index-BGK9Zs9J.js` (1.13MB minified)
+> - `assets_index-BGK9Zs9J.js` (1.13MB minified) — 번들 grep 으로 `sg`/`cg`/`lg`/`ug`/`BS`/`dg` 시그니처 + appointments 이중 경로 schema 복원
 > - `e2e-hospital-isolation.html`, `e2e-tab-session.html`, `e2e-wait-queue.html` (기능 스펙 노출됨)
 > - `e2e-visit-plan.html` (local과 동일)
+
+## 0-A. Phase B-1 & B-2 진행 요약 (완료 2026-04-24)
+
+Local에 prod 기능 이식 완료 — E2E HTML · useFcmToken · HospitalHomePage · WaitQueueWidget ·
+StaffQueuePage · AppointmentsTab · ChatbotWidget · MoreTab 고령자 모드. 117 vitest pass.
+
+**Phase B-3 남은 TODO (주석만 남기고 실구현은 별도 sprint)**:
+- **item 9**: VisitPlanPage 흰 화면 — `src/pages/account/VisitPlanPage.tsx:1` 주석 참고
+- **item 10**: Hospital slug routing 전체 개편 — `src/App.tsx:235` 주석 참고
+
+**주의**: e2e-hospital-isolation.html 시나리오 #7 이 platformAdmin 로 실행될 때
+`hospitals/demo/profile/themeColor` 를 `#deadbe` 로 덮어쓰는 부작용이 있음.
+증상: 전체 환자 UI primary 색상이 연분홍으로 렌더. 발견 시 RTDB PUT 으로
+`#004e9f` 재복구 필요 (본 세션에서 2회 발생 → 2회 복구).
+
+---
 
 ## 0. 결론 요약
 

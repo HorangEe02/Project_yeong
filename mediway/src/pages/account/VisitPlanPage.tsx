@@ -1,3 +1,11 @@
+// TODO(T0-1 Phase B-3 / item 9 — VisitPlan 흰 화면 수정):
+//   Production 이전 세션에서 VisitPlan 진입 시 본문이 빈 흰 화면으로 렌더되는
+//   incident 보고 있음 (2026-04-23 기준). 정확한 원인은 local/prod 코드 diff 에서
+//   확인되지 않았고 역엔지니어링 범위 밖. 별도 sprint 에서 production bundle 의
+//   VisitPlan 관련 module 을 최소 단위로 추출해 비교 진단 필요.
+//   임시 우회: 현 local 코드는 정상 동작 경로를 유지하되, 이 파일을 touch 할 때는
+//   반드시 `features.visit_plan` flag 기반 gating 이 prod 와 일치하는지 재확인.
+
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Clock, Save, Share2, Trash2 } from 'lucide-react';
 import { AccountLayout } from '@/components/account/AccountLayout';

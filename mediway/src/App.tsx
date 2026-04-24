@@ -230,7 +230,16 @@ export default function App() {
           <Route path="/patient" element={<PatientPage />} />
           <Route path="/patient/:sessionId" element={<PatientPage />} />
 
-          {/* 병원 slug 기반 환자 홈 (T0-1 step 3 — shell only) */}
+          {/* 병원 slug 기반 환자 홈 (T0-1 step 3 shell + step 4~8 실구현) */}
+          {/*
+            TODO(T0-1 Phase B-3 / item 10 — Hospital slug routing 전체 개편):
+              Production 은 `/h/:slug/*` 하위에 patient/staff/admin 모두 nested 해
+              HospitalShell 로 감싸는 구조. Local 은 flat `/patient`, `/staff`,
+              `/admin/...` 유지 + 신규 `/h/:slug/patient/home` 1건만 추가된 상태.
+              전체 통합은 대규모 리팩토링이라 T0-1 범위 초과 — 별도 sprint 에서
+              HospitalShell (slug → profile.themeColor/features/name) 주입 + flat
+              route 들을 nested 로 이전. 이행 중에는 기존 bookmark 호환 위해
+              flat route 를 redirect 로 남겨두는 전략 필요. */}
           <Route path="/h/:hospitalSlug/patient/home" element={<HospitalHomePage />} />
         </Routes>
       </div>
