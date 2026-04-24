@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 const mockCallable = vi.fn();
-const mockHttpsCallable = vi.fn(() => mockCallable);
+const mockHttpsCallable = vi.fn((..._args: unknown[]) => mockCallable);
 
 vi.mock('firebase/functions', () => ({
   httpsCallable: (...args: unknown[]) => mockHttpsCallable(...args),
