@@ -33,7 +33,8 @@ export type AuditAction =
   | 'user.role.request'
   | 'user.role.approve'
   | 'user.role.reject'
-  | 'user.account.create';
+  | 'user.account.create'
+  | 'hospital.profile.update';
 
 export interface AuditLogEntry {
   id: string;

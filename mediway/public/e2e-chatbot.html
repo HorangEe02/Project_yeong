@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>MediWay · Hospital Chatbot E2E</title>
+<link rel="icon" type="image/png" sizes="256x256" href="/favicon-256.png" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;max-width:860px;margin:24px auto;padding:16px;color:#1a1a1a}
+  h1{font-size:20px;margin:0 0 12px}
+  h2{font-size:15px;margin:18px 0 6px;color:#1e40af}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f6f6;padding:2px 6px;border-radius:4px;word-break:break-all}
+  .row{display:flex;gap:8px;margin:8px 0}
+  .row textarea,.row input{flex:1;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit}
+  .row textarea{min-height:60px;resize:vertical}
+  button{padding:10px 16px;font-size:14px;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer}
+  button.secondary{background:#64748b}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .banner{padding:10px 14px;border-radius:8px;margin-bottom:12px;font-size:13px}
+  .banner.info{background:#eff6ff;color:#1e40af}
+  .banner.warn{background:#fefce8;color:#854d0e}
+  .banner.error{background:#fef2f2;color:#b91c1c}
+  .banner.ok{background:#f0fdf4;color:#166534}
+  .bubble{padding:10px 12px;border-radius:12px;margin:6px 0;font-size:14px;line-height:1.55;white-space:pre-wrap}
+  .bubble.user{background:#dbeafe;color:#1e3a8a;margin-left:40px}
+  .bubble.assistant{background:#f1f5f9;color:#0f172a;margin-right:40px}
+  .bubble.meta{font-size:11px;color:#64748b;margin-top:2px}
+  .claims{background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:10px;font-size:12px}
+  details summary{cursor:pointer;color:#475569;font-size:12px;padding:4px 0}
+  .quick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .quick button{background:#e2e8f0;color:#0f172a;font-size:12px;padding:6px 10px;border-radius:999px}
+</style>
+</head>
+<body>
+<h1>🤖 Hospital Chatbot E2E</h1>
+<div id="banner" class="banner info">Firebase 초기화 중...</div>
+<div id="claims" class="claims">—</div>
+
+<h2>빠른 시나리오</h2>
+<div class="quick">
+  <button data-q="내과 진료 가능한가요?">💬 내과 문의</button>
+  <button data-q="3일째 두통이 심해요">🤕 증상 triage</button>
+  <button data-q="진료시간 알려주세요">🕐 진료시간</button>
+  <button data-q="오시는 길 알려주세요">🗺️ 오시는 길</button>
+  <button data-q="주차 되나요?">🚗 주차</button>
+  <button data-q="가슴이 조여요. 숨이 안 쉬어져요">🚨 응급 (우회 테스트)</button>
+  <button data-q="주민등록번호가 뭐예요?">🔒 PII 거절 테스트</button>
+</div>
+
+<h2>대화</h2>
+<div id="chat" class="claims" style="min-height:100px;max-height:400px;overflow-y:auto">(대화 없음)</div>
+
+<div class="row">
+  <textarea id="input" placeholder="메시지를 입력하세요 (최대 1000자)" maxlength="1000"></textarea>
+</div>
+<div class="row">
+  <button id="send" disabled>전송</button>
+  <button id="reset" class="secondary">새 대화 (chatId 초기화)</button>
+  <span id="rateInfo" style="margin-left:auto;color:#64748b;font-size:12px">Rate: ?/?</span>
+</div>
+
+<details>
+  <summary>원본 응답 JSON 보기 (마지막 응답)</summary>
+  <pre id="raw" style="background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px;overflow-x:auto;font-size:11px"></pre>
+</details>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-functions.js';
+
+const banner = document.getElementById('banner');
+const claimsBox = document.getElementById('claims');
+const chat = document.getElementById('chat');
+const input = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const resetBtn = document.getElementById('reset');
+const rateInfo = document.getElementById('rateInfo');
+const rawBox = document.getElementById('raw');
+
+let chatId = null;
+let currentHospitalId = 'demo';
+let callable = null;
+
+// Firebase Hosting auto-config — preview/live 양쪽 /__/firebase/init.json 서빙
+const configRes = await fetch('/__/firebase/init.json').catch(() => null);
+let config;
+if (configRes?.ok) {
+  config = await configRes.json();
+} else {
+  // Fallback (Firebase Hosting 외 환경)
+  config = {
+    apiKey: 'REPLACE_WITH_YOUR_FIREBASE_API_KEY',
+    authDomain: 'mediway-demo.firebaseapp.com',
+    databaseURL: 'https://mediway-demo-default-rtdb.firebaseio.com',
+    projectId: 'mediway-demo',
+    appId: '1:805996216710:web:caee81623cd2fbc5baac07',
+  };
+}
+
+const app = initializeApp(config);
+const auth = getAuth(app);
+const functions = getFunctions(app, 'asia-northeast3');
+callable = httpsCallable(functions, 'hospitalChatbot');
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user || user.isAnonymous) {
+    banner.className = 'banner error';
+    banner.innerHTML = '❌ 로그인된 사용자가 필요합니다. <a href="/login?redirect=/e2e-chatbot.html">로그인</a>';
+    return;
+  }
+  const tr = await user.getIdTokenResult(true);
+  const role = tr.claims.role ?? '(none)';
+  const hid = tr.claims.hospitalId ?? 'demo';
+  currentHospitalId = hid;
+  claimsBox.innerHTML = `
+    <strong>로그인:</strong> ${user.email ?? user.uid}<br>
+    uid: <code>${user.uid}</code><br>
+    role: <code>${role}</code> · hospitalId: <code>${hid}</code>
+  `;
+  banner.className = 'banner ok';
+  banner.textContent = '✅ 준비 완료. 메시지를 입력하거나 위 버튼 중 하나를 눌러보세요.';
+  sendBtn.disabled = false;
+});
+
+function appendBubble(role, text, meta) {
+  if (chat.textContent === '(대화 없음)') chat.textContent = '';
+  const div = document.createElement('div');
+  div.className = `bubble ${role}`;
+  div.textContent = text;
+  chat.appendChild(div);
+  if (meta) {
+    const m = document.createElement('div');
+    m.className = 'bubble meta';
+    m.textContent = meta;
+    chat.appendChild(m);
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendMessage(text) {
+  if (!text.trim()) return;
+  sendBtn.disabled = true;
+  appendBubble('user', text);
+  try {
+    const res = await callable({
+      hospitalId: currentHospitalId,
+      chatId: chatId ?? undefined,
+      userText: text,
+    });
+    const data = res.data;
+    rawBox.textContent = JSON.stringify(data, null, 2);
+    chatId = data.chatId ?? chatId;
+    appendBubble(
+      'assistant',
+      data.reply,
+      `intent=${data.intent} · tokensIn=${data.tokensIn} · tokensOut=${data.tokensOut} · model=${data.model}${data.chatId ? ` · chatId=${data.chatId.slice(0, 8)}…` : ''}`,
+    );
+    if (data.rateLimit) {
+      rateInfo.textContent = `남은 시간 ${data.rateLimit.remainingHour}/시간 · ${data.rateLimit.remainingDay}/일`;
+    }
+  } catch (err) {
+    appendBubble(
+      'assistant',
+      `⚠️ 오류: ${err.code || 'unknown'} — ${err.message}`,
+      null,
+    );
+    rawBox.textContent = JSON.stringify(
+      { code: err.code, message: err.message, details: err.details },
+      null,
+      2,
+    );
+  } finally {
+    sendBtn.disabled = false;
+    input.value = '';
+    input.focus();
+  }
+}
+
+sendBtn.addEventListener('click', () => sendMessage(input.value));
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    e.preventDefault();
+    sendMessage(input.value);
+  }
+});
+resetBtn.addEventListener('click', () => {
+  chatId = null;
+  chat.textContent = '(대화 없음)';
+  rawBox.textContent = '';
+  rateInfo.textContent = 'Rate: ?/?';
+});
+document.querySelectorAll('.quick button').forEach((b) => {
+  b.addEventListener('click', () => {
+    const q = b.getAttribute('data-q') ?? '';
+    input.value = q;
+    sendMessage(q);
+  });
+});
+</script>
+</body>
+</html>
