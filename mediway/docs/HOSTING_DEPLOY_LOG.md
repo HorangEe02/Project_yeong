@@ -117,3 +117,35 @@ surgical patch 스크립트 재활용 시 이 체크리스트 확인:
 - [ ] config.headers 포함?
 - [ ] populateFiles 호출 전 version body 에 config 삽입?
 
+---
+
+## 2026-04-24 — e2e HTML error banner 색상 브랜드 blue 롤백
+
+- **Release**: `fb6c3ea4c03acbb8`
+- **Previous**: `e425dbd4ec15af83`
+- **Release time**: 2026-04-24T07:09:47Z (16:09 KST)
+
+### 변경
+5개 e2e HTML 의 error/fail 스타일을 Tailwind red-50 핑크 → MediWay primary blue 로.
+
+```
+.banner.error { background:#fef2f2; color:#b91c1c }   →   background:#eff6ff; color:#004e9f
+.fail        { color:#c33 }                             →   color:#004e9f
+.banner.fail { background:#fef2f2; color:#991b1b }      →   background:#eff6ff; color:#004e9f
+```
+
+Local 파일 수정 + Firebase Hosting REST API 로 3개 파일만 업로드:
+- e2e-hospital-isolation.html
+- e2e-visit-plan.html
+- e2e-wait-queue.html
+
+(e2e-chatbot.html, e2e-rules-v2.html 은 LIVE 미배포 — local commit 만)
+(e2e-tab-session.html 은 해당 스타일 없음)
+
+Landing V2 redirect 패치 (`to:/hospitals/select`) + SPA rewrites + cache headers
+모두 그대로 유지.
+
+### 검증
+- `/e2e-hospital-isolation.html` LIVE fetch 시 `color:#004e9f` 확인
+- `/login` 새로고침 여전히 200 (rewrites 정상)
+
