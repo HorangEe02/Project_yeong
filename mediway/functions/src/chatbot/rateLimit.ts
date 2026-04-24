@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 
 export const LIMITS = {
-  perHour: 20,
+  perHour: 25,
   perDay: 100,
 };
 

@@ -463,11 +463,11 @@ describe('hospitalChatbot 핸들러', () => {
 //  rateLimit.ts — 순수 함수
 // ═══════════════════════════════════════════════
 describe('rateLimit — LIMITS 정책', () => {
-  it('시간당 20, 일일 100', async () => {
+  it('시간당 25, 일일 100', async () => {
     const { LIMITS: L } = await vi.importActual<typeof import('../chatbot/rateLimit')>(
       '../chatbot/rateLimit',
     );
-    expect(L.perHour).toBe(20);
+    expect(L.perHour).toBe(25);
     expect(L.perDay).toBe(100);
   });
 });

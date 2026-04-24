@@ -38,6 +38,9 @@ const QUICK_SUGGESTIONS = [
   '진료실 위치',
 ];
 
+/** 서버 rateLimit.ts LIMITS.perHour 와 동기화 — 변경 시 두 쪽 같이 수정 */
+const RATE_LIMIT_PER_HOUR = 25;
+
 const ERROR_COPY: Record<ChatbotError['code'], string> = {
   unauthenticated: '로그인 후 다시 시도해 주세요.',
   rate_limited: '잠시 후 다시 시도해 주세요.',
@@ -73,6 +76,7 @@ export function ChatbotWidget() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [remainingHour, setRemainingHour] = useState<number | null>(null);
   const composingRef = useRef(false);
   const threadRef = useRef<HTMLDivElement | null>(null);
 
@@ -117,10 +121,12 @@ export function ChatbotWidget() {
         };
         setMessages((prev) => [...prev, botMsg]);
         if (res.chatId) setChatId(res.chatId);
+        if (res.rateLimit) setRemainingHour(res.rateLimit.remainingHour);
       } catch (err) {
         const typed = err as ChatbotError;
         const copy = ERROR_COPY[typed.code] ?? ERROR_COPY.unknown;
         setErrorMsg(copy);
+        if (typed.code === 'rate_limited') setRemainingHour(0);
       } finally {
         setSending(false);
       }
@@ -150,8 +156,19 @@ export function ChatbotWidget() {
       aria-label="AI 챗봇"
       className="flex flex-col gap-3 rounded-xl bg-surface-container-lowest p-4"
     >
-      <header className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-on-surface">AI 안내 도우미</h3>
+      <header className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-on-surface">AI 안내 도우미</h3>
+          {remainingHour !== null && (
+            <span
+              className="rounded-full bg-surface-container px-2 py-0.5 text-[11px] font-medium text-on-surface-variant tabular-nums"
+              aria-label={`시간당 남은 질문 ${remainingHour} / ${RATE_LIMIT_PER_HOUR}`}
+              title="시간당 사용 가능한 질문 수"
+            >
+              남은 질문 {remainingHour}/{RATE_LIMIT_PER_HOUR}
+            </span>
+          )}
+        </div>
         <button
           type="button"
           onClick={handleNewConversation}
