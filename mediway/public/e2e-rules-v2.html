@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>MediWay · RTDB Rules v2 (Custom Claims) E2E</title>
+<link rel="icon" type="image/png" sizes="256x256" href="/favicon-256.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;max-width:940px;margin:24px auto;padding:16px;color:#1a1a1a}
+  h1{font-size:20px;margin:0 0 12px}
+  h2{font-size:16px;margin:24px 0 8px;color:#1e40af}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top}
+  th{background:#f6f6f6;font-weight:600}
+  .ok{color:#0a7}
+  .fail{color:#c33}
+  .warn{color:#a60}
+  .muted{color:#888;font-size:12px}
+  button{padding:10px 16px;font-size:14px;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer;margin-right:6px}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f6f6;padding:2px 6px;border-radius:4px;word-break:break-all}
+  .banner{padding:10px 14px;border-radius:8px;margin-bottom:12px}
+  .banner.info{background:#eff6ff;color:#1e40af}
+  .banner.warn{background:#fefce8;color:#854d0e}
+  .banner.error{background:#fef2f2;color:#b91c1c}
+  .banner.ok{background:#f0fdf4;color:#166534}
+  .claims{background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid #e2e8f0;margin:8px 0}
+</style>
+</head>
+<body>
+<h1>🔐 RTDB Security Rules v2 — Custom Claims E2E</h1>
+<div id="banner" class="banner info">Firebase 초기화 중...</div>
+<div id="claims" class="claims muted"></div>
+<p>
+  <button id="runReads" disabled>Read 테스트</button>
+  <button id="runWrites" disabled>Write 테스트</button>
+  <button id="cleanup" disabled>임시 데이터 정리</button>
+</p>
+<div id="result"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+
+const config = {
+  apiKey: 'REPLACE_WITH_YOUR_FIREBASE_API_KEY',
+  authDomain: 'mediway-demo.firebaseapp.com',
+  databaseURL: 'https://mediway-demo-default-rtdb.firebaseio.com',
+  projectId: 'mediway-demo',
+  storageBucket: 'mediway-demo.firebasestorage.app',
+  messagingSenderId: '805996216710',
+  appId: '1:805996216710:web:caee81623cd2fbc5baac07',
+};
+
+const DB = 'https://mediway-demo-default-rtdb.firebaseio.com';
+
+const banner = document.getElementById('banner');
+const claimsBox = document.getElementById('claims');
+const runReadsBtn = document.getElementById('runReads');
+const runWritesBtn = document.getElementById('runWrites');
+const cleanupBtn = document.getElementById('cleanup');
+const result = document.getElementById('result');
+
+const app = initializeApp(config);
+const auth = getAuth(app);
+
+let currentToken = null;
+let currentUid = null;
+let currentClaims = null;
+
+function renderClaims() {
+  if (!currentClaims) {
+    claimsBox.innerHTML = '(claims 미확인)';
+    return;
+  }
+  const { role, hospitalId, hospitalIds, claimsSetAt } = currentClaims;
+  const roleOk = ['patient','staff','admin','platformAdmin'].includes(role);
+  claimsBox.innerHTML = `
+    <strong>현재 Custom Claims:</strong><br>
+    role = <code class="${roleOk?'ok':'fail'}">${role ?? '(missing)'}</code>${roleOk ? '' : ' ⚠️ 누락/비정상 — Commit 9 migration 필요'}<br>
+    hospitalId = <code>${hospitalId ?? '(null)'}</code><br>
+    hospitalIds = <code>${JSON.stringify(hospitalIds ?? [])}</code><br>
+    claimsSetAt = <code>${claimsSetAt ? new Date(claimsSetAt).toISOString() : '(none)'}</code>`;
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user || user.isAnonymous) {
+    banner.textContent = '❌ 로그인된 일반 사용자가 필요합니다. 먼저 로그인해 주세요.';
+    banner.className = 'banner error';
+    claimsBox.innerHTML = '<button id="gologin">로그인 페이지로</button>';
+    document.getElementById('gologin')?.addEventListener('click', () => {
+      location.href = '/login?redirect=/e2e-rules-v2.html';
+    });
+    return;
+  }
+
+  currentToken = await user.getIdToken(true);
+  currentUid = user.uid;
+  const tokenResult = await user.getIdTokenResult();
+  currentClaims = {
+    role: tokenResult.claims.role,
+    hospitalId: tokenResult.claims.hospitalId ?? null,
+    hospitalIds: tokenResult.claims.hospitalIds ?? [],
+    claimsSetAt: tokenResult.claims.claimsSetAt,
+  };
+  renderClaims();
+
+  banner.textContent = `✅ ${user.email ?? user.uid} — uid = ${currentUid}`;
+  banner.className = 'banner ok';
+  runReadsBtn.disabled = false;
+  runWritesBtn.disabled = false;
+  cleanupBtn.disabled = false;
+});
+
+async function restFetch(method, path, body) {
+  const url = `${DB}${path}.json?auth=${currentToken}`;
+  const opts = { method };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  const text = (await res.text()).slice(0, 160);
+  return { status: res.status, body: text, ok: res.ok };
+}
+
+function interpretExpectation(role, hospitalId, scenario) {
+  // scenario.expect 는 role별 분기표. undefined면 'any'로 간주.
+  const byRole = scenario.expect ?? {};
+  const matchedRole =
+    byRole[role] ??
+    byRole[scenario.defaultRole ?? 'default'];
+  // 'allow' | 'deny' | hospital-scoped: { matchedHospitalId, notMatched }
+  if (matchedRole === 'allow') return { expected: 'allow' };
+  if (matchedRole === 'deny') return { expected: 'deny' };
+  if (matchedRole && typeof matchedRole === 'object' && matchedRole.sameHospital !== undefined) {
+    const sameTenant = hospitalId && scenario.targetHospitalId && hospitalId === scenario.targetHospitalId;
+    return { expected: sameTenant ? matchedRole.sameHospital : matchedRole.otherHospital ?? 'deny' };
+  }
+  return { expected: 'skip' };
+}
+
+function verdict(got, expected) {
+  if (expected === 'skip') return { label: '—', cls: 'muted' };
+  if (expected === 'allow') {
+    return got.ok ? { label: '✓ allow', cls: 'ok' } : { label: `✗ expected allow, got ${got.status}`, cls: 'fail' };
+  }
+  if (expected === 'deny') {
+    return !got.ok ? { label: '✓ deny', cls: 'ok' } : { label: `✗ expected deny, got ${got.status} allowed`, cls: 'fail' };
+  }
+  return { label: '?', cls: 'warn' };
+}
+
+// === Read 시나리오 ===
+const READ_SCENARIOS = [
+  {
+    name: '본인 프로필 읽기',
+    path: () => `/users/${currentUid}`,
+    expect: { patient: 'allow', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+  },
+  {
+    name: '병원 목록 (hospitals) 읽기',
+    path: () => `/hospitals`,
+    expect: { patient: 'allow', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+  },
+  {
+    name: 'users 전체 리스트 (admin·platformAdmin만)',
+    path: () => `/users`,
+    expect: { patient: 'deny', staff: 'deny', admin: 'allow', platformAdmin: 'allow' },
+  },
+  {
+    name: 'audit_logs 전체 읽기 (platformAdmin 전용 — admin도 deny)',
+    path: () => `/audit_logs`,
+    expect: { patient: 'deny', staff: 'deny', admin: 'deny', platformAdmin: 'allow' },
+  },
+  {
+    name: 'staff_codes 루트 (admin·platformAdmin만)',
+    path: () => `/staff_codes`,
+    expect: { patient: 'deny', staff: 'deny', admin: 'allow', platformAdmin: 'allow' },
+  },
+  {
+    name: 'hospitals/$hid/staff-codes (환자 열람 차단 — staff 이상)',
+    path: () => `/hospitals/${currentClaims?.hospitalId ?? 'unset'}/staff-codes`,
+    expect: { patient: 'deny', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+  },
+  {
+    name: '본인 visit_plan 읽기',
+    path: () => `/visit_plans/${currentUid}`,
+    expect: { patient: 'allow', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+  },
+  {
+    name: 'wait_queue/(hospitalId) 읽기 (staff·admin 동일 병원)',
+    path: () => `/wait_queue/${currentClaims?.hospitalId ?? 'unset'}`,
+    expect: { patient: 'deny', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+  },
+  {
+    name: '다른 병원 wait_queue 읽기 (cross-tenant 거부)',
+    path: () => `/wait_queue/__other_hospital_sentinel`,
+    expect: { patient: 'deny', staff: 'deny', admin: 'deny', platformAdmin: 'allow' },
+  },
+  {
+    name: 'wait_queue leaf — 본인 patientUid 대응 entry (cascade allow)',
+    // 주의: 이 테스트는 runWrites의 "wait_queue leaf write"가 먼저 성공해야 의미 있음.
+    // 환자 계정으로 실행 시 write는 deny되지만, 외부(예: 스태프가 미리 준비한 시나리오)에서 동일 경로에
+    // patientUid=auth.uid 엔트리가 있으면 leaf read는 allow여야 함.
+    path: () => `/wait_queue/${currentClaims?.hospitalId ?? 'unset'}/__e2e_dept/__e2e_date/__e2e_q_${currentUid}`,
+    expect: { patient: 'allow', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+  },
+];
+
+async function runReads() {
+  runReadsBtn.disabled = true;
+  result.innerHTML = '<h2>Read 테스트 실행 중...</h2>';
+  const rows = [];
+  for (const s of READ_SCENARIOS) {
+    const path = s.path();
+    const got = await restFetch('GET', path);
+    const { expected } = interpretExpectation(currentClaims?.role ?? 'patient', currentClaims?.hospitalId, s);
+    const v = verdict(got, expected);
+    rows.push({ name: s.name, path, got, v, expected });
+  }
+  renderTable('Read 결과', rows);
+  runReadsBtn.disabled = false;
+}
+
+// === Write 시나리오 (임시 E2E 경로만 조작, cleanup 수동) ===
+async function runWrites() {
+  runWritesBtn.disabled = true;
+  result.innerHTML = '<h2>Write 테스트 실행 중...</h2>';
+  const rows = [];
+  const now = Date.now();
+  const base = {
+    uid: currentUid + '_E2E',
+    waypoints: [{ poiId: 'test_1' }, { poiId: 'test_2' }],
+    source: 'rules_v2_e2e',
+    updatedBy: currentUid,
+    updatedAt: now,
+    expiresAt: now + 3600_000,
+  };
+  const SCENARIOS = [
+    {
+      name: '본인 visit_plan write',
+      path: `/visit_plans/${currentUid}_E2E_rulesv2`,
+      body: base,
+      expect: { patient: 'allow', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+    },
+    {
+      name: '다른 유저 visit_plan write (patient·staff 권한 분리)',
+      path: `/visit_plans/__not_my_uid_sentinel`,
+      body: { ...base, uid: 'attacker_E2E' },
+      expect: { patient: 'deny', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+    },
+    {
+      name: 'audit_logs self-entry write',
+      path: `/audit_logs/__e2e_${now}`,
+      body: { actorUid: currentUid, action: 'rules.v2.selftest', timestamp: now, meta: {} },
+      expect: { patient: 'allow', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+    },
+    {
+      name: 'audit_logs with forged actorUid (거부)',
+      path: `/audit_logs/__e2e_forge_${now}`,
+      body: { actorUid: 'not-me', action: 'forgery', timestamp: now },
+      expect: { patient: 'deny', staff: 'deny', admin: 'deny', platformAdmin: 'deny' },
+    },
+    {
+      name: 'hospitals/$hospitalId write (admin·platformAdmin only, same tenant)',
+      path: `/hospitals/${currentClaims?.hospitalId ?? '__unset'}/announcements/__e2e_${now}`,
+      body: { title: 'rules v2 e2e', createdAt: now },
+      expect: { patient: 'deny', staff: 'deny', admin: 'allow', platformAdmin: 'allow' },
+    },
+    {
+      name: 'sessions write with foreign hospitalId (cross-tenant 방어)',
+      path: `/sessions/__e2e_foreign_${now}`,
+      body: { hospitalId: '__other_hospital_sentinel', staffUid: currentUid, patientUid: currentUid, createdAt: now },
+      expect: { patient: 'deny', staff: 'deny', admin: 'deny', platformAdmin: 'allow' },
+    },
+    {
+      name: 'users/$uid/role self-escalation → admin 차단',
+      path: `/users/${currentUid}/role`,
+      body: 'admin',
+      expect: { patient: 'deny', staff: 'deny', admin: 'allow', platformAdmin: 'allow' },
+    },
+    {
+      name: 'wait_queue leaf write (staff는 자기 hospitalId에 write 가능 → leaf read cascade 검증용 seed)',
+      path: `/wait_queue/${currentClaims?.hospitalId ?? '__unset'}/__e2e_dept/__e2e_date/__e2e_q_${currentUid}`,
+      body: { patientUid: currentUid, queuedAt: now },
+      expect: { patient: 'deny', staff: 'allow', admin: 'allow', platformAdmin: 'allow' },
+    },
+  ];
+  for (const s of SCENARIOS) {
+    const got = await restFetch('PUT', s.path, s.body);
+    const { expected } = interpretExpectation(currentClaims?.role ?? 'patient', currentClaims?.hospitalId, s);
+    const v = verdict(got, expected);
+    rows.push({ name: s.name, path: s.path, got, v, expected });
+  }
+  renderTable('Write 결과', rows);
+  runWritesBtn.disabled = false;
+}
+
+function renderTable(title, rows) {
+  const allOk = rows.every(r => r.v.cls === 'ok' || r.v.cls === 'muted');
+  result.innerHTML = `
+    <h2>${title}</h2>
+    <div class="banner ${allOk ? 'ok' : 'error'}">${allOk ? '🎉 모든 규칙 의도대로 동작' : '⚠️ 예상과 다른 결과 — 규칙 조정 필요'}</div>
+    <table>
+      <thead><tr><th>시나리오</th><th>경로</th><th>HTTP</th><th>기대</th><th>결과</th><th>응답</th></tr></thead>
+      <tbody>${rows.map(r => `
+        <tr>
+          <td>${r.name}</td>
+          <td><code>${r.path}</code></td>
+          <td>${r.got.status}</td>
+          <td><code>${r.expected}</code></td>
+          <td class="${r.v.cls}">${r.v.label}</td>
+          <td><code>${(r.got.body || '').replace(/</g,'&lt;')}</code></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function cleanup() {
+  cleanupBtn.disabled = true;
+  const paths = [
+    `/visit_plans/${currentUid}_E2E_rulesv2`,
+    `/wait_queue/${currentClaims?.hospitalId ?? '__unset'}/__e2e_dept/__e2e_date/__e2e_q_${currentUid}`,
+    // audit_logs·hospitals·sessions e2e 항목은 식별 가능한 prefix 로 수동 정리 필요
+  ];
+  for (const p of paths) {
+    await restFetch('DELETE', p);
+  }
+  result.innerHTML = '<p class="muted">visit_plans·wait_queue e2e 항목 정리 완료. audit_logs/hospitals/sessions e2e 엔트리는 콘솔에서 수동 제거하세요.</p>';
+  cleanupBtn.disabled = false;
+}
+
+runReadsBtn.addEventListener('click', runReads);
+runWritesBtn.addEventListener('click', runWrites);
+cleanupBtn.addEventListener('click', cleanup);
+</script>
+</body>
+</html>

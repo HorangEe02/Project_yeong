@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-effect { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e8e8ea",
+                        "tertiary-fixed-dim": "#74d1ff",
+                        "surface-container-highest": "#e2e2e4",
+                        "on-surface-variant": "#414753",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1a1c1d",
+                        "secondary-fixed": "#d7e2ff",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2f3132",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#c1e8ff",
+                        "on-primary-fixed": "#001b3e",
+                        "on-primary-fixed-variant": "#00458e",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f9f9fb",
+                        "primary": "#004e9f",
+                        "on-primary-container": "#dfe8ff",
+                        "surface-dim": "#d9dadc",
+                        "background": "#f9f9fb",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#aac7ff",
+                        "primary-fixed-dim": "#aac7ff",
+                        "surface-container-low": "#f3f3f5",
+                        "on-secondary-fixed": "#001b3f",
+                        "on-tertiary-fixed": "#001e2b",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "outline": "#727784",
+                        "secondary-fixed-dim": "#abc7ff",
+                        "surface-container": "#eeeef0",
+                        "tertiary": "#005673",
+                        "inverse-on-surface": "#f0f0f2",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#007094",
+                        "primary-fixed": "#d7e3ff",
+                        "outline-variant": "#c1c6d5",
+                        "secondary": "#005ab7",
+                        "on-secondary-container": "#fefcff",
+                        "secondary-container": "#0372e4",
+                        "on-surface": "#1a1c1d",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#cdecff",
+                        "on-secondary-fixed-variant": "#00458f",
+                        "surface-variant": "#e2e2e4",
+                        "primary-container": "#0066cc",
+                        "surface-tint": "#005cba",
+                        "surface": "#f9f9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary/10">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-xl shadow-primary/5">
+<div class="flex items-center justify-between px-8 py-4 w-full max-w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-blue-800">MediWay</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-blue-700 font-semibold border-b-2 border-blue-600 transition-all" href="#">Dashboard</a>
+<a class="text-slate-500 hover:text-blue-600 transition-all" href="#">Patients</a>
+<a class="text-slate-500 hover:text-blue-600 transition-all" href="#">Analytics</a>
+<a class="text-slate-500 hover:text-blue-600 transition-all" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-surface-container-high px-4 py-2 rounded-full gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48" placeholder="병원 내 위치 검색" type="text"/>
+</div>
+<button class="p-2 rounded-full hover:bg-slate-100/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-slate-600" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-slate-100/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-slate-600" data-icon="help_outline">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-2 ring-2 ring-primary/10">
+<img alt="User profile photo" data-alt="Professional medical director portrait in white coat with modern clinical background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFdGs6pcrDqYTdBTi6-P35z3ycLYs0tM-6QoecZd0GMccfbUk9NPURO-vr7jS3ffoCEs6S45DPEOf3SvdIPXxT6pWUA4mitx7kPG2BnlAyuJRoMFnYFGzcUXkf3lC-nQWvEzXZWLkLW2pBsq2mrAj59YSDs6roOhPUkYIHwlnVQ9y8YAQNyIAfWff6mhJXvK73hoTs_Y_h7RqK6oVYcLdAPN6WSgz1roNsw0C03YF7aUk6_o8dPnczZYJ0p_-_CCZSgM33dXKfwa0y"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="relative px-8 pt-12 pb-24 lg:pt-24 lg:pb-40 overflow-hidden">
+<div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+<div class="flex-1 text-left z-10">
+<span class="inline-block px-4 py-1.5 rounded-full bg-primary/5 text-primary text-sm font-semibold tracking-wide mb-6">
+                        Smart Hospital Navigation
+                    </span>
+<h1 class="text-5xl lg:text-7xl font-bold tracking-tighter text-on-surface leading-[1.1] mb-6">
+                        진료 끝났습니다,<br/>가세요 — <span class="text-primary italic">그래서 어디로?</span>
+</h1>
+<p class="text-xl text-on-surface-variant max-w-xl leading-relaxed mb-10">
+                        대형 병원의 복잡한 동선을 혁신하는 실내 네비게이션 플랫폼, MediWay. 환자의 불안을 해소하고 의료진의 효율을 극대화합니다.
+                    </p>
+<div class="flex flex-wrap gap-4">
+<button class="px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold text-lg shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-98 transition-all">
+                            서비스 도입 문의하기
+                        </button>
+<button class="px-8 py-4 rounded-xl bg-surface-container-highest text-on-surface font-semibold text-lg hover:bg-surface-container-high active:scale-98 transition-all">
+                            데모 체험하기
+                        </button>
+</div>
+</div>
+<div class="flex-1 w-full relative">
+<div class="relative w-full aspect-[4/3] rounded-xl overflow-hidden shadow-2xl shadow-blue-900/10">
+<img class="w-full h-full object-cover" data-alt="Ultra-modern hospital corridor with clean white surfaces, soft blue neon path line overlays on floor, minimalist futuristic medical setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5HE5bieem3T36ZwJZ5UsRAAZsh_jsBNGZNN6N-MTUGCv5G_zSSuuGOx8KMrBgybbYXdJk2aeb7TQnONU4XQBsff_xXeBr5j3d9y-JWQc4CMyMhFVH7iUBIVLzcm66CHzbiSPDVe36WGQprcWJcNGT1fpA4HyG_XqbSSFNtwNVrmDXfloRY2VvhObOl9vH40vRsDpQ1kh4QuiCMLaAMQpCeLl0oy0PCcWJo88BsE-XpavZy7SP0Sja6IYNdJ1Yieb_xDRlmv75NBBE"/>
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent"></div>
+<!-- Floating UI Elements (Glassmorphism) -->
+<div class="absolute top-8 left-8 p-4 glass-effect bg-white/60 rounded-xl shadow-lg flex items-center gap-4 border border-white/20">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl" data-icon="location_on">location_on</span>
+</div>
+<div>
+<p class="text-xs font-semibold text-primary uppercase tracking-wider">Current Location</p>
+<p class="text-sm font-bold">1F 메인 로비</p>
+</div>
+</div>
+<div class="absolute bottom-8 right-8 p-5 glass-effect bg-white/70 rounded-xl shadow-xl border border-white/30 max-w-[240px]">
+<p class="text-xs font-bold text-on-surface-variant mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-green-500" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                다음 이동 경로 전송됨
+                            </p>
+<p class="text-lg font-bold text-on-surface leading-tight">2F 혈액검사실로<br/>이동해 주세요</p>
+<div class="mt-4 flex items-center justify-between text-xs font-semibold text-primary">
+<span>예상 소요 시간: 3분</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Section (Bento Grid) -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-8">
+<div class="text-center mb-20">
+<h2 class="text-3xl lg:text-4xl font-bold tracking-tight mb-4">병원의 일상을 바꾸는 압도적 경험</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">기존의 비효율적인 안내 시스템을 완전히 대체하여 스마트한 진료 환경을 구축합니다.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="md:col-span-2 group relative overflow-hidden bg-surface-container-lowest rounded-xl p-10 hover:shadow-2xl hover:shadow-primary/5 transition-all">
+<div class="flex flex-col lg:flex-row gap-10 items-center">
+<div class="flex-1">
+<div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="chat_bubble_outline">chat_bubble_outline</span>
+</div>
+<h3 class="text-2xl font-bold mb-4">"모호한 안내는 이제 그만"</h3>
+<p class="text-on-surface-variant leading-relaxed">
+                                    구두 설명이나 종이 안내문 대신, 의료진이 전송하는 실시간 디지털 동선으로 환자가 헤매지 않도록 정확하게 가이드합니다.
+                                </p>
+</div>
+<div class="flex-1 w-full">
+<img class="rounded-xl shadow-lg w-full h-48 object-cover" data-alt="Doctor holding tablet showing digital medical route map, professional medical environment with soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACKmQpQ69TJLFVpVGzZYElNIkRNI-ys3rxcUR4Ibhq7r_7Q5yNQxHenIdQiCCXGu4jr_sDlKJU16aS2ZwU-tYLqSJt9_W4kgJxDCx5XRhLmb1Tdu5MizJ0d9oEepi79YW5PZhfW2vePaaXntJB1f5v55udMy2T3KRfd8LKLOR60Bn9PjmlG0BVTX2rw2IszBb54RJO-nd-HXic-tKk1VUD4l61cICQgFj709lJMbreMmvySYNfvUbXF5H90mULwRjpplMzFXPCScXR"/>
+</div>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="group bg-gradient-to-b from-primary to-primary-container rounded-xl p-10 text-on-primary hover:shadow-2xl hover:shadow-primary/20 transition-all flex flex-col">
+<div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform">
+<span class="material-symbols-outlined text-white text-3xl" data-icon="view_in_ar">view_in_ar</span>
+</div>
+<h3 class="text-2xl font-bold mb-4">"복잡한 병원도 한눈에"</h3>
+<p class="opacity-90 leading-relaxed mb-8">
+                            AR 기반 실시간 턴바이턴 경로 안내를 통해 실내에서도 GPS처럼 정확한 길찾기를 지원합니다.
+                        </p>
+<div class="mt-auto pt-4 border-t border-white/20">
+<div class="flex items-center gap-2 font-bold italic">
+<span>High-Tech Serenity</span>
+<span class="material-symbols-outlined" data-icon="sparkles">colors_spark</span>
+</div>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="md:col-span-3 bg-surface-container-lowest rounded-xl p-10 hover:shadow-2xl transition-all border border-transparent hover:border-primary/10">
+<div class="flex flex-col lg:flex-row items-center gap-12">
+<div class="lg:w-1/3">
+<div class="w-14 h-14 rounded-2xl bg-tertiary/10 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-icon="family_history">family_history</span>
+</div>
+<h3 class="text-2xl font-bold mb-4">"환자와 의료진 모두를 위해"</h3>
+<p class="text-on-surface-variant leading-relaxed">
+                                    환자의 대기 시간과 불안감을 줄이고, 병원 내부의 병목 현상을 해결하여 진료 흐름을 최적화합니다. 이는 병원 경영 효율화의 핵심입니다.
+                                </p>
+</div>
+<div class="lg:w-2/3 grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-surface-container-low p-6 rounded-xl text-center">
+<p class="text-primary font-black text-3xl mb-1">42%</p>
+<p class="text-xs font-bold text-on-surface-variant uppercase">대기 시간 감소</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl text-center">
+<p class="text-primary font-black text-3xl mb-1">95%</p>
+<p class="text-xs font-bold text-on-surface-variant uppercase">환자 만족도</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl text-center">
+<p class="text-primary font-black text-3xl mb-1">15%</p>
+<p class="text-xs font-bold text-on-surface-variant uppercase">진료 회전율 증대</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl text-center">
+<p class="text-primary font-black text-3xl mb-1">2.4x</p>
+<p class="text-xs font-bold text-on-surface-variant uppercase">업무 효율성</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-24 px-8">
+<div class="max-w-5xl mx-auto bg-slate-900 rounded-[2.5rem] overflow-hidden relative shadow-2xl shadow-slate-900/40">
+<div class="absolute inset-0 opacity-20">
+<img class="w-full h-full object-cover" data-alt="Dark abstract architectural background with clean lines and soft blue highlights, premium corporate medical feel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP5lhkJwlBTsTr7ZUALLipzXtRxQ8mGI3q3FkLjS6oCpAszc77OhvDeXnHwZVIWhS1dvKRVzNVxgTuOw7Huq_v1WPcjn99BlQrZVP2Vrr_4US-3c7STcesbllAklnqiYjAd3Lmmr9ukTNVGONd8xJGklpV4Un-lA3STe81eO1HaLVHUZllOg2IqcF9-2JYUfBdbOVPql_aQQ_6zeZ27DFpZMZMNo2AE1mmMTkTI24S9gL3XTsC4r-SSQ1bVLj_RhxvWOZ_w1EG8eB_"/>
+</div>
+<div class="relative z-10 p-12 lg:p-20 text-center">
+<h2 class="text-4xl lg:text-5xl font-bold text-white tracking-tight mb-8">당신의 병원을 <span class="text-primary-fixed-dim">스마트하게</span> 바꾸세요.</h2>
+<p class="text-slate-400 text-lg max-w-2xl mx-auto mb-12">
+                        MediWay는 이미 50여 곳의 대형 종합 병원에서 검증된 솔루션입니다.<br/>지금 바로 맞춤형 도입 상담을 시작하세요.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="px-10 py-5 rounded-xl bg-primary text-white font-bold text-lg hover:bg-primary-container transition-all">
+                            서비스 도입 문의하기
+                        </button>
+<button class="px-10 py-5 rounded-xl bg-white/10 text-white font-bold text-lg hover:bg-white/20 backdrop-blur-md transition-all">
+                            체험판 다운로드
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface px-8 py-16">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+<div class="col-span-1 md:col-span-1">
+<span class="text-2xl font-black tracking-tighter text-blue-800 mb-6 block">MediWay</span>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                        디지털 헬스케어의 새로운 표준.<br/>우리는 환자의 모든 발걸음을 배려합니다.
+                    </p>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-on-surface">Product</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">실내 네비게이션</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">의료진 관리 도구</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">환자 데이터 분석</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">시스템 연동 (EMR/HIS)</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-on-surface">Company</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">브랜드 스토리</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">공지사항</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">채용 안내</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">문의하기</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-on-surface">Connect</h4>
+<div class="flex gap-4 mb-6">
+<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="language">language</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="alternate_email">alternate_email</span>
+</button>
+</div>
+<p class="text-xs text-on-surface-variant">© 2024 MediWay Inc. All rights reserved.</p>
+</div>
+</div>
+<div class="pt-8 border-t border-surface-container-high flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex gap-8 text-xs font-medium text-on-surface-variant/60">
+<a href="#">Privacy Policy</a>
+<a href="#">Terms of Service</a>
+<a href="#">Security Guidelines</a>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-xs font-semibold text-on-surface-variant">All Systems Operational</span>
+</div>
+</div>
+</div>
+</footer>
+<!-- SideNavBar (Mobile Trigger Hidden, Logic preserved from JSON for semantic structure) -->
+<div class="hidden lg:hidden h-screen w-64 fixed left-0 top-0 bg-slate-50 p-6 flex-col gap-2 z-[60]">
+<div class="mb-10">
+<span class="font-black text-blue-700 text-xl">MediWay Clinical</span>
+<p class="text-[10px] text-slate-500">High-Tech Serenity</p>
+</div>
+<nav class="flex flex-col gap-2">
+<button class="flex items-center gap-3 px-4 py-3 text-blue-700 bg-white rounded-xl shadow-sm">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Home</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-blue-50">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="text-sm font-medium">Routes</span>
+</button>
+</nav>
+</div>
+</body></html>

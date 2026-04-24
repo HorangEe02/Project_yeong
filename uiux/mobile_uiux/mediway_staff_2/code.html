@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay Staff Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#c1e8ff",
+                    "surface-dim": "#d9dadc",
+                    "inverse-surface": "#2f3132",
+                    "surface": "#f9f9fb",
+                    "on-secondary-fixed-variant": "#00458f",
+                    "on-surface": "#1a1c1d",
+                    "secondary-fixed": "#d7e2ff",
+                    "tertiary-fixed-dim": "#74d1ff",
+                    "inverse-primary": "#aac7ff",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c1c6d5",
+                    "secondary-container": "#0372e4",
+                    "primary-container": "#0066cc",
+                    "on-primary-container": "#dfe8ff",
+                    "surface-tint": "#005cba",
+                    "secondary": "#005ab7",
+                    "primary": "#004e9f",
+                    "inverse-on-surface": "#f0f0f2",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "background": "#f9f9fb",
+                    "on-tertiary-container": "#cdecff",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e2e2e4",
+                    "on-tertiary-fixed": "#001e2b",
+                    "surface-container-highest": "#e2e2e4",
+                    "secondary-fixed-dim": "#abc7ff",
+                    "primary-fixed": "#d7e3ff",
+                    "surface-container-low": "#f3f3f5",
+                    "primary-fixed-dim": "#aac7ff",
+                    "on-secondary-container": "#fefcff",
+                    "surface-container": "#eeeef0",
+                    "on-surface-variant": "#414753",
+                    "on-secondary-fixed": "#001b3f",
+                    "on-primary-fixed": "#001b3e",
+                    "on-background": "#1a1c1d",
+                    "outline": "#727784",
+                    "tertiary-container": "#007094",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#00458e",
+                    "tertiary": "#005673",
+                    "surface-container-high": "#e8e8ea",
+                    "surface-bright": "#f9f9fb",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface mb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg shadow-[0px_10px_40px_rgba(0,78,159,0.04)]">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-md mx-auto">
+<div class="flex items-center gap-3">
+<img alt="User profile photo" class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="Professional medical staff portrait with a warm, confident expression in a brightly lit clinical setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbBdoNJrIwBQibMxqWyJgDr6GIFIliE1Z4-GCJ_-YDF8hDWGR9J7ywvt5ZWsyfIUhItYVfCxX4TFi7xZs712g01E8aOE7rR3qJbi7hdiju98MRqvAYWwUAMorbdl2GKIhCkMpjisRYWEn2IWWQQfSkPsq0a4FuItN2hP7OefMO4C8pvhwmwyV6Y_uc2kvWX7hf_Kj5UdIP11aVpiptcZ8KJ539n65fLA5YCaU-bwRZwXpoOo-3Ugos6NfHpkFOaSNqGB7_0OV7HlBo"/>
+<span class="text-xl font-black text-blue-800 uppercase tracking-widest">MediWay</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-blue-50/50 transition-all text-blue-700">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-20 px-6 max-w-md mx-auto space-y-8">
+<!-- Quick Action: QR Scanner -->
+<section class="mt-4">
+<button class="w-full bg-gradient-to-r from-primary to-primary-container p-6 rounded-xl flex items-center justify-between group active:scale-95 transition-all shadow-[0px_20px_40px_rgba(0,78,159,0.15)]">
+<div class="text-left">
+<span class="block text-on-primary/70 text-sm font-medium tracking-wide uppercase">Operational Task</span>
+<h2 class="text-on-primary text-2xl font-bold tracking-tight">Scan Patient QR</h2>
+</div>
+<div class="w-14 h-14 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-3xl" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
+</div>
+</button>
+</section>
+<!-- Route Templates Section -->
+<section class="space-y-4">
+<div class="flex justify-between items-end">
+<h3 class="text-on-surface font-bold text-xl tracking-tight">Route Templates</h3>
+<span class="text-primary text-sm font-semibold">View All</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Template Card 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl space-y-4 shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary-container/20">
+<div class="w-10 h-10 bg-tertiary-fixed rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-tertiary-fixed">emergency_home</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface leading-tight">ICU Ward A</h4>
+<p class="text-on-surface-variant text-xs mt-1">12 Patients Checked</p>
+</div>
+</div>
+<!-- Template Card 2 -->
+<div class="bg-surface-container-lowest p-5 rounded-xl space-y-4 shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary-container/20">
+<div class="w-10 h-10 bg-secondary-fixed rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-fixed">biotech</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface leading-tight">Lab Diagnostics</h4>
+<p class="text-on-surface-variant text-xs mt-1">Priority Collection</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Patient Status List (Editorial Style) -->
+<section class="space-y-6">
+<h3 class="text-on-surface font-bold text-xl tracking-tight">Current Status</h3>
+<div class="space-y-1">
+<!-- Status Row 1 -->
+<div class="flex items-center gap-4 py-4 px-2 rounded-xl hover:bg-surface-container-low transition-all">
+<div class="relative">
+<img alt="Patient photo" class="w-12 h-12 rounded-full object-cover" data-alt="Close-up portrait of an elderly woman with kind eyes and silver hair, brightly lit studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBv_kFyFp_PkNOvxEMT-L_N76XqIoVOpRq5D-VR60s51foT6wm73nJMmjtd5T2bu9E8EkksmOrblUa6-okcZ4BVmvHT4b7fzc-8zfJn6ogmB0YkhSVrXcyunctrleB2ZBDCFfa34ffrfKB0IrxZpCNx_coJ3C7cPTinfNtgnP5ydOV4PcXjA7-Bja5u9xhNOhDPzV1dOfoqoMIQCyDwH7wBowgzj5s5Eq0e7AWc8nb0j4D5W04TJux4sqDUiA5mJEhz2SCSxEJQq7aX"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-error rounded-full border-2 border-surface"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface truncate">Elena Vance</h4>
+<span class="text-xs font-bold text-error bg-error-container px-2 py-0.5 rounded-full uppercase tracking-tighter">Critical</span>
+</div>
+<p class="text-on-surface-variant text-sm truncate">Room 402 • Post-Op Recovery</p>
+</div>
+</div>
+<!-- Status Row 2 -->
+<div class="flex items-center gap-4 py-4 px-2 rounded-xl hover:bg-surface-container-low transition-all">
+<div class="relative">
+<img alt="Patient photo" class="w-12 h-12 rounded-full object-cover" data-alt="Portrait of a middle-aged man with short dark hair and a calm expression, soft natural window light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFgLDP2AO3MzC46H6-Vb1pod6nShYRJnvqTr9-6R8FJFj2BaZfPT34oSfbAzxKPtalzhVchFak7ijFdY_p9OVtD90YZYZNdRzjd_0Fa5lMPJ_O7uC1bp-naphDprGCUnwdIER9EYtni8T-avwXg5srQh42tpZ0P_ue2PHoRqB-BQP-QKF1ljcgPW0sRGIYCUz7IrO5JTOMAUeOI7ktua82Ko9IalPGs9_H6uyBHG0XAtqr0FcIGvXwwhpu4HNV68tRMawdZQYwddCC"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-surface"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface truncate">Marcus Chen</h4>
+<span class="text-xs font-bold text-primary bg-primary-fixed px-2 py-0.5 rounded-full uppercase tracking-tighter">Stable</span>
+</div>
+<p class="text-on-surface-variant text-sm truncate">Room 215 • Cardiology Wing</p>
+</div>
+</div>
+<!-- Status Row 3 -->
+<div class="flex items-center gap-4 py-4 px-2 rounded-xl hover:bg-surface-container-low transition-all">
+<div class="relative">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold">JD</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-surface"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-on-surface truncate">Julian Doe</h4>
+<span class="text-xs font-bold text-primary bg-primary-fixed px-2 py-0.5 rounded-full uppercase tracking-tighter">Stable</span>
+</div>
+<p class="text-on-surface-variant text-sm truncate">Room 108 • Observation</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Visualization Bento -->
+<section class="pb-8">
+<div class="bg-surface-container-high rounded-[1.5rem] p-6 grid grid-cols-2 gap-4">
+<div class="col-span-2">
+<h3 class="text-on-surface font-bold text-lg mb-4">Pulse Metrics</h3>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col justify-between h-32">
+<span class="text-on-surface-variant text-xs font-medium uppercase tracking-wider">Active Alerts</span>
+<span class="text-3xl font-black text-error">04</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl flex flex-col justify-between h-32">
+<span class="text-on-surface-variant text-xs font-medium uppercase tracking-wider">Completed</span>
+<span class="text-3xl font-black text-primary">82%</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-2xl rounded-t-[1.5rem] z-50 shadow-[0px_-15px_50px_rgba(0,0,0,0.05)] flex justify-around items-center px-4 pb-6 pt-3">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center bg-blue-50 text-blue-700 rounded-[1.25rem] px-5 py-2 active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_health</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Home</span>
+</a>
+<!-- Pulse -->
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:text-blue-500 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Pulse</span>
+</a>
+<!-- Guide -->
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:text-blue-500 transition-colors" href="#">
+<span class="material-symbols-outlined">medical_information</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Guide</span>
+</a>
+<!-- Facility -->
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:text-blue-500 transition-colors" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Facility</span>
+</a>
+</nav>
+</body></html>

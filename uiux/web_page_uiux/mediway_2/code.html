@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay Patient Navigation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e8e8ea",
+                        "tertiary-fixed-dim": "#74d1ff",
+                        "surface-container-highest": "#e2e2e4",
+                        "on-surface-variant": "#414753",
+                        "on-primary": "#ffffff",
+                        "on-background": "#1a1c1d",
+                        "secondary-fixed": "#d7e2ff",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2f3132",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#c1e8ff",
+                        "on-primary-fixed": "#001b3e",
+                        "on-primary-fixed-variant": "#00458e",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f9f9fb",
+                        "primary": "#004e9f",
+                        "on-primary-container": "#dfe8ff",
+                        "surface-dim": "#d9dadc",
+                        "background": "#f9f9fb",
+                        "on-error-container": "#93000a",
+                        "inverse-primary": "#aac7ff",
+                        "primary-fixed-dim": "#aac7ff",
+                        "surface-container-low": "#f3f3f5",
+                        "on-secondary-fixed": "#001b3f",
+                        "on-tertiary-fixed": "#001e2b",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "outline": "#727784",
+                        "secondary-fixed-dim": "#abc7ff",
+                        "surface-container": "#eeeef0",
+                        "tertiary": "#005673",
+                        "inverse-on-surface": "#f0f0f2",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#007094",
+                        "primary-fixed": "#d7e3ff",
+                        "outline-variant": "#c1c6d5",
+                        "secondary": "#005ab7",
+                        "on-secondary-container": "#fefcff",
+                        "secondary-container": "#0372e4",
+                        "on-surface": "#1a1c1d",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#cdecff",
+                        "on-secondary-fixed-variant": "#00458f",
+                        "surface-variant": "#e2e2e4",
+                        "primary-container": "#0066cc",
+                        "surface-tint": "#005cba",
+                        "surface": "#f9f9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .nav-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .map-gradient-overlay {
+            background: linear-gradient(to top, rgba(249, 249, 251, 1) 0%, rgba(249, 249, 251, 0) 20%);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- TopAppBar (From JSON) -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl shadow-blue-900/5 flex items-center justify-between px-8 py-4 w-full max-w-full">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-300">MediWay</span>
+</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 font-sans tracking-tight transition-all" href="#">Dashboard</a>
+<a class="text-blue-700 dark:text-blue-400 font-semibold border-b-2 border-blue-600 font-sans tracking-tight transition-all" href="#">Patients</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 font-sans tracking-tight transition-all" href="#">Analytics</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-blue-600 font-sans tracking-tight transition-all" href="#">Settings</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-all rounded-full">
+<span class="material-symbols-outlined text-slate-600" data-icon="notifications">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="User profile photo" data-alt="Close-up professional portrait of a medical professional in white coat with a friendly expression in a bright clinical setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAp857-aG4SLo3mwtL3rxe4H-zjkIMs7-T-yOovJZY6d8qlber7P4rd8S-j1GYuskwPQssTIsZgexzSEK3-Q02GaRI0-HnyC9nSPz1zImZ1TyclFmemflRvA8zCuFKATIq3MrMCtHHYxXKADjy7hpUUasni9342oC1wiq9QN1TS0lLJt-VZ5DiH-eeN5bVXJ3Wi97rCs5xlg_y_abzG_0hCBYBKgXUu7ZOpmc9sPU7DLF0I2zfjrIkKsY5Tx668IG-IUWAkm2qAwYcy"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-4 md:px-8 max-w-7xl mx-auto flex flex-col gap-8">
+<!-- Header Location -->
+<section class="bg-surface-container-lowest p-6 rounded-xl shadow-sm border-l-4 border-primary">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="location_on" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<div>
+<p class="text-label-md text-on-surface-variant font-medium">현재 위치</p>
+<h1 class="text-2xl font-bold tracking-tight text-on-surface">본관 2층 내과 앞</h1>
+</div>
+</div>
+</section>
+<!-- Progress Stepper -->
+<section class="bg-surface-container-low p-8 rounded-xl">
+<div class="flex items-center justify-between relative">
+<div class="absolute top-1/2 left-0 w-full h-1 bg-surface-container-high -translate-y-1/2 z-0"></div>
+<div class="absolute top-1/2 left-0 w-1/3 h-1 bg-primary -translate-y-1/2 z-0"></div>
+<!-- Step 1: Done -->
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-icon="check">check</span>
+</div>
+<span class="text-sm font-bold text-primary">내과</span>
+</div>
+<!-- Step 2: Active -->
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container border-4 border-surface-container-low shadow-lg">
+<span class="material-symbols-outlined" data-icon="biotech" style="font-variation-settings: 'FILL' 1;">biotech</span>
+</div>
+<span class="text-sm font-bold text-on-surface">채혈실</span>
+</div>
+<!-- Step 3: Upcoming -->
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+</div>
+<span class="text-sm font-medium text-on-surface-variant">원무과</span>
+</div>
+<!-- Step 4: Upcoming -->
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="prescriptions">prescriptions</span>
+</div>
+<span class="text-sm font-medium text-on-surface-variant">약국</span>
+</div>
+</div>
+</section>
+<!-- Main Map Visual -->
+<section class="relative w-full aspect-[4/3] md:aspect-[21/9] rounded-xl overflow-hidden bg-surface-container-high shadow-inner">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-30 mix-blend-multiply" data-alt="A clean, minimalist architectural floor plan of a hospital building with simplified 3D perspectives and bright lighting" data-location="Seoul" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFC4KivnNo73XhCl4UdS2QQT72uNvfq2E7PFx4cQuk-FzctDE0tVtBQFyn8aXlhbqUDTqX8AJtT-eRrjsj2whFC8HtM7X1E5Hwx5G6-AJqszgfiBBLnQXY2aw0se41BvHsnLbafClNtIu5Vja75JQ3gbuAG8DRh60BLSXNPPC6_9qJ2_ehJODWdwNsH1hkITewoRu3zlIorxVrSE6bF-JB4edVm4baxn0gSgupiJy_YeNITCyTitwooTj9EW-w2oXcdUlAklkywlke"/>
+</div>
+<!-- Map UI Elements Overlay -->
+<div class="absolute inset-0 z-10 p-8 flex flex-col justify-between">
+<!-- Map Navigation Layer (Abstract Simulation) -->
+<div class="relative flex-grow">
+<!-- Start Point -->
+<div class="absolute top-3/4 left-1/4 flex flex-col items-center">
+<div class="w-6 h-6 bg-primary rounded-full ring-4 ring-white shadow-lg animate-pulse"></div>
+<span class="mt-2 bg-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">현위치</span>
+</div>
+<!-- Path Line (SVG) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" preserveaspectratio="none" viewbox="0 0 1000 1000">
+<path d="M250,750 L400,600 L600,600 L750,400" fill="none" stroke="#004e9f" stroke-dasharray="12 8" stroke-linecap="round" stroke-width="8"></path>
+</svg>
+<!-- Destination Point -->
+<div class="absolute top-1/3 left-3/4 flex flex-col items-center">
+<span class="material-symbols-outlined text-error text-4xl" data-icon="location_on" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="mt-2 bg-error text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">본관 3층 채혈실</span>
+</div>
+</div>
+<!-- Floating Map Controls -->
+<div class="flex justify-end gap-3">
+<button class="w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<button class="w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+<button class="w-12 h-12 rounded-xl bg-white shadow-lg flex items-center justify-center hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="my_location">my_location</span>
+</button>
+</div>
+</div>
+<div class="absolute inset-0 map-gradient-overlay z-0"></div>
+</section>
+<!-- Quick Action Grid -->
+<section class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-3 p-5 bg-surface-container-lowest rounded-xl shadow-sm hover:bg-surface-container-low transition-all">
+<span class="text-2xl">🅿️</span>
+<span class="font-bold text-lg text-on-surface">주차 위치</span>
+</button>
+<button class="flex items-center justify-center gap-3 p-5 bg-surface-container-lowest rounded-xl shadow-sm hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-2xl" data-icon="search">search</span>
+<span class="font-bold text-lg text-on-surface">검색</span>
+</button>
+</section>
+</main>
+<!-- Floating Next Step Card (Bottom Anchor) -->
+<div class="fixed bottom-0 left-0 w-full p-4 md:p-8 z-50">
+<div class="max-w-3xl mx-auto bg-primary-container text-white p-6 rounded-xl shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden relative">
+<!-- Glass Shine Effect -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-3xl -mr-20 -mt-20 rounded-full"></div>
+<div class="flex gap-4 items-start relative z-10">
+<div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-3xl" data-icon="directions_walk">directions_walk</span>
+</div>
+<div>
+<h3 class="text-sm font-medium opacity-80">다음 목적지</h3>
+<h2 class="text-xl font-extrabold tracking-tight">본관 3층 채혈실</h2>
+<div class="flex items-center gap-3 mt-1 text-sm font-semibold text-on-primary-container">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span> 도보 3분
+                        </span>
+<span class="opacity-30">|</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="elevator">elevator</span> 엘리베이터 이용 권장
+                        </span>
+</div>
+</div>
+</div>
+<button class="relative z-10 bg-white text-primary px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-surface-container-lowest transition-all active:scale-95">
+                길 안내 시작
+            </button>
+</div>
+</div>
+</body></html>

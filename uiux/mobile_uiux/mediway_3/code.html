@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay | Patient Navigation Guide</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#c1e8ff",
+                        "surface-dim": "#d9dadc",
+                        "inverse-surface": "#2f3132",
+                        "surface": "#f9f9fb",
+                        "on-secondary-fixed-variant": "#00458f",
+                        "on-surface": "#1a1c1d",
+                        "secondary-fixed": "#d7e2ff",
+                        "tertiary-fixed-dim": "#74d1ff",
+                        "inverse-primary": "#aac7ff",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c1c6d5",
+                        "secondary-container": "#0372e4",
+                        "primary-container": "#0066cc",
+                        "on-primary-container": "#dfe8ff",
+                        "surface-tint": "#005cba",
+                        "secondary": "#005ab7",
+                        "primary": "#004e9f",
+                        "inverse-on-surface": "#f0f0f2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "background": "#f9f9fb",
+                        "on-tertiary-container": "#cdecff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e2e2e4",
+                        "on-tertiary-fixed": "#001e2b",
+                        "surface-container-highest": "#e2e2e4",
+                        "secondary-fixed-dim": "#abc7ff",
+                        "primary-fixed": "#d7e3ff",
+                        "surface-container-low": "#f3f3f5",
+                        "primary-fixed-dim": "#aac7ff",
+                        "on-secondary-container": "#fefcff",
+                        "surface-container": "#eeeef0",
+                        "on-surface-variant": "#414753",
+                        "on-secondary-fixed": "#001b3f",
+                        "on-primary-fixed": "#001b3e",
+                        "on-background": "#1a1c1d",
+                        "outline": "#727784",
+                        "tertiary-container": "#007094",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#00458e",
+                        "tertiary": "#005673",
+                        "surface-container-high": "#e8e8ea",
+                        "surface-bright": "#f9f9fb",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-[0px_10px_40px_rgba(0,78,159,0.04)]">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-md mx-auto">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high flex items-center justify-center">
+<img alt="User" class="w-full h-full object-cover" data-alt="Portrait of a medical professional with a friendly smile, clean white lab coat, soft bright clinic background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkXv2KlM2QgYYM5OK85H-4d9TH2t1nclzhdxW896HrRW0ik-Pg_sKglZ5rpPc_7o18LKEaGJTWd8Z7FCIB5bwm0ascgMasDiJmAmhqKKEyUT0YCwSUdro49OwZQAfrjzRI4fkqcyOa8-EF6imVFjm_zdvp8INUGu2AzSJ27pHmmYoFSMxBG40QG0b6WuT9UWyqPqRuxZyiZJkNkgnN0qEKxPEmXxc0GX7Xd-C1za5WoNhPuWXbDJb5XMqMmUpldlDaQlMVOTnQnSxa"/>
+</div>
+<h1 class="text-xl font-black text-blue-800 dark:text-blue-200 uppercase tracking-widest font-['Inter']">MediWay</h1>
+<div class="p-2 rounded-full hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all active:scale-95 duration-200 ease-out">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400">notifications</span>
+</div>
+</div>
+</nav>
+<main class="pt-20 px-6 max-w-md mx-auto space-y-6">
+<!-- Welcome Header -->
+<header class="space-y-1 py-2">
+<p class="text-on-surface-variant font-medium text-sm tracking-wide">HELLO, ARTHUR</p>
+<h2 class="text-3xl font-bold tracking-tight text-on-surface">Your Daily Route</h2>
+</header>
+<!-- Daily Route Progress Tracker (Bento-style Minimalist) -->
+<section class="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_10px_30px_rgba(0,0,0,0.02)]">
+<div class="relative flex justify-between items-start">
+<!-- Progress Line -->
+<div class="absolute top-5 left-0 w-full h-[2px] bg-surface-container-high -z-0"></div>
+<div class="absolute top-5 left-0 w-1/3 h-[2px] bg-primary transition-all duration-500 -z-0"></div>
+<!-- Step 1: Active/Done -->
+<div class="flex flex-col items-center gap-3 relative z-10">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-sm" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-on-surface-variant">Blood Test</span>
+</div>
+<!-- Step 2: Current -->
+<div class="flex flex-col items-center gap-3 relative z-10">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest border-4 border-primary-container flex items-center justify-center ring-4 ring-primary/5">
+<div class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></div>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-primary">Admin</span>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex flex-col items-center gap-3 relative z-10">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-on-surface-variant/30"></div>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-on-surface-variant/50">Pharmacy</span>
+</div>
+</div>
+</section>
+<!-- Next Destination Card (Primary Focus) -->
+<section class="bg-primary-container rounded-xl p-6 text-on-primary-container shadow-2xl shadow-primary/10 overflow-hidden relative">
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="space-y-1">
+<p class="text-[11px] font-bold uppercase tracking-[0.1em] opacity-80">Next Destination</p>
+<h3 class="text-2xl font-bold tracking-tight">Main Administration</h3>
+</div>
+<div class="bg-white/20 backdrop-blur-md rounded-xl p-3 flex flex-col items-center min-w-[70px]">
+<span class="text-xs font-bold uppercase opacity-80">ETA</span>
+<span class="text-xl font-black">4 min</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex items-center gap-3 bg-on-primary/10 rounded-lg p-3">
+<span class="material-symbols-outlined text-lg">distance</span>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-semibold opacity-70">Distance</span>
+<span class="text-sm font-bold">180 meters</span>
+</div>
+</div>
+<div class="flex items-center gap-3 bg-on-primary/10 rounded-lg p-3">
+<span class="material-symbols-outlined text-lg">stairs</span>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-semibold opacity-70">Level</span>
+<span class="text-sm font-bold">Floor 2</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Indoor Navigation Map (Simplified 2D) -->
+<section class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-[0px_20px_50px_rgba(0,0,0,0.04)] relative">
+<div class="p-6 pb-2">
+<h4 class="text-sm font-bold text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">near_me</span>
+                    Current Indoor View
+                </h4>
+</div>
+<div class="h-64 w-full bg-surface-container-high relative overflow-hidden">
+<!-- Fake Indoor Map Elements -->
+<div class="absolute inset-0 opacity-40">
+<div class="absolute top-10 left-10 w-24 h-40 bg-white rounded-lg"></div>
+<div class="absolute top-10 left-40 w-32 h-20 bg-white rounded-lg"></div>
+<div class="absolute top-40 left-40 w-20 h-20 bg-white rounded-lg"></div>
+</div>
+<!-- Navigation Route Line -->
+<svg class="absolute inset-0 w-full h-full" viewbox="0 0 400 400">
+<path d="M 50 300 Q 150 280 200 150 T 350 100" fill="transparent" stroke="#004e9f" stroke-dasharray="8,8" stroke-linecap="round" stroke-width="4"></path>
+<circle cx="50" cy="300" fill="#004e9f" r="6"></circle>
+<circle cx="350" cy="100" fill="#004e9f" fill-opacity="0.2" r="10"></circle>
+<circle cx="350" cy="100" fill="#004e9f" r="5"></circle>
+</svg>
+<!-- Current User Location Pulse -->
+<div class="absolute bottom-[90px] left-[40px] flex items-center justify-center">
+<div class="w-8 h-8 bg-primary/20 rounded-full animate-ping absolute"></div>
+<div class="w-4 h-4 bg-primary rounded-full border-2 border-white shadow-md relative z-10"></div>
+</div>
+<!-- Labels -->
+<div class="absolute bottom-6 left-6 px-3 py-1 bg-white/90 backdrop-blur rounded-full shadow-sm">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">West Wing Entrance</span>
+</div>
+<div class="absolute top-12 right-6 px-3 py-1 bg-primary text-white rounded-full shadow-md">
+<span class="text-[10px] font-bold uppercase">Admin Block</span>
+</div>
+</div>
+<div class="p-4 bg-surface-container-lowest flex items-center justify-between">
+<button class="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-wider px-4 py-2 hover:bg-primary-container/10 rounded-full transition-all">
+<span class="material-symbols-outlined text-[18px]">explore</span>
+                    Open Floor Plan
+                </button>
+<div class="flex gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">remove</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Navigation Tips -->
+<section class="grid grid-cols-2 gap-4 pb-4">
+<div class="p-4 bg-surface-container-low rounded-xl space-y-2">
+<span class="material-symbols-outlined text-secondary">elevator</span>
+<p class="text-xs font-semibold text-on-surface-variant leading-snug">Use Elevator B near the cafe for faster access.</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-xl space-y-2">
+<span class="material-symbols-outlined text-secondary">info</span>
+<p class="text-xs font-semibold text-on-surface-variant leading-snug">Need help? Look for the 'Purple Vest' guides.</p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl rounded-t-[1.5rem] shadow-[0px_-15px_50px_rgba(0,0,0,0.05)]">
+<div class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3">
+<!-- Home -->
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-500 transition-colors active:scale-90 duration-300">
+<span class="material-symbols-outlined" data-icon="home_health">home_health</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Home</span>
+</div>
+<!-- Pulse -->
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-500 transition-colors active:scale-90 duration-300">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Pulse</span>
+</div>
+<!-- Guide (ACTIVE) -->
+<div class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-[1.25rem] px-5 py-2 active:scale-90 duration-300">
+<span class="material-symbols-outlined" data-icon="medical_information" style="font-variation-settings: 'FILL' 1;">medical_information</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Guide</span>
+</div>
+<!-- Facility -->
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-500 transition-colors active:scale-90 duration-300">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Facility</span>
+</div>
+</div>
+</nav>
+</body></html>

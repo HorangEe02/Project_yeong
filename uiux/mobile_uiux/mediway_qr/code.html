@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#d7e2ff",
+                    "secondary-container": "#0372e4",
+                    "on-secondary-fixed-variant": "#00458f",
+                    "on-tertiary-container": "#cdecff",
+                    "surface-dim": "#d9dadc",
+                    "surface-container-low": "#f3f3f5",
+                    "primary": "#004e9f",
+                    "on-background": "#1a1c1d",
+                    "surface-container": "#eeeef0",
+                    "inverse-primary": "#aac7ff",
+                    "secondary": "#005ab7",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-variant": "#e2e2e4",
+                    "surface-container-highest": "#e2e2e4",
+                    "outline": "#727784",
+                    "tertiary-fixed": "#c1e8ff",
+                    "inverse-surface": "#2f3132",
+                    "secondary-fixed-dim": "#abc7ff",
+                    "outline-variant": "#c1c6d5",
+                    "surface-tint": "#005cba",
+                    "primary-fixed": "#d7e3ff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001b3e",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#dfe8ff",
+                    "inverse-on-surface": "#f0f0f2",
+                    "on-secondary-container": "#fefcff",
+                    "tertiary-fixed-dim": "#74d1ff",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f9f9fb",
+                    "tertiary-container": "#007094",
+                    "on-tertiary-fixed": "#001e2b",
+                    "on-error-container": "#93000a",
+                    "surface": "#f9f9fb",
+                    "surface-container-high": "#e8e8ea",
+                    "on-primary": "#ffffff",
+                    "background": "#f9f9fb",
+                    "primary-fixed-dim": "#aac7ff",
+                    "on-surface-variant": "#414753",
+                    "tertiary": "#005673",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed": "#001b3f",
+                    "on-surface": "#1a1c1d",
+                    "primary-container": "#0066cc",
+                    "on-primary-fixed-variant": "#00458e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        @keyframes scan-line {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(240px); opacity: 0; }
+        }
+        .scan-line {
+            animation: scan-line 3s infinite ease-in-out;
+        }
+        .bg-mesh {
+            background-color: #f9f9fb;
+            background-image: radial-gradient(at 0% 0%, hsla(210,100%,93%,1) 0, transparent 50%), 
+                              radial-gradient(at 100% 100%, hsla(210,100%,93%,1) 0, transparent 50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col items-center overflow-x-hidden">
+<!-- Top AppBar -->
+<header class="bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm dark:shadow-none docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-6 py-4 max-w-full mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<h1 class="text-xl font-bold tracking-tighter text-blue-900 dark:text-white font-headline">MediWay</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-slate-500 dark:text-slate-400 font-medium hover:text-blue-600 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="Medical Staff Profile Avatar" class="w-full h-full object-cover" data-alt="Close up portrait of a smiling female doctor wearing professional medical attire in a bright clinic setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLFiYQWjmLg4tPdEkSajQaAVo3vmUyy6VS5ja9CQ7uQBxIEQ0OJQZ_IaGxGf_NCJlrwaJRIoRPzU7nSC91bBbftCFbpGH1aaNUCThht1-felTwqrGdFDbqyk5gltcPFO2IZZHWltlzKNbSijjqZsLwU6bRQkdcVP4leFYqYP4EeTGl347P7WL-vKFeseO2uOziIricV8VGEpxLOYHI8hMDYX7rTyIsM_u0ZcVT_3SmFfC1njyNs1CjQfx81FBD0RqxDQNL3AZFrn0G"/>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-md px-6 pt-8 pb-32 flex flex-col items-center justify-center bg-mesh">
+<!-- Patient Info Card -->
+<div class="w-full mb-8 bg-surface-container-lowest rounded-xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex items-center justify-between">
+<div>
+<p class="text-on-surface-variant text-sm font-medium">환자 정보</p>
+<h2 class="text-xl font-bold text-on-surface mt-1">김메디 <span class="font-normal text-on-surface-variant text-base">님</span></h2>
+</div>
+<div class="text-right">
+<p class="text-on-surface-variant text-xs mb-1">진료실</p>
+<span class="inline-flex items-center px-3 py-1 bg-secondary-fixed text-on-secondary-fixed text-xs font-bold rounded-full">Zone A-1</span>
+</div>
+</div>
+<!-- Main QR Container -->
+<div class="relative group">
+<!-- Glassmorphism Backdrop for QR -->
+<div class="absolute -inset-4 bg-primary/5 blur-2xl rounded-full opacity-50"></div>
+<div class="relative bg-surface-container-lowest p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,78,159,0.1)] border border-white/40">
+<div class="relative w-64 h-64 bg-white rounded-2xl flex items-center justify-center overflow-hidden">
+<!-- Placeholder for QR Code using Material Icon as proxy for visual clarity -->
+<span class="material-symbols-outlined text-[12rem] text-slate-800" style="font-variation-settings: 'wght' 200;">qr_code_2</span>
+<!-- Scanning Animation Line -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent scan-line shadow-[0_0_15px_rgba(0,78,159,0.5)]"></div>
+</div>
+<div class="mt-8 text-center">
+<p class="text-primary font-bold text-lg leading-snug">
+                        이 QR 코드를 간호사에게<br/>보여주세요
+                    </p>
+<p class="text-on-surface-variant text-sm mt-3 font-medium">
+                        의료진이 스캔하면 대기 접수가 완료됩니다.
+                    </p>
+</div>
+</div>
+</div>
+<!-- Secondary Information -->
+<div class="mt-12 w-full space-y-4">
+<div class="flex items-start gap-4 p-5 bg-white/50 backdrop-blur-sm rounded-xl">
+<span class="material-symbols-outlined text-primary mt-1">info</span>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                    본 QR 코드는 보안을 위해 3분마다 갱신됩니다. 화면의 밝기를 높여주시면 더 원활하게 인식됩니다.
+                </p>
+</div>
+<!-- Quick Action -->
+<button class="w-full py-5 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-xl font-bold text-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">map</span>
+                진료실 위치 확인하기
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-8 bg-white/90 dark:bg-slate-950/90 backdrop-blur-2xl shadow-[0_-10px_40px_rgba(0,78,159,0.08)] rounded-t-[2rem] z-50">
+<a class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-2xl px-5 py-2" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[11px] font-semibold Inter mt-1">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined">help_center</span>
+<span class="text-[11px] font-semibold Inter mt-1">가이드</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined">local_hospital</span>
+<span class="text-[11px] font-semibold Inter mt-1">편의시설</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[11px] font-semibold Inter mt-1">내 건강</span>
+</a>
+</nav>
+</body></html>

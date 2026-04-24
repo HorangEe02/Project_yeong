@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay 3D - Patient Navigation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#c1e8ff",
+                    "surface-container-low": "#f3f3f5",
+                    "surface-container-highest": "#e2e2e4",
+                    "surface-dim": "#d9dadc",
+                    "on-error": "#ffffff",
+                    "background": "#f9f9fb",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f9f9fb",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed": "#001b3f",
+                    "inverse-on-surface": "#f0f0f2",
+                    "primary-fixed-dim": "#aac7ff",
+                    "on-background": "#1a1c1d",
+                    "tertiary-fixed-dim": "#74d1ff",
+                    "on-primary-fixed": "#001b3e",
+                    "on-surface-variant": "#414753",
+                    "on-secondary-container": "#fefcff",
+                    "on-tertiary-container": "#cdecff",
+                    "tertiary-container": "#007094",
+                    "secondary-fixed": "#d7e2ff",
+                    "outline": "#727784",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#aac7ff",
+                    "surface-container": "#eeeef0",
+                    "surface-variant": "#e2e2e4",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#00458f",
+                    "on-surface": "#1a1c1d",
+                    "primary": "#004e9f",
+                    "on-error-container": "#93000a",
+                    "outline-variant": "#c1c6d5",
+                    "surface-container-high": "#e8e8ea",
+                    "secondary": "#005ab7",
+                    "surface": "#f9f9fb",
+                    "surface-tint": "#005cba",
+                    "primary-container": "#0066cc",
+                    "inverse-surface": "#2f3132",
+                    "tertiary": "#005673",
+                    "primary-fixed": "#d7e3ff",
+                    "on-tertiary-fixed": "#001e2b",
+                    "secondary-fixed-dim": "#abc7ff",
+                    "secondary-container": "#0372e4",
+                    "on-primary-container": "#dfe8ff",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "on-primary-fixed-variant": "#00458e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .perspective-1000 { perspective: 1000px; }
+        .rotate-x-15 { transform: rotateX(15deg) rotateY(-5deg); }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface overflow-hidden">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm shadow-blue-900/5 flex justify-between items-center px-6 py-3 max-w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-200">MediWay 3D</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="font-sans tracking-tight text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Dashboard</a>
+<a class="font-sans tracking-tight text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Patients</a>
+<a class="font-sans tracking-tight text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Analytics</a>
+<a class="font-sans tracking-tight text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Settings</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all">
+<span class="material-symbols-outlined text-slate-600">notifications</span>
+</button>
+<button class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all">
+<span class="material-symbols-outlined text-slate-600">account_circle</span>
+</button>
+</div>
+</nav>
+<!-- SideNavBar (Contextual: Floor Map Active) -->
+<aside class="fixed left-0 top-16 h-full w-64 z-40 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md flex flex-col p-4 space-y-2">
+<div class="mb-6 px-4 py-2">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_hospital</span>
+</div>
+<div>
+<p class="font-sans text-xs font-semibold uppercase tracking-wider text-primary">Unit 4A</p>
+<p class="text-[10px] text-on-surface-variant opacity-70">Oncology Wing</p>
+</div>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 rounded-xl shadow-sm px-4 py-3 flex items-center gap-3 transition-transform duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">layers</span>
+<span class="font-sans text-xs font-semibold uppercase tracking-wider">Floor Map</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 px-4 py-3 flex items-center gap-3 transition-transform duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">view_in_ar</span>
+<span class="font-sans text-xs font-semibold uppercase tracking-wider">AR View</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 px-4 py-3 flex items-center gap-3 transition-transform duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">emergency</span>
+<span class="font-sans text-xs font-semibold uppercase tracking-wider">Emergency</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 px-4 py-3 flex items-center gap-3 transition-transform duration-200 hover:translate-x-1" href="#">
+<span class="material-symbols-outlined">person_search</span>
+<span class="font-sans text-xs font-semibold uppercase tracking-wider">Directory</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 pb-20">
+<button class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">navigation</span>
+                Start Pathfinding
+            </button>
+</div>
+</aside>
+<!-- Main 3D Navigation Canvas -->
+<main class="ml-64 pt-16 h-screen w-[calc(100%-16rem)] relative overflow-hidden bg-surface">
+<!-- Background 3D Isometric Map Render -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="w-[120%] h-[120%] perspective-1000">
+<div class="w-full h-full rotate-x-15 relative">
+<!-- The Map Image -->
+<img alt="Hospital Floor Map" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="high-quality isometric 3D render of a modern hospital floor plan minimalist white and soft blue lighting glass walls clinical purity futuristic architectural visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgRkobaoqHbmPFgQP_JIgk-tdlA0Beb9IrZYDh2nM5ht4qIPj_bKIxIHR1ELbgdkmwJvi_IZCkoD_59DcrlqHb0bQ5H_es2Sgg4-WYrD4xLObWEFut_3Pru36tsbDaRRi4kAmvOTKGUNL4sX0SbcYl7c7gAuICBU9fqMcub-yi9QASokRhZ2PM1OARAP4J3l54xduQA4J6VBRudayMP7flt58AtW5BmhEWGaVmQPhncblA1Ge5dpfQOgdRQey9bPQ9Rh_Ju7do11ID"/>
+<!-- Path SVG Overlay -->
+<svg class="absolute inset-0 w-full h-full" viewbox="0 0 1000 1000">
+<path class="drop-shadow-[0_0_15px_rgba(0,78,159,0.8)]" d="M200,800 L400,600 L600,650 L850,400" fill="none" stroke="url(#pathGradient)" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"></path>
+<defs>
+<lineargradient id="pathGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#004e9f;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#aac7ff;stop-opacity:1"></stop>
+</lineargradient>
+</defs>
+</svg>
+<!-- Markers -->
+<!-- Start Point -->
+<div class="absolute top-[80%] left-[20%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-4 h-4 bg-primary rounded-full ring-4 ring-white shadow-lg animate-pulse"></div>
+<div class="mt-2 glass-panel px-3 py-1 rounded-full text-[10px] font-bold text-primary shadow-sm">Current Location</div>
+</div>
+<!-- End Point (Laboratory) -->
+<div class="absolute top-[40%] left-[85%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-8 h-8 bg-white rounded-full shadow-2xl flex items-center justify-center ring-2 ring-primary">
+<span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">biotech</span>
+</div>
+<div class="mt-2 bg-primary text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-xl">Laboratory</div>
+</div>
+<!-- POI Markers -->
+<div class="absolute top-[55%] left-[45%] flex flex-col items-center opacity-60">
+<span class="material-symbols-outlined text-slate-400 text-sm">coffee</span>
+<div class="text-[8px] font-medium text-slate-500">Cafe</div>
+</div>
+<div class="absolute top-[68%] left-[62%] flex flex-col items-center opacity-60">
+<span class="material-symbols-outlined text-slate-400 text-sm">wc</span>
+<div class="text-[8px] font-medium text-slate-500">Restrooms</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating UI Navigation Card -->
+<div class="absolute bottom-10 left-10 right-10 md:left-auto md:right-10 md:w-96 glass-panel rounded-xl shadow-2xl shadow-blue-900/10 p-6 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<p class="text-primary font-bold text-xs uppercase tracking-widest">Next Action</p>
+<h2 class="text-2xl font-extrabold tracking-tight text-on-surface">Level 2 Laboratory</h2>
+</div>
+<div class="bg-primary-container text-on-primary-container px-3 py-1 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">timer</span>
+<span class="text-sm font-bold">3 mins</span>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl">
+<div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-primary text-2xl">turn_slight_right</span>
+</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Follow the blue line</p>
+<p class="text-xs text-on-surface-variant">Elevator B will be on your left</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="bg-surface-container-highest py-3 rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                    Report Issue
+                </button>
+<button class="bg-primary text-on-primary py-3 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">call</span>
+                    Assistance
+                </button>
+</div>
+</div>
+<!-- Floor Switcher -->
+<div class="absolute top-10 right-10 flex flex-col gap-2">
+<button class="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-slate-400 hover:text-primary transition-colors shadow-lg">
+<span class="text-xs font-bold">L3</span>
+</button>
+<button class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white shadow-xl shadow-primary/30 ring-2 ring-white">
+<span class="text-xs font-black">L2</span>
+</button>
+<button class="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-slate-400 hover:text-primary transition-colors shadow-lg">
+<span class="text-xs font-bold">L1</span>
+</button>
+</div>
+<!-- AR Mode Toggle FAB (Contextual for Pathfinding) -->
+<button class="absolute bottom-10 left-10 hidden md:flex items-center gap-3 bg-white/90 backdrop-blur-md px-6 py-4 rounded-full shadow-2xl hover:translate-y-[-2px] transition-all group">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">camera</span>
+</div>
+<span class="font-bold text-sm text-primary tracking-wide">Live AR Camera</span>
+</button>
+</main>
+<!-- Bottom Navigation for Mobile Viewports -->
+<div class="md:hidden fixed bottom-0 w-full bg-white/95 backdrop-blur-xl flex justify-around items-center py-3 border-t border-slate-100 z-50">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">layers</span>
+<span class="text-[10px] font-bold">Map</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">view_in_ar</span>
+<span class="text-[10px] font-medium">AR</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">person_search</span>
+<span class="text-[10px] font-medium">Search</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-error">
+<span class="material-symbols-outlined">emergency</span>
+<span class="text-[10px] font-medium">SOS</span>
+</button>
+</div>
+</body></html>

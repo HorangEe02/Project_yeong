@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay - Digital Sanctuary for Healthcare</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#c1e8ff",
+                        "surface-dim": "#d9dadc",
+                        "inverse-surface": "#2f3132",
+                        "surface": "#f9f9fb",
+                        "on-secondary-fixed-variant": "#00458f",
+                        "on-surface": "#1a1c1d",
+                        "secondary-fixed": "#d7e2ff",
+                        "tertiary-fixed-dim": "#74d1ff",
+                        "inverse-primary": "#aac7ff",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c1c6d5",
+                        "secondary-container": "#0372e4",
+                        "primary-container": "#0066cc",
+                        "on-primary-container": "#dfe8ff",
+                        "surface-tint": "#005cba",
+                        "secondary": "#005ab7",
+                        "primary": "#004e9f",
+                        "inverse-on-surface": "#f0f0f2",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "background": "#f9f9fb",
+                        "on-tertiary-container": "#cdecff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e2e2e4",
+                        "on-tertiary-fixed": "#001e2b",
+                        "surface-container-highest": "#e2e2e4",
+                        "secondary-fixed-dim": "#abc7ff",
+                        "primary-fixed": "#d7e3ff",
+                        "surface-container-low": "#f3f3f5",
+                        "primary-fixed-dim": "#aac7ff",
+                        "on-secondary-container": "#fefcff",
+                        "surface-container": "#eeeef0",
+                        "on-surface-variant": "#414753",
+                        "on-secondary-fixed": "#001b3f",
+                        "on-primary-fixed": "#001b3e",
+                        "on-background": "#1a1c1d",
+                        "outline": "#727784",
+                        "tertiary-container": "#007094",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#00458e",
+                        "tertiary": "#005673",
+                        "surface-container-high": "#e8e8ea",
+                        "surface-bright": "#f9f9fb",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg shadow-[0px_10px_40px_rgba(0,78,159,0.04)]">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-md mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container">
+<img alt="Doctor profile" class="w-full h-full object-cover" data-alt="Professional portrait of a friendly female doctor in clinical attire with soft natural lighting and neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7FTeUuxW-kKDOKCQ_II0WmyqkGJ-g4-gKFrG5ChzjqQI2IVn9Xt-VCfr9Oh33fiyT4YUwDwJUyRP6Pz4_EFwNJO2C8RyGv2M4jKdNZoX7QvJX6Ac_HSRCdXelFAC6XjH3YKbjcqtSbOq3uQrK6VRe5VZu4ByScfxvt8d-5lxCNmMoeewK_PO1I_DfvhfzyRa6B7NryjiQYt5H2G8JYW2mOR94fYbE9qVvJE-QDMyKZl_mZHWDSh0LBxnv205mcu_kSx0tiFbht59Q"/>
+</div>
+</div>
+<div class="text-xl font-black text-blue-800 uppercase tracking-widest font-headline">MediWay</div>
+<button class="text-blue-700 p-2 hover:bg-blue-50/50 transition-all active:scale-95 duration-200 ease-out rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-16 pb-32">
+<!-- Hero Section -->
+<section class="px-6 pt-12 pb-8">
+<div class="flex flex-col gap-6 text-center">
+<span class="text-primary font-bold tracking-[0.2em] uppercase text-[10px] bg-primary-fixed/30 px-3 py-1 rounded-full self-center">Clinical Excellence</span>
+<h1 class="text-4xl font-extrabold tracking-tighter text-on-surface leading-[1.1] font-headline">
+                    The Digital <br/>
+<span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Sanctuary</span>
+</h1>
+<p class="text-on-surface-variant text-lg leading-relaxed max-w-[280px] mx-auto font-body font-normal">
+                    Clarity is care. A high-end editorial experience designed for life-saving precision.
+                </p>
+<div class="flex flex-col gap-3 mt-4">
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary py-4 px-8 rounded-3xl font-semibold text-base shadow-lg shadow-primary/20 active:scale-[0.98] transition-all">
+                        Service Inquiry
+                    </button>
+<button class="bg-secondary-fixed text-on-secondary-fixed py-4 px-8 rounded-3xl font-semibold text-base active:scale-[0.98] transition-all">
+                        Request Demo
+                    </button>
+</div>
+</div>
+</section>
+<!-- Hero Visual -->
+<section class="px-6 mb-12">
+<div class="relative w-full h-[300px] rounded-3xl overflow-hidden shadow-2xl">
+<img alt="Modern hospital interface" class="w-full h-full object-cover" data-alt="Futuristic clinical control room with minimalist white furniture and glowing blue holographic medical data interfaces" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlXdZ9GZ-zY3by_-RkKUNOXwp2CsoQZJlR4QobXBb15wCzsQRbkcqKuTpKFYZgCWweZsaEt3_L0hRUvZntAdTx4Hps-N9wn8cqVaXvox19HofLaNCekszUocM-MekDAZB65iHCR_Cj8QnNKOytad83aHGkrJomnArjhBUma3OnHlK7cIPOoYLKqg4TVQfEg2Lewtv3BeNhy3i8PWGwKjOOIoBAe1Qr7PsCblDLPBIxSit7DKjfGlazah2ekj3IEZj7zX1IJnKM2Rwn"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+<div class="absolute bottom-6 left-6 right-6 p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+<div class="flex items-center gap-3">
+<div class="bg-primary-container p-2 rounded-xl">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="clinical_notes">clinical_notes</span>
+</div>
+<div class="flex flex-col">
+<span class="text-white text-xs font-bold uppercase tracking-widest">Live Pulse</span>
+<span class="text-white/80 text-[10px]">Real-time diagnostic stream</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature Cards (Asymmetric Bento-ish Layout) -->
+<section class="px-6 flex flex-col gap-8">
+<div class="flex flex-col gap-2">
+<h2 class="text-2xl font-bold tracking-tight font-headline">Reimagined Care</h2>
+<div class="h-1 w-12 bg-primary rounded-full"></div>
+</div>
+<!-- Card 1: Safe Navigation -->
+<div class="group bg-surface-container-lowest rounded-3xl p-8 flex flex-col gap-6 shadow-[0px_10px_40px_rgba(0,0,0,0.02)] border border-outline-variant/10">
+<div class="w-14 h-14 bg-tertiary-fixed-dim rounded-2xl flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-3xl" data-icon="explore">explore</span>
+</div>
+<div class="flex flex-col gap-2">
+<h3 class="text-xl font-bold text-on-surface">Safe Navigation</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                        Intuitive spatial mapping for healthcare environments. Reducing cognitive load when every second matters.
+                    </p>
+</div>
+<div class="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-wider">
+                    Learn Protocol 
+                    <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Card 2: Patient-Staff Connection -->
+<div class="group bg-surface-container-high rounded-3xl p-8 flex flex-col gap-6 shadow-inner">
+<div class="w-14 h-14 bg-secondary-container rounded-2xl flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-3xl" data-icon="diversity_1">diversity_1</span>
+</div>
+<div class="flex flex-col gap-2">
+<h3 class="text-xl font-bold text-on-surface">Staff Connection</h3>
+<p class="text-on-surface-variant text-sm leading-relaxed">
+                        The Digital Sanctuary connects teams through seamless, non-intrusive feedback loops and instant messaging.
+                    </p>
+</div>
+<div class="relative h-24 mt-2 overflow-hidden rounded-2xl">
+<img alt="Team connecting" class="w-full h-full object-cover" data-alt="Two doctors in a bright modern hospital hallway reviewing a digital tablet together with smiles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-0YMfGuVQ9bJB_sxkqbybl1QNUkHajOzT9kosoNCdma-iY5Y_HjVU9IzQgly3EN_nt4sNw-CNMNo9euZghFJI4gzQaTL8SqhJO7LBe5xVYLHBPo_VQaEd1aldoAn6FtZznitPL_wNldsRDvctBBdLRdwWsCjOuvZs_wYeEiNefEZFYX_Dz-_gV4NISh03W8Dcdj6ujrMwyvfkpVGNf-pkeROoBZt7kDam3hy0j7EfFilIgUXAOYH2-xk42HnI0fkFUVqPgmggv8Nr"/>
+</div>
+</div>
+<!-- Card 3: Vitality Glass -->
+<div class="bg-primary/5 rounded-3xl p-8 flex flex-col gap-4 border border-primary/5">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="visibility">visibility</span>
+<span class="text-xs font-bold text-primary uppercase tracking-widest">Signature Tech</span>
+</div>
+<h3 class="text-lg font-bold text-on-surface leading-tight">Vitality Glass Integration</h3>
+<p class="text-on-surface-variant text-sm">
+                    Our proprietary interface layer provides high-tech serenity through intentional transparency.
+                </p>
+</div>
+</section>
+<!-- Aesthetic Divider -->
+<div class="px-6 py-12 flex justify-center">
+<div class="w-24 h-px bg-gradient-to-r from-transparent via-outline-variant/30 to-transparent"></div>
+</div>
+<!-- Trust Section -->
+<section class="px-6 mb-8 text-center">
+<p class="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.3em] mb-6">Trusted by Elite Institutions</p>
+<div class="flex justify-around items-center opacity-40 grayscale">
+<span class="material-symbols-outlined text-3xl" data-icon="health_and_safety">health_and_safety</span>
+<span class="material-symbols-outlined text-3xl" data-icon="local_hospital">local_hospital</span>
+<span class="material-symbols-outlined text-3xl" data-icon="emergency">emergency</span>
+<span class="material-symbols-outlined text-3xl" data-icon="medical_services">medical_services</span>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-white/90 backdrop-blur-2xl rounded-t-[1.5rem] shadow-[0px_-15px_50px_rgba(0,0,0,0.05)]">
+<div class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3">
+<!-- Active Tab: Home -->
+<a class="flex flex-col items-center justify-center bg-blue-50 text-blue-700 rounded-[1.25rem] px-5 py-2 active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="home_health" style="font-variation-settings: 'FILL' 1;">home_health</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:text-blue-500 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Pulse</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:text-blue-500 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="medical_information">medical_information</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Guide</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-5 py-2 hover:text-blue-500 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span class="font-['Inter'] text-[11px] font-medium tracking-wide uppercase mt-1">Facility</span>
+</a>
+</div>
+</nav>
+</body></html>

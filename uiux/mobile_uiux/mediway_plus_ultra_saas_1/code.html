@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay Sanctuary - Patient Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#004e9f",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#00458e",
+                        "surface-bright": "#f9f9fb",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#aac7ff",
+                        "secondary-fixed-dim": "#abc7ff",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d7e2ff",
+                        "secondary": "#005ab7",
+                        "inverse-on-surface": "#f0f0f2",
+                        "on-primary-container": "#dfe8ff",
+                        "on-surface-variant": "#414753",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f3f3f5",
+                        "on-secondary-container": "#fefcff",
+                        "surface-container-highest": "#e2e2e4",
+                        "on-tertiary-container": "#cdecff",
+                        "background": "#f9f9fb",
+                        "surface-container-high": "#e8e8ea",
+                        "error-container": "#ffdad6",
+                        "surface": "#f9f9fb",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#c1e8ff",
+                        "tertiary": "#005673",
+                        "on-primary-fixed": "#001b3e",
+                        "outline": "#727784",
+                        "outline-variant": "#c1c6d5",
+                        "on-tertiary-fixed": "#001e2b",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#007094",
+                        "on-surface": "#1a1c1d",
+                        "tertiary-fixed-dim": "#74d1ff",
+                        "on-secondary-fixed": "#001b3f",
+                        "primary-container": "#0066cc",
+                        "inverse-surface": "#2f3132",
+                        "surface-dim": "#d9dadc",
+                        "primary-fixed-dim": "#aac7ff",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "primary-fixed": "#d7e3ff",
+                        "on-background": "#1a1c1d",
+                        "surface-variant": "#e2e2e4",
+                        "surface-tint": "#005cba",
+                        "on-secondary-fixed-variant": "#00458f",
+                        "surface-container": "#eeeef0",
+                        "secondary-container": "#0372e4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "display": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Hide scrollbar for horizontal scroll areas */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col pt-20 pb-24 md:flex-row md:pt-0 md:pb-0">
+<!-- TopAppBar (Mobile) -->
+<header class="fixed top-0 w-full z-50 flex items-center justify-between px-8 py-4 bg-[#f9f9fb]/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_40px_60px_rgba(0,78,159,0.06)] md:hidden">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#004e9f] text-2xl" data-icon="clinical_notes" style="font-variation-settings: 'FILL' 1;">clinical_notes</span>
+<h1 class="font-['Inter'] tracking-tight leading-relaxed font-semibold text-2xl bg-gradient-to-r from-[#004e9f] to-[#0066cc] bg-clip-text text-transparent">MediWay Sanctuary</h1>
+</div>
+<div>
+<img alt="Medical Professional Profile" class="w-10 h-10 rounded-full object-cover border-2 border-surface-container-lowest" data-alt="Portrait of a female medical professional smiling slightly in a bright, modern clinical setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAddfvY_7tyTFuLeNPpfjQb2VQrPdt0kkQkKT3_tpSpr1kXILPzKNbzJuDcmehxiSkGWUWZA4a8faTn7kfnj7eLDH7H0X6NRv2e676ivGVRrRzdPQd1wk17XQ5L4h7m0PW2hAZhD2eQTixuYR0t7_G7vaP0MqQXMisMFOuNe2FO38f7xF2qfQuKkwsZrxmItdSNTvuwBPh9FHT-uQNJD_Eo0_rffHWVaH_qSsoKWzHnbe_5LeOwfSnE2jKBfuPkM3gJdiZmaQePjlwf"/>
+</div>
+</header>
+<!-- NavigationDrawer (Web) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-screen w-72 z-40 pt-20 bg-[#ffffff] dark:bg-slate-900 shadow-2xl shadow-blue-900/5 rounded-r-3xl flex-col">
+<div class="px-8 mb-8">
+<h2 class="text-lg font-black text-[#1a1c1d] dark:text-slate-100">St. Jude Medical</h2>
+<p class="font-['Inter'] text-sm tracking-tight text-on-surface-variant">Multi-tenant Portal</p>
+</div>
+<ul class="space-y-4 px-2 flex-grow">
+<li>
+<a class="flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-[#004e9f] to-[#0066cc] text-white rounded-2xl shadow-lg cursor-pointer active:scale-95 duration-200 ease-in-out font-['Inter'] text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+                    Patient Queue
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-4 text-slate-600 dark:text-slate-400 hover:bg-[#e8e8ea] dark:hover:bg-slate-800 rounded-2xl cursor-pointer hover:translate-x-1 transition-transform active:opacity-80 font-['Inter'] text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+                    Appointments
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-4 text-slate-600 dark:text-slate-400 hover:bg-[#e8e8ea] dark:hover:bg-slate-800 rounded-2xl cursor-pointer hover:translate-x-1 transition-transform active:opacity-80 font-['Inter'] text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="accessible_forward">accessible_forward</span>
+                    Senior Hub
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-4 text-slate-600 dark:text-slate-400 hover:bg-[#e8e8ea] dark:hover:bg-slate-800 rounded-2xl cursor-pointer hover:translate-x-1 transition-transform active:opacity-80 font-['Inter'] text-sm tracking-tight" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+                    Analytics
+                </a>
+</li>
+</ul>
+<div class="p-6 mt-auto">
+<div class="flex items-center gap-3">
+<img alt="Clinic Administrator" class="w-10 h-10 rounded-full object-cover" data-alt="Portrait of a female medical professional smiling slightly in a bright, modern clinical setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJrYIyr9qjuzDNbxn1829QrBRAr07tTVbXavn5x2ZU0-_RnCvSWigIJds5r57a6NAApHLIsEVgHFyUKE7xXtYwzkTal3Awu_tp6WUq9ynr0RSiZJxB8H4B7Gsjd2ptYv46RAkTSCjNWnTjb8RQWxTb_jpbkjg023OPv55BBs_ytdiqvSEaDkd8d-nu4x2cW0WHtjVGrhjmaLrXAAk_wwFQ02Jbf1IgXQJn-frsq_9LHZy6xJKcdcuZoWNkZ1mmlxXiJPFliQjar1iS"/>
+<div>
+<p class="font-semibold text-sm">Sarah Jenkins</p>
+<p class="text-xs text-on-surface-variant">Patient</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 px-6 md:pl-80 md:pr-12 md:py-12 max-w-7xl mx-auto w-full">
+<!-- Header Greeting (Mobile mainly, but visible on web too) -->
+<div class="mb-8 md:hidden">
+<h2 class="text-3xl font-display font-bold tracking-tight text-on-surface">Good morning, Sarah</h2>
+<p class="text-on-surface-variant mt-1">KNU Hospital</p>
+</div>
+<!-- Horizontal Navigation Tabs (Mobile) -->
+<div class="mb-8 md:hidden -mx-6 px-6 overflow-x-auto no-scrollbar">
+<div class="flex gap-4 pb-2 w-max">
+<button class="px-6 py-2.5 bg-primary-container text-on-primary-container rounded-full font-medium text-sm whitespace-nowrap shadow-[0_4px_14px_rgba(0,102,204,0.15)] transition-all">Home</button>
+<button class="px-6 py-2.5 bg-surface-container-highest text-on-surface-variant rounded-full font-medium text-sm whitespace-nowrap hover:bg-surface-container-low transition-all">Outpatient</button>
+<button class="px-6 py-2.5 bg-surface-container-highest text-on-surface-variant rounded-full font-medium text-sm whitespace-nowrap hover:bg-surface-container-low transition-all">Inpatient</button>
+<button class="px-6 py-2.5 bg-surface-container-highest text-on-surface-variant rounded-full font-medium text-sm whitespace-nowrap hover:bg-surface-container-low transition-all">My Health</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Bento Grid Left Column -->
+<div class="md:col-span-8 flex flex-col gap-6">
+<!-- Web Greeting -->
+<div class="hidden md:block mb-4">
+<h2 class="text-4xl font-display font-bold tracking-tight text-on-surface">Good morning, Sarah</h2>
+<p class="text-on-surface-variant mt-2 text-lg">Here is your care overview for today at KNU Hospital.</p>
+</div>
+<!-- Real-time Queue Widget -->
+<div class="bg-surface-container-lowest rounded-3xl p-6 relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
+<div class="flex justify-between items-start relative z-10">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary-container animate-pulse"></div>
+<span class="text-sm font-semibold text-secondary uppercase tracking-wider">Real-time Queue</span>
+</div>
+<h3 class="text-2xl font-bold mt-2">Cardiology Dept.</h3>
+<p class="text-on-surface-variant text-sm mt-1">Dr. Michael Chen</p>
+</div>
+<div class="w-14 h-14 rounded-2xl bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="stethoscope">stethoscope</span>
+</div>
+</div>
+<div class="mt-8 flex items-end justify-between relative z-10">
+<div>
+<p class="text-5xl font-black text-primary tracking-tighter">3</p>
+<p class="text-sm font-medium text-on-surface-variant mt-1">People ahead of you</p>
+</div>
+<div class="text-right">
+<p class="text-3xl font-bold text-on-surface tracking-tight">~12<span class="text-lg text-on-surface-variant font-medium">min</span></p>
+<p class="text-sm font-medium text-on-surface-variant mt-1">Estimated Wait</p>
+</div>
+</div>
+</div>
+<!-- Today's Schedule Card -->
+<div class="bg-surface-container-lowest rounded-3xl p-6 relative shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+<h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="today">today</span>
+                        Today's Schedule
+                    </h3>
+<div class="flex gap-4 items-stretch group cursor-pointer p-4 -mx-4 rounded-2xl hover:bg-surface-container-low transition-colors duration-300">
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-2xl min-w-[70px] p-3 text-center">
+<span class="text-xs font-semibold uppercase tracking-wider">Oct</span>
+<span class="text-xl font-bold">24</span>
+<span class="text-xs mt-1">10:30</span>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<h4 class="font-bold text-lg text-on-surface">Cardiology Follow-up</h4>
+<p class="text-sm text-on-surface-variant flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                                Building B, Floor 3, Room 302
+                            </p>
+</div>
+<div class="hidden sm:flex items-center justify-center text-outline group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Right Column (Quick Actions) -->
+<div class="md:col-span-4 flex flex-col gap-4">
+<h3 class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider mb-2 md:mt-20">Quick Actions</h3>
+<button class="w-full bg-surface-container-lowest p-5 rounded-2xl flex items-center gap-4 hover:shadow-[0_8px_20px_rgba(0,78,159,0.08)] transition-all duration-300 group border-none">
+<div class="w-12 h-12 rounded-xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed group-hover:bg-secondary-container group-hover:text-on-secondary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+</div>
+<div class="text-left flex-1">
+<h4 class="font-semibold text-on-surface">Book Appointment</h4>
+<p class="text-xs text-on-surface-variant mt-0.5">Schedule next visit</p>
+</div>
+</button>
+<button class="w-full bg-surface-container-lowest p-5 rounded-2xl flex items-center gap-4 hover:shadow-[0_8px_20px_rgba(0,78,159,0.08)] transition-all duration-300 group border-none">
+<div class="w-12 h-12 rounded-xl bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed group-hover:bg-tertiary-container group-hover:text-on-tertiary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="directions">directions</span>
+</div>
+<div class="text-left flex-1">
+<h4 class="font-semibold text-on-surface">Wayfinding</h4>
+<p class="text-xs text-on-surface-variant mt-0.5">Navigate hospital</p>
+</div>
+</button>
+<button class="w-full bg-error-container/40 p-5 rounded-2xl flex items-center gap-4 hover:bg-error-container/60 transition-all duration-300 group border-none mt-4">
+<div class="w-12 h-12 rounded-xl bg-error text-on-error flex items-center justify-center shadow-lg shadow-error/20">
+<span class="material-symbols-outlined" data-icon="emergency">emergency</span>
+</div>
+<div class="text-left flex-1">
+<h4 class="font-bold text-error">Emergency Info</h4>
+<p class="text-xs text-on-surface-variant mt-0.5">Immediate assistance</p>
+</div>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full z-50 bg-[#ffffff]/90 dark:bg-slate-950/90 backdrop-blur-xl md:hidden pb-safe shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border-t border-surface-container-low">
+<div class="flex justify-around items-center h-16">
+<a class="flex flex-col items-center justify-center w-full h-full text-[#004e9f]" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px] font-medium mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-slate-500 hover:text-[#004e9f] transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="event">event</span>
+<span class="text-[10px] font-medium mt-1">Schedule</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-slate-500 hover:text-[#004e9f] transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="notifications">notifications</span>
+<span class="text-[10px] font-medium mt-1">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-slate-500 hover:text-[#004e9f] transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl" data-icon="person">person</span>
+<span class="text-[10px] font-medium mt-1">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

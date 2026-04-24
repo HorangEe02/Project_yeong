@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "tertiary-fixed": "#c1e8ff",
+                  "surface-container-low": "#f3f3f5",
+                  "surface-container-highest": "#e2e2e4",
+                  "surface-dim": "#d9dadc",
+                  "on-error": "#ffffff",
+                  "background": "#f9f9fb",
+                  "on-primary": "#ffffff",
+                  "error": "#ba1a1a",
+                  "surface-bright": "#f9f9fb",
+                  "error-container": "#ffdad6",
+                  "on-secondary-fixed": "#001b3f",
+                  "inverse-on-surface": "#f0f0f2",
+                  "primary-fixed-dim": "#aac7ff",
+                  "on-background": "#1a1c1d",
+                  "tertiary-fixed-dim": "#74d1ff",
+                  "on-primary-fixed": "#001b3e",
+                  "on-surface-variant": "#414753",
+                  "on-secondary-container": "#fefcff",
+                  "on-tertiary-container": "#cdecff",
+                  "tertiary-container": "#007094",
+                  "secondary-fixed": "#d7e2ff",
+                  "outline": "#727784",
+                  "on-secondary": "#ffffff",
+                  "surface-container-lowest": "#ffffff",
+                  "inverse-primary": "#aac7ff",
+                  "surface-container": "#eeeef0",
+                  "surface-variant": "#e2e2e4",
+                  "on-tertiary": "#ffffff",
+                  "on-secondary-fixed-variant": "#00458f",
+                  "on-surface": "#1a1c1d",
+                  "primary": "#004e9f",
+                  "on-error-container": "#93000a",
+                  "outline-variant": "#c1c6d5",
+                  "surface-container-high": "#e8e8ea",
+                  "secondary": "#005ab7",
+                  "surface": "#f9f9fb",
+                  "surface-tint": "#005cba",
+                  "primary-container": "#0066cc",
+                  "inverse-surface": "#2f3132",
+                  "tertiary": "#005673",
+                  "primary-fixed": "#d7e3ff",
+                  "on-tertiary-fixed": "#001e2b",
+                  "secondary-fixed-dim": "#abc7ff",
+                  "secondary-container": "#0372e4",
+                  "on-primary-container": "#dfe8ff",
+                  "on-tertiary-fixed-variant": "#004d67",
+                  "on-primary-fixed-variant": "#00458e"
+          },
+          "borderRadius": {
+                  "DEFAULT": "0.25rem",
+                  "lg": "0.5rem",
+                  "xl": "1.5rem",
+                  "full": "9999px"
+          },
+          "fontFamily": {
+                  "headline": ["Inter"],
+                  "body": ["Inter"],
+                  "label": ["Inter"]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body { font-family: 'Inter', sans-serif; background-color: #f9f9fb; color: #1a1c1d; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-panel { backdrop-filter: blur(20px); background: rgba(255, 255, 255, 0.8); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TopNavBar (Shared Component Execution) -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm shadow-blue-900/5">
+<div class="flex justify-between items-center w-full px-6 py-3 max-w-full">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-200">MediWay 3D</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="font-sans tracking-tight text-sm font-medium text-blue-700 dark:text-blue-400 border-b-2 border-blue-600 pb-1" href="#">Dashboard</a>
+<a class="font-sans tracking-tight text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Patients</a>
+<a class="font-sans tracking-tight text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Analytics</a>
+<a class="font-sans tracking-tight text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-blue-600 transition-colors" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+</div>
+<input class="bg-slate-100 border-none rounded-full pl-10 pr-4 py-1.5 text-xs w-64 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Search facilities or patients..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all">
+<span class="material-symbols-outlined text-slate-600" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all">
+<span class="material-symbols-outlined text-slate-600" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800 h-px"></div>
+</header>
+<!-- SideNavBar (Shared Component Execution) -->
+<aside class="fixed left-0 top-16 h-full w-64 z-40 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md shadow-xl shadow-blue-950/10 flex flex-col p-4 space-y-2">
+<div class="px-4 py-6 mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="professional male doctor portrait in clinical setting soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOBV2g4vXAlR84NtKhomYC_D_Cj2kQnrT-RB1Ipid8iFQQhoOlQDXPA2CpprJPY_3wsjTkYfKJHKJWz-h6ZqV_lADwU26Dy4sk-7uGsBNVZ_10zsvgZ9Qw4-S2eD841PFeGxm6FZoKAXBShlGm0_ja3NrfqT3kZ9hUoa6GxBlEBcLlBghYwxvweH4bI0gMpiBvKvtCOvQJ_2z8QbOJgbfgIC9JiXyRQjEaLQzBFqmpUASiWsryAUdojjDYrWcBYFTlLB5rOQjdU-22"/>
+</div>
+<div>
+<h3 class="text-sm font-bold text-on-surface">Unit 4A</h3>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">Oncology Wing</p>
+</div>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="bg-white dark:bg-slate-800 text-blue-700 dark:text-blue-300 rounded-xl shadow-sm px-4 py-3 flex items-center gap-3 font-sans text-xs font-semibold uppercase tracking-wider hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="layers">layers</span>
+<span>Floor Map</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 px-4 py-3 flex items-center gap-3 font-sans text-xs font-semibold uppercase tracking-wider hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="view_in_ar">view_in_ar</span>
+<span>AR View</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 px-4 py-3 flex items-center gap-3 font-sans text-xs font-semibold uppercase tracking-wider hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-error" data-icon="emergency">emergency</span>
+<span>Emergency</span>
+</a>
+<a class="text-slate-500 dark:text-slate-400 px-4 py-3 flex items-center gap-3 font-sans text-xs font-semibold uppercase tracking-wider hover:translate-x-1 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+<span>Directory</span>
+</a>
+</nav>
+<div class="mt-auto pb-20">
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-95 transition-all">
+        Start Pathfinding
+      </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 pt-16 h-screen overflow-hidden flex">
+<!-- 3D Visualization Area -->
+<div class="flex-1 relative bg-surface-container-low overflow-hidden">
+<!-- 3D Render Placeholder -->
+<div class="absolute inset-0 z-0">
+<img alt="Hospital Exterior" class="w-full h-full object-cover opacity-20 grayscale mix-blend-multiply" data-alt="high-quality 3d isometric model of a modern glass hospital building complex with clean architectural lines and soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaCOwZRH3RKK-uzQJWVr8WO8MlTowklZMaiT3P-34k3_aw1ohd5qlrFXrWZ85hE7N3ZXaH6s7HcE8RC0_kCdNzyeyV9Q_R7KLWuFfT1hhCBp_ufrwqemb9Q2lQDnbqx2oEO7fh75tRO6JGf-Oe2DxJnoq5GWu4Y9UI79oh301WwSbY2lZBGlB06MGZb9iQs64zDqejj1EdQfCXaPYkSMakvLD1kx70fhGmEdjk4psUkxmmsg2nIfCwuf24Q8-iQXrEs9dAU3T3txf0"/>
+<!-- Abstract 3D Grid Overlay -->
+<div class="absolute inset-0 bg-[radial-gradient(#004e9f15_1px,transparent_1px)] [background-size:32px_32px]"></div>
+</div>
+<!-- Hero 3D Labels -->
+<div class="absolute inset-0 z-10 pointer-events-none flex items-center justify-center">
+<div class="relative w-[600px] h-[400px]">
+<!-- Floating UI Marker: Pharmacy -->
+<div class="absolute top-1/4 right-1/4 pointer-events-auto">
+<div class="glass-panel p-3 rounded-xl shadow-xl flex items-center gap-3 border border-white/40">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">local_pharmacy</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Floor 1</p>
+<h4 class="text-sm font-bold">Main Pharmacy</h4>
+</div>
+</div>
+<div class="h-12 w-px bg-primary mx-auto mt-2 opacity-50"></div>
+<div class="w-2 h-2 bg-primary rounded-full mx-auto ring-4 ring-primary/20"></div>
+</div>
+<!-- Parking Marker -->
+<div class="absolute bottom-1/4 left-1/3 pointer-events-auto">
+<div class="glass-panel p-4 rounded-xl shadow-xl border border-primary/20">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 bg-secondary-container rounded-full flex items-center justify-center text-on-secondary">
+<span class="material-symbols-outlined text-sm">directions_car</span>
+</div>
+<div>
+<h4 class="text-sm font-extrabold text-primary">B2-04</h4>
+<p class="text-[9px] font-medium text-on-surface-variant uppercase">Your Vehicle</p>
+</div>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="w-3/4 h-full bg-primary"></div>
+</div>
+</div>
+<div class="h-20 w-px bg-primary mx-auto -mt-2 opacity-30 dashed border-l border-dashed"></div>
+</div>
+</div>
+</div>
+<!-- Floating Controls Bottom Left -->
+<div class="absolute bottom-8 left-8 z-20 flex gap-4">
+<div class="glass-panel p-2 rounded-xl flex flex-col gap-2 shadow-lg">
+<button class="p-3 hover:bg-surface-container-highest rounded-lg text-primary transition-all">
+<span class="material-symbols-outlined">add</span>
+</button>
+<div class="h-px bg-outline-variant/30"></div>
+<button class="p-3 hover:bg-surface-container-highest rounded-lg text-primary transition-all">
+<span class="material-symbols-outlined">remove</span>
+</button>
+</div>
+<div class="glass-panel p-2 rounded-xl flex items-center gap-2 shadow-lg px-4">
+<span class="material-symbols-outlined text-slate-400">layers</span>
+<select class="bg-transparent border-none text-xs font-bold focus:ring-0 text-on-surface-variant">
+<option>All Floors</option>
+<option>Basement B2</option>
+<option>Level 1: Lobby</option>
+<option>Level 4: Oncology</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Right Detail Panel -->
+<div class="w-[400px] bg-surface-container-lowest h-full overflow-y-auto no-scrollbar shadow-2xl z-30">
+<div class="p-8">
+<header class="mb-8">
+<h2 class="text-2xl font-extrabold tracking-tight text-on-surface mb-2">Facility Insights</h2>
+<p class="text-on-surface-variant text-sm leading-relaxed">Real-time floor occupancy and convenience services in Unit 4A.</p>
+</header>
+<!-- Parking Status Card -->
+<section class="mb-10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Active Parking</h3>
+<span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-[10px] font-bold">SECURED</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-6 relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Spot ID</p>
+<h4 class="text-3xl font-black text-primary tracking-tighter">B2-04</h4>
+</div>
+<div class="text-right">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Entry Time</p>
+<p class="text-sm font-bold">08:42 AM</p>
+</div>
+</div>
+<div class="flex items-center gap-4 py-4 border-t border-outline-variant/20">
+<div class="flex-1">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Current Fee</p>
+<p class="text-xl font-bold text-on-surface">$12.50</p>
+</div>
+<button class="bg-white px-4 py-2 rounded-lg text-xs font-bold text-primary shadow-sm hover:shadow-md transition-all">
+                Pay Now
+              </button>
+</div>
+<!-- Parking Mini Map (Bento style) -->
+<div class="mt-4 h-32 w-full rounded-lg bg-surface-container-highest relative overflow-hidden group">
+<img alt="Parking Layout" class="w-full h-full object-cover opacity-60" data-alt="clean blueprint of a parking garage level with blue navigation paths and highlighted parking spots in a clinical tech style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPFTWSK-EtSq7CjjuNThtKyMQP3LZnmA2xWHc2y5Z3Y9N86xj8IQjyjWhhwFfbS4XXRd7XvMKy-lHFhWkk-XFO0cjdF8axBm0zlHUGErHwCzconaBrRmr2wTWJtXczcVKoeywZSq3mvlJ4edYyH7VqdpSPW4c1wB_knCWdjtvRhl4RF56v0J7AVz4vr9cOgTjc910dUjUA48LaboDLemZz63VmGon32sSzY4rvys_u4HaVC3F2nPGXx9Y_dlMH2af2-qm4D0hxNSgU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+<div class="absolute top-2 right-2 px-2 py-1 bg-primary text-on-primary rounded text-[9px] font-black tracking-widest">MAP VIEW</div>
+<!-- Path Visualization -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M 30,70 L 50,50 L 80,50" fill="none" stroke="#004e9f" stroke-dasharray="4 2" stroke-width="2"></path>
+<circle cx="80" cy="50" fill="#004e9f" r="3"></circle>
+</svg>
+</div>
+</div>
+</section>
+<!-- Convenience Bento Grid -->
+<section>
+<h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">Nearby Facilities</h3>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-low p-4 rounded-xl hover:bg-white hover:shadow-lg transition-all group cursor-pointer">
+<span class="material-symbols-outlined text-primary mb-3 block group-hover:scale-110 transition-transform">local_cafe</span>
+<h4 class="text-sm font-bold mb-1">Blue Cup Cafe</h4>
+<p class="text-[10px] text-on-surface-variant">Lobby • Open</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl hover:bg-white hover:shadow-lg transition-all group cursor-pointer">
+<span class="material-symbols-outlined text-primary mb-3 block group-hover:scale-110 transition-transform">atm</span>
+<h4 class="text-sm font-bold mb-1">Standard Bank</h4>
+<p class="text-[10px] text-on-surface-variant">Lobby • 24/7</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl hover:bg-white hover:shadow-lg transition-all group cursor-pointer">
+<span class="material-symbols-outlined text-primary mb-3 block group-hover:scale-110 transition-transform">medical_services</span>
+<h4 class="text-sm font-bold mb-1">Emergency Kit</h4>
+<p class="text-[10px] text-on-surface-variant">Unit 4A • 50m</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl hover:bg-white hover:shadow-lg transition-all group cursor-pointer">
+<span class="material-symbols-outlined text-primary mb-3 block group-hover:scale-110 transition-transform">restaurant</span>
+<h4 class="text-sm font-bold mb-1">Food Court</h4>
+<p class="text-[10px] text-on-surface-variant">Level 2 • Closed</p>
+</div>
+</div>
+</section>
+<!-- Pathfinding Footer -->
+<div class="mt-10 pt-10 border-t border-outline-variant/20">
+<div class="flex items-start gap-4 bg-primary/5 p-4 rounded-xl">
+<span class="material-symbols-outlined text-primary">route</span>
+<div>
+<p class="text-xs font-bold text-on-surface">Smart Navigation Active</p>
+<p class="text-[10px] text-on-surface-variant leading-relaxed mt-1">Route to Elevator Bank C is currently the fastest path to your vehicle.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Visual Anchor (Floating Action) -->
+<div class="fixed bottom-6 right-[432px] z-40">
+<button class="flex items-center gap-3 bg-white shadow-2xl p-4 rounded-full border border-primary/10 hover:translate-y-[-2px] transition-all">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">explore</span>
+</div>
+<div class="pr-4">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Interactive</p>
+<p class="text-xs font-extrabold text-primary">3D TOUR</p>
+</div>
+</button>
+</div>
+</body></html>

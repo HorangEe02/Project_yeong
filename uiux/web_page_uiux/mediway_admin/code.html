@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#005ab7",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "on-tertiary-fixed": "#001e2b",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#eeeef0",
+                    "inverse-primary": "#aac7ff",
+                    "surface-tint": "#005cba",
+                    "primary-fixed": "#d7e3ff",
+                    "primary-fixed-dim": "#aac7ff",
+                    "error-container": "#ffdad6",
+                    "background": "#f9f9fb",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#dfe8ff",
+                    "surface-container-high": "#e8e8ea",
+                    "secondary-fixed-dim": "#abc7ff",
+                    "surface-dim": "#d9dadc",
+                    "tertiary": "#005673",
+                    "secondary-fixed": "#d7e2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#004e9f",
+                    "on-secondary-fixed": "#001b3f",
+                    "on-tertiary-container": "#cdecff",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#f0f0f2",
+                    "surface-container-highest": "#e2e2e4",
+                    "surface": "#f9f9fb",
+                    "on-secondary-fixed-variant": "#00458f",
+                    "outline": "#727784",
+                    "primary-container": "#0066cc",
+                    "tertiary-fixed-dim": "#74d1ff",
+                    "on-primary-fixed-variant": "#00458e",
+                    "on-primary": "#ffffff",
+                    "on-surface-variant": "#414753",
+                    "tertiary-container": "#007094",
+                    "tertiary-fixed": "#c1e8ff",
+                    "outline-variant": "#c1c6d5",
+                    "on-surface": "#1a1c1d",
+                    "on-primary-fixed": "#001b3e",
+                    "surface-bright": "#f9f9fb",
+                    "on-secondary-container": "#fefcff",
+                    "surface-container-low": "#f3f3f5",
+                    "inverse-surface": "#2f3132",
+                    "surface-variant": "#e2e2e4",
+                    "on-background": "#1a1c1d",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#0372e4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                @apply bg-surface-container-lowest/80 backdrop-blur-[20px];
+            }
+            .gradient-primary {
+                @apply bg-gradient-to-r from-primary to-primary-container;
+            }
+            .shadow-ambient {
+                @apply shadow-[0_8px_40px_-12px_rgba(0,78,159,0.06)];
+            }
+            .text-headline-lg {
+                @apply font-headline text-[2rem] leading-[2.5rem] tracking-[-0.02em] font-bold;
+            }
+            .text-headline-sm {
+                @apply font-headline text-[1.5rem] leading-[2rem] tracking-[-0.02em] font-semibold;
+            }
+            .text-body-lg {
+                @apply font-body text-[1rem] leading-[1.6rem] font-normal;
+            }
+            .text-label-md {
+                @apply font-label text-[0.875rem] leading-[1.25rem] font-medium text-on-surface-variant;
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-body">
+<!-- TopNavBar -->
+<nav class="docked full-width top-0 sticky z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-xl shadow-blue-900/5">
+<div class="flex justify-between items-center px-10 h-24 w-full relative">
+<!-- Brand Logo -->
+<div class="text-2xl font-black tracking-tighter text-blue-900 dark:text-blue-100 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[28px]" data-icon="ecg_heart">ecg_heart</span>
+</div>
+                MediWay Admin
+            </div>
+<!-- Navigation Links -->
+<div class="flex gap-8 items-center h-full">
+<a class="font-inter tracking-tight text-sm font-medium h-full flex flex-col justify-center text-blue-700 dark:text-blue-400 font-bold border-b-2 border-blue-600 dark:border-blue-400 pb-1" href="#">
+                    Dashboard
+                </a>
+<a class="font-inter tracking-tight text-sm font-medium h-full flex flex-col justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">
+                    User Management
+                </a>
+<a class="font-inter tracking-tight text-sm font-medium h-full flex flex-col justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors" href="#">
+                    Settings
+                </a>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="bg-surface-container-high text-on-surface text-sm rounded-full pl-10 pr-4 py-2 border-none focus:ring-0 w-48 transition-all focus:bg-surface-container-lowest focus:shadow-ambient" placeholder="Search..." type="text"/>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all scale-95 active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all scale-95 active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<button class="ml-2 px-5 py-2.5 rounded-xl gradient-primary text-on-primary font-medium text-sm flex items-center gap-2 hover:opacity-90 transition-opacity shadow-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                    Add Account
+                </button>
+<div class="ml-4 w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-lowest shadow-sm">
+<img alt="Administrator Profile" class="w-full h-full object-cover" data-alt="professional headshot of an administrator in a clinical setting with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZ4rXJN1SJwqdEWdZb51SzwGCi10lL4OkG6ddxZgTxgr4XK972YoSiwL102GY250salngDu4L_xJybLhNS1Ueh2JY-98OkPe3vSMJijSyap_8Wad1_dICxRWlnXhmpZZyIvoHpF-3eHnv8FQcktzLEtvBb7YH-l05Xl6_FXwUHsX3G-dcVuUX8wCUYlxkByAo2BFcvaPrbtgexsPad_r4k0JhBlsCFjPE07SWQtywkEOQrRMvpX5IiNcmhumcAwVJiQWgtQlVgWG8c"/>
+</div>
+</div>
+<!-- Separation Logic -->
+<div class="bg-slate-200/50 dark:bg-slate-800/50 h-px w-full absolute bottom-0"></div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 max-w-[1400px] w-full mx-auto px-10 py-12 flex flex-col gap-12">
+<!-- Header -->
+<header class="flex flex-col gap-2">
+<h1 class="text-headline-lg text-on-surface">System Overview</h1>
+<p class="text-body-lg text-on-surface-variant">Real-time metrics and administration for the MediWay ecosystem.</p>
+</header>
+<!-- Bento Grid Overview Cards -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Total Users -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-ambient flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-primary/5 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="flex items-center gap-4 mb-6 relative z-10">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</div>
+<h2 class="text-label-md uppercase tracking-wider">Total Users</h2>
+</div>
+<div class="relative z-10">
+<div class="text-[3rem] leading-none font-bold text-on-surface tracking-tight">12,458</div>
+<div class="mt-2 text-sm text-tertiary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_up">trending_up</span>
+                        +4.2% from last month
+                    </div>
+</div>
+</div>
+<!-- Active Staff -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-ambient flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-secondary/5 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="flex items-center gap-4 mb-6 relative z-10">
+<div class="w-12 h-12 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+</div>
+<h2 class="text-label-md uppercase tracking-wider">Active Staff</h2>
+</div>
+<div class="relative z-10">
+<div class="text-[3rem] leading-none font-bold text-on-surface tracking-tight">842</div>
+<div class="mt-2 text-sm text-tertiary flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_up">trending_up</span>
+                        +12 new this week
+                    </div>
+</div>
+</div>
+<!-- Registered Patients -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-ambient flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-tertiary/5 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="flex items-center gap-4 mb-6 relative z-10">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined" data-icon="ward">ward</span>
+</div>
+<h2 class="text-label-md uppercase tracking-wider">Registered Patients</h2>
+</div>
+<div class="relative z-10">
+<div class="text-[3rem] leading-none font-bold text-on-surface tracking-tight">11,616</div>
+<div class="mt-2 text-sm text-on-surface-variant flex items-center gap-1">
+                        Steady growth
+                    </div>
+</div>
+</div>
+</section>
+<!-- User Management Table Section -->
+<section class="bg-surface-container-low rounded-[2rem] p-2 flex flex-col gap-6">
+<div class="bg-surface-container-lowest rounded-[1.75rem] p-8 shadow-ambient min-h-[500px] flex flex-col">
+<!-- Table Header & Controls -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div>
+<h2 class="text-headline-sm text-on-surface">User Management</h2>
+<p class="text-sm text-on-surface-variant mt-1">Directory of all registered accounts</p>
+</div>
+<div class="flex items-center gap-3 w-full md:w-auto">
+<div class="relative flex-1 md:w-64">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full bg-surface-container text-on-surface rounded-xl pl-12 pr-4 py-3 border-none focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all" placeholder="Search users..." type="text"/>
+</div>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface rounded-xl p-3 flex items-center justify-center transition-colors">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-label-md text-on-surface-variant border-b border-surface-variant/50">
+<th class="pb-4 pl-4 font-semibold">Name</th>
+<th class="pb-4 font-semibold">Role</th>
+<th class="pb-4 font-semibold">Status</th>
+<th class="pb-4 font-semibold">Last Login</th>
+<th class="pb-4 pr-4 text-right font-semibold">Actions</th>
+</tr>
+</thead>
+<tbody class="text-body-lg">
+<!-- Row 1 -->
+<tr class="group hover:bg-surface-container/30 transition-colors">
+<td class="py-4 pl-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold text-sm">
+                                            SJ
+                                        </div>
+<div>
+<div class="font-medium text-on-surface">Dr. Sarah Jenkins</div>
+<div class="text-sm text-on-surface-variant">sarah.j@mediway.com</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-fixed text-on-secondary-fixed">
+                                        Staff
+                                    </span>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-2 text-sm">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+                                        Active
+                                    </div>
+</td>
+<td class="py-4 text-on-surface-variant text-sm">2 hours ago</td>
+<td class="py-4 pr-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container" title="Edit">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors rounded-lg hover:bg-error-container/50" title="Deactivate">
+<span class="material-symbols-outlined text-[20px]" data-icon="block">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-surface-container/30 transition-colors border-t border-surface-variant/30">
+<td class="py-4 pl-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-sm">
+                                            MR
+                                        </div>
+<div>
+<div class="font-medium text-on-surface">Michael Rodriguez</div>
+<div class="text-sm text-on-surface-variant">m.rodriguez@email.com</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-container-high text-on-surface">
+                                        Patient
+                                    </span>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-2 text-sm">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+                                        Active
+                                    </div>
+</td>
+<td class="py-4 text-on-surface-variant text-sm">Yesterday</td>
+<td class="py-4 pr-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container" title="Edit">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error transition-colors rounded-lg hover:bg-error-container/50" title="Deactivate">
+<span class="material-symbols-outlined text-[20px]" data-icon="block">block</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-surface-container/30 transition-colors border-t border-surface-variant/30">
+<td class="py-4 pl-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-bold text-sm">
+                                            EL
+                                        </div>
+<div>
+<div class="font-medium text-on-surface-variant">Emma Lawson</div>
+<div class="text-sm text-on-surface-variant">emma.l@email.com</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface-container-high text-on-surface">
+                                        Guardian
+                                    </span>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-2 text-sm text-on-surface-variant">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+                                        Inactive
+                                    </div>
+</td>
+<td class="py-4 text-on-surface-variant text-sm">Oct 12, 2023</td>
+<td class="py-4 pr-4 text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container" title="Edit">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error-container rounded-lg transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Placeholder -->
+<div class="mt-auto pt-6 flex items-center justify-between border-t border-surface-variant/30 text-sm text-on-surface-variant">
+<div>Showing 1 to 3 of 12,458 users</div>
+<div class="flex gap-2">
+<button class="p-2 rounded-lg hover:bg-surface-container text-outline-variant cursor-not-allowed">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="p-2 rounded-lg hover:bg-surface-container text-on-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-8 mt-auto bg-slate-50 dark:bg-slate-950 text-xs font-medium text-slate-400 dark:text-slate-500 border-t border-transparent relative">
+<div class="bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent h-px absolute top-0 w-full"></div>
+<div class="flex flex-col md:flex-row justify-between items-center px-12 max-w-7xl mx-auto">
+<p>© 2024 MediWay Clinical Sanctuary. High-Tech Serenity System.</p>
+<div class="flex gap-6 mt-4 md:mt-0">
+<a class="text-slate-400 dark:text-slate-500 hover:text-blue-500 transition-colors" href="#">Documentation</a>
+<a class="text-slate-400 dark:text-slate-500 hover:text-blue-500 transition-colors" href="#">HIPAA Compliance</a>
+<a class="text-slate-400 dark:text-slate-500 hover:text-blue-500 transition-colors" href="#">API Status</a>
+</div>
+</div>
+</footer>
+</body></html>

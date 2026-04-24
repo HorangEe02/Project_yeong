@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>MediWay · visit_plans 규칙 E2E</title>
+<link rel="icon" type="image/png" sizes="256x256" href="/favicon-256.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;max-width:860px;margin:24px auto;padding:16px;color:#1a1a1a}
+  h1{font-size:20px;margin:0 0 12px}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #eee}
+  th{background:#f6f6f6;font-weight:600}
+  .ok{color:#0a7}
+  .fail{color:#c33}
+  .muted{color:#888;font-size:12px}
+  button{padding:10px 16px;font-size:14px;background:#2563eb;color:white;border:none;border-radius:8px;cursor:pointer}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f6f6;padding:2px 6px;border-radius:4px}
+  .banner{padding:10px 14px;border-radius:8px;margin-bottom:12px}
+  .banner.info{background:#eff6ff;color:#1e40af}
+  .banner.warn{background:#fefce8;color:#854d0e}
+  .banner.error{background:#fef2f2;color:#b91c1c}
+  .banner.ok{background:#f0fdf4;color:#166534}
+</style>
+</head>
+<body>
+<h1>🧪 visit_plans 보안 규칙 E2E</h1>
+<div id="banner" class="banner info">Firebase 초기화 중...</div>
+<div id="meta" class="muted"></div>
+<p><button id="run" disabled>테스트 실행</button> <button id="cleanup" disabled>임시 데이터 정리</button></p>
+<div id="result"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+
+const config = {
+  apiKey: 'REPLACE_WITH_YOUR_FIREBASE_API_KEY',
+  authDomain: 'mediway-demo.firebaseapp.com',
+  databaseURL: 'https://mediway-demo-default-rtdb.firebaseio.com',
+  projectId: 'mediway-demo',
+  storageBucket: 'mediway-demo.firebasestorage.app',
+  messagingSenderId: '805996216710',
+  appId: '1:805996216710:web:caee81623cd2fbc5baac07',
+};
+
+const banner = document.getElementById('banner');
+const meta = document.getElementById('meta');
+const runBtn = document.getElementById('run');
+const cleanupBtn = document.getElementById('cleanup');
+const result = document.getElementById('result');
+
+const app = initializeApp(config);
+const auth = getAuth(app);
+
+let currentToken = null;
+let currentUid = null;
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    banner.textContent = '❌ 로그인이 필요합니다. 아래 버튼을 눌러 로그인 페이지로 이동하세요.';
+    banner.className = 'banner error';
+    meta.innerHTML = '<button id="gologin">로그인 페이지로</button>';
+    document.getElementById('gologin')?.addEventListener('click', () => {
+      location.href = '/login?redirect=/e2e-visit-plan.html';
+    });
+    return;
+  }
+  if (user.isAnonymous) {
+    banner.textContent = '⚠️ 익명 사용자입니다 — admin 계정으로 로그인해 주세요.';
+    banner.className = 'banner warn';
+    meta.innerHTML = '<button id="gologin">로그인 페이지로</button>';
+    document.getElementById('gologin')?.addEventListener('click', () => {
+      location.href = '/login?redirect=/e2e-visit-plan.html';
+    });
+    return;
+  }
+
+  currentToken = await user.getIdToken(true); // 강제 갱신
+  currentUid = user.uid;
+
+  // ID 토큰 sub 클레임 디코딩 (auth.uid 검증)
+  let tokenSub = '(decode-fail)';
+  let tokenAud = '';
+  let tokenIss = '';
+  let tokenExp = '';
+  try {
+    const payload = JSON.parse(atob(currentToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    tokenSub = payload.sub ?? '';
+    tokenAud = payload.aud ?? '';
+    tokenIss = (payload.iss ?? '').replace('https://securetoken.google.com/', '');
+    tokenExp = payload.exp ? new Date(payload.exp * 1000).toISOString() : '';
+  } catch {}
+
+  // 사전 진단 — 본인 role 읽기 가능한지 확인
+  const roleRes = await fetch(`${DB}/users/${currentUid}/role.json?auth=${currentToken}`)
+    .then(async r => ({ status: r.status, body: await r.text() }));
+
+  // auth.uid === $uid 경로로 자기 자신의 visit_plans/{uid} 읽기 가능 여부
+  const selfRes = await fetch(`${DB}/visit_plans/${currentUid}.json?auth=${currentToken}`)
+    .then(async r => ({ status: r.status, body: (await r.text()).slice(0, 80) }));
+
+  const uidMatch = tokenSub === currentUid ? '✅ match' : `⚠️ mismatch (token.sub=${tokenSub})`;
+
+  banner.textContent = `✅ 로그인 확인: ${user.email ?? user.uid}`;
+  banner.className = 'banner ok';
+  meta.innerHTML = `uid (SDK) = <code>${currentUid}</code><br>`
+    + `token.sub = <code>${tokenSub}</code> ${uidMatch}<br>`
+    + `token.iss = <code>${tokenIss}</code> · token.aud = <code>${tokenAud}</code><br>`
+    + `token.exp = <code>${tokenExp}</code><br>`
+    + `path = <code>/visit_plans/${currentUid}_E2E</code><br>`
+    + `role read = <code>${roleRes.status} ${roleRes.body}</code><br>`
+    + `self visit_plans read = <code>${selfRes.status} ${selfRes.body}</code>`;
+  runBtn.disabled = false;
+  cleanupBtn.disabled = false;
+});
+
+const DB = 'https://mediway-demo-default-rtdb.firebaseio.com';
+const makePath = () => `/visit_plans/${currentUid}_E2E`;
+
+const put = (data) => fetch(`${DB}${makePath()}.json?auth=${currentToken}`, {
+  method: 'PUT', body: JSON.stringify(data),
+}).then(async r => ({ status: r.status, body: (await r.text()).slice(0, 140) }));
+
+const del = () => fetch(`${DB}${makePath()}.json?auth=${currentToken}`, { method: 'DELETE' });
+
+const runTests = async () => {
+  runBtn.disabled = true;
+  result.innerHTML = '<p class="muted">실행 중...</p>';
+  const now = Date.now();
+  const base = {
+    uid: currentUid + '_E2E',
+    waypoints: [{ poiId: 'test_1' }, { poiId: 'test_2' }],
+    source: 'admin',
+    updatedBy: currentUid,
+    updatedAt: now,
+    expiresAt: now + 3600_000,
+  };
+  const scenarios = [
+    ['✅ valid write',              base,                                                200],
+    ['ℹ️ 11 waypoints (클라 검증)', { ...base, waypoints: Array(11).fill({ poiId: 'x' }) }, 200],
+    ['❌ wrong updatedBy',          { ...base, updatedBy: 'not-my-uid' },                 401],
+    ['❌ expiresAt > 48h',          { ...base, expiresAt: now + 3 * 86400_000 },          401],
+    ['✅ cleanup write',            base,                                                200],
+  ];
+  const rows = [];
+  for (const [name, data, expected] of scenarios) {
+    const res = await put(data);
+    rows.push({ name, status: res.status, expected, pass: res.status === expected, body: res.body });
+  }
+  await del();
+  const ok = rows.every(r => r.pass);
+  result.innerHTML = `
+    <div class="banner ${ok ? 'ok' : 'error'}">${ok ? '🎉 모든 시나리오 통과' : '⚠️ 일부 실패 — 규칙 점검 필요'}</div>
+    <table>
+      <thead><tr><th>시나리오</th><th>status</th><th>expected</th><th>결과</th><th>body</th></tr></thead>
+      <tbody>${rows.map(r => `
+        <tr>
+          <td>${r.name}</td>
+          <td>${r.status}</td>
+          <td>${r.expected}</td>
+          <td class="${r.pass ? 'ok' : 'fail'}">${r.pass ? '✓' : '✗'}</td>
+          <td><code>${(r.body || '').replace(/</g,'&lt;')}</code></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  runBtn.disabled = false;
+};
+
+runBtn.addEventListener('click', runTests);
+cleanupBtn.addEventListener('click', async () => {
+  cleanupBtn.disabled = true;
+  await del();
+  result.innerHTML = '<p class="muted">정리 완료</p>';
+  cleanupBtn.disabled = false;
+});
+</script>
+</body>
+</html>

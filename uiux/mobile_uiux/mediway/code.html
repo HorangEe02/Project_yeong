@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#cdecff",
+                        "on-primary-container": "#dfe8ff",
+                        "on-error": "#ffffff",
+                        "primary-container": "#0066cc",
+                        "on-secondary-container": "#fefcff",
+                        "tertiary-container": "#007094",
+                        "primary-fixed": "#d7e3ff",
+                        "secondary-fixed-dim": "#abc7ff",
+                        "primary": "#004e9f",
+                        "surface-tint": "#005cba",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed-variant": "#00458e",
+                        "surface-dim": "#d9dadc",
+                        "on-surface": "#1a1c1d",
+                        "inverse-on-surface": "#f0f0f2",
+                        "surface-container": "#eeeef0",
+                        "surface": "#f9f9fb",
+                        "error": "#ba1a1a",
+                        "tertiary": "#005673",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#c1e8ff",
+                        "tertiary-fixed-dim": "#74d1ff",
+                        "on-surface-variant": "#414753",
+                        "on-secondary-fixed-variant": "#00458f",
+                        "secondary": "#005ab7",
+                        "background": "#f9f9fb",
+                        "secondary-fixed": "#d7e2ff",
+                        "primary-fixed-dim": "#aac7ff",
+                        "outline": "#727784",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001b3e",
+                        "inverse-surface": "#2f3132",
+                        "surface-container-low": "#f3f3f5",
+                        "surface-container-high": "#e8e8ea",
+                        "secondary-container": "#0372e4",
+                        "on-tertiary-fixed": "#001e2b",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e2e2e4",
+                        "surface-bright": "#f9f9fb",
+                        "outline-variant": "#c1c6d5",
+                        "inverse-primary": "#aac7ff",
+                        "on-secondary-fixed": "#001b3f",
+                        "on-background": "#1a1c1d",
+                        "surface-variant": "#e2e2e4",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Ambient Background Gradients -->
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary-fixed-dim/30 blur-[100px] pointer-events-none"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-tertiary-fixed-dim/20 blur-[100px] pointer-events-none"></div>
+<!-- TopAppBar Container -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 py-4 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors active:scale-95 duration-200 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<span class="text-xl font-bold tracking-tighter text-blue-800 dark:text-blue-300">MediWay</span>
+<div class="w-10"></div> <!-- Placeholder for balance -->
+<div class="absolute bottom-0 left-0 bg-slate-200/50 dark:bg-slate-800/50 h-[1px] w-full"></div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-md px-6 pt-24 pb-12 relative z-10 flex flex-col h-full overflow-y-auto">
+<!-- Hero Section -->
+<div class="text-center mb-8">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-surface-container-lowest shadow-[0_8px_30px_rgba(0,78,159,0.08)] mb-4">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="health_and_safety">health_and_safety</span>
+</div>
+<h1 class="text-2xl font-bold tracking-tight text-on-surface mb-2 font-headline">Welcome to MediWay</h1>
+<p class="text-on-surface-variant text-sm font-body">Your digital sanctuary for health management.</p>
+</div>
+<!-- Login / Signup Card -->
+<div class="bg-surface-container-lowest rounded-[2rem] p-6 shadow-[0_20px_40px_rgba(0,78,159,0.04)] mb-8">
+<!-- Tab Switcher -->
+<div class="flex p-1 bg-surface-container-low rounded-xl mb-6">
+<button class="flex-1 py-2.5 text-sm font-semibold rounded-lg bg-surface-container-lowest shadow-sm text-primary transition-all">Login</button>
+<button class="flex-1 py-2.5 text-sm font-medium rounded-lg text-on-surface-variant hover:text-on-surface transition-all">Sign Up</button>
+</div>
+<!-- Form -->
+<form class="space-y-4">
+<!-- Email Input -->
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline" data-icon="mail">mail</span>
+</div>
+<input class="w-full pl-12 pr-4 py-3.5 bg-surface-container-highest text-on-surface placeholder-outline border-none rounded-xl focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_4px_20px_rgba(0,78,159,0.08)] transition-all font-body text-sm" placeholder="Email Address" required="" type="email"/>
+</div>
+<!-- Password Input -->
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline" data-icon="lock">lock</span>
+</div>
+<input class="w-full pl-12 pr-12 py-3.5 bg-surface-container-highest text-on-surface placeholder-outline border-none rounded-xl focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_4px_20px_rgba(0,78,159,0.08)] transition-all font-body text-sm" placeholder="Password" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-4 flex items-center text-outline hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility_off">visibility_off</span>
+</button>
+</div>
+<!-- Forgot Password -->
+<div class="flex justify-end pt-1">
+<a class="text-xs font-medium text-primary hover:text-primary-container transition-colors" href="#">Forgot password?</a>
+</div>
+<!-- Submit Button -->
+<button class="w-full py-4 mt-2 bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold rounded-xl shadow-[0_8px_20px_rgba(0,78,159,0.2)] hover:shadow-[0_12px_24px_rgba(0,78,159,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-headline text-base" type="submit">
+                    Login to MediWay
+                    <span class="material-symbols-outlined text-[20px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+</div>
+<!-- Social Login Section -->
+<div class="mt-auto">
+<div class="flex items-center gap-4 mb-6">
+<div class="h-[1px] flex-1 bg-surface-container-highest"></div>
+<span class="text-xs font-medium text-outline-variant uppercase tracking-wider">Or continue with</span>
+<div class="h-[1px] flex-1 bg-surface-container-highest"></div>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full py-3.5 bg-[#FEE500] text-[#000000] font-semibold rounded-xl flex items-center justify-center gap-3 hover:bg-[#FEE500]/90 transition-colors active:scale-[0.98] text-sm">
+                    Kakao
+                </button>
+<button class="w-full py-3.5 bg-[#03C75A] text-white font-semibold rounded-xl flex items-center justify-center gap-3 hover:bg-[#03C75A]/90 transition-colors active:scale-[0.98] text-sm">
+                    Naver
+                </button>
+<button class="w-full py-3.5 bg-white text-on-surface font-semibold rounded-xl flex items-center justify-center gap-3 shadow-[0_2px_10px_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors active:scale-[0.98] text-sm">
+<img alt="Google Logo" class="w-5 h-5 object-contain" data-alt="Google colorful G logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAI_kibIUQhTo4-kLudyCuLnWc7bcnTDWOnm5Mh2ESRQKhua9Qp72dn0S0MNbSbdlQ7NnehmvBQ4yHQRXHAU4HYj3Ey5R0iXUA8On1sHOYM0QXBEMJr5LdqdRuE6vZnqXuFTDkYo-eWK6hrm9b3JV4l-tkm1q2ZumpvV5RnMpvX-0Rz_eBqBYavtUBJf2VKllKROa7ZnRB04CyM3HVPpSu7nr6k-urfl2L-qxZcbfXLE7-HcCrc82sROCLapWHqG7iNi0JpWkISUR7"/>
+                    Google
+                </button>
+</div>
+</div>
+<!-- Footer Links -->
+<div class="mt-8 text-center px-4">
+<p class="text-[11px] text-outline leading-relaxed">
+                By continuing, you agree to our <a class="text-primary hover:underline" href="#">Terms of Service</a> and acknowledge our <a class="text-primary hover:underline" href="#">Privacy Policy</a>.
+            </p>
+</div>
+</main>
+</body></html>

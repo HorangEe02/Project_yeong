@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MediWay - Select Hospital</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-bright": "#f9f9fb",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#007094",
+                    "outline": "#727784",
+                    "on-secondary-container": "#fefcff",
+                    "surface-container-highest": "#e2e2e4",
+                    "primary": "#004e9f",
+                    "on-primary-fixed": "#001b3e",
+                    "background": "#f9f9fb",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#eeeef0",
+                    "primary-container": "#0066cc",
+                    "on-tertiary-fixed": "#001e2b",
+                    "tertiary-fixed": "#c1e8ff",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "on-background": "#1a1c1d",
+                    "secondary-fixed": "#d7e2ff",
+                    "secondary-container": "#0372e4",
+                    "on-primary-fixed-variant": "#00458e",
+                    "secondary-fixed-dim": "#abc7ff",
+                    "surface-container-low": "#f3f3f5",
+                    "on-secondary-fixed": "#001b3f",
+                    "inverse-surface": "#2f3132",
+                    "outline-variant": "#c1c6d5",
+                    "on-primary-container": "#dfe8ff",
+                    "surface-tint": "#005cba",
+                    "secondary": "#005ab7",
+                    "surface": "#f9f9fb",
+                    "surface-container-high": "#e8e8ea",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#cdecff",
+                    "primary-fixed-dim": "#aac7ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#aac7ff",
+                    "tertiary": "#005673",
+                    "surface-dim": "#d9dadc",
+                    "primary-fixed": "#d7e3ff",
+                    "on-secondary-fixed-variant": "#00458f",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#74d1ff",
+                    "on-surface-variant": "#414753",
+                    "on-error-container": "#93000a",
+                    "error-container": "#ffdad6",
+                    "on-surface": "#1a1c1d",
+                    "inverse-on-surface": "#f0f0f2",
+                    "surface-variant": "#e2e2e4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "display": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            },
+            "fontSize": {
+                "headline-sm": ["1.5rem", { lineHeight: "2rem", letterSpacing: "-0.02em" }],
+                "display-lg": ["3.5rem", { lineHeight: "4rem", letterSpacing: "-0.02em" }],
+                "body-lg": ["1rem", { lineHeight: "1.6" }],
+                "label-md": ["0.75rem", { lineHeight: "1rem" }]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.surface');
+            color: theme('colors.on-surface');
+            font-family: 'Inter', sans-serif;
+        }
+        /* No-Line Rule & Ghost Border Fallback */
+        .ghost-border {
+            border: 1px solid rgba(193, 198, 213, 0.15); /* outline-variant at 15% */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 antialiased">
+<!-- Top Navigation suppressed as this is a transactional/onboarding screen -->
+<main class="w-full max-w-2xl flex flex-col items-center">
+<!-- Brand Header -->
+<div class="mb-12 text-center">
+<h1 class="font-display text-display-lg font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-container mb-4">
+                MediWay Healthcare
+            </h1>
+<p class="font-body text-body-lg text-on-surface-variant max-w-md mx-auto">
+                Your digital sanctuary for comprehensive medical care. Please select your preferred institution to continue.
+            </p>
+</div>
+<!-- Hospital Selector Card (Vitality Glass / Elevated Surface) -->
+<div class="w-full bg-surface-container-lowest rounded-2xl p-8 md:p-10 shadow-[0_20px_40px_-15px_rgba(0,78,159,0.06)] ghost-border relative z-10">
+<h2 class="font-headline text-headline-sm font-semibold text-on-surface mb-8 text-center">
+                Select Hospital
+            </h2>
+<!-- Search / Filter (Surface-Container-High) -->
+<div class="mb-8 relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full bg-surface-container-high text-on-surface placeholder-outline font-body text-body-lg rounded-xl py-4 pl-12 pr-4 outline-none focus:bg-surface-container-lowest focus:ring-0 focus:shadow-[0_10px_30px_-10px_rgba(0,78,159,0.08)] transition-all duration-300 border-none" placeholder="Search by name or region..." type="text"/>
+</div>
+<!-- Hospital List (No Dividers, Vertical Whitespace) -->
+<div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+<!-- Institution Item: Active/Selected State -->
+<div class="group flex items-center p-4 rounded-xl bg-surface-container-low cursor-pointer transition-all hover:bg-surface-container">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm mr-4 flex-shrink-0">
+<img alt="KNU Hospital Logo" class="w-8 h-8 object-contain rounded-full" data-alt="clean abstract medical cross logo in deep blue on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxzVe2LIzvxR8lGYN9ipDHlC9Ga3FXKU4tnero3bBk-tX-F0r_Z6U_eL5p8fu4UvQNkJaKIPrIt3_75AiKIs95wlrQADqPKIfgOgZnsy0cF-kzfofo4jJhskwoKXuFZOQ3e2MT6gktS9r-vUmcD5jZECzxczNoNNm-WA-Px06Ku0y-PDFBs3VcK0iQVcg9XsgoGm2XEfBG1-D6IRjRvFsfT6R_ENNr49rH2G660k6V8myPTWdCUijYabVXkL0h8jQLQKyipUE-I1tf"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline text-base font-semibold text-on-surface group-hover:text-primary transition-colors">KNU Hospital</h3>
+<p class="font-label text-label-md text-on-surface-variant mt-1">Tertiary Referral Hospital • Daegu</p>
+</div>
+<div class="ml-4 flex-shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Institution Item -->
+<div class="group flex items-center p-4 rounded-xl hover:bg-surface-container-low cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm mr-4 flex-shrink-0">
+<img alt="SNU Hospital Logo" class="w-8 h-8 object-contain rounded-full" data-alt="modern abstract letter s logo in medical blue and white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAimvaVVgcn6EkYQ4kAuTxY3izRBTRZK3cF3mojocXHcJ_sKAXXpeAfCuI4J6GrMdrQUP4vL3dwRp3ck5CIkPF-iyePNF7HZBH7PgVAaSPd_VAyvOeicarv3iSiJ8-84MEhfs5m1qHOQfJtSzVR37G0aR9plP1r5mqsKlhKE8X1FSw-ebTbyB_mqeZtCAmlRELkNIzUZ6zUgnu3DtnhZl-Q4RxFCj919v7H8HAMSGt6Sdi0iCfr3qhHPMT6ylvkvt9WMJDlQpdcqv8n"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline text-base font-medium text-on-surface group-hover:text-primary transition-colors">SNU Hospital</h3>
+<p class="font-label text-label-md text-on-surface-variant mt-1">National University Hospital • Seoul</p>
+</div>
+<div class="ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline" data-icon="arrow_forward_ios">arrow_forward_ios</span>
+</div>
+</div>
+<!-- Institution Item -->
+<div class="group flex items-center p-4 rounded-xl hover:bg-surface-container-low cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm mr-4 flex-shrink-0">
+<img alt="Severance Hospital Logo" class="w-8 h-8 object-contain rounded-full" data-alt="elegant medical shield logo minimalist design blue" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-Lm9h0QTKTtPF6i5-R9A28B8G9ueFD6EgAcivT1Gi4gBR4JOChsTreyfg0E_-by07zVoY0a5Ns1PVBugM1n40Kng9nad1Zd8nrmAIFTrBYAxrSWMQAM5iIr7VvyYuv0omSJj7VoMXczJxm5f_on3phCTmFJCmf7qHoWPXi_OreZ-7PwZV1D-1RZxc4z-m6X5ALzDEAhhL_q2MizbZVDd1nVLV3-6WOINd1wwBAYm2BBrF0-aP31sTbbt_6FvcQ7hjb9vFy2xa6MIj"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline text-base font-medium text-on-surface group-hover:text-primary transition-colors">Severance Hospital</h3>
+<p class="font-label text-label-md text-on-surface-variant mt-1">General Hospital • Seoul</p>
+</div>
+<div class="ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline" data-icon="arrow_forward_ios">arrow_forward_ios</span>
+</div>
+</div>
+<!-- Institution Item -->
+<div class="group flex items-center p-4 rounded-xl hover:bg-surface-container-low cursor-pointer transition-all">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm mr-4 flex-shrink-0">
+<img alt="Asan Medical Center Logo" class="w-8 h-8 object-contain rounded-full" data-alt="abstract leaf and cross medical logo bright blue" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeXzhELz0UWn4RbMP1j3GnOUPkH328Cn4bdZ3NpcLsv7sy1a71nwWTFe7hakOmsyaRPxNfhtaAbyCUo7Yhv4VGIoNxdh8H6snHa3mGWPPFdYttx3P3cEu2cQtyL843lEO8sZYOnJvhKOZe_ewOokNwA7TxArEWS6BK-YLujLh2KAZJfpPkdFt2GM_T2z-PgMtH3LrR2e5xyuSgUJ3i4epIWsrBYxyvZkKxhqvlG__aCLAkVGFmB5YWsnhxLTpY-F-kR9GeM6b4YeAX"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline text-base font-medium text-on-surface group-hover:text-primary transition-colors">Asan Medical Center</h3>
+<p class="font-label text-label-md text-on-surface-variant mt-1">Tertiary Hospital • Seoul</p>
+</div>
+<div class="ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-outline" data-icon="arrow_forward_ios">arrow_forward_ios</span>
+</div>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="mt-10 pt-6 flex justify-center">
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-semibold text-lg py-4 px-12 rounded-2xl shadow-[0_10px_30px_-10px_rgba(0,78,159,0.3)] hover:shadow-[0_15px_35px_-10px_rgba(0,78,159,0.4)] hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto">
+                    Enter Portal
+                </button>
+</div>
+</div>
+<!-- Supportive Tertiary Link -->
+<div class="mt-8">
+<button class="font-body text-primary text-sm font-medium hover:underline flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="help_outline">help_outline</span>
+                Need help finding your hospital?
+            </button>
+</div>
+</main>
+<!-- Decorative ambient background glow -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-tertiary-fixed rounded-full blur-[100px] opacity-20"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary-fixed rounded-full blur-[120px] opacity-20"></div>
+</div>
+</body></html>

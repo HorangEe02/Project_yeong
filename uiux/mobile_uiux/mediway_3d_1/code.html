@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hospital Navigator - 3D Wayfinding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#414753",
+                    "secondary-fixed-dim": "#abc7ff",
+                    "outline-variant": "#c1c6d5",
+                    "on-primary-fixed-variant": "#00458e",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-container": "#cdecff",
+                    "tertiary-fixed-dim": "#74d1ff",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-fixed-dim": "#aac7ff",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#aac7ff",
+                    "background": "#f9f9fb",
+                    "on-secondary-fixed-variant": "#00458f",
+                    "surface-container-highest": "#e2e2e4",
+                    "primary": "#004e9f",
+                    "on-tertiary-fixed": "#001e2b",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed": "#001b3f",
+                    "surface-variant": "#e2e2e4",
+                    "tertiary-container": "#007094",
+                    "on-tertiary-fixed-variant": "#004d67",
+                    "primary-container": "#0066cc",
+                    "inverse-on-surface": "#f0f0f2",
+                    "secondary-fixed": "#d7e2ff",
+                    "on-secondary-container": "#fefcff",
+                    "secondary-container": "#0372e4",
+                    "primary-fixed": "#d7e3ff",
+                    "on-background": "#1a1c1d",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#005cba",
+                    "surface": "#f9f9fb",
+                    "inverse-surface": "#2f3132",
+                    "secondary": "#005ab7",
+                    "tertiary-fixed": "#c1e8ff",
+                    "on-primary-fixed": "#001b3e",
+                    "on-secondary": "#ffffff",
+                    "tertiary": "#005673",
+                    "surface-container-high": "#e8e8ea",
+                    "on-surface": "#1a1c1d",
+                    "surface-dim": "#d9dadc",
+                    "surface-container": "#eeeef0",
+                    "surface-container-low": "#f3f3f5",
+                    "outline": "#727784",
+                    "surface-bright": "#f9f9fb",
+                    "on-primary-container": "#dfe8ff",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9fb; color: #1a1c1d; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .perspective-map {
+            perspective: 1200px;
+        }
+        .map-canvas {
+            transform: rotateX(55deg) rotateZ(-25deg);
+            transform-style: preserve-3d;
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="overflow-hidden h-screen select-none">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm dark:shadow-none flex justify-between items-center px-6 py-4">
+<button class="active:scale-95 duration-200 hover:bg-slate-100/50 p-2 rounded-full">
+<span class="material-symbols-outlined text-blue-700 dark:text-blue-400" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold text-blue-800 dark:text-blue-300 font-sans tracking-tight">Hospital Navigator</h1>
+<button class="active:scale-95 duration-200 hover:bg-slate-100/50 p-2 rounded-full">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400" data-icon="close">close</span>
+</button>
+</header>
+<!-- 3D Map Canvas Section -->
+<main class="relative h-full w-full bg-surface overflow-hidden perspective-map">
+<!-- Floor Number Indicator -->
+<div class="absolute left-6 top-24 z-10">
+<div class="bg-surface-container-lowest glass-panel px-4 py-2 rounded-xl shadow-sm flex flex-col items-center gap-1">
+<span class="text-xs font-bold text-primary tracking-widest uppercase">Floor</span>
+<span class="text-2xl font-black text-on-surface">L2</span>
+</div>
+</div>
+<!-- 3D Environment Rendering -->
+<div class="absolute inset-0 flex items-center justify-center map-canvas">
+<div class="relative w-[1000px] h-[1000px] bg-surface-container-high rounded-[3rem] shadow-2xl flex items-center justify-center">
+<!-- Isometric Floor Plan Image Background -->
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-100/50 to-transparent"></div>
+<div class="relative w-full h-full p-20">
+<!-- Path Visualization -->
+<svg class="w-full h-full" viewbox="0 0 800 800">
+<!-- Path segments -->
+<path class="drop-shadow-[0_0_8px_rgba(0,78,159,0.4)]" d="M 100,600 L 300,600 L 300,300 L 550,300 L 550,150" fill="none" stroke="#004e9f" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"></path>
+<!-- Start Point -->
+<circle cx="100" cy="600" fill="#004e9f" r="10"></circle>
+<!-- Destination Pin -->
+<g transform="translate(550,150)">
+<path d="M0 0 L-10 -25 A12 12 0 1 1 10 -25 Z" fill="#ba1a1a"></path>
+<circle cx="0" cy="-28" fill="white" r="4"></circle>
+</g>
+</svg>
+<!-- Decorative Walls and Rooms -->
+<div class="absolute top-[20%] left-[40%] w-48 h-64 bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/10 flex items-center justify-center">
+<span class="text-[10px] uppercase tracking-tighter text-on-surface-variant font-bold">Diagnostics</span>
+</div>
+<div class="absolute top-[45%] left-[20%] w-32 h-32 bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/10 flex items-center justify-center">
+<span class="text-[10px] uppercase tracking-tighter text-on-surface-variant font-bold">Cafeteria</span>
+</div>
+<div class="absolute top-[60%] left-[55%] w-40 h-52 bg-surface-container-lowest rounded-xl shadow-lg border border-outline-variant/10 flex items-center justify-center">
+<span class="text-[10px] uppercase tracking-tighter text-on-surface-variant font-bold">Elevator B</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Controls -->
+<div class="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-20">
+<button class="w-14 h-14 bg-surface-container-lowest glass-panel rounded-full shadow-lg flex items-center justify-center text-primary active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<button class="w-14 h-14 bg-surface-container-lowest glass-panel rounded-full shadow-lg flex items-center justify-center text-primary active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="my_location">my_location</span>
+</button>
+</div>
+<!-- AR Mode Toggle -->
+<div class="absolute top-24 right-6 z-20">
+<button class="glass-panel px-4 py-3 rounded-full flex items-center gap-3 shadow-lg border border-white/20 active:scale-95 transition-all">
+<div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+<span class="material-symbols-outlined text-on-surface" data-icon="view_in_ar">view_in_ar</span>
+<span class="text-sm font-semibold text-on-surface">Live AR</span>
+</button>
+</div>
+<!-- Navigation Instruction Card -->
+<div class="absolute bottom-32 left-0 w-full px-6 z-30">
+<div class="bg-surface-container-lowest glass-panel p-6 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.12)] border border-white/30">
+<div class="flex items-start gap-5">
+<div class="w-16 h-16 bg-primary-container rounded-2xl flex items-center justify-center text-on-primary-container shrink-0">
+<span class="material-symbols-outlined text-4xl" data-icon="turn_right">turn_right</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-1">
+<h2 class="text-xl font-bold tracking-tight text-on-surface">Level 2 Laboratory</h2>
+<span class="text-primary font-bold text-sm bg-primary/10 px-3 py-1 rounded-full">3 mins walk</span>
+</div>
+<p class="text-on-surface-variant text-[15px] leading-relaxed">
+                            Follow the blue line. <span class="font-bold text-on-surface">Elevator B</span> will be on your left.
+                        </p>
+</div>
+</div>
+<!-- Step progress indicator -->
+<div class="mt-6 flex gap-2">
+<div class="h-1.5 flex-1 bg-primary rounded-full"></div>
+<div class="h-1.5 flex-1 bg-surface-container-high rounded-full"></div>
+<div class="h-1.5 flex-1 bg-surface-container-high rounded-full"></div>
+<div class="h-1.5 flex-1 bg-surface-container-high rounded-full"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pt-3 pb-8 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-t-[2rem] z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
+<div class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-200 rounded-2xl px-6 py-2 transition-all">
+<span class="material-symbols-outlined" data-icon="explore" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="text-[11px] font-medium tracking-wide uppercase font-sans mt-1">Guidance</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-6 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="apartment">apartment</span>
+<span class="text-[11px] font-medium tracking-wide uppercase font-sans mt-1">Directory</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-6 py-2 hover:text-blue-600 dark:hover:text-blue-300 active:scale-90 duration-150">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+<span class="text-[11px] font-medium tracking-wide uppercase font-sans mt-1">Assistance</span>
+</div>
+</nav>
+</body></html>

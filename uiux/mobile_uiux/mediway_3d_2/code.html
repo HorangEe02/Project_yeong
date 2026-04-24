@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hospital Navigator - 3D Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#414753",
+                        "secondary-fixed-dim": "#abc7ff",
+                        "outline-variant": "#c1c6d5",
+                        "on-primary-fixed-variant": "#00458e",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#cdecff",
+                        "tertiary-fixed-dim": "#74d1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#aac7ff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#aac7ff",
+                        "background": "#f9f9fb",
+                        "on-secondary-fixed-variant": "#00458f",
+                        "surface-container-highest": "#e2e2e4",
+                        "primary": "#004e9f",
+                        "on-tertiary-fixed": "#001e2b",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#001b3f",
+                        "surface-variant": "#e2e2e4",
+                        "tertiary-container": "#007094",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "primary-container": "#0066cc",
+                        "inverse-on-surface": "#f0f0f2",
+                        "secondary-fixed": "#d7e2ff",
+                        "on-secondary-container": "#fefcff",
+                        "secondary-container": "#0372e4",
+                        "primary-fixed": "#d7e3ff",
+                        "on-background": "#1a1c1d",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#005cba",
+                        "surface": "#f9f9fb",
+                        "inverse-surface": "#2f3132",
+                        "secondary": "#005ab7",
+                        "tertiary-fixed": "#c1e8ff",
+                        "on-primary-fixed": "#001b3e",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#005673",
+                        "surface-container-high": "#e8e8ea",
+                        "on-surface": "#1a1c1d",
+                        "surface-dim": "#d9dadc",
+                        "surface-container": "#eeeef0",
+                        "surface-container-low": "#f3f3f5",
+                        "outline": "#727784",
+                        "surface-bright": "#f9f9fb",
+                        "on-primary-container": "#dfe8ff",
+                        "on-tertiary": "#ffffff",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9fb; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .perspective-map {
+            perspective: 1200px;
+        }
+        .map-layer {
+            transform: rotateX(45deg) rotateZ(-15deg);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="bg-white/80 backdrop-blur-xl fixed top-0 w-full z-50 shadow-sm flex justify-between items-center px-6 py-4 w-full">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-blue-700" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold text-blue-800 tracking-tight font-headline">Hospital Navigator</h1>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-slate-100/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-blue-700" data-icon="close">close</span>
+</button>
+</header>
+<!-- Main 3D Map Canvas -->
+<main class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+<!-- 3D Map Container -->
+<div class="absolute inset-0 z-0 perspective-map flex items-center justify-center">
+<div class="relative w-[150%] h-[150%] map-layer transition-transform duration-700">
+<img alt="3D Map" class="w-full h-full object-cover rounded-[4rem] opacity-90 scale-110" data-alt="Modern isometric 3D architectural rendering of a high-tech hospital campus with glass buildings and green spaces in bright daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL8z_CVagqtmKvxhmA4Ysdw-rurFAlac65vUpy10y3T6-ucZT3UflsbSQcL7NsmETlgrC9ygtoPHGa3n8m1xGYK74MwBGawl-zgnNmbgXoDt_sXk8a6ZEILVhupgOmUmTwHbSfRomT0SVdvuUXLp7u4t7b3uMI5Ntl4QKBZYO7s-58IM9OAlTWA3qwab69NcqDTMqH6FpDgq0EV5d7D9oQPQbBNtoKvxaLu-9fdm3s2W3vn0Dg0onpPVN81ViTsTbph1vQmslFzRcu"/>
+<!-- Map Markers (Floating Above Map) -->
+<div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+<div class="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl shadow-xl flex items-center gap-2 animate-bounce">
+<span class="material-symbols-outlined text-blue-700 text-sm" data-icon="local_cafe">local_cafe</span>
+<span class="text-[10px] font-bold text-on-surface uppercase tracking-wider">Cafe</span>
+</div>
+<div class="w-1 h-8 bg-gradient-to-b from-white/90 to-transparent"></div>
+</div>
+<div class="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+<div class="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl shadow-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-700 text-sm" data-icon="atm">atm</span>
+<span class="text-[10px] font-bold text-on-surface uppercase tracking-wider">ATM</span>
+</div>
+<div class="w-1 h-8 bg-gradient-to-b from-white/90 to-transparent"></div>
+</div>
+<div class="absolute bottom-1/3 right-1/3 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+<div class="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl shadow-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-700 text-sm" data-icon="local_pharmacy">local_pharmacy</span>
+<span class="text-[10px] font-bold text-on-surface uppercase tracking-wider">Pharmacy</span>
+</div>
+<div class="w-1 h-8 bg-gradient-to-b from-white/90 to-transparent"></div>
+</div>
+<!-- User Current Position -->
+<div class="absolute top-[55%] left-[45%] z-20">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-12 h-12 bg-blue-500/20 rounded-full animate-ping"></div>
+<div class="w-6 h-6 bg-blue-700 border-4 border-white rounded-full shadow-lg"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating UI Overlays -->
+<div class="absolute top-24 right-6 flex flex-col gap-4 z-30">
+<button class="w-12 h-12 bg-white/90 backdrop-blur-lg rounded-xl shadow-lg flex items-center justify-center text-blue-700 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="layers">layers</span>
+</button>
+<button class="w-12 h-12 bg-white/90 backdrop-blur-lg rounded-xl shadow-lg flex items-center justify-center text-blue-700 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="near_me">near_me</span>
+</button>
+</div>
+<!-- Destination Card -->
+<div class="absolute bottom-32 left-6 right-6 z-40">
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-6 flex flex-col gap-5 border border-white/20 backdrop-blur-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="text-xs font-bold text-primary tracking-[0.1em] uppercase mb-1">Next Destination</p>
+<h2 class="text-xl font-bold text-on-surface tracking-tight">Main Administration</h2>
+</div>
+<div class="bg-primary-container px-3 py-1 rounded-full">
+<p class="text-xs font-bold text-on-primary-container">Floor 2</p>
+</div>
+</div>
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-700" data-icon="schedule">schedule</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">ETA</p>
+<p class="text-lg font-bold text-on-surface">4 min</p>
+</div>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant/30"></div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-700" data-icon="distance">distance</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">Distance</p>
+<p class="text-lg font-bold text-on-surface">180 m</p>
+</div>
+</div>
+</div>
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-white py-4 rounded-xl font-bold text-sm tracking-wide shadow-lg shadow-blue-500/20 active:scale-95 transition-all">
+                    Start Live Navigation
+                </button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-2xl flex justify-around items-center px-4 pt-3 pb-8 z-50 rounded-t-[2rem] shadow-[0_-10px_40px_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center bg-blue-50 text-blue-700 rounded-2xl px-6 py-2 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="explore" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="text-[11px] font-medium tracking-wide uppercase font-sans">Guidance</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-6 py-2 hover:text-blue-600 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="apartment">apartment</span>
+<span class="text-[11px] font-medium tracking-wide uppercase font-sans">Directory</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 px-6 py-2 hover:text-blue-600 transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="medical_services">medical_services</span>
+<span class="text-[11px] font-medium tracking-wide uppercase font-sans">Assistance</span>
+</a>
+</nav>
+</body></html>

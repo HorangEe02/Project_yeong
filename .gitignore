@@ -1,0 +1,39 @@
+# ⚠️ 상위 디렉터리 시크릿/로컬 산출물 보호
+
+# === 시크릿 (API 키 · 평문 노출 금지) ===
+data/kakao_api/
+data/Naver_api/
+
+# === 대용량 리소스 (필요 시 별도 LFS 또는 외부 저장) ===
+data/3d_scan/
+
+# === 편집기 · OS ===
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# === Claude Code / OMC 세션 상태 (로컬 전용) ===
+.claude/
+.omc/
+
+# === Node / Bundler ===
+node_modules/
+dist/
+dist-ssr/
+
+# === Firebase 로컬 secrets / 런타임 ===
+mediway/.env
+mediway/.env.local
+mediway/.env.*.local
+mediway/functions/.secret.local
+mediway/functions/.env
+mediway/functions/.env.local
+mediway/functions/.runtimeconfig.json
+mediway/functions/lib/
+mediway/.firebase/
+
+# === Local 로그 / 디버그 산출물 ===
+*.log
+mediway/database-debug.log
+mediway/backup-pre-p1-migration.json

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "secondary-container": "#0372e4",
+                "on-surface": "#1a1c1d",
+                "primary-fixed": "#d7e3ff",
+                "background": "#f9f9fb",
+                "primary": "#004e9f",
+                "on-tertiary": "#ffffff",
+                "on-secondary-fixed-variant": "#00458f",
+                "surface-container-low": "#f3f3f5",
+                "inverse-on-surface": "#f0f0f2",
+                "on-secondary-container": "#fefcff",
+                "inverse-primary": "#aac7ff",
+                "on-primary": "#ffffff",
+                "surface-container-high": "#e8e8ea",
+                "surface-dim": "#d9dadc",
+                "on-background": "#1a1c1d",
+                "surface": "#f9f9fb",
+                "outline": "#727784",
+                "tertiary-container": "#007094",
+                "inverse-surface": "#2f3132",
+                "secondary-fixed": "#d7e2ff",
+                "secondary": "#005ab7",
+                "on-error-container": "#93000a",
+                "on-primary-fixed-variant": "#00458e",
+                "tertiary-fixed": "#c1e8ff",
+                "surface-container-lowest": "#ffffff",
+                "tertiary": "#005673",
+                "primary-fixed-dim": "#aac7ff",
+                "surface-container": "#eeeef0",
+                "on-surface-variant": "#414753",
+                "tertiary-fixed-dim": "#74d1ff",
+                "primary-container": "#0066cc",
+                "error-container": "#ffdad6",
+                "surface-tint": "#005cba",
+                "surface-container-highest": "#e2e2e4",
+                "on-secondary-fixed": "#001b3f",
+                "on-primary-container": "#dfe8ff",
+                "on-secondary": "#ffffff",
+                "error": "#ba1a1a",
+                "on-tertiary-fixed": "#001e2b",
+                "outline-variant": "#c1c6d5",
+                "on-tertiary-fixed-variant": "#004d67",
+                "surface-variant": "#e2e2e4",
+                "on-tertiary-container": "#cdecff",
+                "secondary-fixed-dim": "#abc7ff",
+                "surface-bright": "#f9f9fb",
+                "on-primary-fixed": "#001b3e",
+                "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "1.5rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9fb; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #004e9f, #0066cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased">
+<!-- TopNavBar from Shared Components JSON -->
+<nav class="fixed top-0 w-full z-50 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm shadow-blue-900/5 flex items-center justify-between px-8">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold bg-gradient-to-r from-blue-800 to-blue-600 bg-clip-text text-transparent">MediWay</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-slate-500 dark:text-slate-400 font-medium pb-1 hover:text-blue-600 transition-colors duration-200" href="#">Dashboard</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium pb-1 hover:text-blue-600 transition-colors duration-200" href="#">Patient Flow</a>
+<a class="text-blue-700 dark:text-blue-400 font-semibold border-b-2 border-blue-700 dark:border-blue-400 pb-1" href="#">Facility</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium pb-1 hover:text-blue-600 transition-colors duration-200" href="#">Settings</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container">
+<img alt="Medical Professional Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a professional doctor wearing a white coat in a bright clinical setting with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQRnnIMB9bP0pVYQHTYTZH2VQeabbe3ZpayJUj9G9NAgVu9cMzqSSlwv66xZWesPoblFxQNpKlxl1YATr2TZfz_qNEfWA8YHXrx7-a_kHaROMqANw3oLwxuH2y90qw3SvuCLCDyWzTSEaBozS2vKSExANOCbVSdiramRXFKRu2wBKK17wiltKiz-3hYfOmYsYgdiwl74uK7xqPK94dXoF-eT7nanEOazP0jVn4EBmk4iNIlVT-XRwqZqBkzfXjAteDOKnnxT0TQN8N"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-12 px-8 max-w-7xl mx-auto">
+<!-- Header Section: Large Search Bar -->
+<section class="mb-12">
+<div class="max-w-3xl mx-auto text-center mb-8">
+<h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">무엇을 도와드릴까요?</h1>
+<p class="text-on-surface-variant text-lg">찾으시는 편의시설이나 진료과를 입력해 주세요.</p>
+</div>
+<div class="max-w-4xl mx-auto relative">
+<div class="flex items-center bg-surface-container-lowest rounded-xl p-2 shadow-sm border border-transparent focus-within:shadow-md transition-all duration-300">
+<span class="material-symbols-outlined ml-4 text-primary text-2xl">search</span>
+<input class="w-full px-4 py-4 bg-transparent border-none focus:ring-0 text-xl font-medium placeholder:text-outline-variant" placeholder="시설, 진료과, 교수진 검색..." type="text"/>
+<button class="bg-primary hover:bg-primary-container text-on-primary px-8 py-3 rounded-lg font-semibold transition-all active:scale-95 mr-2">
+                        검색
+                    </button>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left & Center: Facility Grid & Map -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Popular Facilities Icon Grid -->
+<div class="bg-surface-container-low rounded-xl p-8">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-bold tracking-tight">인기 편의시설</h2>
+<button class="text-primary font-semibold text-sm flex items-center gap-1">전체보기 <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+<div class="group bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all hover:translate-y-[-4px] cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-3xl">coffee</span>
+</div>
+<span class="font-bold text-on-surface">카페</span>
+</div>
+<div class="group bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all hover:translate-y-[-4px] cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-3xl">local_convenience_store</span>
+</div>
+<span class="font-bold text-on-surface">편의점</span>
+</div>
+<div class="group bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all hover:translate-y-[-4px] cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-3xl">atm</span>
+</div>
+<span class="font-bold text-on-surface">ATM</span>
+</div>
+<div class="group bg-surface-container-lowest p-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all hover:translate-y-[-4px] cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-3xl">medication</span>
+</div>
+<span class="font-bold text-on-surface">약국</span>
+</div>
+</div>
+</div>
+<!-- Facility Map Preview -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm">
+<div class="p-8 border-b-0">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h2 class="text-2xl font-bold tracking-tight">층별 편의시설 안내</h2>
+<p class="text-on-surface-variant text-sm mt-1">지도를 드래그하여 상세 위치를 확인하세요.</p>
+</div>
+<div class="flex bg-surface-container-high p-1 rounded-lg">
+<button class="px-4 py-2 bg-surface-container-lowest rounded-md text-sm font-bold shadow-sm">B1</button>
+<button class="px-4 py-2 text-sm font-medium hover:bg-surface-container-lowest/50 rounded-md">1F</button>
+<button class="px-4 py-2 text-sm font-medium hover:bg-surface-container-lowest/50 rounded-md">2F</button>
+</div>
+</div>
+<div class="relative h-96 w-full rounded-xl overflow-hidden bg-surface-container">
+<img alt="Floor Map" class="w-full h-full object-cover" data-alt="Architectural minimalist 3D floor plan of a modern hospital corridor with clean lines, soft shadows, and neutral blue-grey tones" data-location="Seoul" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7KubgITqTAT3sPUpPZGy-IwhEzMVKaXwR_meNgUgCsiF4N1nhE_EZs6ajp0YxU97O1TqrXABYTs8vrApNVjTBJuw1AzW9Z06d7JIKTfNAiwzwHwPBe5pQxSH3Ty8VEctI4NDS57ZDGauuxVMnkYvLYhxb3XuPu7N4SeIoGKmQWa_Si4GiXw8t2tLW-VDYUBTYnz9AZLcwKJRsune1zxPEoZGh0Gl92WVvl_0j6NS45NObdTQMbY5X7hxNkEBrAa3z6Ix8QI3rW5rB"/>
+<!-- Overlay Map Pointers -->
+<div class="absolute top-1/4 left-1/3 p-3 bg-white/90 backdrop-blur rounded-lg shadow-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="text-xs font-bold">스타벅스 (본관점)</span>
+</div>
+<div class="absolute bottom-1/3 right-1/4 p-3 bg-white/90 backdrop-blur rounded-lg shadow-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="text-xs font-bold">우리은행 ATM</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Parking & Status -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Parking Card -->
+<div class="bg-primary rounded-xl p-8 text-on-primary shadow-xl shadow-primary/20 relative overflow-hidden">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary-container rounded-full opacity-30"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-3xl">directions_car</span>
+<h3 class="text-xl font-bold tracking-tight">실시간 주차 정보</h3>
+</div>
+<div class="bg-white/10 backdrop-blur-md rounded-xl p-6 mb-6">
+<p class="text-on-primary/70 text-sm font-medium mb-1">내 주차 위치</p>
+<p class="text-3xl font-extrabold tracking-tighter">지하 2층 <span class="text-white">B-04</span></p>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-primary/70">입차 시간</span>
+<span class="font-bold">14:24</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-primary/70">이용 시간</span>
+<span class="font-bold">1시간 12분</span>
+</div>
+<div class="pt-4 mt-4 border-t border-white/10 flex justify-between items-end">
+<div>
+<p class="text-on-primary/70 text-xs mb-1">예상 정산 금액</p>
+<p class="text-2xl font-bold">4,500원</p>
+</div>
+<div class="bg-white text-primary px-3 py-1 rounded-full text-xs font-black">
+                                    미결제
+                                </div>
+</div>
+</div>
+<button class="w-full mt-8 bg-white text-primary font-bold py-4 rounded-lg active:scale-95 transition-all shadow-lg">
+                            간편 결제하기
+                        </button>
+</div>
+</div>
+<!-- Emergency Contact / Help -->
+<div class="bg-surface-container-high rounded-xl p-6">
+<h3 class="font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">contact_support</span>
+                        고객 안내
+                    </h3>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<div class="w-2 h-2 mt-2 bg-primary rounded-full"></div>
+<p class="text-sm leading-relaxed text-on-surface-variant">거동이 불편하신 분들을 위해 <strong>무료 휠체어 대여 서비스</strong>를 1층 로비에서 제공합니다.</p>
+</li>
+<li class="flex items-start gap-3">
+<div class="w-2 h-2 mt-2 bg-primary rounded-full"></div>
+<p class="text-sm leading-relaxed text-on-surface-variant">무인 정산기 이용 시 대기 시간을 줄일 수 있습니다. (본관 1층, 주차장 엘리베이터 홀)</p>
+</li>
+</ul>
+</div>
+<!-- Ad/Announcement -->
+<div class="rounded-xl h-48 relative overflow-hidden group cursor-pointer">
+<img alt="Health Checkup Ad" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="Professional sterile hospital interior with futuristic medical technology and soft blue ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7qQbx3noeQqP9mraUKfmqwWPLNR0sGXos209fr338oy3BREbisjD-tB2mkrGHFdu30y3Jj9vzZMTVT2uuyWW0glEj2sJHUUeI9csO3CFRCrV8B4-glgy76zcisWM00rheSwA8Lj8SVrGCUxTlOdFRbwQ-qjVbxcEWysCUuUPZfx53avi_IKRfrCAxvMVkw197nYrplYwztbv27TNGpOKgc6oaeGe7xWSJGQWbVfm8ga3dkgiq5HqzfJgU2WevOeQzH2ekSe8_cQsq"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6">
+<span class="text-primary-fixed text-[10px] font-bold tracking-widest uppercase mb-1">Check-up Promotion</span>
+<p class="text-white font-bold leading-snug">종합 건강검진 센터<br/>확장 이전 안내 (신관 5층)</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Quick Action (suppressed on details, shown here for convenience) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-90 transition-all z-50">
+<span class="material-symbols-outlined text-3xl">chat_bubble</span>
+</button>
+</body></html>

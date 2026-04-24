@@ -1,0 +1,145 @@
+{
+  "rules": {
+    "hospitals": {
+      ".read": true,
+      "$hospitalId": {
+        ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.role === 'admin' && auth.token.hospitalId === $hospitalId))",
+        "staff-codes": {
+          ".read": "auth != null && (auth.token.role === 'staff' || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')"
+        },
+        "announcements": {
+          ".read": true
+        },
+        "pois": {
+          ".read": true
+        },
+        "floor-plans": {
+          ".read": true
+        },
+        "departments": {
+          ".read": true
+        },
+        "triage-map": {
+          ".read": "auth != null"
+        }
+      }
+    },
+
+    "users": {
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+      ".indexOn": ["role", "hospitalId", "status", "createdAt"],
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+        ".write": "auth != null && (auth.uid === $uid || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+        "role": {
+          ".write": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || (!data.exists() && auth.uid === $uid && (newData.val() === 'patient' || newData.val() === 'staff')))"
+        },
+        "status": {
+          ".write": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || (!data.exists() && auth.uid === $uid && newData.val() === 'active'))"
+        },
+        "hospitalId": {
+          ".write": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || (!data.exists() && auth.uid === $uid))"
+        },
+        "createdAt": {
+          ".write": "auth != null && !data.exists() && auth.uid === $uid"
+        }
+      }
+    },
+
+    "staff_codes": {
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null && ((!data.child('usedBy').exists() && newData.child('usedBy').val() === auth.uid) || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')"
+      }
+    },
+
+    "sessions": {
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+      ".indexOn": ["hospitalId", "staffUid", "patientUid"],
+      "$sessionId": {
+        ".write": "auth != null && (!newData.child('hospitalId').exists() || newData.child('hospitalId').val() === auth.token.hospitalId || auth.token.role === 'platformAdmin')",
+        ".read": "auth != null && (data.child('staffUid').val() === auth.uid || data.child('patientUid').val() === auth.uid || (auth.token.role === 'staff' && data.child('hospitalId').val() === auth.token.hospitalId) || (auth.token.role === 'admin' && data.child('hospitalId').val() === auth.token.hospitalId) || auth.token.role === 'platformAdmin')"
+      }
+    },
+
+    "qr_tokens": {
+      "$token": {
+        ".write": "auth != null",
+        ".read": "auth != null"
+      }
+    },
+
+    "audit_logs": {
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+      ".indexOn": ["timestamp", "actorUid", "target"],
+      "$id": {
+        ".write": "auth != null && !data.exists() && newData.child('actorUid').val() === auth.uid"
+      }
+    },
+
+    "visit_plans": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || (auth.token.role === 'staff' && (!data.child('hospitalId').exists() || data.child('hospitalId').val() === auth.token.hospitalId)) || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+        ".write": "auth != null && (auth.uid === $uid || (auth.token.role === 'staff' && (!newData.child('hospitalId').exists() || newData.child('hospitalId').val() === auth.token.hospitalId)) || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+        "updatedBy": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "expiresAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 172800000"
+        },
+        "waypoints": {
+          ".validate": "newData.hasChildren()"
+        }
+      }
+    },
+
+    "shared_plans": {
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null && (!data.exists() || data.child('uid').val() === auth.uid)",
+        "uid": {
+          ".validate": "newData.val() === auth.uid"
+        },
+        "expiresAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 1800000"
+        }
+      }
+    },
+
+    "staff_invitations": {
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+      "$token": {
+        ".read": "auth != null",
+        ".write": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin' || (data.child('email').val() === auth.token.email && newData.child('status').val() === 'accepted' && newData.child('claimedBy').val() === auth.uid))"
+      }
+    },
+
+    "hospital_index": {
+      ".read": true,
+      ".write": "auth != null && auth.token.role === 'platformAdmin'"
+    },
+
+    "triage_usage": {
+      ".read": "auth != null && auth.token.role === 'platformAdmin'",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "wait_queue": {
+      "$hospitalId": {
+        ".read": "auth != null && ((auth.token.role === 'staff' && auth.token.hospitalId === $hospitalId) || (auth.token.role === 'admin' && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
+        ".write": "auth != null && ((auth.token.role === 'staff' && auth.token.hospitalId === $hospitalId) || (auth.token.role === 'admin' && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
+        "$department": {
+          "$date": {
+            "$queueNumber": {
+              ".read": "auth != null && data.child('patientUid').val() === auth.uid"
+            }
+          }
+        }
+      }
+    }
+  }
+}
