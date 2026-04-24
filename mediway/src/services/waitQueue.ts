@@ -1,6 +1,6 @@
 import { onValue, ref } from 'firebase/database';
 import { db, isFirebaseConfigured } from '@/config/firebase';
-import type { WaitQueuePatientIndex } from '@/types/waitQueue';
+import type { WaitQueuePatientIndex, WaitQueueStatus } from '@/types/waitQueue';
 
 /**
  * KST(UTC+9) 기준 오늘 날짜를 `'YYYY-MM-DD'` 형식으로 반환.
@@ -63,4 +63,35 @@ export function subscribeMyWaitQueue(
     },
   );
   return unsubscribe;
+}
+
+/**
+ * 위젯이 "가장 먼저 보여줘야 할" 단일 엔트리를 고른다.
+ *
+ * 필터: `date === today` & `status !== completed/cancelled`
+ * 정렬 우선순위 (환자 행동 urgency 순):
+ *   called (진료실로 이동해야 함)
+ *   > in-progress (이미 진료실 안)
+ *   > waiting (그냥 대기)
+ *
+ * 여러 부서 동시 접수(예: 내과 + 정형외과)인 경우 urgency 가 같으면 number 오름차순.
+ */
+export function selectPrimaryActive(
+  entries: WaitQueuePatientIndex[],
+  today: string,
+): WaitQueuePatientIndex | null {
+  const URGENCY: Record<WaitQueueStatus, number> = {
+    called: 0,
+    'in-progress': 1,
+    waiting: 2,
+    completed: 99,
+    cancelled: 99,
+  };
+  const active = entries
+    .filter((e) => e.date === today && e.status !== 'completed' && e.status !== 'cancelled')
+    .sort((a, b) => {
+      const d = URGENCY[a.status] - URGENCY[b.status];
+      return d !== 0 ? d : a.number - b.number;
+    });
+  return active[0] ?? null;
 }

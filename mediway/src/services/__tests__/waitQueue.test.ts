@@ -13,7 +13,22 @@ vi.mock('@/config/firebase', () => ({
   isFirebaseConfigured: () => true,
 }));
 
-import { subscribeMyWaitQueue, todayDateKST } from '../waitQueue';
+import { selectPrimaryActive, subscribeMyWaitQueue, todayDateKST } from '../waitQueue';
+import type { WaitQueuePatientIndex } from '@/types/waitQueue';
+
+function entry(
+  id: string,
+  overrides: Partial<WaitQueuePatientIndex> = {},
+): WaitQueuePatientIndex {
+  return {
+    id,
+    department: '내과',
+    date: '2026-04-24',
+    number: 1,
+    status: 'waiting',
+    ...overrides,
+  };
+}
 
 describe('todayDateKST', () => {
   it('UTC 자정은 KST 오전 9시 → 같은 날짜', () => {
@@ -107,5 +122,67 @@ describe('subscribeMyWaitQueue', () => {
     const unsubscribe = subscribeMyWaitQueue('demo', 'uid-1', vi.fn());
     unsubscribe();
     expect(mockUnsub).toHaveBeenCalled();
+  });
+});
+
+describe('selectPrimaryActive', () => {
+  const TODAY = '2026-04-24';
+
+  it('오늘이 아닌 엔트리는 제외', () => {
+    const result = selectPrimaryActive(
+      [entry('a', { date: '2026-04-23', status: 'waiting' })],
+      TODAY,
+    );
+    expect(result).toBeNull();
+  });
+
+  it('completed/cancelled 는 제외', () => {
+    const result = selectPrimaryActive(
+      [
+        entry('a', { status: 'completed' }),
+        entry('b', { status: 'cancelled' }),
+      ],
+      TODAY,
+    );
+    expect(result).toBeNull();
+  });
+
+  it('called > in-progress > waiting urgency 순위로 우선', () => {
+    const result = selectPrimaryActive(
+      [
+        entry('wait', { status: 'waiting', number: 1 }),
+        entry('prog', { status: 'in-progress', number: 2 }),
+        entry('call', { status: 'called', number: 3 }),
+      ],
+      TODAY,
+    );
+    expect(result?.id).toBe('call');
+  });
+
+  it('같은 urgency 내에서는 number 오름차순', () => {
+    const result = selectPrimaryActive(
+      [
+        entry('c', { status: 'waiting', number: 5 }),
+        entry('a', { status: 'waiting', number: 2 }),
+        entry('b', { status: 'waiting', number: 3 }),
+      ],
+      TODAY,
+    );
+    expect(result?.id).toBe('a');
+  });
+
+  it('빈 리스트면 null', () => {
+    expect(selectPrimaryActive([], TODAY)).toBeNull();
+  });
+
+  it('원본 배열은 변경하지 않음 (non-mutating)', () => {
+    const input = [
+      entry('b', { status: 'waiting', number: 2 }),
+      entry('a', { status: 'called', number: 1 }),
+    ];
+    const snapshot = JSON.stringify(input);
+    selectPrimaryActive(input, TODAY);
+    // 실제로는 내부에서 sort() 호출 시 mutation 가능 → filter 체인으로 새 배열 생성됨을 확인
+    expect(JSON.stringify(input)).toBe(snapshot);
   });
 });
