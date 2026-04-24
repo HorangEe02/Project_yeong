@@ -19,6 +19,7 @@ export { refreshMyClaims, setUserClaims } from './setClaims';
 export { migrateAllClaims } from './migrations/migrateAllClaims';
 export { verifyMigration } from './migrations/verifyMigration';
 export { onQueueCall } from './wait_queue/onQueueCall';
+export { hospitalChatbot } from './chatbot/hospitalChatbot';
 
 const region = 'asia-northeast3';
 
