@@ -197,3 +197,52 @@ T0-1 Local Sync 완료 후 `firebase deploy --only hosting` 으로 전체 번들
 - [ ] e2e HTML 에 primary blue 적용
 - [ ] SPA rewrites + cache headers 가 firebase.json 에 설정됨
 
+---
+
+## 2026-04-24 — legacy hospitalId 상수 Lh 를 'demo' 로 정정
+
+- **Release**: `770e5eeaddfb1ee9`
+- **Previous**: `8da78dc2d7001b6c`
+- **Release time**: 2026-04-24T07:31:19Z (16:31 KST)
+
+### 문제
+의료진 "동선 전송 및 관리 센터" 에서 QR 매칭 후 [동선 전송] 클릭 시
+"동선 전송에 실패했습니다. 다시 시도해주세요." 오류.
+
+### 원인
+prod 번들에 남은 P1 시대 하드코딩 상수:
+```js
+var Lh = `demo-hospital`;      // 레거시 hospitalId
+// ...
+let a = { sessionId, patientUid, staffUid, qrToken, hospitalId: Lh, ... };
+await wh(a);   // sessions/{sessionId} write
+```
+
+sessions 규칙은 `newData.hospitalId === auth.token.hospitalId` 요구.
+현재 시스템의 hospitalId 는 `'demo'`. staff/admin 계정이 `Lh='demo-hospital'` 로
+쓰려 하면 `'demo-hospital' !== 'demo'` 로 permission_denied. platformAdmin 만
+bypass 조건으로 통과 (박준영 계정에서는 성공했을 것).
+
+### 수정
+번들 surgical patch 1건 — unique match 확인 후:
+```
+var Lh=`demo-hospital`,Rh=3;   →   var Lh=`demo`,Rh=3;
+```
+Δ = -9 bytes. 새 filename `index-v4fix1.js`.
+
+남은 `demo-hospital` 2건은:
+- `Fm.hospitalId` (floor map 정적 데이터)
+- `Rm.id` (building metadata 정적 데이터)
+→ RTDB rule과 무관한 로컬 참조 — 의도적으로 변경 없음.
+
+### 영향
+- ✅ Staff/admin 의 동선 전송 (`sessions/{sessionId}` write) 성공
+- ✅ Landing → 환자 V2 redirect, SPA rewrites, e2e primary blue 모두 유지
+- ⚠️ `Dh(uid, Lh)` mismatched 경고: 레거시 plan 에 `hospitalId='demo-hospital'` 가
+  저장돼 있다면 이제 mismatched=true. 실제 DB 엔트리 보면 소수/없음 추정.
+
+### 관련 수정 (RTDB 단일 write, 배포 불필요)
+`hospitals/demo/profile/themeColor`: `#deadbe` (분홍) → `#004e9f` (primary blue).
+오염 원인: e2e-hospital-isolation.html 시나리오 #7 이 platformAdmin 로 실행될 때
+`#deadbe` 를 쓴 부작용.
+
