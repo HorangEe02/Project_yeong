@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>MediWay · 탭 전환 세션 보존 E2E</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;max-width:860px;margin:24px auto;padding:16px;color:#1a1a1a}
+  h1{font-size:20px;margin:0 0 12px}
+  ol{padding-left:20px}
+  li{margin-bottom:8px}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f6f6;padding:2px 6px;border-radius:4px}
+  .banner{padding:10px 14px;border-radius:8px;margin-bottom:12px}
+  .banner.info{background:#eff6ff;color:#1e40af}
+  .banner.ok{background:#f0fdf4;color:#166534}
+  .banner.warn{background:#fefce8;color:#854d0e}
+</style>
+</head>
+<body>
+<h1>🧪 탭 전환 세션 보존 수동 체크리스트</h1>
+<div class="banner info">
+  이 페이지는 실 브라우저에서 수동으로 체크할 시나리오를 제시합니다.
+  Mount-all + <code>hidden</code> 전략이 QR 스캐너와 폼 입력 상태를
+  탭 전환 중에 보존하는지 확인합니다.
+</div>
+
+<h2>사전 조건</h2>
+<ul>
+  <li>로그인 상태 · <code>primaryHospitalId: demo</code></li>
+  <li><code>features.appointments=true</code> 활성 (Firebase Console)</li>
+</ul>
+
+<h2>시나리오 A — 외래 폼 입력 보존</h2>
+<ol>
+  <li><code>/h/demo/patient/home?tab=appointments</code> 접속</li>
+  <li>"+ 새 예약" 클릭 → 폼 펼침</li>
+  <li>진료과 · 예약 시각 · 메모 입력 (저장 X)</li>
+  <li>상단 탭에서 "홈" 클릭</li>
+  <li>다시 "외래" 클릭</li>
+  <li class="banner ok">기대: 입력한 진료과·시각·메모 값이 그대로 보임</li>
+</ol>
+
+<h2>시나리오 B — 안내 탭 QR 스캐너 / 지도 뷰포트 유지</h2>
+<ol>
+  <li><code>/h/demo/patient/home?tab=guide</code> 접속 → 지도 렌더 확인</li>
+  <li>특정 POI 클릭 또는 지도 zoom/pan 조작</li>
+  <li>상단 탭 "홈" → "안내" 순서로 전환</li>
+  <li class="banner ok">기대: 지도 뷰포트(확대·선택)가 이전 상태 유지</li>
+  <li class="banner warn">
+    주의: html5-qrcode 카메라 스트림은 <code>hidden</code> (display:none) 상태에서
+    대부분의 브라우저가 일시 정지시킵니다. 탭 복귀 시 스캐너가 재시작되는지 확인.
+    만약 끊김이 확인되면 <code>HospitalHomePage</code>의 hidden 처리를
+    <code>visibility:hidden + position:absolute</code> 패턴으로 전환해야 합니다.
+  </li>
+</ol>
+
+<h2>시나리오 C — 더보기 탭 고령자 모드 토글 지속</h2>
+<ol>
+  <li><code>/h/demo/patient/home?tab=more</code> 접속</li>
+  <li>"고령자 모드" 스위치 ON (화면 크게 변경 확인)</li>
+  <li>탭 "홈" → "안내" → "더보기" 순환</li>
+  <li>페이지 새로고침 (F5)</li>
+  <li class="banner ok">기대: 새로고침 이후에도 고령자 모드 ON 유지 (RTDB persist)</li>
+</ol>
+
+<h2>시나리오 D — URL 영속성</h2>
+<ol>
+  <li><code>/h/demo/patient/home?tab=guide</code> 접속</li>
+  <li>탭 "외래" 클릭</li>
+  <li class="banner ok">기대: URL이 <code>?tab=appointments</code>로 변경</li>
+  <li>브라우저 뒤로가기 버튼</li>
+  <li class="banner ok">기대: 탭이 "안내"로 전환</li>
+</ol>
+
+<p class="banner info">
+  시나리오 B의 QR 스캐너 끊김 이슈가 확인되면 GitHub issue에 기록하고 C10 이후 폴리싱 때 처리합니다.
+</p>
+</body>
+</html>

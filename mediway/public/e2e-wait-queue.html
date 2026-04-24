@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>MediWay · 대기열 + FCM E2E (P3)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;max-width:860px;margin:24px auto;padding:16px;color:#1a1a1a}
+  h1{font-size:20px;margin:0 0 12px}
+  h2{font-size:16px;margin:18px 0 8px}
+  ol{padding-left:20px}
+  li{margin-bottom:6px}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f6f6f6;padding:2px 6px;border-radius:4px}
+  .banner{padding:10px 14px;border-radius:8px;margin-bottom:12px}
+  .banner.info{background:#eff6ff;color:#1e40af}
+  .banner.ok{background:#f0fdf4;color:#166534}
+  .banner.warn{background:#fefce8;color:#854d0e}
+  .banner.fail{background:#fef2f2;color:#991b1b}
+</style>
+</head>
+<body>
+<h1>🧪 대기열 + FCM Push 수동 체크리스트</h1>
+<div class="banner info">
+  P3 C1-C5 실기기 검증용. 환자·의료진 두 개의 브라우저/디바이스가 필요합니다.
+  데모 병원 <code>features.appointments=true</code>, FCM 권한 허용 전제.
+</div>
+
+<h2>사전 조건</h2>
+<ul>
+  <li>환자 계정(예: <code>user-patient</code>)과 의료진 계정(<code>user-staff</code>, role=staff, hospitalId=demo) 각각 로그인 가능</li>
+  <li>환자 디바이스: 알림 권한 "허용" (HomeTab 진입 시 <code>useFcmToken</code>이 자동 요청)</li>
+  <li><code>/user_fcm_tokens/&lt;patientUid&gt;/*</code>에 토큰이 저장된 것을 Firebase Console에서 확인</li>
+  <li>클라우드 함수 <code>onQueueCall</code>이 us-central1에 배포되어 있음</li>
+</ul>
+
+<h2>시나리오 A — 접수 → 위젯 순번 즉시 반영</h2>
+<ol>
+  <li>환자: <code>/h/demo/patient/home?tab=appointments</code> 진입</li>
+  <li>"+ 새 예약"으로 오늘자 예약 생성 (진료과: 내과, 시간: 지금부터 1시간 후)</li>
+  <li>예약 카드의 <strong>"접수"</strong> 버튼 클릭</li>
+  <li class="banner ok">기대: "접수됨" 뱃지 전환 + 홈 위젯의 <strong>순번 N번 · 대기 중</strong> 실시간 표시</li>
+</ol>
+
+<h2>시나리오 B — 의료진 Call Next → 환자 알림</h2>
+<ol>
+  <li>의료진: <code>/h/demo/staff/queue</code> 진입 → 부서 "내과" + 오늘 날짜 자동 선택</li>
+  <li>대기열에 환자 순번 카드 표시 확인</li>
+  <li><strong>"다음 환자 호출"</strong> 버튼 클릭</li>
+  <li class="banner ok">기대 (의료진): 환자 카드 status가 "호출됨"으로 전환</li>
+  <li class="banner ok">기대 (환자 홈 위젯): 배경 강조 + "호출됨 — 진료실로 이동해 주세요" 문구</li>
+  <li class="banner ok">기대 (환자 디바이스): 5초 이내 시스템 알림 배너 수신 (FCM Push)</li>
+  <li class="banner warn">알림 미수신 시: Firebase Console → Functions → <code>onQueueCall</code> 로그에서 <code>sent=N failed=0</code> 확인</li>
+</ol>
+
+<h2>시나리오 C — 진료 시작 → 완료 전환</h2>
+<ol>
+  <li>의료진: 호출된 카드의 <strong>"진료 시작"</strong> 클릭</li>
+  <li class="banner ok">기대: 상단 "진료 중" 카운트 +1, 환자 위젯도 "진료 중"</li>
+  <li>의료진: <strong>"완료"</strong> 클릭</li>
+  <li class="banner ok">기대: 카드 사라짐 (default: completed 필터링), 환자 위젯 "접수된 진료가 없습니다"</li>
+</ol>
+
+<h2>시나리오 D — 교차 병원 격리 (보안)</h2>
+<ol>
+  <li>다른 병원 계정 (<code>hospitalId=smch</code>)으로 로그인</li>
+  <li>DevTools 콘솔에서 <code>fetch('https://mediway-demo-default-rtdb.firebaseio.com/hospitals/demo/wait_queue/내과/&lt;today&gt;.json?auth=&lt;idToken&gt;')</code> 시도</li>
+  <li class="banner fail">기대: HTTP 401 permission_denied — 다른 병원 대기열 차단</li>
+</ol>
+
+<h2>시나리오 E — AI Triage (선택)</h2>
+<ol>
+  <li>병원 <code>features.aiTriage=true</code> 설정 (Firebase Console / RTDB)</li>
+  <li>환자: 홈 탭에서 <strong>"AI 진료과 추천"</strong> 위젯 노출 확인</li>
+  <li>"2일째 기침과 미열이 있어요" 입력 → "진료과 추천" 클릭</li>
+  <li class="banner ok">기대: 상위 3개 진료과 + 신뢰도 % + "진단 아님" disclaimer 표시 (5초 이내)</li>
+  <li>동일 사용자가 1시간 내 10회 초과 시도</li>
+  <li class="banner warn">기대: <code>resource-exhausted</code> 에러 — 시간당 10회 제한 확인</li>
+</ol>
+
+<h2>로그 확인 위치</h2>
+<ul>
+  <li>FCM: Firebase Console → Functions → <code>onQueueCall(us-central1)</code> 로그</li>
+  <li>Triage: Functions → <code>triageSymptoms(asia-northeast3)</code> 로그 + <code>/triage_audit</code> RTDB 경로</li>
+  <li>대기열 상태: RTDB <code>/hospitals/demo/wait_queue/내과/&lt;YYYY-MM-DD&gt;</code></li>
+</ul>
+
+</body>
+</html>
