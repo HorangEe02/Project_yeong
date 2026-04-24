@@ -138,11 +138,14 @@ describe('injectClaimsForUid', () => {
     expect(uidArg).toBe('uid-10');
     expect(claimsArg.role).toBe('staff');
 
-    expect(mockPush).toHaveBeenCalledTimes(1);
+    // T1-1b dual-write: legacy /audit_logs + nested /audit_logs_v2/{bucket}
+    expect(mockPush).toHaveBeenCalledTimes(2);
     const [path, value] = mockPush.mock.calls[0];
     expect(path).toBe('audit_logs');
     expect((value as { action: string }).action).toBe('user.claims.autoInject');
     expect((value as { meta: { origin: string } }).meta.origin).toBe('ensureUserRecord');
+    const [v2Path] = mockPush.mock.calls[1];
+    expect(v2Path).toBe('audit_logs_v2/smch');
   });
 
   it('프로필 미존재 + throwOnError=false이면 silently 로깅만', async () => {

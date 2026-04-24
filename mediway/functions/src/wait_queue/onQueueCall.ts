@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin';
 import { onValueUpdated } from 'firebase-functions/v2/database';
+import { appendAuditLog } from '../util/auditLog';
 
 /**
  * 대기열 엔트리 status가 'called'로 전환될 때 해당 환자에게 FCM push 발송.
@@ -103,8 +104,8 @@ export const onQueueCall = onValueUpdated(
       `[onQueueCall] hospital=${hospitalId} dept=${department} patient=${patientUid} queueNumber=${queueNumber} sent=${sent} failed=${failed}`,
     );
 
-    // audit — platformAdmin audit log에 기록 (소비자: 대시보드)
-    await db.ref('audit_logs').push({
+    // audit — dual-write (T1-1b): legacy /audit_logs + nested /audit_logs_v2/{hid}
+    await appendAuditLog(db, String(hospitalId), {
       actorUid: 'system:onQueueCall',
       action: 'wait_queue.call.push',
       target: patientUid,

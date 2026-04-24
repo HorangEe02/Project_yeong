@@ -1,4 +1,5 @@
 import * as admin from 'firebase-admin';
+import { appendAuditLog } from './util/auditLog';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { z } from 'zod';
 
@@ -46,7 +47,7 @@ export const refreshMyClaims = onCall({ region, cors: true }, async (req) => {
   const claims = await buildClaimsFromProfile(uid);
   await admin.auth().setCustomUserClaims(uid, claims);
 
-  await admin.database().ref('audit_logs').push({
+  await appendAuditLog(admin.database(), claims.hospitalId, {
     actorUid: uid,
     action: 'user.claims.refresh',
     target: uid,
@@ -105,7 +106,7 @@ export const setUserClaims = onCall({ region, cors: true }, async (req) => {
   };
   await admin.auth().setCustomUserClaims(uid, nextClaims);
 
-  await admin.database().ref('audit_logs').push({
+  await appendAuditLog(admin.database(), nextClaims.hospitalId, {
     actorUid: req.auth.uid,
     actorEmail: req.auth.token.email ?? null,
     action: 'user.claims.setByAdmin',
@@ -134,7 +135,7 @@ export async function injectClaimsForUid(
   try {
     const claims = await buildClaimsFromProfile(uid);
     await admin.auth().setCustomUserClaims(uid, claims);
-    await admin.database().ref('audit_logs').push({
+    await appendAuditLog(admin.database(), claims.hospitalId, {
       actorUid: uid,
       action: 'user.claims.autoInject',
       target: uid,

@@ -16,6 +16,7 @@ import { loadHospitalContext, renderSystemInstruction } from './context';
 import { loadHistory, appendTurn } from './chatSession';
 import { checkRateLimit, incrementUsage, LIMITS } from './rateLimit';
 import type { ChatbotCallResult, IntentKind } from './providers/shared';
+import { appendAuditLog } from '../util/auditLog';
 
 const region = 'asia-northeast3';
 
@@ -64,7 +65,7 @@ export const hospitalChatbot = onCall(
 
     // 4. Safety pre-check: 응급 → LLM 우회 하드코드 응답
     if (checkEmergency(userText)) {
-      await db.ref('audit_logs').push({
+      await appendAuditLog(db, hospitalId, {
         actorUid: uid,
         action: 'chatbot.escalate',
         target: hospitalId,
@@ -84,7 +85,7 @@ export const hospitalChatbot = onCall(
 
     // 5. PII 요청 거절
     if (checkPiiRequest(userText)) {
-      await db.ref('audit_logs').push({
+      await appendAuditLog(db, hospitalId, {
         actorUid: uid,
         action: 'chatbot.pii_refuse',
         target: hospitalId,
@@ -184,11 +185,11 @@ export const hospitalChatbot = onCall(
       console.warn('[hospitalChatbot] chat_sessions 영속화 실패 (응답은 정상 반환)', err);
     }
 
-    // 11. Usage tracking (chatbot_usage) + audit
+    // 11. Usage tracking (chatbot_usage) + audit (dual-write T1-1b)
     try {
       await Promise.all([
         incrementUsage(uid, now),
-        db.ref('audit_logs').push({
+        appendAuditLog(db, hospitalId, {
           actorUid: uid,
           action: 'chatbot.reply',
           target: hospitalId,

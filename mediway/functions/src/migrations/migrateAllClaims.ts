@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { buildClaimsFromProfile } from '../setClaims';
+import { appendAuditLog } from '../util/auditLog';
 
 const region = 'asia-northeast3';
 const PAGE_SIZE = 500;
@@ -94,7 +95,7 @@ export const migrateAllClaims = onCall(
             const claims = await buildClaimsFromProfile(uid);
             if (!dryRun) {
               await admin.auth().setCustomUserClaims(uid, claims);
-              await db.ref('audit_logs').push({
+              await appendAuditLog(db, claims.hospitalId, {
                 actorUid: req.auth.uid,
                 action: `user.claims.migration.${MIGRATION_VERSION}`,
                 target: uid,

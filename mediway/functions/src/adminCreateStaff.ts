@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { injectClaimsForUid } from './setClaims';
+import { appendAuditLog } from './util/auditLog';
 
 export type CreateStaffMode = 'email_reset' | 'temp_password';
 
@@ -119,8 +120,8 @@ export async function handleCreateStaff(
     );
   }
 
-  // 6. 감사 로그
-  await db.ref('audit_logs').push({
+  // 6. 감사 로그 (dual-write T1-1b)
+  await appendAuditLog(db, hospitalId, {
     actorUid: callerUid,
     actorEmail: callerEmail ?? null,
     action: 'user.account.create',
