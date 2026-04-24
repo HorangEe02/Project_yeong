@@ -55,3 +55,43 @@ curl -X DELETE "https://mediway-demo-default-rtdb.firebaseio.com/audit_logs_v2.j
 - **T1-1c** — `database.rules.json` 에 `audit_logs_v2` rule 추가 +
   기존 `audit_logs` rule 은 write 금지 + platformAdmin read only 로 tighten.
   AdminAuditPage 조회 경로를 v2 로 전환.
+
+---
+
+## 2026-04-24 — T1-2a: visit_plans nested 경로 backfill
+
+관련 스크립트: `mediway/scripts/migrate-visit-plans-to-nested.py`
+기획 근거: `mediway/docs/LOCAL_SYNC_GAPS.md` § 2 — visit_plans 이중 구조 정리.
+
+### 실행 결과
+| 항목 | 값 |
+|------|-----|
+| 백업 경로 | `/visit_plans_backup_1777034578225` |
+| 백업 엔트리 수 | 2 |
+| `/visit_plans` (legacy) | 2 유지 (T1-2c cutover 전까지 보존) |
+| `/hospitals/demo/visit_plans/*` | 2 (모두 demo 로 정확 추론) |
+| hospitalId 필드 | nested entry 에 주입 완료 |
+
+### Bucket 분류 근거
+- entry 1: `users/{uid}/hospitalId = 'demo'`
+- entry 2: `users/{uid}/primaryHospitalId = 'demo'` (박준영 platformAdmin)
+- unknown bucket 발생 건수: 0
+
+### 롤백 절차
+```bash
+# 백업에서 /visit_plans 복원 (nested 는 별도 정리)
+python3 mediway/scripts/migrate-visit-plans-to-nested.py --rollback 1777034578225
+```
+nested 를 수동 삭제할 경우:
+```bash
+TOKEN=$(gcloud auth print-access-token)
+curl -X DELETE "https://mediway-demo-default-rtdb.firebaseio.com/hospitals/demo/visit_plans.json?access_token=${TOKEN}"
+```
+
+### 다음 단계 (T1-2c)
+- `src/services/visitPlan.ts` 에서 legacy write/subscribe/read fallback 제거.
+- `database.rules.json` 의 root `/visit_plans` 관대처리 제거
+  (.read: platformAdmin only, $uid/.write: false).
+- `e2e-hospital-isolation.html` 시나리오 #8 (legacy visit_plans 쓰기 허용) 기대값을
+  '차단' 으로 업데이트.
+- `firebase deploy --only database`.
