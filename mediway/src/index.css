@@ -29,3 +29,37 @@
     @apply bg-surface/80 backdrop-blur-glass;
   }
 }
+
+/*
+ * 고령자 모드 — body.ui-senior 에 부착 시 글자/버튼/입력을 전반적으로 확대.
+ * 토글 소스: stores/preferencesStore + services/preferences (RTDB + localStorage).
+ * root level 에서 작동하므로 모든 탭/페이지에 일관 적용.
+ */
+.ui-senior {
+  font-size: 1.15em;
+  line-height: 1.65;
+}
+.ui-senior button,
+.ui-senior a[role='button'],
+.ui-senior [role='tab'] {
+  min-height: 48px;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+}
+.ui-senior input[type='text'],
+.ui-senior input[type='email'],
+.ui-senior input[type='password'],
+.ui-senior input[type='search'],
+.ui-senior input[type='number'],
+.ui-senior input[type='tel'],
+.ui-senior input[type='date'],
+.ui-senior input[type='datetime-local'],
+.ui-senior select,
+.ui-senior textarea {
+  font-size: 1rem;
+  min-height: 44px;
+}
+/* 글자 색 대비 강화 — text-on-surface-variant 를 조금 더 진하게 */
+.ui-senior .text-on-surface-variant {
+  color: #2e3440;
+}

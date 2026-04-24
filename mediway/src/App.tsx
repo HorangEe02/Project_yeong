@@ -33,10 +33,13 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { initAnonymousAuth } from '@/services/auth';
 import { isFirebaseConfigured } from '@/config/firebase';
 import { useAuthStore } from '@/stores/authStore';
+import { usePreferencesStore } from '@/stores/preferencesStore';
 
 export default function App() {
   const initAuth = useAuthStore((s) => s.init);
   const cleanupAuth = useAuthStore((s) => s.cleanup);
+  const user = useAuthStore((s) => s.user);
+  const uiSenior = usePreferencesStore((s) => s.uiSenior);
 
   useEffect(() => {
     initAuth();
@@ -49,6 +52,20 @@ export default function App() {
       initAnonymousAuth();
     }
   }, []);
+
+  // 로그인 사용자 변경 시 preferences 구독 재개시 (로그아웃 시 localStorage fallback)
+  useEffect(() => {
+    const uid = user && !user.isAnonymous ? user.uid : null;
+    usePreferencesStore.getState().init(uid);
+    return () => {
+      usePreferencesStore.getState().cleanup();
+    };
+  }, [user?.uid, user?.isAnonymous]);
+
+  // uiSenior state → body.classList.ui-senior 동기화 (모든 탭/페이지에 일괄 적용)
+  useEffect(() => {
+    document.body.classList.toggle('ui-senior', uiSenior);
+  }, [uiSenior]);
 
   return (
     <BrowserRouter>
