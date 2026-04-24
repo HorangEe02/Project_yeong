@@ -6,6 +6,8 @@ const mockRef = vi.fn((_db: unknown, path?: string) =>
 );
 const mockGet = vi.fn();
 const mockUpdate = vi.fn();
+const mockPush = vi.fn();
+const mockRunTransaction = vi.fn();
 
 vi.mock('firebase/database', () => ({
   onValue: (...args: unknown[]) => mockOnValue(...args),
@@ -13,6 +15,8 @@ vi.mock('firebase/database', () => ({
     args.length <= 1 ? mockRef(args[0]) : mockRef(args[0], args[1] as string),
   get: (...args: unknown[]) => mockGet(...args),
   update: (...args: unknown[]) => mockUpdate(...args),
+  push: (...args: unknown[]) => mockPush(...args),
+  runTransaction: (...args: unknown[]) => mockRunTransaction(...args),
 }));
 
 vi.mock('@/config/firebase', () => ({
@@ -22,6 +26,7 @@ vi.mock('@/config/firebase', () => ({
 
 import {
   callNextWaiting,
+  checkInToQueue,
   markCompleted,
   markInProgress,
   selectPrimaryActive,
@@ -343,5 +348,90 @@ describe('markInProgress / markCompleted', () => {
     expect(payload['hospitals/demo/wait_queue/내과/2026-04-24/e2/status']).toBe('completed');
     expect(typeof payload['hospitals/demo/wait_queue/내과/2026-04-24/e2/completedAt']).toBe('number');
     expect(payload['hospitals/demo/wait_queue_by_patient/p-2/e2/status']).toBe('completed');
+  });
+});
+
+describe('checkInToQueue', () => {
+  beforeEach(() => {
+    mockRunTransaction.mockReset();
+    mockPush.mockReset();
+    mockUpdate.mockReset();
+    mockRef.mockClear();
+    mockUpdate.mockResolvedValue(undefined);
+    mockPush.mockReturnValue({ key: 'entry-key-1' });
+  });
+
+  it('counter transaction + dual-write wait_queue + index', async () => {
+    mockRunTransaction.mockResolvedValue({
+      committed: true,
+      snapshot: { val: () => 5 },
+    });
+
+    const result = await checkInToQueue('demo', 'uid-patient', {
+      department: '내과',
+      date: '2026-04-24',
+      appointmentId: 'appt-42',
+    });
+
+    // 1) counter transaction called on correct path
+    const txRefArg = mockRunTransaction.mock.calls[0][0];
+    expect(txRefArg.__path).toBe('hospitals/demo/wait_queue_counters/내과/2026-04-24/current');
+
+    // transaction update fn: (undefined) → 1, (n) → n+1
+    const txFn = mockRunTransaction.mock.calls[0][1] as (v: unknown) => number;
+    expect(txFn(undefined)).toBe(1);
+    expect(txFn(7)).toBe(8);
+
+    // 2) result shape
+    expect(result.id).toBe('entry-key-1');
+    expect(result.number).toBe(5);
+    expect(result.status).toBe('waiting');
+    expect(result.patientUid).toBe('uid-patient');
+    expect(result.appointmentId).toBe('appt-42');
+
+    // 3) dual-write payload
+    const payload = mockUpdate.mock.calls[0][1];
+    const entryPath = 'hospitals/demo/wait_queue/내과/2026-04-24/entry-key-1';
+    const indexPath = 'hospitals/demo/wait_queue_by_patient/uid-patient/entry-key-1';
+    expect(payload[entryPath].number).toBe(5);
+    expect(payload[entryPath].status).toBe('waiting');
+    expect(payload[entryPath].hospitalId).toBe('demo');
+    expect(payload[entryPath].department).toBe('내과');
+    expect(payload[entryPath].date).toBe('2026-04-24');
+    expect(payload[entryPath].appointmentId).toBe('appt-42');
+    expect(payload[indexPath]).toEqual({
+      department: '내과',
+      date: '2026-04-24',
+      number: 5,
+      status: 'waiting',
+    });
+  });
+
+  it('appointmentId 없이도 동작', async () => {
+    mockRunTransaction.mockResolvedValue({
+      committed: true,
+      snapshot: { val: () => 1 },
+    });
+    const r = await checkInToQueue('demo', 'uid-p', { department: '외과', date: '2026-04-24' });
+    const payload = mockUpdate.mock.calls[0][1];
+    const entryPath = 'hospitals/demo/wait_queue/외과/2026-04-24/entry-key-1';
+    expect('appointmentId' in payload[entryPath]).toBe(false);
+    expect(r.number).toBe(1);
+  });
+
+  it('department 공백 → throw', async () => {
+    await expect(
+      checkInToQueue('demo', 'uid-p', { department: '  ', date: '2026-04-24' }),
+    ).rejects.toThrow('부서명');
+  });
+
+  it('transaction 미성공 시 throw', async () => {
+    mockRunTransaction.mockResolvedValue({
+      committed: false,
+      snapshot: { val: () => null },
+    });
+    await expect(
+      checkInToQueue('demo', 'uid-p', { department: '내과', date: '2026-04-24' }),
+    ).rejects.toThrow('순번 할당 실패');
   });
 });

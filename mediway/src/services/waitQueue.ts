@@ -1,4 +1,4 @@
-import { get, onValue, ref, update } from 'firebase/database';
+import { get, onValue, push, ref, runTransaction, update } from 'firebase/database';
 import { db, isFirebaseConfigured } from '@/config/firebase';
 import type {
   WaitQueueEntry,
@@ -228,4 +228,89 @@ export async function markCompleted(
     [`hospitals/${hospitalId}/wait_queue/${entry.department}/${entry.date}/${entry.id}/completedAt`]: now,
     [`hospitals/${hospitalId}/wait_queue_by_patient/${entry.patientUid}/${entry.id}/status`]: 'completed',
   });
+}
+
+// =====================================================================
+// Patient-side check-in (접수) — prod 번들 `sg` 함수 동일 스키마.
+// Rules (2026-04-24 edbe495 배포 이후) 가 환자 self write 허용.
+// =====================================================================
+
+export interface CheckInInput {
+  department: string;
+  /** KST YYYY-MM-DD — 기본값 오늘 */
+  date?: string;
+  /** 선택: 원본 예약 id (있으면 wait_queue 엔트리에 연결 기록) */
+  appointmentId?: string;
+}
+
+/**
+ * 환자가 외래 예약에 대해 **접수**를 수행.
+ *
+ * 동작:
+ *  1) `/hospitals/{hid}/wait_queue_counters/{dept}/{date}/current` 에 transaction 으로
+ *     current += 1 (없으면 1) — 부서·날짜별 순번 할당.
+ *  2) `push()` 로 entryId 생성.
+ *  3) multi-update (원자):
+ *     - `/hospitals/{hid}/wait_queue/{dept}/{date}/{entryId}` = full entry
+ *     - `/hospitals/{hid}/wait_queue_by_patient/{uid}/{entryId}` = index subset
+ *  4) 생성된 WaitQueueEntry 반환.
+ *
+ * 권한 (2026-04-24 rules 기준):
+ *  - wait_queue_counters: hospitalId 일치 유저 자유롭게 증분 (validate 로 +1 enforce)
+ *  - wait_queue leaf: !data.exists() + patientUid===auth.uid + status=waiting +
+ *    department/date/hospitalId path match → 환자 본인만 신규 생성
+ *  - wait_queue_by_patient: 본인 $uid 에 자유 write
+ *
+ * UX:
+ *  - AppointmentsTab 의 [접수] 버튼이 호출.
+ *  - 성공 후 환자 홈 WaitQueueWidget 이 구독 중인 wait_queue_by_patient 에 새 엔트리
+ *    반영 → 순번 즉시 표시.
+ */
+export async function checkInToQueue(
+  hospitalId: string,
+  patientUid: string,
+  input: CheckInInput,
+): Promise<WaitQueueEntry> {
+  if (!isFirebaseConfigured()) throw new Error('Firebase 미설정');
+  const department = input.department.trim();
+  if (!department) throw new Error('부서명이 비어 있습니다');
+  const date = input.date ?? todayDateKST();
+
+  // 1) counter transaction
+  const counterRef = ref(db, `hospitals/${hospitalId}/wait_queue_counters/${department}/${date}/current`);
+  const tx = await runTransaction(counterRef, (current) =>
+    (typeof current === 'number' ? current : 0) + 1,
+  );
+  if (!tx.committed) throw new Error('순번 할당 실패');
+  const number = tx.snapshot.val() as number;
+
+  // 2) generate entry id
+  const entryRef = push(ref(db, `hospitals/${hospitalId}/wait_queue/${department}/${date}`));
+  const entryId = entryRef.key;
+  if (!entryId) throw new Error('엔트리 id 생성 실패');
+
+  // 3) dual-write
+  const now = Date.now();
+  const entry: WaitQueueEntry = {
+    id: entryId,
+    hospitalId,
+    department,
+    date,
+    number,
+    patientUid,
+    status: 'waiting',
+    createdAt: now,
+    ...(input.appointmentId ? { appointmentId: input.appointmentId } : {}),
+  };
+  const indexRow: Omit<WaitQueuePatientIndex, 'id'> = {
+    department,
+    date,
+    number,
+    status: 'waiting',
+  };
+  await update(ref(db), {
+    [`hospitals/${hospitalId}/wait_queue/${department}/${date}/${entryId}`]: entry,
+    [`hospitals/${hospitalId}/wait_queue_by_patient/${patientUid}/${entryId}`]: indexRow,
+  });
+  return entry;
 }
