@@ -12,6 +12,9 @@ import {
   sanitizeUserText,
   STANDARD_DISCLAIMER,
 } from './safety';
+import { loadHospitalContext, renderSystemInstruction } from './context';
+import { loadHistory, appendTurn } from './chatSession';
+import { checkRateLimit, incrementUsage, LIMITS } from './rateLimit';
 import type { ChatbotCallResult, IntentKind } from './providers/shared';
 
 const region = 'asia-northeast3';
@@ -21,26 +24,6 @@ const RequestSchema = z.object({
   userText: z.string().min(1).max(1000),
   chatId: z.string().max(128).optional(),
 });
-
-/**
- * R3.1 MVP용 기본 system prompt. 병원별 context 동적 주입은 R3.2에서.
- */
-const BASE_SYSTEM_INSTRUCTION = `당신은 "MediWay 병원" 안내 챗봇입니다. 병원 이용에 관한 친절한 안내를 제공합니다.
-
-[답변 스타일]
-- 한국어, 존댓말, 3~5문장 이내
-- 필요 시 이모지 1개 (🏥 💊 🗺️) 허용
-- 증상 질문에는 관련 진료과 2~3개를 추천하되 반드시 "진단이 아님" 안내 포함
-- 모르는 정보는 "병원에 직접 문의 부탁드립니다"로 답변
-
-[금지]
-- 확정 진단·처방·약물 복용법·용량 안내
-- 주민번호·계좌·비밀번호 등 개인정보 요청
-- 다른 병원 추천
-- 원격 진료 행위로 해석될 수 있는 상세 의학 조언
-
-[응급 안내]
-- 가슴통증·호흡곤란·의식저하·대량출혈·자살 징후는 즉시 119 + 응급실 + 1393 안내`;
 
 export const hospitalChatbot = onCall(
   { region, cors: true, timeoutSeconds: 60 },
@@ -121,7 +104,43 @@ export const hospitalChatbot = onCall(
     // 6. Intent detection
     const intent: IntentKind = detectIntent(userText);
 
-    // 7. Gemini call (stateless — history X for MVP; R3.3에서 멀티턴)
+    // 6.5. Rate limit 체크 (escalate/PII 조기 반환은 이미 return한 상태)
+    const rc = await checkRateLimit(uid, now);
+    if (!rc.allowed) {
+      throw new HttpsError(
+        'resource-exhausted',
+        rc.remainingDay === 0
+          ? `오늘 이용 한도(${LIMITS.perDay}회)를 초과했습니다. 내일 다시 시도해 주세요.`
+          : `시간당 한도(${LIMITS.perHour}회)를 초과했습니다. 약 ${Math.ceil(rc.retryAfterSeconds / 60)}분 후 다시 시도해 주세요.`,
+        { retryAfterSeconds: rc.retryAfterSeconds },
+      );
+    }
+
+    // 7. Hospital context 로드 (5분 memoize)
+    let systemInstruction: string;
+    try {
+      const ctx = await loadHospitalContext(hospitalId);
+      systemInstruction = renderSystemInstruction(ctx);
+    } catch (err) {
+      console.warn('[hospitalChatbot] context 로드 실패 — generic fallback', err);
+      systemInstruction = `당신은 병원 안내 챗봇입니다. 한국어로 친절히 답변하세요. 증상 질문에는 관련 진료과를 추천하고 "진단이 아님" 고지를 포함하세요. 응급 증상은 119 + 응급실 안내.`;
+    }
+
+    // 8. 멀티턴 히스토리 로드 (chatId 제공된 경우만)
+    const chatIdInput = parsed.data.chatId;
+    let history: Awaited<ReturnType<typeof loadHistory>> = [];
+    if (chatIdInput) {
+      try {
+        history = await loadHistory(hospitalId, uid, chatIdInput);
+      } catch (err) {
+        console.warn(
+          `[hospitalChatbot] history 로드 실패 chatId=${chatIdInput} — 빈 히스토리로 진행`,
+          err,
+        );
+      }
+    }
+
+    // 9. Gemini call (히스토리 포함)
     let reply: string;
     let tokensIn = 0;
     let tokensOut = 0;
@@ -129,8 +148,8 @@ export const hospitalChatbot = onCall(
       const r = await geminiChat({
         apiKey,
         model,
-        systemInstruction: BASE_SYSTEM_INSTRUCTION,
-        history: [],
+        systemInstruction,
+        history,
         userText,
       });
       reply = applyDisclaimer(r.reply || '죄송합니다, 답변을 생성하지 못했습니다.');
@@ -144,18 +163,42 @@ export const hospitalChatbot = onCall(
       );
     }
 
-    // 8. Usage tracking + audit
-    const hourEpoch = Math.floor(now / 3_600_000);
+    // 10. 대화 영속화 (chatId 신규/기존 둘 다 append)
+    let sessionChatId = chatIdInput;
+    try {
+      const turn = await appendTurn({
+        hospitalId,
+        uid,
+        chatId: chatIdInput,
+        userText,
+        userIntent: intent,
+        assistantReply: reply,
+        tokensIn,
+        tokensOut,
+        model,
+      });
+      sessionChatId = turn.chatId;
+    } catch (err) {
+      console.warn('[hospitalChatbot] chat_sessions 영속화 실패 (응답은 정상 반환)', err);
+    }
+
+    // 11. Usage tracking (chatbot_usage) + audit
     try {
       await Promise.all([
-        db.ref(`triage_usage/${uid}/${hourEpoch}`).transaction((cur) => {
-          return typeof cur === 'number' ? cur + 1 : 1;
-        }),
+        incrementUsage(uid, now),
         db.ref('audit_logs').push({
           actorUid: uid,
           action: 'chatbot.reply',
           target: hospitalId,
-          meta: { intent, tokensIn, tokensOut, model, userTextLen: userText.length },
+          meta: {
+            intent,
+            tokensIn,
+            tokensOut,
+            model,
+            userTextLen: userText.length,
+            chatId: sessionChatId ?? null,
+            historyLen: history.length,
+          },
           timestamp: now,
         }),
       ]);
@@ -170,6 +213,11 @@ export const hospitalChatbot = onCall(
       tokensIn,
       tokensOut,
       model,
+      chatId: sessionChatId,
+      rateLimit: {
+        remainingHour: Math.max(0, rc.remainingHour - 1),
+        remainingDay: Math.max(0, rc.remainingDay - 1),
+      },
     };
     return result;
   },

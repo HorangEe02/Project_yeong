@@ -183,6 +183,24 @@
       "$id": {
         ".write": "auth != null && !data.exists() && newData.child('actorUid').val() === auth.uid"
       }
+    },
+
+    "chat_sessions": {
+      "$hospitalId": {
+        "$uid": {
+          ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'platformAdmin')",
+          ".write": "auth != null && (auth.uid === $uid || auth.token.role === 'platformAdmin')",
+          ".indexOn": ["lastActivityAt"]
+        }
+      }
+    },
+
+    "chatbot_usage": {
+      ".read": "auth != null && auth.token.role === 'platformAdmin'",
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'platformAdmin')",
+        ".write": "auth != null && auth.uid === $uid"
+      }
     }
   }
 }
