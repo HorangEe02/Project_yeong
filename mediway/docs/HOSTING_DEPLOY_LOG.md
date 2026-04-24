@@ -63,3 +63,57 @@ Local source가 prod 수준에 도달하지 못한 상황에서 `firebase deploy
 해시를 새로 계산해 올리는 방식이 안전.
 
 T0-1 Local Sync 완료 후 이 런북은 역할을 마친다.
+
+---
+
+## 2026-04-24 — `1f674c8d5ae50dce` → `e425dbd4ec15af83` config 복구 (긴급)
+
+- **Release**: `e425dbd4ec15af83`
+- **Previous**: `1f674c8d5ae50dce` (config 공백으로 SPA rewrite 손실)
+- **Release time**: 2026-04-24T07:04:10Z (16:04 KST)
+
+### 문제
+사용자가 딥링크 URL (예: `/login`, `/signup`, `/h/demo/patient/home`) 에서 브라우저
+새로고침 시 Firebase Hosting 기본 "Page Not Found" 표시.
+
+### 원인
+직전 surgical patch 배포 (`1f674c8d5ae50dce`) 에서 Firebase Hosting REST API 로
+새 version 을 만들 때 `config` 필드를 비워 버림 (`{}`). 이전 version
+`690c50e1e208e60a` 에는 다음이 있었음:
+```json
+"config": {
+  "rewrites": [{"glob": "**", "path": "/index.html"}],
+  "headers": [
+    {"glob": "/index.html", "headers": {"Cache-Control": "no-cache, no-store, must-revalidate"}},
+    {"glob": "/assets/**", "headers": {"Cache-Control": "public, max-age=31536000, immutable"}}
+  ]
+}
+```
+패치 배포 시 파일만 populateFiles 로 지정하고 config 는 누락 → SPA rewrite 없음
+→ 어떤 client-side route 도 직접 접근 시 404.
+
+### 수정
+새 version 을 config 포함으로 생성:
+```python
+api('POST', '/v1beta1/sites/{SITE}/versions',
+    body={'config': {rewrites, headers}})   # ← 핵심: config 본문에 포함
+```
+
+파일 map 은 직전 version (`1f674c8d5ae50dce`) 과 동일 20 path 를 populateFiles.
+모든 hash 가 이미 CDN 에 존재 → upload 0건, 빠름. Finalize + Release.
+
+### 영향
+- ✅ SPA rewrites 복구 — `/login` 외 모든 client-side route 새로고침 200
+- ✅ `/assets/**` immutable cache + `/index.html` no-cache 복구
+- ✅ Landing V2 redirect 패치 (`to:/hospitals/select`) 유지
+- ✅ 패치된 JS 파일명 (`/assets/index-v2fix1.js`) 유지
+
+### 교훈
+REST API 로 `POST /versions` 생성 시 `config` 를 빈 body 로 보내면 default 가
+아닌 **빈 config** 로 생성된다. Firebase Hosting CLI 는 `firebase.json` 을
+읽어 자동으로 config 를 채우지만, REST API 직접 호출 시 명시해야 함.
+surgical patch 스크립트 재활용 시 이 체크리스트 확인:
+- [ ] config.rewrites 포함?
+- [ ] config.headers 포함?
+- [ ] populateFiles 호출 전 version body 에 config 삽입?
+
