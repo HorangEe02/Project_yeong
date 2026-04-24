@@ -149,3 +149,51 @@ Landing V2 redirect 패치 (`to:/hospitals/select`) + SPA rewrites + cache heade
 - `/e2e-hospital-isolation.html` LIVE fetch 시 `color:#004e9f` 확인
 - `/login` 새로고침 여전히 200 (rewrites 정상)
 
+---
+
+## 2026-04-24 — Landing "환자" 버튼 데모 병원 직접 라우팅
+
+- **Release**: `8da78dc2d7001b6c`
+- **Previous**: `fb6c3ea4c03acbb8`
+- **Release time**: 2026-04-24T07:20:36Z (16:20 KST)
+
+### 문제
+이전 surgical patch(`1f674c8d5ae50dce`)는 Landing "환자" 버튼을 `/hospitals/select`
+로 보내도록 수정. 이 경로에서 로그인된 환자를 auto-redirect 할 것으로 기대했으나
+실제로는 `_j()` 컴포넌트의 redirect 조건이 **URL query parameter `?hospital=<slug>`**
+만 검사:
+
+```js
+let t = searchParams.get('hospital');        // user profile 과 무관
+return t && hospitals.some(h => h.slug === t)
+  ? <Navigate to={`/h/${t}/patient/home`} />
+  : <picker>
+```
+
+→ `profile.hospitalId` 가 `demo` 여도 쿼리가 없으면 picker 에서 멈춤.
+
+### 수정
+현 LIVE 는 demo 단일 병원 환경이므로 Landing 버튼을 `/h/demo/patient/home` 으로
+**직접** 라우팅. 중간 picker 단계 제거.
+
+```
+to:`/hospitals/select` → to:`/h/demo/patient/home`
+```
+
+원본 prod 번들 (`/assets/index-BGK9Zs9J.js`) 에서 새로 patch → 새 filename
+`index-v3fix1.js`. 기존 `v2fix1.js` 는 버전에 같이 포함 (rollback 안전).
+
+### 영향
+- ✅ Landing → 환자 → 바로 데모 병원 V2 홈 (한 번에 이동)
+- ✅ serving config (rewrites + cache headers) 유지
+- ✅ e2e 색상 롤백 유지 (primary blue)
+- ⚠️ 다병원 환경으로 확장 시 이 route 는 slug 조건부 처리로 재설계 필요
+
+### 다음 세대 번들 교체 시 작업 순서
+T0-1 Local Sync 완료 후 `firebase deploy --only hosting` 으로 전체 번들을 교체할 때
+위 surgical patch 세 번 (`v2fix1` → `v3fix1` → 색상 롤백) 의 결과가 local 소스에 모두
+반영돼 있는지 확인 필수:
+- [ ] LandingPage "환자" 버튼이 auth 상태 기반으로 조건부 라우팅
+- [ ] e2e HTML 에 primary blue 적용
+- [ ] SPA rewrites + cache headers 가 firebase.json 에 설정됨
+
