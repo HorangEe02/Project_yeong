@@ -1,6 +1,10 @@
-import { onValue, ref } from 'firebase/database';
+import { get, onValue, ref, update } from 'firebase/database';
 import { db, isFirebaseConfigured } from '@/config/firebase';
-import type { WaitQueuePatientIndex, WaitQueueStatus } from '@/types/waitQueue';
+import type {
+  WaitQueueEntry,
+  WaitQueuePatientIndex,
+  WaitQueueStatus,
+} from '@/types/waitQueue';
 
 /**
  * KST(UTC+9) 기준 오늘 날짜를 `'YYYY-MM-DD'` 형식으로 반환.
@@ -94,4 +98,134 @@ export function selectPrimaryActive(
       return d !== 0 ? d : a.number - b.number;
     });
   return active[0] ?? null;
+}
+
+// =====================================================================
+// Staff-side — 의료진이 쓰는 대기열 관리 함수들
+// 권한: RTDB rule이 staff|admin of same hospital OR platformAdmin 만 허용.
+// prod 번들의 fg / cg / lg / ug 함수와 동일 schema/semantics.
+// =====================================================================
+
+interface SubscribeDeptQueueOptions {
+  /** true면 completed/cancelled 엔트리도 포함 (default: false) */
+  includeCompleted?: boolean;
+}
+
+/**
+ * `/hospitals/{hospitalId}/wait_queue/{department}/{date}` 실시간 구독.
+ * 의료진 콘솔에서 해당 부서·날짜의 모든 엔트리를 보기 위한 용도.
+ *
+ * 기본 필터: completed / cancelled 제외.
+ * 정렬: number 오름차순 (먼저 접수된 순).
+ */
+export function subscribeDeptQueue(
+  hospitalId: string,
+  department: string,
+  date: string,
+  onData: (entries: WaitQueueEntry[]) => void,
+  onError?: (err: Error) => void,
+  opts: SubscribeDeptQueueOptions = {},
+): () => void {
+  if (!isFirebaseConfigured()) {
+    onData([]);
+    return () => {};
+  }
+  const path = `hospitals/${hospitalId}/wait_queue/${department}/${date}`;
+  const unsubscribe = onValue(
+    ref(db, path),
+    (snap) => {
+      const val = snap.val() as Record<string, WaitQueueEntry> | null;
+      if (!val) {
+        onData([]);
+        return;
+      }
+      const list = Object.values(val)
+        .filter((e) =>
+          opts.includeCompleted
+            ? true
+            : e.status !== 'completed' && e.status !== 'cancelled',
+        )
+        .sort((a, b) => a.number - b.number);
+      onData(list);
+    },
+    (err) => {
+      console.error('[waitQueue] dept subscription error:', err);
+      onError?.(err as Error);
+    },
+  );
+  return unsubscribe;
+}
+
+/**
+ * 해당 부서·날짜에서 **아직 waiting** 인 가장 낮은 number 엔트리를 `called` 로 전이.
+ *
+ * 구현:
+ *   1) `/hospitals/{hid}/wait_queue/{dept}/{date}` 한 번 get
+ *   2) Object.values → filter(status === 'waiting') → sort by number → [0]
+ *   3) 해당 엔트리의 `status=called` + `calledAt=now` 를 wait_queue 와
+ *      wait_queue_by_patient 양쪽에 멀티-update (dual-write).
+ *   4) 업데이트된 엔트리 객체 반환 (호출 없음 시 null)
+ *
+ * 주의: 읽기-수정-쓰기 사이 race 가능성 — 두 staff 가 동시에 호출하면
+ *   같은 환자를 두 번 호출할 수 있음. prod 번들(`cg`)도 동일한 단순 패턴이라
+ *   parity 우선. 필요 시 후속에서 transaction 으로 강화.
+ *
+ * FCM push 는 onQueueCall 서버 트리거가 담당 (status 'called' 감지 시 발송).
+ */
+export async function callNextWaiting(
+  hospitalId: string,
+  department: string,
+  date: string,
+): Promise<WaitQueueEntry | null> {
+  if (!isFirebaseConfigured()) return null;
+
+  const snap = await get(ref(db, `hospitals/${hospitalId}/wait_queue/${department}/${date}`));
+  if (!snap.exists()) return null;
+
+  const val = snap.val() as Record<string, WaitQueueEntry>;
+  const next = Object.values(val)
+    .filter((e) => e.status === 'waiting')
+    .sort((a, b) => a.number - b.number)[0];
+  if (!next) return null;
+
+  const now = Date.now();
+  await update(ref(db), {
+    [`hospitals/${hospitalId}/wait_queue/${department}/${date}/${next.id}/status`]: 'called',
+    [`hospitals/${hospitalId}/wait_queue/${department}/${date}/${next.id}/calledAt`]: now,
+    [`hospitals/${hospitalId}/wait_queue_by_patient/${next.patientUid}/${next.id}/status`]: 'called',
+  });
+  return { ...next, status: 'called', calledAt: now };
+}
+
+/**
+ * 엔트리를 `in-progress` 로 전이 + `startedAt` 기록. dual-write.
+ * 전제: 호출자가 해당 엔트리 객체를 가지고 있음 (subscribeDeptQueue 결과 카드).
+ */
+export async function markInProgress(
+  hospitalId: string,
+  entry: WaitQueueEntry,
+): Promise<void> {
+  if (!isFirebaseConfigured()) throw new Error('Firebase 미설정');
+  const now = Date.now();
+  await update(ref(db), {
+    [`hospitals/${hospitalId}/wait_queue/${entry.department}/${entry.date}/${entry.id}/status`]: 'in-progress',
+    [`hospitals/${hospitalId}/wait_queue/${entry.department}/${entry.date}/${entry.id}/startedAt`]: now,
+    [`hospitals/${hospitalId}/wait_queue_by_patient/${entry.patientUid}/${entry.id}/status`]: 'in-progress',
+  });
+}
+
+/**
+ * 엔트리를 `completed` 로 전이 + `completedAt` 기록. dual-write.
+ */
+export async function markCompleted(
+  hospitalId: string,
+  entry: WaitQueueEntry,
+): Promise<void> {
+  if (!isFirebaseConfigured()) throw new Error('Firebase 미설정');
+  const now = Date.now();
+  await update(ref(db), {
+    [`hospitals/${hospitalId}/wait_queue/${entry.department}/${entry.date}/${entry.id}/status`]: 'completed',
+    [`hospitals/${hospitalId}/wait_queue/${entry.department}/${entry.date}/${entry.id}/completedAt`]: now,
+    [`hospitals/${hospitalId}/wait_queue_by_patient/${entry.patientUid}/${entry.id}/status`]: 'completed',
+  });
 }
