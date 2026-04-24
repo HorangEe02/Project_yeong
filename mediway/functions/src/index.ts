@@ -20,6 +20,8 @@ export { migrateAllClaims } from './migrations/migrateAllClaims';
 export { verifyMigration } from './migrations/verifyMigration';
 export { onQueueCall } from './wait_queue/onQueueCall';
 export { hospitalChatbot } from './chatbot/hospitalChatbot';
+export { onAppointmentCreate } from './appointments/onAppointmentCreate';
+export { appointmentReminderScheduler } from './appointments/appointmentReminderScheduler';
 
 const region = 'asia-northeast3';
 
