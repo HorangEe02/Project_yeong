@@ -147,7 +147,7 @@
       ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
       ".indexOn": ["timestamp", "actorUid", "target"],
       "$id": {
-        ".write": "false"
+        ".write": "auth != null && !data.exists() && newData.child('actorUid').val() === auth.uid"
       }
     },
 
@@ -163,9 +163,12 @@
     },
 
     "visit_plans": {
-      ".read": "auth != null && auth.token.role === 'platformAdmin'",
       "$uid": {
-        ".write": "false"
+        ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'staff' || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+        ".write": "auth != null && (auth.uid === $uid || auth.token.role === 'staff' || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+        "updatedBy": { ".validate": "newData.val() === auth.uid" },
+        "expiresAt": { ".validate": "newData.isNumber() && newData.val() <= now + 172800000" },
+        "waypoints": { ".validate": "newData.hasChildren()" }
       }
     },
 
