@@ -144,7 +144,7 @@
     },
 
     "audit_logs": {
-      ".read": "auth != null && auth.token.role === 'platformAdmin'",
+      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
       ".indexOn": ["timestamp", "actorUid", "target"],
       "$id": {
         ".write": "false"
