@@ -20,15 +20,16 @@ export interface AuditLogEntry {
 }
 
 /**
- * T1-1b dual-write 모드:
- *   - legacy `/audit_logs/{pushId}` (전체 관리용, platformAdmin 만 read)
- *   - nested `/audit_logs_v2/{bucket}/{pushId}` (hospitalId 별 격리)
+ * T1-1c cutover 모드 (2026-04-24 이후):
+ *   - **v2 only**: `/audit_logs_v2/{bucket}/{pushId}`
+ *   - legacy `/audit_logs` write 는 제거됨 (rules 도 write:false 로 차단)
  *
  * `hospitalId` 가 null/undefined/빈문자열 → `platform` bucket 사용
  * (platformAdmin 시스템 액션: bootstrap, claims migration 등).
  *
- * 두 write 는 Promise.all 로 병행. 한쪽 실패 시 전체 reject — 호출자가 처리.
- * T1-1c cutover 에서 legacy write 제거 예정.
+ * 기존 legacy entries + 백업 (`/audit_logs_backup_{ts}`) 은 T1-1a 기록 그대로
+ * 유지 (platformAdmin read-only). AdminAuditPage 는 `audit_logs_v2/{hid}` 를
+ * 조회한다.
  */
 export async function appendAuditLog(
   db: database.Database,
@@ -36,8 +37,5 @@ export async function appendAuditLog(
   entry: AuditLogEntry,
 ): Promise<void> {
   const bucket = hospitalId && hospitalId.trim() ? hospitalId.trim() : 'platform';
-  await Promise.all([
-    db.ref('audit_logs').push(entry),
-    db.ref(`audit_logs_v2/${bucket}`).push(entry),
-  ]);
+  await db.ref(`audit_logs_v2/${bucket}`).push(entry);
 }

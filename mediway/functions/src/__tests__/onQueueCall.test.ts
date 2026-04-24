@@ -91,7 +91,9 @@ describe('onQueueCall — status 전이 처리', () => {
         department: '내과',
       }),
     });
-    const auditCall = mockPush.mock.calls.find(([p]) => p === 'audit_logs');
+    const auditCall = mockPush.mock.calls.find(([p]) =>
+      typeof p === 'string' && p.startsWith('audit_logs_v2/'),
+    );
     expect(auditCall?.[1]).toMatchObject({
       action: 'wait_queue.call.push',
       target: 'p1',
@@ -168,7 +170,9 @@ describe('onQueueCall — status 전이 처리', () => {
     expect(mockSend).toHaveBeenCalledTimes(2);
     expect(mockRemove).toHaveBeenCalledTimes(1);
     expect(mockRemove.mock.calls[0][0]).toBe('user_fcm_tokens/p1/stale');
-    const auditCall = mockPush.mock.calls.find(([p]) => p === 'audit_logs');
+    const auditCall = mockPush.mock.calls.find(([p]) =>
+      typeof p === 'string' && p.startsWith('audit_logs_v2/'),
+    );
     expect(auditCall?.[1]).toMatchObject({
       meta: { sent: 1, failed: 1 },
     });

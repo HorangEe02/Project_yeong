@@ -138,14 +138,12 @@ describe('injectClaimsForUid', () => {
     expect(uidArg).toBe('uid-10');
     expect(claimsArg.role).toBe('staff');
 
-    // T1-1b dual-write: legacy /audit_logs + nested /audit_logs_v2/{bucket}
-    expect(mockPush).toHaveBeenCalledTimes(2);
+    // T1-1c cutover: v2-only (legacy write 제거됨)
+    expect(mockPush).toHaveBeenCalledTimes(1);
     const [path, value] = mockPush.mock.calls[0];
-    expect(path).toBe('audit_logs');
+    expect(path).toBe('audit_logs_v2/smch');
     expect((value as { action: string }).action).toBe('user.claims.autoInject');
     expect((value as { meta: { origin: string } }).meta.origin).toBe('ensureUserRecord');
-    const [v2Path] = mockPush.mock.calls[1];
-    expect(v2Path).toBe('audit_logs_v2/smch');
   });
 
   it('프로필 미존재 + throwOnError=false이면 silently 로깅만', async () => {
@@ -200,7 +198,7 @@ describe('refreshMyClaims 핸들러', () => {
       expect.objectContaining({ role: 'staff', hospitalId: 'smch' }),
     );
     const [auditPath, auditValue] = mockPush.mock.calls[0];
-    expect(auditPath).toBe('audit_logs');
+    expect(auditPath).toBe('audit_logs_v2/smch');
     expect((auditValue as { action: string }).action).toBe('user.claims.refresh');
   });
 });
@@ -292,7 +290,7 @@ describe('setUserClaims 핸들러 — 권한·검증·에스컬레이션 방어'
     });
 
     const [path, value] = mockPush.mock.calls[0];
-    expect(path).toBe('audit_logs');
+    expect(path).toBe('audit_logs_v2/smch');
     const log = value as {
       action: string;
       actorUid: string;

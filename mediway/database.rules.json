@@ -144,10 +144,21 @@
     },
 
     "audit_logs": {
-      ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
+      ".read": "auth != null && auth.token.role === 'platformAdmin'",
       ".indexOn": ["timestamp", "actorUid", "target"],
       "$id": {
-        ".write": "auth != null && !data.exists() && newData.child('actorUid').val() === auth.uid"
+        ".write": "false"
+      }
+    },
+
+    "audit_logs_v2": {
+      ".read": "auth != null && auth.token.role === 'platformAdmin'",
+      "$hospitalId": {
+        ".read": "auth != null && (auth.token.role === 'platformAdmin' || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId))",
+        ".indexOn": ["timestamp", "actorUid", "target"],
+        "$id": {
+          ".write": "auth != null && !data.exists() && newData.child('actorUid').val() === auth.uid && ($hospitalId === 'platform' ? auth.token.role === 'platformAdmin' : (auth.token.hospitalId === $hospitalId || auth.token.role === 'platformAdmin'))"
+        }
       }
     },
 

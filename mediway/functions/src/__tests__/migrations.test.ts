@@ -147,7 +147,9 @@ describe('migrateAllClaims — 실행', () => {
     expect(mockSetCustomUserClaims).toHaveBeenCalledWith('u3', expect.objectContaining({ role: 'admin', hospitalId: 'snuh' }));
 
     // audit_logs push는 각 유저마다 1회
-    const auditCalls = mockPush.mock.calls.filter(([p]) => p === 'audit_logs');
+    const auditCalls = mockPush.mock.calls.filter(
+      ([p]) => typeof p === 'string' && p.startsWith('audit_logs_v2/'),
+    );
     expect(auditCalls).toHaveLength(3);
     expect((auditCalls[0][1] as { action: string }).action).toBe('user.claims.migration.v1');
 
@@ -200,7 +202,9 @@ describe('migrateAllClaims — 실행', () => {
     expect(result.dryRun).toBe(true);
     expect(result.progress.migrated).toBe(1);
     expect(mockSetCustomUserClaims).not.toHaveBeenCalled();
-    const auditCalls = mockPush.mock.calls.filter(([p]) => p === 'audit_logs');
+    const auditCalls = mockPush.mock.calls.filter(
+      ([p]) => typeof p === 'string' && p.startsWith('audit_logs_v2/'),
+    );
     expect(auditCalls).toHaveLength(0);
   });
 
