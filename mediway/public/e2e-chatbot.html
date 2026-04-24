@@ -143,11 +143,9 @@ async function sendMessage(text) {
   sendBtn.disabled = true;
   appendBubble('user', text);
   try {
-    const res = await callable({
-      hospitalId: currentHospitalId,
-      chatId: chatId ?? undefined,
-      userText: text,
-    });
+    const payload = { hospitalId: currentHospitalId, userText: text };
+    if (chatId) payload.chatId = chatId; // null일 땐 아예 필드 누락 (Firebase callable undefined→null 변환 회피)
+    const res = await callable(payload);
     const data = res.data;
     rawBox.textContent = JSON.stringify(data, null, 2);
     chatId = data.chatId ?? chatId;

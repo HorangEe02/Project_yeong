@@ -22,7 +22,8 @@ const region = 'asia-northeast3';
 const RequestSchema = z.object({
   hospitalId: z.string().min(1).max(64),
   userText: z.string().min(1).max(1000),
-  chatId: z.string().max(128).optional(),
+  // Firebase callable SDK가 undefined 필드를 null로 직렬화하기 때문에 nullish 허용
+  chatId: z.string().max(128).nullish(),
 });
 
 export const hospitalChatbot = onCall(
@@ -127,7 +128,8 @@ export const hospitalChatbot = onCall(
     }
 
     // 8. 멀티턴 히스토리 로드 (chatId 제공된 경우만)
-    const chatIdInput = parsed.data.chatId;
+    // Firebase callable이 undefined → null로 직렬화할 수 있으므로 정규화
+    const chatIdInput = parsed.data.chatId ?? undefined;
     let history: Awaited<ReturnType<typeof loadHistory>> = [];
     if (chatIdInput) {
       try {

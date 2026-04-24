@@ -48,8 +48,8 @@
         },
         "visit_plans": {
           "$uid": {
-            ".read": "auth != null && (auth.uid === $uid || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
-            ".write": "auth != null && (auth.uid === $uid || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
+            ".read": "auth != null && ((auth.uid === $uid && auth.token.hospitalId === $hospitalId) || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
+            ".write": "auth != null && ((auth.uid === $uid && auth.token.hospitalId === $hospitalId) || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
             "updatedBy": {
               ".validate": "newData.val() === auth.uid"
             },
