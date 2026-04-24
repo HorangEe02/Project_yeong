@@ -4,6 +4,7 @@ import { Header } from '@/components/common/Header';
 import { LandingPage } from '@/pages/LandingPage';
 import { StaffPage } from '@/pages/StaffPage';
 import { PatientPage } from '@/pages/PatientPage';
+import { HospitalHomePage } from '@/pages/HospitalHomePage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { SignupChoicePage } from '@/pages/auth/SignupChoicePage';
 import { StaffSignupPage } from '@/pages/auth/StaffSignupPage';
@@ -202,6 +203,9 @@ export default function App() {
           {/* 환자 — 익명+로그인 모두 허용 (원 설계 유지) */}
           <Route path="/patient" element={<PatientPage />} />
           <Route path="/patient/:sessionId" element={<PatientPage />} />
+
+          {/* 병원 slug 기반 환자 홈 (T0-1 step 3 — shell only) */}
+          <Route path="/h/:hospitalSlug/patient/home" element={<HospitalHomePage />} />
         </Routes>
       </div>
     </BrowserRouter>
