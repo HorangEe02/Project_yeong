@@ -41,25 +41,7 @@
           "$department": {
             "$date": {
               "$queueNumber": {
-                ".read": "auth != null && data.child('patientUid').val() === auth.uid",
-                ".write": "auth != null && !data.exists() && auth.token.hospitalId === $hospitalId && newData.child('patientUid').val() === auth.uid && newData.child('status').val() === 'waiting' && newData.child('hospitalId').val() === $hospitalId && newData.child('department').val() === $department && newData.child('date').val() === $date"
-              }
-            }
-          }
-        },
-        "wait_queue_by_patient": {
-          "$uid": {
-            ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'platformAdmin' || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId))",
-            ".write": "auth != null && (auth.uid === $uid || auth.token.role === 'platformAdmin' || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId))"
-          }
-        },
-        "wait_queue_counters": {
-          ".read": "auth != null && (auth.token.hospitalId === $hospitalId || auth.token.role === 'platformAdmin')",
-          ".write": "auth != null && (auth.token.hospitalId === $hospitalId || auth.token.role === 'platformAdmin')",
-          "$department": {
-            "$date": {
-              "current": {
-                ".validate": "newData.isNumber() && newData.val() > 0 && (!data.exists() || newData.val() === data.val() + 1)"
+                ".read": "auth != null && data.child('patientUid').val() === auth.uid"
               }
             }
           }
