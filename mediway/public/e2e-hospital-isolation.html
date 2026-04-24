@@ -129,8 +129,8 @@ runBtn.addEventListener('click', async () => {
       run: () => set(ref(db, `hospitals/${myHospital}/profile/themeColor`), '#deadbe'),
     },
     {
-      category: '레거시 visit_plans 자기 uid 쓰기 (P2까지 허용)',
-      expected: true,
+      category: '레거시 visit_plans 자기 uid 쓰기 (T1-2c 이후 차단)',
+      expected: false,
       run: () =>
         set(ref(db, `visit_plans/${uid}`), {
           waypoints: { w1: { poiId: 'p-test' } },

@@ -82,19 +82,12 @@ export function AssignVisitPlanDialog({
       // autoSend 토글은 별도 setAutoSendOptIn 호출 필요하나 권한 이슈 회피 위해
       // 본 다이얼로그에서는 배정 후 별도 서비스로 업데이트
       if (autoSend) {
-        // setAutoSendOptIn 은 본인만 호출 가능 → admin 이 직접 dual-update (T1-2b)
+        // setAutoSendOptIn 은 본인만 호출 가능 → admin 이 직접 nested update (T1-2c 이후 nested only)
         const { update, ref } = await import('firebase/database');
         const { db } = await import('@/config/firebase');
-        const patch = { autoSendOptIn: true };
-        const updates: Array<Promise<void>> = [
-          update(ref(db, `visit_plans/${uid}`), patch),
-        ];
-        if (hospitalId) {
-          updates.push(
-            update(ref(db, `hospitals/${hospitalId}/visit_plans/${uid}`), patch),
-          );
-        }
-        await Promise.all(updates);
+        await update(ref(db, `hospitals/${hospitalId}/visit_plans/${uid}`), {
+          autoSendOptIn: true,
+        });
       }
       onAssigned();
       onClose();

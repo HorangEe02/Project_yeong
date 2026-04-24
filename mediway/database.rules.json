@@ -163,18 +163,9 @@
     },
 
     "visit_plans": {
+      ".read": "auth != null && auth.token.role === 'platformAdmin'",
       "$uid": {
-        ".read": "auth != null && (auth.uid === $uid || (auth.token.role === 'staff' && (!data.child('hospitalId').exists() || data.child('hospitalId').val() === auth.token.hospitalId)) || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
-        ".write": "auth != null && (auth.uid === $uid || (auth.token.role === 'staff' && (!newData.child('hospitalId').exists() || newData.child('hospitalId').val() === auth.token.hospitalId)) || auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
-        "updatedBy": {
-          ".validate": "newData.val() === auth.uid"
-        },
-        "expiresAt": {
-          ".validate": "newData.isNumber() && newData.val() <= now + 172800000"
-        },
-        "waypoints": {
-          ".validate": "newData.hasChildren()"
-        }
+        ".write": "false"
       }
     },
 
