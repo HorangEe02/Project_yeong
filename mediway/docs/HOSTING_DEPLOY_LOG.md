@@ -6,6 +6,55 @@
 
 ---
 
+## 2026-04-26 — Staff sub-nav 가운데 정렬 + 응급 탭 추가
+
+- **이전 LIVE 번들**: `index-B7my1M0_.js` + `index-CTDm0AWe.css`
+- **신 LIVE 번들**: `index-CdK89X7D.js` + `index-CTDm0AWe.css` (CSS 동일)
+- **Release time**: 2026-04-26T06:21:** Z (15:21+ KST)
+- **Channel**: `live`
+
+### 변경
+사용자 요청 — staff 「동선 전송 / 대기열 콘솔」 탭이 페이지 간 좌우로 이동 + 응급 탭 부재.
+
+#### 1. 가운데 정렬 일관화
+- StaffSubNav nav className: `flex w-full max-w-md gap-1 sm:w-auto`
+  → `mx-auto flex w-full max-w-2xl justify-center gap-1 sm:w-auto`
+- StaffPage(max-w-5xl) ↔ StaffQueuePage(max-w-3xl) 폭 차이로 탭이 좌·중앙으로 보이던
+  비일관성 해소 — 부모 폭 무관하게 nav 자체가 가운데 정렬
+
+#### 2. 응급 탭 추가
+- StaffSubNavTab 타입: `'dashboard' | 'queue'` → `'dashboard' | 'queue' | 'emergency'`
+- 신규 「응급」 탭 (빨간 강조, AlertTriangle) — `/h/{slug}/staff/emergency`
+- features.emergencyCall=false 인 hospital 에선 자동 숨김 (default true 라 모든 hospital 기본 노출)
+
+추가:
+- `src/pages/StaffEmergencyPage.tsx` — `<StaffSubNav active="emergency" /> + <EmergencyCallCard />`
+  · 환자 측 EmergencyCallCard 재사용 (119 + 위치 + 확인 dialog)
+  · 의료진이 자기/동료/환자 대신 119 신고 + 현재 위치 안내 가능
+- `src/App.tsx` — nested `staff/emergency` 라우트 + ProtectedRoute(staff|admin)
+
+테스트 추가 — `StaffSubNav.test.tsx` (+5 케이스):
+- 응급 탭 default 노출 / features=false 시 미노출 / href / aria-current / mx-auto+justify-center 검증
+
+### 사용자 영향
+
+| 흐름 | 변화 |
+|------|------|
+| `/h/demo/staff` ↔ `/h/demo/staff/queue` 이동 | 탭이 항상 가운데 — 위치 변동 없음 |
+| 의료진 메뉴 | 「동선 전송 / 대기열 콘솔 / 응급」 3 탭 |
+| `/h/demo/staff/emergency` 진입 | EmergencyCallCard — 119 통화 + 위치 + 확인 dialog |
+
+### 배포 검증 (자동)
+- HTTP 200
+- 신 번들 hash 로컬/LIVE 일치
+- vitest 31 files, 335 passed (+5)
+
+### 롤백
+- Hosting: 이전 release `index-B7my1M0_.js` "Rollback"
+- (또는) features.emergencyCall=false 명시 → 응급 탭만 즉시 숨김
+
+---
+
 ## 2026-04-26 — emergencyCall default ON (모든 hospital 기본 활성)
 
 - **이전 LIVE 번들**: `index-BIXOAMN-.js` + `index-CTDm0AWe.css`

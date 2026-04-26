@@ -6,6 +6,7 @@ import { LegacyHospitalRedirect } from '@/components/hospital/LegacyRedirect';
 import { LandingPage } from '@/pages/LandingPage';
 import { StaffPage } from '@/pages/StaffPage';
 import { StaffQueuePage } from '@/pages/StaffQueuePage';
+import { StaffEmergencyPage } from '@/pages/StaffEmergencyPage';
 import { PatientPage } from '@/pages/PatientPage';
 import { HospitalHomePage } from '@/pages/HospitalHomePage';
 import { LoginPage } from '@/pages/auth/LoginPage';
@@ -271,6 +272,14 @@ export default function App() {
               element={
                 <ProtectedRoute requireRole={['staff', 'admin']}>
                   <StaffQueuePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="staff/emergency"
+              element={
+                <ProtectedRoute requireRole={['staff', 'admin']}>
+                  <StaffEmergencyPage />
                 </ProtectedRoute>
               }
             />

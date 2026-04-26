@@ -68,3 +68,48 @@ describe('StaffSubNav', () => {
     expect(screen.getByRole('navigation', { name: '의료진 메뉴' })).toBeTruthy();
   });
 });
+
+describe('StaffSubNav — 응급 탭 (features.emergencyCall)', () => {
+  it('default true (FEATURE_DEFAULTS) → 응급 탭 노출', () => {
+    wrap('demo', <StaffSubNav active="dashboard" />);
+    expect(screen.getByRole('link', { name: '응급' })).toBeTruthy();
+    expect(screen.getByTestId('staff-nav-emergency')).toBeTruthy();
+  });
+
+  it('features.emergencyCall=false → 응급 탭 미노출', () => {
+    wrap(
+      'demo',
+      <StaffSubNav active="dashboard" />,
+      { features: { emergencyCall: false } },
+    );
+    expect(screen.queryByRole('link', { name: '응급' })).toBeNull();
+    expect(screen.queryByTestId('staff-nav-emergency')).toBeNull();
+  });
+
+  it('응급 href = /h/{slug}/staff/emergency', () => {
+    wrap('demo', <StaffSubNav active="dashboard" />);
+    expect(
+      screen.getByRole('link', { name: '응급' }).getAttribute('href'),
+    ).toBe('/h/demo/staff/emergency');
+  });
+
+  it('active="emergency" → 응급 탭 aria-current=page', () => {
+    wrap('demo', <StaffSubNav active="emergency" />);
+    expect(
+      screen.getByRole('link', { name: '응급' }).getAttribute('aria-current'),
+    ).toBe('page');
+    expect(
+      screen.getByRole('link', { name: '동선 전송' }).getAttribute('aria-current'),
+    ).toBeNull();
+  });
+});
+
+describe('StaffSubNav — 가운데 정렬', () => {
+  it('nav className 에 mx-auto + justify-center 적용', () => {
+    wrap('demo', <StaffSubNav active="dashboard" />);
+    const nav = screen.getByRole('navigation', { name: '의료진 메뉴' });
+    const cls = nav.getAttribute('class') ?? '';
+    expect(cls).toMatch(/\bmx-auto\b/);
+    expect(cls).toMatch(/\bjustify-center\b/);
+  });
+});
