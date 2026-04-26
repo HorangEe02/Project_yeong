@@ -26,6 +26,7 @@ const FEATURE_KEYS: Array<{ key: string; label: string }> = [
   { key: 'familyDelegation', label: '가족 대리' },
   { key: 'healthRecords', label: '검사결과 보관' },
   { key: 'parking', label: '주차 할인' },
+  { key: 'emergencyCall', label: '응급 호출 (119)' },
 ];
 
 const STATUS_OPTIONS: Array<{ value: HospitalProfile['contractStatus']; label: string }> = [

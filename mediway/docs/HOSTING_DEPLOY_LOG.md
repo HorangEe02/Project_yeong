@@ -6,6 +6,35 @@
 
 ---
 
+## 2026-04-26 — Admin features 동기화 hotfix (emergencyCall 토글 가능)
+
+- **이전 LIVE 번들**: `index-BjFBq90O.js` + `index-CTDm0AWe.css`
+- **신 LIVE 번들**: `index-BIXOAMN-.js` + `index-CTDm0AWe.css` (CSS 동일 — admin UI 만 변경)
+- **Release time**: 2026-04-26T06:09:35Z (15:09 KST)
+- **Channel**: `live`
+
+### 원인 / 수정
+
+이전 commit `2da2aeb` (GuideTab 응급 모드 + features 가드) 에서 `FEATURE_DEFAULTS` 와
+`useFeature('emergencyCall')` 인프라는 추가했지만 **`AdminHospitalDetailPage.tsx` 의
+`FEATURE_KEYS` 목록에 `emergencyCall` 추가를 빠뜨림** — admin UI 에 토글 체크박스
+미노출 → admin 가 `features.emergencyCall=true` 로 설정할 방법 없어 GuideTab 「응급 호출」
+탭 항상 미노출.
+
+수정: `FEATURE_KEYS` 에 `{ key: 'emergencyCall', label: '응급 호출 (119)' }` 추가.
+
+### 활성화 절차 (admin 시각 검증)
+1. platformAdmin (`catlife9029@gmail.com`) 로그인
+2. `/admin/hospitals/demo` → Features 섹션
+3. **「응급 호출 (119)」** 체크박스 (이제 노출됨) → 체크 → 저장
+4. 환자 home → 안내 탭 → 「응급 호출」 3rd 탭 노출 (실시간 RTDB 반영)
+
+### 롤백
+- Hosting: 이전 release `index-BjFBq90O.js` "Rollback"
+- 또는 admin features.emergencyCall=true 토글 해제 — 코드 변경 없이 즉시 숨김
+
+---
+
 ## 2026-04-26 — 환자 페이지 3 기능 (탭 정렬 + 외래 필터 + 응급 호출)
 
 - **이전 LIVE 번들**: `index-DwCp7tZA.js` + `index-BKULjQy2.css` (QR 자가 발급)
