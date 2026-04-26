@@ -115,19 +115,20 @@ Production 모든 E2E가 `/__/firebase/init.json`에서 config를 fetch. Local d
 ## 5. 우선순위 복구 계획
 
 ### 🔴 Tier 0 (즉시)
-| # | 작업 | 소요 | 순서 |
-|---|---|---|---|
-| 1 | **Rules tightening** — `hospitals/{hid}/wait_queue`·`visit_plans` 에 명시적 `.read` 추가해 cross-tenant 차단 | 0.5일 | 당장 |
-| 2 | **`onQueueCall` 함수 재작성** — e2e-wait-queue.html §B 스펙 기반. 사용자가 "다음 환자 호출" 시 환자 알림 복구 | 2일 | 1번 다음 |
-| 3 | **`triageSymptoms` 함수 재작성** — plusultra §3.6 + e2e §E 스펙. AI 진료과 추천 복구 | 3-5일 | 2번 다음 |
+| # | 작업 | 상태 |
+|---|---|---|
+| 1 | **Rules tightening** — `hospitals/{hid}/wait_queue`·`visit_plans` 에 명시적 `.read` 추가해 cross-tenant 차단 | ✅ T1-1 / T1-2 (2026-04-25) |
+| 2 | **`onQueueCall` 함수 재작성** — e2e-wait-queue.html §B 스펙 기반 | ✅ F5b `7bf536c` (dispatcher 통합 형태로 재작성) |
+| 3 | **`triageSymptoms` 함수 재작성** — AI 진료과 추천 복구 | ⏳ 별도 sprint (시나리오 E 의 Local 부재) |
 
-### 🟠 Tier 1 (본 sprint 범위 초과)
-| # | 작업 | 소요 | 근거 |
-|---|---|---|---|
-| 4 | **P2 탭 셸 재구현** — HospitalHomePage + 6탭 + 고령자 모드 토글 | 1주 | Production은 이미 있음, local 없음 |
-| 5 | **P3 WaitQueueWidget + StaffQueuePage** | 1주 | Production 있음 |
-| 6 | **P3 Appointments CRUD (RTDB + UI)** | 1주 | Production 있음 |
-| 7 | **hospital-slug route 체계 전환** (`/h/{slug}/...`) | 3-5일 | 전면 라우팅 리팩토링 |
+### 🟠 Tier 1
+| # | 작업 | 상태 |
+|---|---|---|
+| 4 | **P2 탭 셸 재구현** — HospitalHomePage + 6탭 + 고령자 모드 토글 | ✅ T0-1 B-1/B-2 (2026-04-24) |
+| 5 | **P3 WaitQueueWidget + StaffQueuePage** | ✅ T0-1 B-2 + F1 (2026-04-26) |
+| 6 | **P3 Appointments CRUD (RTDB + UI)** | ✅ T0-1 B-2 (2026-04-24) |
+| 7 | **hospital-slug route 체계 전환** (`/h/{slug}/...`) | ✅ B-3.10 (2026-04-26) |
+| 8 | **P3 F1 wait queue UI prod-parity 통합** — features 가드 + slug 일원화 + StaffSubNav + empty CTA + e2e 시나리오 A-D smoke | ✅ F1 (2026-04-26) — 설계: `docs/F1_WAIT_QUEUE_UI_INTEGRATION.md`, 7 커밋 (`3174225` → `b36936b` + 본 docs) |
 
 ### 🟡 Tier 2 (리서치 필요)
 - Production이 정확히 어떤 auth flow·role gate 쓰는지 분석 (minified 해독 난이도 ↑)
