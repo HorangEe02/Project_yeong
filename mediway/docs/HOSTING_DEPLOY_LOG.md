@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-04-26 — Phase H.5 — QRDisplay 환자 정보 카드 동적 visit 바인딩
+
+- **이전 LIVE 번들**: `index-BxGdUsO2.js` + `index-CTDm0AWe.css`
+- **신 LIVE 번들**: `index-OGIVtuQo.js` + `index-CTDm0AWe.css` (CSS 동일)
+- **Release time**: 2026-04-26T10:11+ Z (19:11+ KST)
+
+### 변경
+하드코딩 "MediWay 데모 환자 / Zone A-1" 제거 → `useActiveVisit(slug, patientUid)` 동적 바인딩.
+
+#### 분기 표시
+- **outpatient**: `{name} · 외래 · {department} / {zone}`
+- **inpatient**: `{name} · 입원 · {ward}-{room}-{bed?}` (zone 무시)
+- **checkup**: `{name} · 검진 · {zone}`
+- **emergency**: `{name} · 응급 · ER / {zone}`
+- **null** (active visit 없음): `{name}` + "진료 정보 없음 — 안내 데스크에 문의해주세요"
+- **loading**: "불러오는 중..."
+
+이름 우선순위: `visit.displayName` (RTDB cache) → `profile.displayName` → `'환자'`.
+
+### 테스트 추가
+- `src/components/patient/__tests__/QRDisplay.test.tsx` — 9 케이스
+- vitest 누적 384/384 (375 → 384 = +9)
+
+### 데이터 의존성
+- 현재 LIVE `/visits/{demo}/...` 비어있음 → 모든 환자에게 fallback "진료 정보 없음" 표시 (안전)
+- H.6 admin 등록 페이지 + H.7 시드 후 실제 데이터 흐름 가능
+
+### 롤백
+- Hosting: `index-BxGdUsO2.js` rollback (Firebase console)
+
+---
+
 ## 2026-04-26 — RTDB rules `/visits` path 추가 (Phase H.2)
 
 - **배포 종류**: RTDB rules (Hosting / Functions 변경 없음)

@@ -2,14 +2,52 @@ import { useEffect, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Shield, RefreshCw } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { useHospital } from '@/contexts/HospitalContext';
+import { useActiveVisit } from '@/hooks/useActiveVisit';
+import { useAuthStore } from '@/stores/authStore';
+import { getCurrentUid } from '@/services/auth';
+import {
+  isInpatientVisit,
+  isOutpatientVisit,
+  isCheckupVisit,
+  isEmergencyVisit,
+  type Visit,
+} from '@/types/visit';
 
 interface Props {
   onTokenGenerated: (token: string) => void;
 }
 
+/** Visit 의 type 별 카드 라벨 + tag. visit 없으면 null. */
+function visitInfoFor(
+  visit: Visit | null,
+): { label: string; tag: string } | null {
+  if (!visit) return null;
+  if (isInpatientVisit(visit)) {
+    const tag = `${visit.ward}-${visit.room}${visit.bed ? `-${visit.bed}` : ''}`;
+    return { label: '입원', tag };
+  }
+  if (isEmergencyVisit(visit)) {
+    return { label: '응급', tag: `ER / ${visit.zone}` };
+  }
+  if (isOutpatientVisit(visit)) {
+    return { label: '외래', tag: `${visit.department} / ${visit.zone}` };
+  }
+  if (isCheckupVisit(visit)) {
+    return { label: '검진', tag: visit.zone };
+  }
+  return null;
+}
+
 export function QRDisplay({ onTokenGenerated }: Props) {
   const [token, setToken] = useState<string>('');
   const [refreshCount, setRefreshCount] = useState(0);
+
+  // 환자 정보 카드 — Phase H: 동적 visit 바인딩.
+  const { slug } = useHospital();
+  const patientUid = getCurrentUid();
+  const profile = useAuthStore((s) => s.profile);
+  const { visit, loading: visitLoading } = useActiveVisit(slug, patientUid);
 
   useEffect(() => {
     const newToken = uuidv4();
@@ -27,14 +65,36 @@ export function QRDisplay({ onTokenGenerated }: Props) {
 
   const handleRefresh = () => setRefreshCount((c) => c + 1);
 
+  const displayName = visit?.displayName ?? profile?.displayName ?? '환자';
+  const visitInfo = visitInfoFor(visit);
+
   return (
     <div className="flex flex-col items-center gap-6">
-      {/* 안내 카드 */}
-      <div className="w-full rounded-2xl bg-gradient-to-br from-blue-50 to-surface-container-lowest p-6 text-center">
+      {/* 안내 카드 — visit 정보 동적 (H.5) */}
+      <div
+        className="w-full rounded-2xl bg-gradient-to-br from-blue-50 to-surface-container-lowest p-6 text-center"
+        data-testid="visit-info-card"
+      >
         <p className="mb-1 text-xs font-medium text-on-surface-variant">환자 정보</p>
-        <p className="text-lg font-bold text-on-surface">
-          MediWay 데모 환자 <span className="ml-2 rounded-lg bg-primary/10 px-2 py-0.5 text-sm font-semibold text-primary">Zone A-1</span>
-        </p>
+        {visitLoading ? (
+          <p className="text-sm text-on-surface-variant" data-testid="visit-loading">
+            불러오는 중...
+          </p>
+        ) : visitInfo ? (
+          <p className="text-lg font-bold text-on-surface" data-testid="visit-loaded">
+            {displayName}
+            <span className="ml-2 rounded-lg bg-primary/10 px-2 py-0.5 text-sm font-semibold text-primary">
+              {visitInfo.label} · {visitInfo.tag}
+            </span>
+          </p>
+        ) : (
+          <div data-testid="visit-empty">
+            <p className="text-lg font-bold text-on-surface">{displayName}</p>
+            <p className="mt-1 text-xs text-on-surface-variant">
+              진료 정보 없음 — 안내 데스크에 문의해주세요
+            </p>
+          </div>
+        )}
       </div>
 
       {/* QR 코드 */}
