@@ -1,8 +1,51 @@
-# Firebase Hosting 배포 이력 (surgical patch 전용)
+# Firebase Hosting 배포 이력
 
-Local source가 production 수준에 도달하기 전까지 `firebase deploy --only hosting`
-전체 배포는 금지. 이 문서는 prod 번들에 최소 패치를 가하기 위한 surgical
-배포만 기록한다.
+> **2026-04-26 정책 전환**: B-3.10 (hospital slug routing) + F1 (wait queue UI 통합)
+> 완료로 local source 가 prod parity 에 도달 → 전체 `firebase deploy --only hosting`
+> 가능. 본 문서는 본 배포(LIVE) 와 surgical patch 배포 모두 기록한다.
+
+---
+
+## 2026-04-26 — B-3.10 + F1 결합 본 배포 (prod parity 달성)
+
+- **이전 surgical patch**: `2b52463a288bc8d4`
+- **신 LIVE 번들**: `index-D_OWDnbO.js` + `index-CycsFZ0b.css`
+- **Release time**: 2026-04-26T02:15:02Z (11:15 KST)
+- **Channel**: `live` (mediway-demo.web.app)
+- **Preview 사전 검증**: `preview-b310` (mediway-demo--preview-b310-ahxpd47u.web.app, 동일 번들)
+
+### 포함 변경 (13 commit, `4ed4195` → `35b64c8`)
+
+#### B-3.10 Hospital slug nested routing (6 commits)
+- `94077e5` hospitalProfile service + HospitalProfile 타입 (12 unit test)
+- `d0d145d` HospitalShell + HospitalContext (13 unit test)
+- `7a7bb53` nested `/h/:slug/*` + LegacyHospitalRedirect (8 unit test)
+- `2eb602d` Header + HospitalHomePage 가 nested 인식
+- `5e5f6cc` App-level routing 통합 smoke (10 케이스)
+- `33daf30` 추적 갱신
+
+#### F1 Wait queue UI 통합 (7 commits)
+- `3174225` `useHospitalFeatures()` + FEATURE_DEFAULTS (13 unit test)
+- `fc4650c` HospitalHomePage tab visibility from features (10 unit test)
+- `b230db5` WaitQueueWidget hospital-aware + features-gated + empty CTA (15 unit test)
+- `bcd9f15` AppointmentsTab → useHospital().slug
+- `ad4c5d6` StaffSubNav + Staff/StaffQueue 통합 헤더 (6 unit test)
+- `b36936b` 시나리오 A-D 통합 smoke (6 케이스)
+- `35b64c8` docs
+
+### 검증 (배포 직후 자동)
+- HTTP 200 (`https://mediway-demo.web.app/`)
+- `index-D_OWDnbO.js` 가 LIVE / preview / 로컬 dist 일치
+- LIVE etag `f57051ab0a1ca219...`
+
+### 후속 (24h 모니터링 후)
+1. legacy `/audit_logs/*` + `/visit_plans/*` 트래픽 0 건 확인
+2. `scripts/purge-legacy-paths.py --apply --confirm` 실행
+3. RTDB rules 의 legacy write 관대처리(`7ec98f8`) 재차 tightening
+
+### 롤백 절차 (필요 시)
+1. Firebase Console → Hosting → 이전 release `2b52463a288bc8d4` 옆 "Rollback" 버튼
+2. 또는 CLI: `firebase hosting:rollback` (대화형)
 
 ---
 
