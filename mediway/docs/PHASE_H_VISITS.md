@@ -253,7 +253,7 @@ export function useActiveVisit(slug: string | null, patientUid: string | null): 
 | H.1 | ✅ done | (작업 중) | Visit type + 4 type guards + VISIT_TYPE_REQUIRED_FIELDS + isActiveStatus, vitest 19/19 pass |
 | H.2 | ✅ done | (작업 중) | `/visits/{hid}/{visitId}` rules 추가 + deploy released, validate 강화 (type/status enum, zone len, hospitalId match) |
 | H.3 | ✅ done | (작업 중) | createVisit/updateVisit/updateVisitStatus/deleteVisit + subscribeActiveVisit + listVisitsByPatient/Department + 4 visit.* AuditAction, vitest 14/14 pass |
-| H.4 | pending | — | — |
+| H.4 | ✅ done | (작업 중) | useActiveVisit hook (subscribe + cleanup), vitest 7/7 pass |
 | H.5 | pending | — | — |
 | H.6 | pending | — | — |
 | H.7 | pending | — | — |
