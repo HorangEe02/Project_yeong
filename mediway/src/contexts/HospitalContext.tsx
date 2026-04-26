@@ -40,6 +40,12 @@ export const FEATURE_DEFAULTS: Readonly<Record<string, boolean>> = Object.freeze
   familyDelegation: false,
   healthRecords: false,
   parking: false,
+  /**
+   * 응급 호출 (119 + 현재 위치 표시) — 윤리·법적 검토 영역.
+   * default false → 병원 admin 가 명시 enable 한 hospital 만 위젯 노출.
+   * GuideTab 「응급 호출」 모드 탭이 features.emergencyCall=true 일 때만 추가됨.
+   */
+  emergencyCall: false,
 });
 
 const HospitalContext = createContext<HospitalContextValue | null>(null);

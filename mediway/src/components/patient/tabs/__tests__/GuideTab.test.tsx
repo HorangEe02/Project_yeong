@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, useSearchParams } from 'react-router-dom';
+import type { HospitalProfile } from '@/types/hospital';
 
 // PatientMapBrowseView 는 HospitalMapContainer + mapStore + 정적 데이터 의존성을 끌어옴 — 본 단위 테스트
 // 비범위로 stub. browse 모드 분기만 검증.
@@ -8,13 +9,30 @@ vi.mock('@/components/patient/PatientMapBrowseView', () => ({
   PatientMapBrowseView: () => <div data-testid="map-browse-stub" />,
 }));
 
-import { GuideTab } from '../GuideTab';
+// EmergencyCallCard 는 navigator.geolocation 의존 — emergency 모드는 별도 테스트 영역
+vi.mock('@/components/patient/EmergencyCallCard', () => ({
+  EmergencyCallCard: () => <div data-testid="emergency-stub" />,
+}));
 
-function renderAt(initialPath: string = '/h/demo/patient/home?tab=guide') {
+import { GuideTab } from '../GuideTab';
+import { HospitalProvider } from '@/contexts/HospitalContext';
+
+function renderAt(
+  initialPath: string = '/h/demo/patient/home?tab=guide',
+  features?: Record<string, boolean>,
+) {
+  const profile: HospitalProfile = {
+    id: 'demo',
+    name: 'MediWay 데모',
+    status: 'active',
+    ...(features ? { features } : {}),
+  };
   return render(
     <MemoryRouter initialEntries={[initialPath]}>
-      <GuideTab />
-      <UrlProbe />
+      <HospitalProvider value={{ slug: 'demo', profile }}>
+        <GuideTab />
+        <UrlProbe />
+      </HospitalProvider>
     </MemoryRouter>,
   );
 }
