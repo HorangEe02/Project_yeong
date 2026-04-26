@@ -12,6 +12,12 @@ import {
   subscribeMyWaitQueue,
   todayDateKST,
 } from '@/services/waitQueue';
+import {
+  formatGroupHeader,
+  groupAppointments,
+  FILTER_VISIBILITY_THRESHOLD,
+  type Granularity,
+} from '@/utils/appointmentsGrouping';
 import type {
   AppointmentPatientIndex,
   AppointmentStatus,
@@ -83,6 +89,15 @@ export function AppointmentsTab() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [busyApptId, setBusyApptId] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
+  /** 그룹화 단위 — 사용자 요청 (일/월/년) */
+  const [granularity, setGranularity] = useState<Granularity>('day');
+
+  const showGranularityFilter =
+    appointments.length >= FILTER_VISIBILITY_THRESHOLD;
+  const groupedAppointments = useMemo(
+    () => groupAppointments(appointments, granularity),
+    [appointments, granularity],
+  );
 
   useEffect(() => {
     if (!uid || isAnon) return;
@@ -200,78 +215,139 @@ export function AppointmentsTab() {
         </div>
       )}
 
+      {showGranularityFilter && (
+        <div
+          role="tablist"
+          aria-label="기간 단위"
+          className="flex w-full max-w-xs gap-1 rounded-xl bg-surface-container-high p-1 sm:w-auto"
+        >
+          {(['day', 'month', 'year'] as const).map((g) => (
+            <GranularityButton
+              key={g}
+              value={g}
+              active={granularity}
+              onClick={() => setGranularity(g)}
+            />
+          ))}
+        </div>
+      )}
+
       {appointments.length === 0 ? (
         <p className="rounded-xl bg-surface-container-lowest p-6 text-center text-sm text-on-surface-variant">
           예약된 진료가 없습니다.
         </p>
       ) : (
-        <ul className="space-y-2">
-          {appointments.map((a) => {
-            const busy = busyApptId === a.id;
-            const alreadyCheckedIn = a.status === 'scheduled' && isCheckedInToday(a.department);
-            const canCheckIn =
-              a.status === 'scheduled' && isToday(a.scheduledAt) && !alreadyCheckedIn;
-            const canCancel = a.status === 'scheduled';
-            return (
-              <li
-                key={a.id}
-                className="flex items-center gap-3 rounded-xl bg-surface-container-lowest p-4"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base font-semibold text-on-surface">
-                      {a.department}
-                    </span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[a.status]}`}
+        <div className="space-y-4" data-testid="appointments-grouped">
+          {groupedAppointments.map(({ key, entries }) => (
+            <section key={key} aria-label={formatGroupHeader(key, granularity)}>
+              <h3 className="sticky top-[112px] z-[5] -mx-1 bg-surface px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+                {formatGroupHeader(key, granularity)}
+                <span className="ml-2 text-[10px] tabular-nums text-on-surface-variant/70">
+                  {entries.length}건
+                </span>
+              </h3>
+              <ul className="space-y-2">
+                {entries.map((a) => {
+                  const busy = busyApptId === a.id;
+                  const alreadyCheckedIn = a.status === 'scheduled' && isCheckedInToday(a.department);
+                  const canCheckIn =
+                    a.status === 'scheduled' && isToday(a.scheduledAt) && !alreadyCheckedIn;
+                  const canCancel = a.status === 'scheduled';
+                  return (
+                    <li
+                      key={a.id}
+                      className="flex items-center gap-3 rounded-xl bg-surface-container-lowest p-4"
                     >
-                      {STATUS_LABELS[a.status]}
-                    </span>
-                    {alreadyCheckedIn && (
-                      <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-on-primary">
-                        접수됨
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-1 text-xs text-on-surface-variant">
-                    {new Date(a.scheduledAt).toLocaleString('ko-KR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {canCheckIn && (
-                    <button
-                      type="button"
-                      onClick={() => handleCheckIn(a)}
-                      disabled={busy}
-                      className="rounded-lg border border-primary px-3 py-1 text-xs font-medium text-primary disabled:opacity-50"
-                    >
-                      {busy ? '접수 중…' : '접수'}
-                    </button>
-                  )}
-                  {canCancel && (
-                    <button
-                      type="button"
-                      onClick={() => handleCancel(a)}
-                      disabled={busy}
-                      aria-label="예약 취소"
-                      className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container disabled:opacity-50"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base font-semibold text-on-surface">
+                            {a.department}
+                          </span>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[a.status]}`}
+                          >
+                            {STATUS_LABELS[a.status]}
+                          </span>
+                          {alreadyCheckedIn && (
+                            <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-on-primary">
+                              접수됨
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-xs text-on-surface-variant">
+                          {new Date(a.scheduledAt).toLocaleString('ko-KR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {canCheckIn && (
+                          <button
+                            type="button"
+                            onClick={() => handleCheckIn(a)}
+                            disabled={busy}
+                            className="rounded-lg border border-primary px-3 py-1 text-xs font-medium text-primary disabled:opacity-50"
+                          >
+                            {busy ? '접수 중…' : '접수'}
+                          </button>
+                        )}
+                        {canCancel && (
+                          <button
+                            type="button"
+                            onClick={() => handleCancel(a)}
+                            disabled={busy}
+                            aria-label="예약 취소"
+                            className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container disabled:opacity-50"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))}
+        </div>
       )}
     </section>
+  );
+}
+
+interface GranularityButtonProps {
+  value: Granularity;
+  active: Granularity;
+  onClick: () => void;
+}
+
+const GRANULARITY_LABEL: Record<Granularity, string> = {
+  day: '일별',
+  month: '월별',
+  year: '년별',
+};
+
+function GranularityButton({ value, active, onClick }: GranularityButtonProps) {
+  const isActive = value === active;
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={isActive}
+      onClick={onClick}
+      data-testid={`granularity-${value}`}
+      className={`flex-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all sm:flex-none sm:px-4 ${
+        isActive
+          ? 'bg-surface-container-lowest text-primary shadow-ambient'
+          : 'text-on-surface-variant hover:bg-surface-container'
+      }`}
+    >
+      {GRANULARITY_LABEL[value]}
+    </button>
   );
 }
 
