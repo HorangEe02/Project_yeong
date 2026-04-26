@@ -6,6 +6,61 @@
 
 ---
 
+## 2026-04-26 — 환자 페이지 3 기능 (탭 정렬 + 외래 필터 + 응급 호출)
+
+- **이전 LIVE 번들**: `index-DwCp7tZA.js` + `index-BKULjQy2.css` (QR 자가 발급)
+- **신 LIVE 번들**: `index-BjFBq90O.js` + `index-CTDm0AWe.css`
+- **Release time**: 2026-04-26T06:05:07Z (15:05 KST)
+- **Channel**: `live` (mediway-demo.web.app)
+
+### 포함 변경 (7 commit, `1da6ccf` → `0ded945`)
+
+사용자 요청 3 기능 일괄:
+- `1da6ccf` HospitalHomePage 6-tab nav `justify-center` (가운데 정렬)
+- `4d28991` AppointmentsTab 일/월/년 그룹화 + 드롭다운 (5건 미만 자동 숨김)
+- `810cf18` 그룹화 helper 단위 테스트 (18 케이스 — KST 자정 경계 포함)
+- `49b70cb` EmergencyCallCard — 119 통화 + 위치 표시 + 확인 dialog
+- `2da2aeb` GuideTab 「응급 호출」 3rd 모드 + features.emergencyCall=false 가드
+- `2a7bc2c` EmergencyCallCard 단위 테스트 (15 케이스) + tel: 링크 정리
+- `0ded945` docs(patient-features)
+
+### 사용자 영향
+
+| 흐름 | 변화 |
+|------|------|
+| 모든 환자 페이지 | 6-tab nav 가운데 정렬 |
+| 외래 탭 (5건 이상) | 「일별/월별/년별」 button group + sticky 그룹 헤더 + 카운트 |
+| 안내 탭 — features.emergencyCall=true | 「응급 호출」 3rd 모드 추가 (빨간 강조) |
+| 안내 탭 — features.emergencyCall=false (default) | 변동 없음 |
+
+### 배포 검증 (자동)
+- HTTP 200 (`https://mediway-demo.web.app/`)
+- 신 번들 hash 로컬/LIVE 일치 (`index-BjFBq90O.js`, `index-CTDm0AWe.css`)
+- LIVE etag `4ee39ba0e4d73b01...`
+
+### 후속 시각 검증 체크리스트
+1. 환자 home 진입 → 「홈 / 외래 / 안내 / 더보기」 가운데 정렬 확인
+2. 외래 탭에 5건 이상 예약 추가 → 「일별/월별/년별」 button group 노출
+   - [일별] → 그룹 헤더 "2026-04-26 (일)" 형식
+   - [월별] → "2026년 4월"
+   - [년별] → "2026년"
+3. (admin 가 features.emergencyCall=true 토글 후) 안내 탭 → 3 탭 (지도/QR/응급)
+   - 「응급 호출」 클릭 → EmergencyCallCard 마운트
+   - 「현재 위치 가져오기」 → 위도/경도 + Google Maps 링크
+   - 「🆘 119 신고」 → 확인 dialog → 「전화 걸기」 = `tel:119`
+
+### 응급 호출 윤리 검증
+- ✅ 단일 클릭으로 119 통화 트리거되지 않음 (확인 dialog 강제)
+- ✅ 「취소」 버튼 노출 — dialog 빠져나갈 수 있음
+- ✅ features.emergencyCall=false 인 hospital 에선 모드 자체 미노출
+
+### 롤백 절차
+1. Hosting: Firebase Console → Hosting → 이전 release `index-DwCp7tZA.js` 옆 "Rollback"
+2. Functions / RTDB rules: 변경 없음 — 롤백 불필요
+3. (가장 빠른 응급 호출 비활성화) `features.emergencyCall=false` 토글 — 코드 변경 없이 모드 즉시 숨김
+
+---
+
 ## 2026-04-26 — QR 자가 발급 + Rate Limit (옵션 B)
 
 - **이전 LIVE 번들**: `index-IfhnchyD.js` + `index-DzrsxMbx.css` (GuideTab 부활)
