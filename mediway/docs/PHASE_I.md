@@ -228,7 +228,10 @@ Staff 가 본인 부서의 **오늘 active visit 리스트** 를 보고 status �
 | I.2.3 | ✅ done | (작업 중) | useStaffActiveVisits hook + 6 테스트 |
 | I.2.4 | ✅ done | (작업 중) | StaffVisitsPage + StaffSubNav 4탭 + /h/:slug/staff/visits 라우트 + 13 테스트 |
 | I.2.5 | ✅ done | (작업 중) | LIVE `index-BKTdpyHQ.js` 배포 (Hook dateMs default 버그 즉시 hotfix 포함) |
-| I.3.1 ~ I.3.4 | pending | — | session/queue 연동 |
+| I.3.1 | ✅ done | (작업 중) | findPOIByZoneHint helper + 9 테스트 |
+| I.3.2 | ✅ done | (작업 중) | StaffDashboard QR 스캔 후 active visit info banner (informational only) |
+| I.3.3 | ⏭ deferred | — | auto-enqueue (외래/응급 → wait_queue) — 별도 sprint |
+| I.3.4 | ✅ done | (작업 중) | LIVE `index-CDKAdGmf.js` 배포 + HOSTING_DEPLOY_LOG entry |
 | I.4.1 | ✅ done | (작업 중) | useVisitHistory hook + 6 테스트 (idle / loading / 성공 / reject / refresh / limit) |
 | I.4.2 | ✅ done | (작업 중) | PatientHistoryPage + 라우트 + 8 테스트 |
 | I.4.3 | ✅ done | (작업 중) | MoreTab "방문 이력" 카드 + HistoryLinkCard + 3 테스트 |

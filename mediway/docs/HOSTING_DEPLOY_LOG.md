@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-04-26 — Phase I.3 — Visit ↔ Session 정보 표시 (minimal, informational)
+
+- **이전 LIVE 번들**: `index-eGz6ry1Z.js` + `index-DRe99xil.css`
+- **신 LIVE 번들**: `index-CDKAdGmf.js` + `index-DRe99xil.css` (CSS 동일)
+
+### 변경
+- `src/utils/visitPOI.ts` 신설 — `findPOIByZoneHint(zone, pois)` 휴리스틱 매핑 (I.3.1)
+- `src/utils/__tests__/visitPOI.test.ts` — 9 케이스
+- `src/components/staff/StaffDashboard.tsx` — QR 스캔 후 active visit 정보 banner 추가 (I.3.2)
+  - `useActiveVisit(slug, patientUid)` 호출
+  - banner: "active visit · {type} · {department} · 위치: {zone or ward-room} · 추천 POI: {매칭}"
+  - **informational only** — 자동 채움 / waypoints 변경 안 함 (기존 동선 흐름 disrupt 안 함)
+
+### POI 매핑 휴리스틱 (default 정책)
+1. POI name/shortName 정확 일치
+2. POI name 이 zone substring (예: "내과 외래" → 내과)
+3. zone 이 POI name substring (예: "약" → 약국)
+4. 매칭 없음 → undefined (banner 에 "추천 POI" 미표시)
+
+### 본 sprint 비범위 (별도 sprint 권장)
+- **I.3.3 auto-enqueue** — 외래/응급 visit 등록 시 wait_queue 자동 등록 — 별도 sprint
+- **자동 waypoints 채움** — visit POI 를 customWaypoints 첫 항목으로 자동 — 별도 sprint
+- Zone naming convention 표준화 (POI 매칭 정확도 ↑)
+
+### 테스트
+- vitest 누적 461/461 (452 → 461 = +9)
+
+### 롤백
+- Hosting: `index-eGz6ry1Z.js` rollback (Firebase console)
+
+---
+
 ## 2026-04-26 — Phase I.5 — UX 보강 (admin nav + 환자 검색)
 
 - **이전 LIVE 번들**: `index-DCZIvWPO.js` + `index-8YhnynKs.css`

@@ -1,10 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   ScanLine,
   CheckCircle2,
   AlertCircle,
   LayoutTemplate,
   PenLine,
+  ClipboardList,
 } from 'lucide-react';
 import { QRScanner } from './QRScanner';
 import { RouteTemplateList } from './RouteTemplateList';
@@ -18,6 +19,10 @@ import { appendAudit } from '@/services/auditLog';
 import { useAutoFillFromPlan } from '@/hooks/useAutoFillFromPlan';
 import { isFirebaseConfigured } from '@/config/firebase';
 import { useHospital } from '@/contexts/HospitalContext';
+import { useActiveVisit } from '@/hooks/useActiveVisit';
+import { findPOIByZoneHint } from '@/utils/visitPOI';
+import { allPOIs } from '@/data/hospital';
+import { isInpatientVisit } from '@/types/visit';
 import { NotificationMessages } from '@/services/notification';
 import { v4 as uuidv4 } from 'uuid';
 import type { RouteTemplate } from '@/types/route-template';
@@ -52,6 +57,13 @@ export function StaffDashboard() {
   const { plan, mismatched, autoSendEligible } = useAutoFillFromPlan(
     patientUid,
     hospitalId,
+  );
+
+  // Phase I.3.2 — 환자의 active visit 조회 + zone POI 매칭 (informational banner only).
+  const { visit: activeVisit } = useActiveVisit(hospitalId, patientUid);
+  const visitMatchedPOI = useMemo(
+    () => (activeVisit?.zone ? findPOIByZoneHint(activeVisit.zone, allPOIs) : undefined),
+    [activeVisit?.zone],
   );
 
   // 플랜 자동 채움
@@ -248,6 +260,36 @@ export function StaffDashboard() {
               </p>
             </div>
           </div>
+
+          {/* Phase I.3.2 — active visit 정보 banner (informational, 자동 채움 안 함) */}
+          {activeVisit && (
+            <div
+              className="flex items-start gap-3 rounded-xl bg-blue-50 p-4"
+              data-testid="visit-info-banner"
+            >
+              <ClipboardList className="mt-0.5 h-5 w-5 shrink-0 text-blue-700" />
+              <div className="text-sm">
+                <p className="font-semibold text-on-surface">
+                  active visit ·{' '}
+                  {activeVisit.type === 'inpatient'
+                    ? '입원'
+                    : activeVisit.type === 'outpatient'
+                      ? '외래'
+                      : activeVisit.type === 'emergency'
+                        ? '응급'
+                        : '검진'}
+                  {activeVisit.department ? ` · ${activeVisit.department}` : ''}
+                </p>
+                <p className="text-xs text-on-surface-variant">
+                  위치:{' '}
+                  {isInpatientVisit(activeVisit)
+                    ? `${activeVisit.ward}-${activeVisit.room}${activeVisit.bed ? `-${activeVisit.bed}` : ''}`
+                    : activeVisit.zone}
+                  {visitMatchedPOI ? ` · 추천 POI: ${visitMatchedPOI.name}` : ''}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* 병원 불일치 경고 */}
           {plan && mismatched && (
