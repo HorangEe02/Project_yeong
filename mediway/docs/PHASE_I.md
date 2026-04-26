@@ -233,5 +233,7 @@ Staff 가 본인 부서의 **오늘 active visit 리스트** 를 보고 status �
 | I.4.2 | ✅ done | (작업 중) | PatientHistoryPage + 라우트 + 8 테스트 |
 | I.4.3 | ✅ done | (작업 중) | MoreTab "방문 이력" 카드 + HistoryLinkCard + 3 테스트 |
 | I.4.4 | ✅ done | (작업 중) | LIVE `index-DCZIvWPO.js` 배포 + HOSTING_DEPLOY_LOG entry |
-| I.5.1 ~ I.5.3 | pending | — | UX 보강 |
+| I.5.1 | ✅ done | (작업 중) | AdminHospitalDetailPage actions 에 visit 관리 진입 링크 |
+| I.5.2 | ✅ done | (작업 중) | PatientSearchPicker (listUsers + 클라이언트 substring filter) + 4 테스트 |
+| I.5.3 | ✅ done | (작업 중) | LIVE `index-eGz6ry1Z.js` + CSS `index-DRe99xil.css` 배포 |
 | I.6.1 ~ I.6.3 | pending | — | notification + archive |

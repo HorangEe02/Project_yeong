@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-04-26 — Phase I.5 — UX 보강 (admin nav + 환자 검색)
+
+- **이전 LIVE 번들**: `index-DCZIvWPO.js` + `index-8YhnynKs.css`
+- **신 LIVE 번들**: `index-eGz6ry1Z.js` + `index-DRe99xil.css` (검색 dropdown 스타일 추가)
+
+### 변경
+- `src/pages/admin/AdminHospitalDetailPage.tsx` — actions 슬롯에 "환자 visit 관리 →" 진입 링크 추가 (I.5.1)
+- `src/pages/AdminVisitsPage.tsx` — PatientSearchPicker sub-component 추가, patientUid 입력 위에 검색 dropdown (I.5.2)
+- `src/pages/__tests__/AdminVisitsPage.test.tsx` — listUsers mock + 4 신규 케이스
+
+### PatientSearchPicker 동작
+- 마운트 시 `listUsers()` 1회 fetch (모든 user — admin 권한 가정)
+- 검색 input → email/displayName substring 클라이언트 filter (대소문자 무시)
+- 결과 dropdown — 최대 8건 표시
+- 결과 클릭 → patientUid + displayName 자동 채움 + query 비우기
+
+### 진입 경로
+- `/admin/hospitals/{slug}` (Admin Hospital Detail) → "환자 visit 관리 →" → `/h/{slug}/admin/visits`
+
+### 테스트
+- vitest 누적 452/452 (448 → 452 = +4)
+
+### 본 sprint 비범위
+- AdminLayout (root admin nav) 자체에 visit 진입 링크 — slug 가 root admin 컨텍스트엔 없으므로 별도 sprint
+- searchUsersByEmail 별도 service (현재는 listUsers 전체 fetch + 클라이언트 filter)
+
+### 롤백
+- Hosting: `index-DCZIvWPO.js` rollback (Firebase console)
+
+---
+
 ## 2026-04-26 — Phase I.4 — 환자 Visit History 페이지 + 더보기 진입 링크
 
 - **이전 LIVE 번들**: `index-BKTdpyHQ.js` + `index-8YhnynKs.css`

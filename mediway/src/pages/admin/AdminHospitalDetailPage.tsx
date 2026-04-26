@@ -113,12 +113,21 @@ export function AdminHospitalDetailPage() {
       title={data?.name ?? '병원 상세'}
       description={`SLUG: ${hospitalId} · ${canEdit ? '편집 가능' : '읽기 전용'}`}
       actions={
-        <Link
-          to="/admin/hospitals"
-          className="rounded-lg border border-surface-container-high px-3 py-2 text-sm text-on-surface no-underline hover:bg-surface-container-low"
-        >
-          ← 목록
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            to={`/h/${hospitalId}/admin/visits`}
+            className="rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary no-underline hover:bg-primary/15"
+            data-testid="admin-hospital-visits-link"
+          >
+            환자 visit 관리 →
+          </Link>
+          <Link
+            to="/admin/hospitals"
+            className="rounded-lg border border-surface-container-high px-3 py-2 text-sm text-on-surface no-underline hover:bg-surface-container-low"
+          >
+            ← 목록
+          </Link>
+        </div>
       }
     >
       {error && (

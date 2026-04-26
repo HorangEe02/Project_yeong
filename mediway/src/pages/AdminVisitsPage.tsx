@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useHospital } from '@/contexts/HospitalContext';
 import { createVisit, subscribeRecentVisits, updateVisitStatus } from '@/services/visit';
 import {
@@ -10,6 +10,8 @@ import {
   type VisitType,
 } from '@/types/visit';
 import { getCurrentUid } from '@/services/auth';
+import { listUsers } from '@/services/adminUsers';
+import type { UserProfile } from '@/types/auth';
 
 /**
  * Phase H.6 — admin 의 환자 visit 등록 페이지.
@@ -211,6 +213,14 @@ export function AdminVisitsPage() {
             ))}
           </div>
         </fieldset>
+
+        {/* 환자 검색 (Phase I.5.2) */}
+        <PatientSearchPicker
+          onPick={(u) => {
+            setPatientUid(u.uid);
+            setDisplayName(u.displayName ?? '');
+          }}
+        />
 
         {/* patientUid */}
         <Field label="환자 uid" required>
@@ -476,6 +486,71 @@ function VisitCard({
         ))}
       </select>
     </li>
+  );
+}
+
+/**
+ * Phase I.5.2 — 환자 검색 dropdown.
+ * 마운트 시 listUsers() 1회 fetch + 클라이언트 substring filter (email/displayName).
+ * 결과 클릭 시 onPick(user) 콜백 → 부모 폼 (patientUid + displayName) 자동 채움.
+ */
+function PatientSearchPicker({ onPick }: { onPick: (u: UserProfile) => void }) {
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    listUsers().then(setUsers).catch(() => setUsers([]));
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [] as UserProfile[];
+    return users
+      .filter(
+        (u) =>
+          (u.email && u.email.toLowerCase().includes(q)) ||
+          (u.displayName && u.displayName.toLowerCase().includes(q)),
+      )
+      .slice(0, 8);
+  }, [users, query]);
+
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-sm font-semibold text-on-surface">환자 검색</span>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="이메일 또는 이름으로 검색"
+        data-testid="visit-patient-search"
+        className="rounded-lg border border-outline-variant px-3 py-2 text-sm"
+      />
+      {filtered.length > 0 && (
+        <ul
+          className="mt-1 flex flex-col gap-1 rounded-lg border border-outline-variant bg-surface-container-lowest p-1"
+          data-testid="visit-patient-search-results"
+        >
+          {filtered.map((u) => (
+            <li key={u.uid}>
+              <button
+                type="button"
+                data-testid={`visit-patient-search-pick-${u.uid}`}
+                className="w-full rounded px-2 py-1.5 text-left text-sm hover:bg-surface-container"
+                onClick={() => {
+                  onPick(u);
+                  setQuery('');
+                }}
+              >
+                <span className="font-medium text-on-surface">
+                  {u.displayName ?? '(이름 없음)'}
+                </span>
+                <span className="ml-2 text-xs text-on-surface-variant">{u.email ?? ''}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

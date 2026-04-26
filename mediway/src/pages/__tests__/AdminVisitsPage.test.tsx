@@ -28,6 +28,11 @@ vi.mock('@/services/auth', () => ({
   getCurrentUid: () => 'admin-1',
 }));
 
+const mockListUsers = vi.fn();
+vi.mock('@/services/adminUsers', () => ({
+  listUsers: () => mockListUsers(),
+}));
+
 import { AdminVisitsPage } from '../AdminVisitsPage';
 
 beforeEach(() => {
@@ -35,8 +40,10 @@ beforeEach(() => {
   mockUpdateVisitStatus.mockReset();
   mockSubscribeRecentVisits.mockReset();
   mockUnsubscribeRecent.mockReset();
+  mockListUsers.mockReset();
   mockCreateVisit.mockResolvedValue('visit-new-1');
   mockUpdateVisitStatus.mockResolvedValue(undefined);
+  mockListUsers.mockResolvedValue([]);
 });
 
 function makeVisit(overrides: Partial<Visit> = {}): Visit {
@@ -220,6 +227,71 @@ describe('AdminVisitsPage — 제출 흐름', () => {
       expect(screen.getByTestId('visit-error').textContent).toMatch(/PERMISSION_DENIED/);
     });
     expect(screen.queryByTestId('visit-success')).toBeNull();
+  });
+});
+
+// =====================================================================
+// I.5.2 — 환자 검색 dropdown
+// =====================================================================
+
+describe('AdminVisitsPage — 환자 검색 (I.5.2)', () => {
+  function makeUser(overrides: Partial<{ uid: string; email: string | null; displayName: string | null }> = {}) {
+    return {
+      uid: 'u1',
+      email: 'u1@demo.test',
+      displayName: '환자1',
+      role: 'patient' as const,
+      status: 'active' as const,
+      providers: [] as never[],
+      createdAt: 0,
+      updatedAt: 0,
+      ...overrides,
+    };
+  }
+
+  it('마운트 시 listUsers 호출', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(mockListUsers).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('빈 query → 검색 결과 미노출', async () => {
+    mockListUsers.mockResolvedValue([makeUser()]);
+    renderPage();
+    await waitFor(() => expect(mockListUsers).toHaveBeenCalled());
+    expect(screen.queryByTestId('visit-patient-search-results')).toBeNull();
+  });
+
+  it('검색 입력 → 일치 결과 표시 (email 또는 displayName substring)', async () => {
+    mockListUsers.mockResolvedValue([
+      makeUser({ uid: 'a', email: 'alpha@demo', displayName: '알파' }),
+      makeUser({ uid: 'b', email: 'beta@demo', displayName: '베타' }),
+      makeUser({ uid: 'c', email: 'gamma@demo', displayName: '감마' }),
+    ]);
+    renderPage();
+    await waitFor(() => expect(mockListUsers).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByTestId('visit-patient-search'), {
+      target: { value: 'alpha' },
+    });
+    expect(screen.getByTestId('visit-patient-search-pick-a')).toBeTruthy();
+    expect(screen.queryByTestId('visit-patient-search-pick-b')).toBeNull();
+  });
+
+  it('결과 클릭 → patientUid + displayName 자동 채움 + query 비우기', async () => {
+    mockListUsers.mockResolvedValue([makeUser({ uid: 'a', email: 'a@demo', displayName: '에이' })]);
+    renderPage();
+    await waitFor(() => expect(mockListUsers).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByTestId('visit-patient-search'), {
+      target: { value: 'a' },
+    });
+    fireEvent.click(screen.getByTestId('visit-patient-search-pick-a'));
+
+    expect((screen.getByTestId('visit-input-patientUid') as HTMLInputElement).value).toBe('a');
+    expect((screen.getByTestId('visit-input-displayName') as HTMLInputElement).value).toBe('에이');
+    expect((screen.getByTestId('visit-patient-search') as HTMLInputElement).value).toBe('');
   });
 });
 
