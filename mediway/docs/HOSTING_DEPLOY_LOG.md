@@ -6,6 +6,56 @@
 
 ---
 
+## 2026-04-26 — Functions Node.js 20 → 22 런타임 마이그레이션 (Functions only, no hosting change)
+
+- **배포 종류**: Cloud Functions (Hosting 변경 없음 — LIVE bundle `index-CdK89X7D.js` 동일)
+- **이전 runtime**: `nodejs20` (12 functions)
+- **신 runtime**: `nodejs22` (12 functions)
+- **Release time**: 2026-04-26T06:35:50 Z (15:35 KST)
+- **Trigger**: 2026-04-30 Node 20 deprecation 임박 (decommission 2026-10-30)
+
+### 변경 파일 (3건)
+- `firebase.json` — `runtime: nodejs20 → nodejs22`
+- `functions/package.json` — `engines.node: 20 → 22`, `@types/node: ^20.17.9 → ^22.10.0`
+- `functions/package-lock.json` — clean rebuild (322 packages)
+
+### 마이그레이션 함수 목록 (12 functions, 모두 Gen2)
+| 함수 | Region |
+|------|--------|
+| adminCreateStaffAccount, appointmentReminderScheduler, hospitalChatbot, kakaoAuth, migrateAllClaims, naverAuth, refreshMyClaims, setUserClaims, triageSymptoms, verifyMigration | asia-northeast3 |
+| onAppointmentCreate, onQueueCall | us-central1 |
+
+### 호환성 사전 검증
+- firebase-functions 5.1.1 (`engines: >=14.10`) ✅
+- firebase-admin 12.7.0 (`engines: >=14`) ✅
+- 로컬 dev 환경 이미 Node v22.17.0 — vitest 109/109 통과 (Step 1 baseline)
+- Clean install 후 tsc 0 errors + vitest 109/109 통과 (Step 3 lockfile rebuild)
+
+### 배포 결과
+- 12/12 함수 `Successful update operation`
+- functions:list 재확인 — 12/12 `nodejs22` 표시
+- 모든 함수 cold start STARTUP TCP probe 1회 시도에 성공
+- ERROR/FATAL 로그 0건
+
+### 영향 없음
+- Hosting LIVE 번들 무변동 — 클라이언트 코드 100% 동일
+- RTDB rules 무변동
+- Functions 인터페이스 (callable signature, event triggers) 무변동
+
+### 롤백 절차 (필요 시 8분 소요)
+```bash
+git revert <commit>
+cd mediway/functions && rm -rf node_modules package-lock.json && npm install
+firebase deploy --only functions --project=mediway-demo
+```
+
+### 본 sprint 비범위 (별도 sprint)
+- firebase-functions 5 → 7 major upgrade (breaking changes 검토 필요)
+- firebase-admin 12 → 13 upgrade
+- npm audit 15 vulnerabilities (2 low, 13 moderate) — 대부분 transitive
+
+---
+
 ## 2026-04-26 — Staff sub-nav 가운데 정렬 + 응급 탭 추가
 
 - **이전 LIVE 번들**: `index-B7my1M0_.js` + `index-CTDm0AWe.css`
