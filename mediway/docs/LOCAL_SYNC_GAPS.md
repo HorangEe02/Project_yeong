@@ -35,12 +35,16 @@ StaffQueuePage · AppointmentsTab · ChatbotWidget · MoreTab 고령자 모드. 
 
 ## 1. 🚨 Critical — 이미 발생한 incident (제가 일으킴)
 
-### 1.1 `triageSymptoms` function 삭제 (asia-northeast3)
-- **용도**: AI 증상 triage (F19) — 증상 텍스트 → 진료과 3개 추천 + 신뢰도 + "진단 아님" disclaimer
-- **증거**: `e2e-wait-queue.html` 시나리오 E가 이 함수의 동작을 구체 기술
-- **데이터**: `/triage_usage/{uid}/{epochHour}=<count>` + `/triage_audit` (RTDB에 남아있음)
-- **상태**: 🔴 현재 production에서 호출 불가. 사용자는 "AI 진료과 추천" 기능이 작동 안 함을 경험할 것
-- **복구**: source 없음 → plusultra_v2 §3.6 + e2e-wait-queue.html §E 스펙 기반 재작성 필요 (~3-5일)
+### 1.1 ~~`triageSymptoms` function 삭제~~ → ✅ 2026-04-26 재작성 완료
+- **상태**: ✅ source-level 복구 완료
+- **설계 문서**: `docs/E_AI_TRIAGE_REWRITE.md`
+- **7 커밋**: `b2ebbb0` → `3fc095e` + 본 docs 커밋
+  - functions/src/triage/{types,rateLimit,prompt,triageSymptoms}.ts (Gemini + epoch-hour bucket + audit dual-write)
+  - src/services/triage.ts (callable wrapper) + src/types/triage.ts
+  - src/components/patient/TriageWidget.tsx (UI)
+  - src/components/patient/tabs/HomeTab.tsx 통합 (features.aiTriage 가드)
+- **시나리오 E 자동 검증**: 8 통합 케이스 + 19 functions unit + 18 widget unit + 15 service unit = 60 신규 테스트
+- **남은 작업**: Functions deploy + Hosting redeploy + admin 가 features.aiTriage=true 토글 (별도 승인)
 
 ### 1.2 `onQueueCall` function 삭제 (us-central1)
 - **용도**: 의료진 "다음 환자 호출" 트리거 → 환자 FCM push 발송 (F1)
@@ -119,7 +123,7 @@ Production 모든 E2E가 `/__/firebase/init.json`에서 config를 fetch. Local d
 |---|---|---|
 | 1 | **Rules tightening** — `hospitals/{hid}/wait_queue`·`visit_plans` 에 명시적 `.read` 추가해 cross-tenant 차단 | ✅ T1-1 / T1-2 (2026-04-25) |
 | 2 | **`onQueueCall` 함수 재작성** — e2e-wait-queue.html §B 스펙 기반 | ✅ F5b `7bf536c` (dispatcher 통합 형태로 재작성) |
-| 3 | **`triageSymptoms` 함수 재작성** — AI 진료과 추천 복구 | ⏳ 별도 sprint (시나리오 E 의 Local 부재) |
+| 3 | **`triageSymptoms` 함수 재작성** — AI 진료과 추천 복구 | ✅ E (2026-04-26) — `b2ebbb0` → `3fc095e`, 설계: `docs/E_AI_TRIAGE_REWRITE.md`, deploy 별도 승인 |
 
 ### 🟠 Tier 1
 | # | 작업 | 상태 |
