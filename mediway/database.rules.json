@@ -203,6 +203,17 @@
       }
     },
 
+    "visits_archive": {
+      ".read": "auth != null && auth.token.role === 'platformAdmin'",
+      "$hospitalId": {
+        ".read": "auth != null && (auth.token.role === 'platformAdmin' || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId))",
+        "$visitId": {
+          ".read": "auth != null && ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId || auth.token.role === 'platformAdmin')",
+          ".write": false
+        }
+      }
+    },
+
     "shared_plans": {
       "$code": {
         ".read": "auth != null",

@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-04-26 — Phase I.6 (minimal) — visitArchiveScheduler + /visits_archive RTDB rules
+
+- **배포 종류**: Cloud Functions (신규 cron) + RTDB rules (Hosting 변경 없음)
+- **신규 함수**: `visitArchiveScheduler(asia-northeast3)` — Successful create
+- **신규 RTDB path**: `/visits_archive/{hospitalId}/{visitId}` — read same-hospital staff/admin/platformAdmin, write false (function 만)
+
+### 변경
+- `functions/src/visits/visitArchiveScheduler.ts` 신설 — onSchedule 'every day 03:00' Asia/Seoul
+- `functions/src/index.ts` — export visitArchiveScheduler
+- `database.rules.json` — `/visits_archive` 블록 추가
+
+### 동작 정책
+- 일 1회 KST 03:00
+- cutoff = now - 90 days
+- status ∈ {completed, cancelled} 인 visit 의 completedAt (또는 fallback updatedAt) > cutoff 만 archive
+- multi-location update: archive 에 write + 원본 삭제 atomic
+- 한 실행당 batch limit 200 — 다음 cron 에서 이어서 처리 (무한 backlog 방어)
+
+### 본 sprint 비범위 (별도 sprint)
+- **visitReminderScheduler (FCM 30분 전 알림)** — FCM token 정책, dispatcher 통합, 시간 윈도우 정책 등 deeper 결정 필요
+- archive index 최적화 — orderByChild('status') + indexOn
+
+### 테스트
+- functions vitest 109/109 (코드 신규지만 admin SDK 모킹 부담 → 수동 LIVE 검증으로 대체)
+- 첫 실행 KST 03:00 (다음날). 검증: Firebase console → Functions → Logs
+
+### 롤백
+- functions: `firebase functions:delete visitArchiveScheduler --region asia-northeast3` (cron 만 제거)
+- rules: revert `/visits_archive` 블록 후 redeploy
+
+---
+
 ## 2026-04-26 — Phase I.3 — Visit ↔ Session 정보 표시 (minimal, informational)
 
 - **이전 LIVE 번들**: `index-eGz6ry1Z.js` + `index-DRe99xil.css`

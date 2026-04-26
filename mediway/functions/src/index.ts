@@ -23,6 +23,7 @@ export { hospitalChatbot } from './chatbot/hospitalChatbot';
 export { onAppointmentCreate } from './appointments/onAppointmentCreate';
 export { appointmentReminderScheduler } from './appointments/appointmentReminderScheduler';
 export { triageSymptoms } from './triage/triageSymptoms';
+export { visitArchiveScheduler } from './visits/visitArchiveScheduler';
 
 const region = 'asia-northeast3';
 

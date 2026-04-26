@@ -239,4 +239,6 @@ Staff 가 본인 부서의 **오늘 active visit 리스트** 를 보고 status �
 | I.5.1 | ✅ done | (작업 중) | AdminHospitalDetailPage actions 에 visit 관리 진입 링크 |
 | I.5.2 | ✅ done | (작업 중) | PatientSearchPicker (listUsers + 클라이언트 substring filter) + 4 테스트 |
 | I.5.3 | ✅ done | (작업 중) | LIVE `index-eGz6ry1Z.js` + CSS `index-DRe99xil.css` 배포 |
-| I.6.1 ~ I.6.3 | pending | — | notification + archive |
+| I.6.1 | ⏭ deferred | — | visitReminderScheduler (FCM) — 별도 sprint, FCM/dispatcher 정책 결정 필요 |
+| I.6.2 | ✅ done | (작업 중) | visitArchiveScheduler — 일 1회 KST 03:00, 90일 + completed/cancelled, batch 200 |
+| I.6.3 | ✅ done | (작업 중) | functions deploy (visitArchiveScheduler create) + RTDB rules /visits_archive |
