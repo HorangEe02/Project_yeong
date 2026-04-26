@@ -190,7 +190,7 @@
         ".indexOn": ["patientUid", "status", "type", "scheduledFor"],
         "$visitId": {
           ".read": "auth != null && (data.child('patientUid').val() === auth.uid || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
-          ".write": "auth != null && ((auth.token.role === 'admin' && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
+          ".write": "auth != null && (auth.token.role === 'platformAdmin' || (auth.token.role === 'admin' && auth.token.hospitalId === $hospitalId) || (auth.token.role === 'staff' && auth.token.hospitalId === $hospitalId && data.exists() && newData.child('patientUid').val() === data.child('patientUid').val() && newData.child('hospitalId').val() === data.child('hospitalId').val() && newData.child('type').val() === data.child('type').val()))",
           ".validate": "newData.hasChildren(['patientUid','hospitalId','type','status','zone','createdAt'])",
           "hospitalId": { ".validate": "newData.isString() && newData.val() === $hospitalId" },
           "type": { ".validate": "newData.isString() && (newData.val() === 'outpatient' || newData.val() === 'inpatient' || newData.val() === 'checkup' || newData.val() === 'emergency')" },

@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-04-26 — Phase I.2.1 — RTDB rules: staff status-only write (Phase I 시작)
+
+- **배포 종류**: RTDB rules (Hosting / Functions 변경 없음)
+- **변경**: `/visits/{hid}/{visitId}/.write` 에 staff branch 추가
+- **Released**: rules released successfully
+
+### 정책 추가 (staff)
+기존 admin/platformAdmin 외에 staff 도 같은 hospital 의 visit 을 update 가능. 단:
+- `data.exists()` — 신규 create 는 admin only (기존 write rule 강화)
+- `newData.child('patientUid').val() === data.child('patientUid').val()` — 환자 변경 차단
+- `newData.child('hospitalId').val() === data.child('hospitalId').val()` — 병원 이전 차단
+- `newData.child('type').val() === data.child('type').val()` — 방문 유형 변경 차단
+
+→ staff 가 사실상 status / zone / ward / room / bed / department / notes 등을 변경 가능. 더 엄격한 제약은 별도 sprint.
+
+### 후속 (Phase I.2.2-I.2.5)
+- service `subscribeActiveVisitsByDepartment` (I.2.2)
+- hook `useStaffActiveVisits` (I.2.3)
+- StaffVisitsPage + StaffSubNav 4탭 (I.2.4)
+- docs + LIVE deploy (I.2.5)
+
+---
+
 ## 2026-04-26 — Phase I.1 — Visit status 변경 UI (admin 콘솔 리스트 + dropdown)
 
 - **이전 LIVE 번들**: `index-8V4XKXmY.js` + `index-BHCQsgut.css`
