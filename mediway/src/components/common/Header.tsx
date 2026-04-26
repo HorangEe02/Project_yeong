@@ -8,8 +8,9 @@ import { Logo } from '@/components/common/Logo';
 export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const isStaff = location.pathname.startsWith('/staff');
-  const isPatient = location.pathname.startsWith('/patient');
+  // B-3 item 10: flat (`/staff`, `/patient`) + nested (`/h/:slug/staff`, `/h/:slug/patient`) 모두 인식
+  const isStaff = isStaffPath(location.pathname);
+  const isPatient = isPatientPath(location.pathname);
 
   const { user, profile, initialized } = useAuthStore();
   const isAdmin = useAuthStore(selectIsAdmin);
@@ -146,4 +147,14 @@ export function Header() {
       </div>
     </header>
   );
+}
+
+/** `/staff`, `/staff/queue`, `/h/{slug}/staff`, `/h/{slug}/staff/queue` 모두 매치 */
+function isStaffPath(pathname: string): boolean {
+  return /^(\/staff|\/h\/[^/]+\/staff)(\/|$)/.test(pathname);
+}
+
+/** `/patient`, `/patient/{sid}`, `/h/{slug}/patient/...` 모두 매치 */
+function isPatientPath(pathname: string): boolean {
+  return /^(\/patient|\/h\/[^/]+\/patient)(\/|$)/.test(pathname);
 }
