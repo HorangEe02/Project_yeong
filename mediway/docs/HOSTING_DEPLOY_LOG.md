@@ -6,6 +6,53 @@
 
 ---
 
+## 2026-04-26 — GuideTab 모드 부활 + ChatbotWidget 일원화
+
+- **이전 LIVE 번들**: `index-paEulSKd.js` + `index-CycsFZ0b.css` (Scenario E)
+- **신 LIVE 번들**: `index-IfhnchyD.js` + `index-DzrsxMbx.css` (CSS 갱신 — QRGuidePlaceholder 신규 스타일 반영)
+- **Release time**: 2026-04-26T05:13:46Z (14:13 KST)
+- **Channel**: `live` (mediway-demo.web.app)
+
+### 포함 변경 (4 commit, `04e51fb` → `f8d55bd`)
+
+이슈 1 — ChatbotWidget hospitalId 일원화:
+- `48ec43b` ChatbotWidget — useHospital().slug 로 변경 (F1.1c 와 일관)
+
+이슈 2 — GuideTab 모드 부활:
+- `04e51fb` GuideTab placeholder → 모드 탭 UI + QRGuidePlaceholder + PatientMapBrowseView mount-all
+- `e21b9c2` 16 단위 테스트
+- `f8d55bd` docs
+
+### 사용자 영향
+
+| 흐름 | 변화 |
+|------|------|
+| 환자 home → 안내 탭 | placeholder → 「지도 보기」/「QR 안내」 모드 탭 + 실제 컨텐츠 |
+| platformAdmin 환자 페이지 진입 | ChatbotWidget 정상 노출 (이전: 조용히 사라지던 버그) |
+| QR session 진입 (`/h/:slug/patient/:sid`) | 변동 없음 (PatientPage 그대로) |
+
+### 배포 검증 (자동)
+- HTTP 200 (`https://mediway-demo.web.app/`)
+- 신 번들 hash 로컬/LIVE 일치 (`index-IfhnchyD.js`, `index-DzrsxMbx.css`)
+- LIVE etag `2d75187becfbab28...`
+
+### 후속 시각 검증 체크리스트
+1. (이슈 2) 환자 계정 → `/h/demo/patient/home?tab=guide` 진입
+   - [ ] 「지도 보기」/「QR 안내」 토글 노출
+   - [ ] 기본 「QR 안내」 활성 — 큰 QR 아이콘 + 3단계 안내
+   - [ ] 「지도 보기」 클릭 → 4층 평면도 + POI 마커 노출 + URL `?mode=browse`
+   - [ ] [지도 보기] 활성 상태로 외래 → 안내 복귀 시 `?mode=` 잃음 (의도된 동작)
+2. (이슈 1) platformAdmin 으로 `/h/demo/patient/home` 진입
+   - [ ] 홈 탭에 ChatbotWidget 노출 + "남은 질문 25/25"
+   - [ ] WaitQueueWidget 와 동시 노출 (이전엔 ChatbotWidget 만 사라짐)
+
+### 롤백 절차
+1. Firebase Console → Hosting → 이전 release `index-paEulSKd.js` 옆 "Rollback"
+2. 또는 CLI: `firebase hosting:rollback`
+- ※ Functions 변경 없음 — 함수 측 롤백 불필요
+
+---
+
 ## 2026-04-26 — Scenario E (AI Triage) 본 배포
 
 - **이전 LIVE 번들**: `index-D_OWDnbO.js` (B-3.10 + F1)
