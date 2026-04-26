@@ -133,6 +133,47 @@ export function subscribeActiveVisit(
 }
 
 /**
+ * Phase I.2.2 — 부서별 active visit 실시간 구독 (staff 콘솔용).
+ *
+ * active = status ∈ {checked-in, in-progress}.
+ * dateMs 가 속한 day (00:00 ~ 23:59 KST 기준 local) 의 visit 만.
+ * 정렬: createdAt asc (오래된 것부터 — 대기 순서).
+ *
+ * 주의: 본 sprint 단계에선 `/visits/{slug}` 전체를 onValue 구독 후 in-memory filter.
+ * department 인덱스 미존재. 데이터 양 ↑ 시 별도 sprint 에서 indexOn + 더 좁은 query.
+ */
+export function subscribeActiveVisitsByDepartment(
+  slug: string,
+  dept: string,
+  dateMs: number,
+  cb: (visits: Visit[]) => void,
+): Unsubscribe {
+  if (!isFirebaseConfigured()) {
+    cb([]);
+    return () => {};
+  }
+  const dayStart = new Date(dateMs).setHours(0, 0, 0, 0);
+  const dayEnd = new Date(dateMs).setHours(23, 59, 59, 999);
+  return onValue(ref(db, `visits/${slug}`), (snap) => {
+    if (!snap.exists()) {
+      cb([]);
+      return;
+    }
+    const out: Visit[] = [];
+    snap.forEach((child) => {
+      const v = child.val() as Visit;
+      if (v.department !== dept) return;
+      if (!isActiveStatus(v.status)) return;
+      const created = v.createdAt ?? 0;
+      if (created < dayStart || created > dayEnd) return;
+      out.push(v);
+    });
+    out.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
+    cb(out);
+  });
+}
+
+/**
  * 병원의 최근 등록 visit 실시간 구독 (admin 콘솔 리스트용).
  * `createdAt desc` 정렬, `limit` 개 반환. RTDB 단에서 `limitToLast(limit)` 적용.
  *

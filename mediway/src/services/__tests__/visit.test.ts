@@ -57,6 +57,7 @@ import {
   updateVisitStatus,
   deleteVisit,
   subscribeActiveVisit,
+  subscribeActiveVisitsByDepartment,
   subscribeRecentVisits,
   listVisitsByPatient,
   listVisitsByDepartment,
@@ -68,6 +69,7 @@ beforeEach(() => {
   mockGet.mockReset();
   mockRemove.mockReset();
   mockOnValue.mockReset();
+  mockUnsubscribe.mockReset();
   mockPush.mockReset();
   mockRef.mockClear();
   mockAppendAudit.mockReset();
@@ -270,6 +272,112 @@ describe('subscribeActiveVisit', () => {
     const v2: Visit = { ...v1, visitId: 'v2', createdAt: 300, status: 'checked-in' };
     onValueCb(fakeSnap([v1, v2]));
     expect(cb).toHaveBeenCalledWith(v2);
+  });
+});
+
+// =====================================================================
+// subscribeActiveVisitsByDepartment (I.2.2)
+// =====================================================================
+
+describe('subscribeActiveVisitsByDepartment', () => {
+  function fakeSnap(visits: Visit[]) {
+    return {
+      exists: () => visits.length > 0,
+      forEach: (cb: (child: { val: () => Visit }) => void) => {
+        for (const v of visits) cb({ val: () => v });
+      },
+    };
+  }
+
+  function v(overrides: Partial<Visit>): Visit {
+    return {
+      visitId: 'x',
+      patientUid: 'u',
+      hospitalId: 'demo',
+      type: 'outpatient',
+      status: 'checked-in',
+      zone: 'Z',
+      department: 'IM',
+      createdAt: 0,
+      updatedAt: 0,
+      createdBy: 'admin-1',
+      ...overrides,
+    };
+  }
+
+  const today = new Date('2026-04-26T12:00:00').getTime();
+  const yesterday = new Date('2026-04-25T12:00:00').getTime();
+
+  it('snapshot 빔 → [] emit', () => {
+    const cb = vi.fn();
+    subscribeActiveVisitsByDepartment('demo', 'IM', today, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    onValueCb(fakeSnap([]));
+    expect(cb).toHaveBeenCalledWith([]);
+  });
+
+  it('department 일치 + active + 같은 날 → 포함', () => {
+    const cb = vi.fn();
+    subscribeActiveVisitsByDepartment('demo', 'IM', today, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    const visit = v({ visitId: 'a', department: 'IM', status: 'checked-in', createdAt: today });
+    onValueCb(fakeSnap([visit]));
+    expect(cb).toHaveBeenCalledWith([visit]);
+  });
+
+  it('department 불일치 → 제외', () => {
+    const cb = vi.fn();
+    subscribeActiveVisitsByDepartment('demo', 'IM', today, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    onValueCb(fakeSnap([v({ visitId: 'a', department: 'GS', createdAt: today })]));
+    expect(cb).toHaveBeenCalledWith([]);
+  });
+
+  it('status=completed → 제외 (active 만)', () => {
+    const cb = vi.fn();
+    subscribeActiveVisitsByDepartment('demo', 'IM', today, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    onValueCb(fakeSnap([v({ visitId: 'a', status: 'completed', createdAt: today })]));
+    expect(cb).toHaveBeenCalledWith([]);
+  });
+
+  it('status=scheduled → 제외 (active 만)', () => {
+    const cb = vi.fn();
+    subscribeActiveVisitsByDepartment('demo', 'IM', today, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    onValueCb(fakeSnap([v({ visitId: 'a', status: 'scheduled', createdAt: today })]));
+    expect(cb).toHaveBeenCalledWith([]);
+  });
+
+  it('다른 날 visit → 제외', () => {
+    const cb = vi.fn();
+    subscribeActiveVisitsByDepartment('demo', 'IM', today, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    onValueCb(fakeSnap([v({ visitId: 'a', createdAt: yesterday })]));
+    expect(cb).toHaveBeenCalledWith([]);
+  });
+
+  it('다건 → createdAt asc 정렬 (대기 순서)', () => {
+    const cb = vi.fn();
+    subscribeActiveVisitsByDepartment('demo', 'IM', today, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    const earlyMs = new Date('2026-04-26T09:00:00').getTime();
+    const lateMs = new Date('2026-04-26T15:00:00').getTime();
+    onValueCb(
+      fakeSnap([
+        v({ visitId: 'late', createdAt: lateMs }),
+        v({ visitId: 'early', createdAt: earlyMs }),
+      ]),
+    );
+    const emitted = (cb.mock.calls[0][0] as Visit[]).map((x) => x.visitId);
+    expect(emitted).toEqual(['early', 'late']);
+  });
+
+  it('unsubscribe 함수 반환', () => {
+    const unsub = subscribeActiveVisitsByDepartment('demo', 'IM', today, vi.fn());
+    expect(typeof unsub).toBe('function');
+    unsub();
+    expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
   });
 });
 
