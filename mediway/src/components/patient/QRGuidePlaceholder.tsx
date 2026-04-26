@@ -1,17 +1,98 @@
-import { QrCode } from 'lucide-react';
+import { useCallback, useState } from 'react';
+import { ArrowLeft, QrCode } from 'lucide-react';
+import { QRDisplay } from './QRDisplay';
+import { useAuthStore } from '@/stores/authStore';
+import { getCurrentUid, initAnonymousAuth } from '@/services/auth';
+import { isFirebaseConfigured } from '@/config/firebase';
+import {
+  issueSelfQRToken,
+  QRTokenRateLimitError,
+} from '@/services/qrToken';
 
 /**
- * GuideTab 의 「QR 안내」 모드 — sessionId 없이 home 진입한 환자에게
- * QR 코드를 받는 방법을 안내한다.
+ * GuideTab 「QR 안내」 모드 — 두 상태 머신:
+ *  1. 'placeholder' (기본) — 안내 데스크 → 발급 → 스캔 3단계 안내 + 「내 QR 코드 발급」 버튼
+ *  2. 'displaying'         — `QRDisplay` 마운트 + 자가 발급 토큰을 RTDB 에 등록 + 「다시 안내 보기」 버튼
  *
- * 본 컴포넌트는 PatientDashboard 의 qr_display state 와 달리 자가 발급 흐름을
- * 가지지 않음 (별도 sprint). 안내 데스크 → 의료진 스캔 의 단방향 경로만 명시.
+ * Rate limit (시간당 30회):
+ *  - `services/qrToken.ts` 의 `issueSelfQRToken` 가 transaction + RTDB rule 로 강제
+ *  - `QRTokenRateLimitError` 캐치 시 inline 안내 + retryAfterSeconds 분 단위 표시
  *
- * 라이프사이클:
- *  - mount-all 정책에 따라 hidden 상태에서도 DOM 에 머무름 (모드 전환 시 재마운트 비용 0)
- *  - 외부 의존성 없음 — useHospital / authStore 미사용 (텍스트 only)
+ * Auth:
+ *  - 로그인 / 익명 모두 발급 허용 — `auth.currentUser` 없으면 `initAnonymousAuth` 로 보강
+ *  - QRDisplay 자체가 3분마다 자동 갱신 + 수동 갱신 버튼 → 토큰마다 issueSelfQRToken 호출
  */
+
+type Mode = 'placeholder' | 'displaying';
+
 export function QRGuidePlaceholder() {
+  const initialized = useAuthStore((s) => s.initialized);
+  const [mode, setMode] = useState<Mode>('placeholder');
+  const [error, setError] = useState<{ msg: string } | null>(null);
+
+  /** QRDisplay 의 onTokenGenerated 콜백 — 토큰 RTDB 등록 + rate-limit 처리. */
+  const handleTokenGenerated = useCallback(async (token: string) => {
+    if (!isFirebaseConfigured()) return;
+    let uid = getCurrentUid();
+    if (!uid) {
+      const u = await initAnonymousAuth().catch(() => null);
+      uid = u?.uid ?? null;
+    }
+    if (!uid) {
+      setError({ msg: '인증을 확인할 수 없습니다. 다시 시도해 주세요.' });
+      setMode('placeholder');
+      return;
+    }
+    try {
+      await issueSelfQRToken(token, uid);
+      setError(null);
+    } catch (err) {
+      if (err instanceof QRTokenRateLimitError) {
+        const minutes = Math.max(1, Math.ceil(err.retryAfterSeconds / 60));
+        setError({
+          msg: `시간당 발급 한도를 초과했습니다. 약 ${minutes}분 후 다시 시도해 주세요.`,
+        });
+      } else {
+        setError({
+          msg: '토큰 발급에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+        });
+      }
+      setMode('placeholder');
+    }
+  }, []);
+
+  const onIssue = useCallback(() => {
+    setError(null);
+    setMode('displaying');
+  }, []);
+
+  const onBack = useCallback(() => {
+    setError(null);
+    setMode('placeholder');
+  }, []);
+
+  if (mode === 'displaying') {
+    return (
+      <section
+        role="region"
+        aria-label="QR 코드 발급"
+        data-testid="qr-self-issue"
+        className="flex flex-col gap-4 rounded-xl bg-surface-container-lowest p-4 sm:p-6"
+      >
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex w-fit items-center gap-1 rounded-lg px-3 py-1.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container"
+          aria-label="안내로 돌아가기"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          다시 안내 보기
+        </button>
+        <QRDisplay onTokenGenerated={handleTokenGenerated} />
+      </section>
+    );
+  }
+
   return (
     <div
       role="region"
@@ -41,6 +122,27 @@ export function QRGuidePlaceholder() {
       <p className="rounded-lg bg-surface-container px-3 py-2 text-[12px] text-on-surface-variant">
         ※ 이미 QR 코드 화면이 열려 있다면 의료진에게 그대로 보여 주세요.
       </p>
+
+      {error && (
+        <div
+          role="alert"
+          data-testid="qr-issue-error"
+          className="w-full rounded-lg bg-error-container p-3 text-sm text-error"
+        >
+          {error.msg}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={onIssue}
+        disabled={!initialized}
+        data-testid="qr-issue-button"
+        className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary disabled:opacity-50"
+      >
+        <QrCode className="h-4 w-4" />
+        내 QR 코드 발급
+      </button>
     </div>
   );
 }
