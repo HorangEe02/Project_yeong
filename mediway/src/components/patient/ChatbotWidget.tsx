@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { RefreshCw, Send } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { useHospital } from '@/contexts/HospitalContext';
 import { sendChatbotMessage } from '@/services/chatbot';
 import type { ChatbotError, UIChatMessage } from '@/types/chatbot';
 
@@ -28,7 +29,13 @@ import type { ChatbotError, UIChatMessage } from '@/types/chatbot';
  *  - IME(한국어) 조합 중엔 Enter 로 전송하지 않음 — 오전송 방지
  *  - aria-live=polite 로 스크린 리더에도 응답 전달
  *
- * 미로그인 / 익명 / profile.hospitalId 없음 시 위젯 자체를 렌더하지 않음 (null).
+ * Slug 소스:
+ *  - 이전: `profile.hospitalId` (사용자 home hospital — primaryHospitalId 만 있는 RTDB
+ *    레코드에서 undefined 가 되어 위젯이 조용히 사라지는 버그가 있었음)
+ *  - 현재: `useHospital().slug` (URL 의 현재 방문 병원). cross-tenant 차단은 HospitalShell 가 담당.
+ *  - F1.1c WaitQueueWidget / AppointmentsTab 와 동일 정책으로 일원화.
+ *
+ * 미로그인 / 익명 시 위젯 자체를 렌더하지 않음 (null).
  */
 
 const QUICK_SUGGESTIONS = [
@@ -67,8 +74,7 @@ function newMessageId(): string {
 
 export function ChatbotWidget() {
   const user = useAuthStore((s) => s.user);
-  const profile = useAuthStore((s) => s.profile);
-  const hospitalId = profile?.hospitalId ?? null;
+  const { slug: hospitalId } = useHospital();
   const isAnon = user?.isAnonymous ?? true;
 
   const [messages, setMessages] = useState<UIChatMessage[]>([WELCOME_MESSAGE]);
@@ -94,7 +100,7 @@ export function ChatbotWidget() {
   const handleSend = useCallback(
     async (rawText: string) => {
       const userText = rawText.trim();
-      if (!userText || sending || !hospitalId) return;
+      if (!userText || sending) return;
 
       setErrorMsg(null);
       setInput('');
@@ -149,7 +155,7 @@ export function ChatbotWidget() {
     setErrorMsg(null);
   };
 
-  if (!user || isAnon || !hospitalId) return null;
+  if (!user || isAnon) return null;
 
   return (
     <section
