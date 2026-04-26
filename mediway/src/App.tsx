@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Header } from '@/components/common/Header';
+import { HospitalShell } from '@/components/hospital/HospitalShell';
+import { LegacyHospitalRedirect } from '@/components/hospital/LegacyRedirect';
 import { LandingPage } from '@/pages/LandingPage';
 import { StaffPage } from '@/pages/StaffPage';
 import { StaffQueuePage } from '@/pages/StaffQueuePage';
@@ -126,21 +128,21 @@ export default function App() {
             }
           />
 
-          {/* 의료진 (staff + admin 허용) */}
+          {/* 의료진 — flat 경로는 nested 로 redirect (B-3 item 10 ─ bookmark 호환) */}
           <Route
             path="/staff"
             element={
-              <ProtectedRoute requireRole={['staff', 'admin']}>
-                <StaffPage />
-              </ProtectedRoute>
+              <LegacyHospitalRedirect
+                buildTarget={(slug) => `/h/${slug}/staff`}
+              />
             }
           />
           <Route
             path="/staff/queue"
             element={
-              <ProtectedRoute requireRole={['staff', 'admin']}>
-                <StaffQueuePage />
-              </ProtectedRoute>
+              <LegacyHospitalRedirect
+                buildTarget={(slug) => `/h/${slug}/staff/queue`}
+              />
             }
           />
 
@@ -226,21 +228,53 @@ export default function App() {
             }
           />
 
-          {/* 환자 — 익명+로그인 모두 허용 (원 설계 유지) */}
-          <Route path="/patient" element={<PatientPage />} />
-          <Route path="/patient/:sessionId" element={<PatientPage />} />
+          {/* 환자 flat 경로 → nested redirect (B-3 item 10) */}
+          <Route
+            path="/patient"
+            element={
+              <LegacyHospitalRedirect
+                buildTarget={(slug) => `/h/${slug}/patient/home`}
+              />
+            }
+          />
+          <Route
+            path="/patient/:sessionId"
+            element={
+              <LegacyHospitalRedirect
+                buildTarget={(slug, p) =>
+                  `/h/${slug}/patient/${p.sessionId ?? ''}`
+                }
+              />
+            }
+          />
 
-          {/* 병원 slug 기반 환자 홈 (T0-1 step 3 shell + step 4~8 실구현) */}
           {/*
-            TODO(T0-1 Phase B-3 / item 10 — Hospital slug routing 전체 개편):
-              Production 은 `/h/:slug/*` 하위에 patient/staff/admin 모두 nested 해
-              HospitalShell 로 감싸는 구조. Local 은 flat `/patient`, `/staff`,
-              `/admin/...` 유지 + 신규 `/h/:slug/patient/home` 1건만 추가된 상태.
-              전체 통합은 대규모 리팩토링이라 T0-1 범위 초과 — 별도 sprint 에서
-              HospitalShell (slug → profile.themeColor/features/name) 주입 + flat
-              route 들을 nested 로 이전. 이행 중에는 기존 bookmark 호환 위해
-              flat route 를 redirect 로 남겨두는 전략 필요. */}
-          <Route path="/h/:hospitalSlug/patient/home" element={<HospitalHomePage />} />
+           * 병원 slug 기반 nested routing (B-3 item 10).
+           * HospitalShell 가 슬러그 검증 + profile 로드 + cross-tenant 가드 + themeColor 주입을
+           * 일괄 처리하고, 자식 라우트들은 <Outlet/> 으로 마운트된다.
+           */}
+          <Route path="/h/:hospitalSlug" element={<HospitalShell />}>
+            <Route path="patient" element={<Navigate to="home" replace />} />
+            <Route path="patient/home" element={<HospitalHomePage />} />
+            {/* 환자 — 익명 + 로그인 모두 허용 (QR 진입) */}
+            <Route path="patient/:sessionId" element={<PatientPage />} />
+            <Route
+              path="staff"
+              element={
+                <ProtectedRoute requireRole={['staff', 'admin']}>
+                  <StaffPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="staff/queue"
+              element={
+                <ProtectedRoute requireRole={['staff', 'admin']}>
+                  <StaffQueuePage />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
         </Routes>
       </div>
     </BrowserRouter>
