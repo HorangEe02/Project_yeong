@@ -6,6 +6,53 @@
 
 ---
 
+## 2026-04-26 — QR 자가 발급 + Rate Limit (옵션 B)
+
+- **이전 LIVE 번들**: `index-IfhnchyD.js` + `index-DzrsxMbx.css` (GuideTab 부활)
+- **신 LIVE 번들**: `index-DwCp7tZA.js` + `index-BKULjQy2.css` (QR self-issue 추가)
+- **Release time**: 2026-04-26T05:29:08Z (14:29 KST)
+- **Channel**: `live` (mediway-demo.web.app)
+- **RTDB Rules**: `/qr_token_usage` 신규 — `firebase deploy --only database` 동시 진행
+
+### 포함 변경 (4 commit, `4ef9147` → `4efab92`)
+
+옵션 B (자가 발급 + 시간당 30회 cap):
+- `4ef9147` RTDB rules `/qr_token_usage` + qrToken service (transaction-based rate limit, 9 unit test)
+- `0711b72` QRGuidePlaceholder 자가 발급 모드 + QRDisplay 통합 + 에러 처리
+- `b90ccf1` 자가 발급 단위 테스트 (15 케이스)
+- `4efab92` docs(qr) 사양 + 추적
+
+### 사용자 영향
+
+| 흐름 | 변화 |
+|------|------|
+| 환자 home → 안내 → QR 안내 | placeholder + 「내 QR 코드 발급」 primary 버튼 |
+| 발급 버튼 클릭 → QRDisplay 표시 | uuid QR + 3분 자동 갱신 + 수동 갱신 |
+| 「다시 안내 보기」 → placeholder 복귀 | mode 토글 무한 가능 |
+| 시간당 30회 초과 시 | inline "약 N분 후 다시 시도해 주세요" 안내 |
+
+### 배포 검증 (자동)
+- HTTP 200 (`https://mediway-demo.web.app/`)
+- 신 번들 hash 로컬/LIVE 일치 (`index-DwCp7tZA.js`, `index-BKULjQy2.css`)
+- LIVE etag `786519ded7807a83...`
+- RTDB rules: `firebase deploy --only database` → "rules ... released successfully"
+
+### 후속 시각 검증 체크리스트
+1. 환자 (또는 platformAdmin) `/h/demo/patient/home?tab=guide` 진입
+2. 「QR 안내」 활성 → 3단계 안내 + 「내 QR 코드 발급」 primary 버튼 노출
+3. 버튼 클릭 → QRDisplay 마운트 (200×200 SVG QR + "이 QR 코드를 간호사에게 보여주세요")
+4. 「다시 안내 보기」 → placeholder 복귀
+5. RTDB Console → `/qr_token_usage/{uid}/{epochHour}` 카운터 1 증가 (3분 후 자동 갱신 시 +1)
+6. RTDB Console → `/qr_tokens/{token}` 신규 entry (status='waiting', patientUid, createdAt)
+7. (선택) 31번째 시도 → "약 N분 후 다시 시도해 주세요" 안내 + placeholder 복귀
+
+### 롤백 절차
+1. Hosting: Firebase Console → Hosting → 이전 release `index-IfhnchyD.js` 옆 "Rollback"
+2. RTDB rules: 이전 rules.json 으로 `firebase deploy --only database`
+3. (선택) 가장 빠른 비활성화 — UI 측 변경 없이 RTDB rules 의 `/qr_token_usage/$epochHour/.validate` 만 `false` 로 설정 → 모든 자가 발급 시도 거부
+
+---
+
 ## 2026-04-26 — GuideTab 모드 부활 + ChatbotWidget 일원화
 
 - **이전 LIVE 번들**: `index-paEulSKd.js` + `index-CycsFZ0b.css` (Scenario E)
