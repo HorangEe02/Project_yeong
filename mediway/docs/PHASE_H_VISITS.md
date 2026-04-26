@@ -256,4 +256,98 @@ export function useActiveVisit(slug: string | null, patientUid: string | null): 
 | H.4 | ✅ done | (작업 중) | useActiveVisit hook (subscribe + cleanup), vitest 7/7 pass |
 | H.5 | ✅ done | (작업 중) | QRDisplay 환자 정보 카드 동적 visit 바인딩 + 9 테스트, LIVE `index-OGIVtuQo.js` 배포 |
 | H.6 | ✅ done | (작업 중) | AdminVisitsPage + nested route `/h/:slug/admin/visits` + 10 테스트, LIVE `index-8V4XKXmY.js` 배포 |
-| H.7 | pending | — | — |
+| H.7 | ✅ done | (작업 중) | manual seed 가이드 + Sprint Summary 섹션 + 진행 로그 마무리 |
+
+---
+
+## Sprint Summary (Phase H 종합)
+
+### 결과
+- **commit 7건** (H.1~H.7) 모두 push, 누적 vitest **354 → 394** (+40 케이스)
+- **LIVE 배포 2회**:
+  - H.5 hosting `index-OGIVtuQo.js` — QRDisplay 동적 바인딩
+  - H.6 hosting `index-8V4XKXmY.js` + `index-BHCQsgut.css` — AdminVisitsPage
+- **RTDB rules 1회 deploy** — `/visits/{hid}/{visitId}` path 신설
+
+### 신규 파일
+| 파일 | 역할 |
+|------|------|
+| `src/types/visit.ts` | Visit type + 4 type guards + form 메타 |
+| `src/types/__tests__/visit.test.ts` | 19 케이스 |
+| `src/services/visit.ts` | CRUD + active subscribe + listing + audit |
+| `src/services/__tests__/visit.test.ts` | 14 케이스 |
+| `src/hooks/useActiveVisit.ts` | 환자 active visit 실시간 구독 hook |
+| `src/hooks/__tests__/useActiveVisit.test.ts` | 7 케이스 |
+| `src/components/patient/__tests__/QRDisplay.test.tsx` | 9 케이스 |
+| `src/pages/AdminVisitsPage.tsx` | admin 등록 폼 |
+| `src/pages/__tests__/AdminVisitsPage.test.tsx` | 10 케이스 |
+| `docs/PHASE_H_VISITS.md` | 본 문서 |
+
+### 수정 파일
+- `database.rules.json` — `/visits` 블록 추가 (audit_logs_v2 패턴)
+- `src/types/admin.ts` — visit.* AuditAction 4건 추가
+- `src/components/patient/QRDisplay.tsx` — 하드코딩 제거 → useActiveVisit 동적
+- `src/App.tsx` — `/h/:slug/admin/visits` 라우트 등록 (ProtectedRoute requireRole=admin)
+- `docs/HOSTING_DEPLOY_LOG.md` — H.2/H.5/H.6 entry 추가
+
+### LIVE 검증 결과 (2026-04-26)
+| 검증 | 결과 |
+|------|------|
+| QRDisplay 환자 정보 카드 — visit null fallback | ✅ "{displayName}" + "진료 정보 없음 — 안내 데스크에 문의해주세요" |
+| 하드코딩 "MediWay 데모 환자 / Zone A-1" 제거 | ✅ 더 이상 표시 안 됨 |
+| AdminVisitsPage 라우트 진입 | ✅ `/h/demo/admin/visits` (admin 권한) |
+| visit 등록 폼 type 분기 | ✅ outpatient/inpatient/checkup/emergency conditional 필드 |
+
+---
+
+## Manual Seed 가이드
+
+자동 seed script 는 본 sprint 비범위. LIVE 에서 admin/platformAdmin 계정으로 직접 등록 권장.
+
+### 시드 시나리오 1 — 본인 외래 visit (catlife9029 platformAdmin)
+1. `catlife9029@gmail.com` 으로 로그인
+2. URL: `https://mediway-demo.web.app/h/demo/admin/visits`
+3. 폼 입력:
+   - 방문 유형: **외래**
+   - 환자 uid: `S5gU1edQKeQ1w02th37Q8hQYowI2` (catlife9029 본인)
+   - 환자 이름: `박준영`
+   - 진료과: `내과`
+   - 구역: `Zone A-1`
+4. 「visit 등록」 클릭 → success 메시지 확인
+5. **검증**: `/h/demo/patient/home?tab=guide` → 「내 QR 코드 발급」 → 환자 정보 카드에 "박준영 외래 · 내과 / Zone A-1" 표시 (status='scheduled' 라 active 아님 → fallback)
+6. 추가 확인: status 를 'checked-in' 으로 변경하려면 RTDB console 직접 수정 (별도 sprint 의 status 변경 UI 도입 전까지)
+
+### 시드 시나리오 2 — 입원 visit (다른 환자)
+1. 동일 admin 페이지 진입
+2. 폼 입력:
+   - 방문 유형: **입원**
+   - 환자 uid: `<inpatient 시연 uid>` (별도 환자 계정)
+   - 병동: `3W` / 병실: `302` / 침대: `A`
+   - 메모: "Phase H 시연용 입원 visit"
+3. 등록 → 환자 측 (해당 uid 로 로그인) 카드에 "입원 · 3W-302-A" 표시 검증
+
+### 시드 시나리오 3 — 응급 visit
+1. 방문 유형: **응급**, 진료과: `ER`, 구역: `ER 분류실`
+
+### Status 변경 (active → 표시) — 임시 가이드
+현재 admin form 에서는 status='scheduled' 만 등록 가능. `checked-in` 또는 `in-progress` 로 변경해야 환자 카드에 visit 정보 표시.
+
+옵션:
+- (단기) Firebase Console → Realtime Database → `/visits/demo/{visitId}/status` 직접 수정 → `"checked-in"`
+- (장기) Phase I 에서 status 변경 UI (staff/admin 콘솔) 추가 예정
+
+---
+
+## 본 sprint 종료 — 다음 sprint 후보 (Phase I)
+
+| 우선순위 | 작업 |
+|----------|------|
+| P1 | Visit status 변경 UI (admin/staff 콘솔) — checked-in / in-progress / completed / cancelled 토글 |
+| P1 | Staff visit 콘솔 — 오늘의 active visit 리스트 + 부서 필터 |
+| P2 | Visit ↔ session 자동 연동 — staff 동선 발송 시 visit.zone 으로 동선 자동 계산 |
+| P2 | Visit ↔ wait_queue 연동 — visit 등록 시 자동 wait_queue 등록 |
+| P2 | 환자 visit history 페이지 (`/h/{slug}/patient/history`) |
+| P3 | Visit notification — 예약 30분 전 push |
+| P3 | `/visits` cron TTL — completed 90일 후 archive |
+| P3 | 환자 검색 (admin form 의 patientUid 자동 완성) |
+| P3 | admin nav 링크 — `/h/{slug}/admin/visits` 진입 메뉴 노출 |
