@@ -88,16 +88,7 @@ export function EmergencyCallCard() {
     );
   }, []);
 
-  const onCallEmergency = useCallback(() => {
-    if (!confirming) {
-      setConfirming(true);
-      return;
-    }
-    // 두 번째 클릭 — tel: 트리거 (모바일 OS 가 전화 앱 실행)
-    window.location.href = 'tel:119';
-    setConfirming(false);
-  }, [confirming]);
-
+  const enterConfirm = useCallback(() => setConfirming(true), []);
   const cancelConfirm = useCallback(() => setConfirming(false), []);
 
   return (
@@ -124,7 +115,7 @@ export function EmergencyCallCard() {
       {!confirming ? (
         <button
           type="button"
-          onClick={onCallEmergency}
+          onClick={enterConfirm}
           data-testid="emergency-call-button"
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-error py-4 text-base font-bold text-on-error shadow-ambient hover:opacity-90"
         >
@@ -145,20 +136,15 @@ export function EmergencyCallCard() {
             확인을 누르면 즉시 전화 앱이 실행됩니다. 통화 중 화면의 위도·경도를 직접 알려 주세요.
           </p>
           <div className="mt-3 flex gap-2">
-            <button
-              type="button"
-              onClick={onCallEmergency}
+            <a
+              href="tel:119"
               data-testid="emergency-confirm-button"
-              className="flex-1 rounded-lg bg-error px-4 py-2 text-sm font-semibold text-on-error"
+              aria-label="119 에 전화 걸기"
+              onClick={cancelConfirm}
+              className="flex-1 rounded-lg bg-error px-4 py-2 text-center text-sm font-semibold text-on-error no-underline"
             >
-              <a
-                href="tel:119"
-                className="block w-full no-underline text-on-error"
-                aria-label="119 에 전화 걸기"
-              >
-                전화 걸기
-              </a>
-            </button>
+              전화 걸기
+            </a>
             <button
               type="button"
               onClick={cancelConfirm}
