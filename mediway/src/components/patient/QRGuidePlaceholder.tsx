@@ -1,13 +1,18 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, QrCode } from 'lucide-react';
 import { QRDisplay } from './QRDisplay';
 import { useAuthStore } from '@/stores/authStore';
 import { getCurrentUid, initAnonymousAuth } from '@/services/auth';
 import { isFirebaseConfigured } from '@/config/firebase';
+import { useHospital } from '@/contexts/HospitalContext';
+import { useSession } from '@/hooks/useSession';
 import {
   issueSelfQRToken,
   QRTokenRateLimitError,
 } from '@/services/qrToken';
+
+const LS_QR_TOKEN = 'mediway_qr_token';
 
 /**
  * GuideTab 「QR 안내」 모드 — 두 상태 머신:
@@ -26,9 +31,22 @@ import {
 type Mode = 'placeholder' | 'displaying';
 
 export function QRGuidePlaceholder() {
+  const navigate = useNavigate();
+  const { slug } = useHospital();
   const initialized = useAuthStore((s) => s.initialized);
   const [mode, setMode] = useState<Mode>('placeholder');
   const [error, setError] = useState<{ msg: string } | null>(null);
+  const [currentToken, setCurrentToken] = useState<string | null>(null);
+
+  // 발급한 token 의 status 실시간 구독 — staff 가 스캔해서 'matched' + sessionId 부여되면
+  // 환자 동선 화면 (`/h/{slug}/patient/{sessionId}`) 으로 자동 이동.
+  const { qrTokenData } = useSession(currentToken);
+
+  useEffect(() => {
+    if (qrTokenData?.status === 'matched' && qrTokenData?.sessionId) {
+      navigate(`/h/${slug}/patient/${qrTokenData.sessionId}`, { replace: true });
+    }
+  }, [qrTokenData?.status, qrTokenData?.sessionId, slug, navigate]);
 
   /** QRDisplay 의 onTokenGenerated 콜백 — 토큰 RTDB 등록 + rate-limit 처리. */
   const handleTokenGenerated = useCallback(async (token: string) => {
@@ -46,6 +64,9 @@ export function QRGuidePlaceholder() {
     try {
       await issueSelfQRToken(token, uid);
       setError(null);
+      // 매칭 감지 + PatientDashboard 복원 위해 token 보관
+      setCurrentToken(token);
+      localStorage.setItem(LS_QR_TOKEN, token);
     } catch (err) {
       if (err instanceof QRTokenRateLimitError) {
         const minutes = Math.max(1, Math.ceil(err.retryAfterSeconds / 60));

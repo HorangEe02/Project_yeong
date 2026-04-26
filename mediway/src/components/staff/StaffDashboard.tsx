@@ -17,13 +17,13 @@ import { getCurrentUid } from '@/services/auth';
 import { appendAudit } from '@/services/auditLog';
 import { useAutoFillFromPlan } from '@/hooks/useAutoFillFromPlan';
 import { isFirebaseConfigured } from '@/config/firebase';
+import { useHospital } from '@/contexts/HospitalContext';
 import { NotificationMessages } from '@/services/notification';
 import { v4 as uuidv4 } from 'uuid';
 import type { RouteTemplate } from '@/types/route-template';
 import type { WaypointStatus } from '@/types/session';
 import type { VisitPlan } from '@/types/visit-plan';
 
-const DEMO_HOSPITAL_ID = 'demo-hospital';
 const AUTO_SEND_COUNTDOWN_SEC = 3;
 
 type StaffState =
@@ -47,9 +47,11 @@ export function StaffDashboard() {
   const [appliedPlan, setAppliedPlan] = useState<VisitPlan | null>(null);
   const [autoSendCountdown, setAutoSendCountdown] = useState(AUTO_SEND_COUNTDOWN_SEC);
 
+  const { slug: hospitalId } = useHospital();
+
   const { plan, mismatched, autoSendEligible } = useAutoFillFromPlan(
     patientUid,
-    DEMO_HOSPITAL_ID,
+    hospitalId,
   );
 
   // 플랜 자동 채움
@@ -146,7 +148,7 @@ export function StaffDashboard() {
             patientUid: resolvedPatientUid,
             staffUid,
             qrToken: patientToken,
-            hospitalId: DEMO_HOSPITAL_ID,
+            hospitalId,
             status: 'navigating',
             currentWaypointIndex: 0,
             waypoints: activeWaypoints.map((poiId, i) => ({

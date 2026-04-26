@@ -6,6 +6,50 @@
 
 ---
 
+## 2026-04-26 — 동선 전송 PERMISSION_DENIED + 환자 자동 redirect 회복 (hotfix)
+
+- **이전 LIVE 번들**: `index-CdK89X7D.js` + `index-CTDm0AWe.css`
+- **중간 LIVE 번들 #1** (Staff fix): `index-DKz2LGXM.js` (16:02 KST)
+- **신 LIVE 번들 #2** (+ Patient redirect): `index-BxGdUsO2.js` (16:15 KST)
+- **CSS**: `index-CTDm0AWe.css` (무변동)
+
+### Root cause #1 — Staff `동선 전송 실패` (StaffDashboard)
+- StaffDashboard.tsx:26 에 하드코딩 `DEMO_HOSPITAL_ID = 'demo-hospital'` 사용
+- 그러나 모든 staff/admin/platformAdmin 의 customClaim `hospitalId === 'demo'`
+- RTDB rule `/sessions/$id/.write` 가 `newData.child('hospitalId').val() === auth.token.hospitalId` 요구
+- → `'demo-hospital' !== 'demo'` → PERMISSION_DENIED → "동선 전송 실패" 메시지
+- 어제 일원화 작업 (4 위젯 useHospital().slug) 에서 StaffDashboard 만 누락 — 회귀
+
+#### Fix — `useHospital().slug` 도입
+- `useHospital()` hook 사용 → `hospitalId = slug` (URL 의 `/h/{slug}/...` 그대로)
+- DEMO_HOSPITAL_ID 상수 제거
+- multi-hospital ready
+
+### Root cause #2 — 환자 측 동선 수신 안 됨 (QRGuidePlaceholder)
+- staff 가 sessions 만들고 qr_token.status='matched' + sessionId 갱신해도
+- 환자가 GuideTab/QRGuidePlaceholder 화면에 머무름 (PatientPage 로 이동 안 됨)
+- PatientDashboard 의 useSession 자동 흐름이 마운트 자체가 안 되어 동선 표시 X
+- 어제 GuideTab 부활 시 PatientDashboard 의 self-contained redirect 누락
+
+#### Fix — useSession + 자동 navigate
+- QRGuidePlaceholder 가 currentToken state + useSession 추가
+- `qrTokenData.status === 'matched' && sessionId` 시 → `navigate('/h/{slug}/patient/{sessionId}', { replace: true })`
+- token 도 `localStorage[mediway_qr_token]` 에 저장 → PatientDashboard 가 useSession 으로 복원
+
+### 변경 파일
+- `src/components/staff/StaffDashboard.tsx` — useHospital 도입, DEMO_HOSPITAL_ID 제거
+- `src/components/patient/QRGuidePlaceholder.tsx` — useSession + 자동 redirect
+- `src/components/patient/__tests__/QRGuidePlaceholder.test.tsx` — Router/HospitalProvider wrapper, useSession mock
+
+### 검증
+- vitest: 335/335 pass
+- LIVE E2E: 환자 QR 발급 → staff 스캔 → 환자 자동 PatientPage 이동 → 동선 표시 ✅
+
+### 롤백 (필요 시)
+- Hosting: `index-CdK89X7D.js` rollback (Firebase console → Hosting → Releases)
+
+---
+
 ## 2026-04-26 — Functions Node.js 20 → 22 런타임 마이그레이션 (Functions only, no hosting change)
 
 - **배포 종류**: Cloud Functions (Hosting 변경 없음 — LIVE bundle `index-CdK89X7D.js` 동일)
