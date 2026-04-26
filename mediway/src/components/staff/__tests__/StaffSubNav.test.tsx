@@ -21,10 +21,26 @@ function wrap(slug: string, ui: React.ReactNode, profile?: Partial<HospitalProfi
 }
 
 describe('StaffSubNav', () => {
-  it('두 탭(동선 전송 / 대기열 콘솔) 라벨 노출', () => {
+  it('네 탭(동선 전송 / 대기열 콘솔 / 환자 진료 / 응급) 라벨 노출 (default features)', () => {
     wrap('demo', <StaffSubNav active="dashboard" />);
     expect(screen.getByRole('link', { name: '동선 전송' })).toBeTruthy();
     expect(screen.getByRole('link', { name: '대기열 콘솔' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: '환자 진료' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: '응급' })).toBeTruthy();
+  });
+
+  it('환자 진료 href = /h/{slug}/staff/visits (I.2.4)', () => {
+    wrap('demo', <StaffSubNav active="visits" />);
+    expect(
+      screen.getByRole('link', { name: '환자 진료' }).getAttribute('href'),
+    ).toBe('/h/demo/staff/visits');
+  });
+
+  it('active="visits" → 환자 진료 탭 aria-current=page (I.2.4)', () => {
+    wrap('demo', <StaffSubNav active="visits" />);
+    expect(
+      screen.getByRole('link', { name: '환자 진료' }).getAttribute('aria-current'),
+    ).toBe('page');
   });
 
   it('active="dashboard" 일 때 dashboard 탭 aria-current=page', () => {

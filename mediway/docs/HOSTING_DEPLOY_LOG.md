@@ -6,6 +6,40 @@
 
 ---
 
+## 2026-04-26 — Phase I.2.4/I.2.5 — Staff visit 콘솔 + StaffSubNav 4탭화
+
+- **이전 LIVE 번들**: `index-9WOEF1cj.js` + `index-8YhnynKs.css`
+- **중간 LIVE 번들** (버그 포함): `index-BOPx-_Ox.js` — useStaffActiveVisits 의 `dateMs=Date.now()` default 가 매 render 마다 새 값 → 무한 재구독 회귀
+- **신 LIVE 번들 (fix)**: `index-BKTdpyHQ.js` + `index-8YhnynKs.css` (CSS 동일)
+- **신규 라우트**: `/h/:hospitalSlug/staff/visits` — ProtectedRoute requireRole=['staff', 'admin']
+
+### 변경
+- `src/pages/StaffVisitsPage.tsx` 신설 — staff 의 부서별 active visit 콘솔
+- `src/hooks/useStaffActiveVisits.ts` 신설 (I.2.3) + dateMs 안정화 fix
+- `src/services/visit.ts` — subscribeActiveVisitsByDepartment (I.2.2)
+- `src/components/staff/StaffSubNav.tsx` — 4번째 탭 "환자 진료" 추가
+- `src/App.tsx` — staff/visits 라우트 등록
+- 테스트 추가: useStaffActiveVisits (6) + StaffVisitsPage (10) + StaffSubNav (3 신규/1 수정)
+
+### 화면 정책
+- 부서명 (profile.department) 헤더 + active 환자 N명 카운트
+- 부서 미설정 시 "관리자에게 문의" alert
+- loading / empty / list 분기
+- 각 행: status badge + 환자명 + 위치 + 접수 시각 + status select (변경 → updateVisitStatus)
+
+### Bug fix 노트 (I.2.5)
+- 첫 deploy 직후 `useStaffActiveVisits` 의 default param 회귀 발견 (vitest 1 fail)
+- Hook 내부에서 `useState(() => Date.now())` 로 한 번만 capture, dateMs 명시 시 그 값 우선
+- 즉시 재빌드 + 재배포 → 신 LIVE `index-BKTdpyHQ.js`
+
+### 테스트
+- vitest 누적 431/431 (406 → 431 = +25)
+
+### 롤백
+- Hosting: `index-9WOEF1cj.js` rollback (Firebase console)
+
+---
+
 ## 2026-04-26 — Phase I.2.1 — RTDB rules: staff status-only write (Phase I 시작)
 
 - **배포 종류**: RTDB rules (Hosting / Functions 변경 없음)

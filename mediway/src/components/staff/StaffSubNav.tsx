@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useHospital, useFeature } from '@/contexts/HospitalContext';
 
-export type StaffSubNavTab = 'dashboard' | 'queue' | 'emergency';
+export type StaffSubNavTab = 'dashboard' | 'queue' | 'visits' | 'emergency';
 
 interface SubNavSpec {
   id: StaffSubNavTab;
@@ -15,6 +15,7 @@ interface SubNavSpec {
 const TABS: readonly SubNavSpec[] = [
   { id: 'dashboard', label: '동선 전송', to: (s) => `/h/${s}/staff` },
   { id: 'queue', label: '대기열 콘솔', to: (s) => `/h/${s}/staff/queue` },
+  { id: 'visits', label: '환자 진료', to: (s) => `/h/${s}/staff/visits` },
   {
     id: 'emergency',
     label: '응급',

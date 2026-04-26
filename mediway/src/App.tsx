@@ -7,6 +7,7 @@ import { LandingPage } from '@/pages/LandingPage';
 import { StaffPage } from '@/pages/StaffPage';
 import { StaffQueuePage } from '@/pages/StaffQueuePage';
 import { StaffEmergencyPage } from '@/pages/StaffEmergencyPage';
+import { StaffVisitsPage } from '@/pages/StaffVisitsPage';
 import { AdminVisitsPage } from '@/pages/AdminVisitsPage';
 import { PatientPage } from '@/pages/PatientPage';
 import { HospitalHomePage } from '@/pages/HospitalHomePage';
@@ -281,6 +282,14 @@ export default function App() {
               element={
                 <ProtectedRoute requireRole={['staff', 'admin']}>
                   <StaffEmergencyPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="staff/visits"
+              element={
+                <ProtectedRoute requireRole={['staff', 'admin']}>
+                  <StaffVisitsPage />
                 </ProtectedRoute>
               }
             />
