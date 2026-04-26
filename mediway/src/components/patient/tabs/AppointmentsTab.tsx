@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
+import { useHospital } from '@/contexts/HospitalContext';
 import {
   cancelAppointment,
   createAppointment,
@@ -24,6 +25,15 @@ import type { WaitQueuePatientIndex } from '@/types/waitQueue';
  *  - `subscribeMyAppointments` → 예약 레코드 (scheduledAt 오름차순)
  *  - `subscribeMyWaitQueue` → 오늘 접수된 wait_queue 엔트리 (접수 상태 판별용)
  *
+ * Slug 소스 (F1.1d):
+ *  - 이전: `profile.hospitalId` (사용자 home hospital)
+ *  - 현재: `useHospital().slug` (URL `/h/{slug}/...` 의 현재 방문 병원)
+ *  - cross-tenant 차단은 HospitalShell 가드가 담당.
+ *
+ * 마운트 가드:
+ *  - HospitalHomePage 가 features.appointments=true 일 때만 본 탭을 마운트
+ *    (commit F1.1b 의 visibleTabs). 본 컴포넌트는 그 전제 위에서 동작.
+ *
  * 상태별 카드 동작:
  *  - scheduled + 오늘이면서 아직 접수 안 됨: [접수] + [X 취소]
  *  - scheduled + 이미 접수됨: '접수됨' 뱃지 + [X 취소] (접수 취소는 별도 flow)
@@ -33,8 +43,8 @@ import type { WaitQueuePatientIndex } from '@/types/waitQueue';
  * 새 예약 form:
  *  - 부서 select + 일시 (datetime-local) + 진료 시간 (min) + 메모 (선택)
  *
- * TODO(B-3+):
- *  - 부서 목록을 hospitals/{hid}/departments 동기화
+ * TODO(별도 sprint):
+ *  - 부서 목록을 hospitals/{slug}/departments 동기화 (현 schema 미정)
  *  - 반복 예약 / 예약 수정
  *  - 담당 의료진 선택
  */
@@ -63,8 +73,7 @@ const STATUS_STYLES: Record<AppointmentStatus, string> = {
 
 export function AppointmentsTab() {
   const user = useAuthStore((s) => s.user);
-  const profile = useAuthStore((s) => s.profile);
-  const hospitalId = profile?.hospitalId ?? null;
+  const { slug: hospitalId } = useHospital();
   const uid = user?.uid ?? null;
   const isAnon = user?.isAnonymous ?? true;
 
@@ -76,7 +85,7 @@ export function AppointmentsTab() {
   const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
-    if (!hospitalId || !uid || isAnon) return;
+    if (!uid || isAnon) return;
     const unsubA = subscribeMyAppointments(
       hospitalId,
       uid,
@@ -114,7 +123,7 @@ export function AppointmentsTab() {
 
   const handleCheckIn = useCallback(
     async (appt: AppointmentPatientIndex) => {
-      if (!hospitalId || !uid) return;
+      if (!uid) return;
       setActionError(null);
       setBusyApptId(appt.id);
       try {
@@ -134,7 +143,7 @@ export function AppointmentsTab() {
 
   const handleCancel = useCallback(
     async (appt: AppointmentPatientIndex) => {
-      if (!hospitalId || !uid) return;
+      if (!uid) return;
       setActionError(null);
       setBusyApptId(appt.id);
       try {
@@ -155,13 +164,7 @@ export function AppointmentsTab() {
       </section>
     );
   }
-  if (!hospitalId) {
-    return (
-      <section className="space-y-4 p-4">
-        <p className="text-sm text-on-surface-variant">병원 소속 정보를 확인 중입니다.</p>
-      </section>
-    );
-  }
+  // hospitalId 는 useHospital() 으로부터 항상 보장됨 (HospitalShell ready 상태에서만 마운트).
 
   return (
     <section className="space-y-4 p-4">
