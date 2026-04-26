@@ -220,7 +220,7 @@ Staff 가 본인 부서의 **오늘 active visit 리스트** 를 보고 status �
 
 | Phase | 상태 | Commit | 비고 |
 |-------|------|--------|------|
-| I.1.1 | pending | — | service `subscribeRecentVisits` |
+| I.1.1 | ✅ done | (작업 중) | subscribeRecentVisits + 5 테스트 (orderByChild createdAt desc + limitToLast) |
 | I.1.2 | pending | — | AdminVisitsPage 리스트 + status 변경 |
 | I.1.3 | pending | — | docs + LIVE deploy |
 | I.2.1 ~ I.2.5 | pending | — | Staff console |

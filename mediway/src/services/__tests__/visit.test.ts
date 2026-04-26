@@ -20,6 +20,7 @@ const mockRef = vi.fn((_db: unknown, path?: string) =>
 const mockQuery = vi.fn((r: unknown) => ({ __query: r }));
 const mockOrderByChild = vi.fn((field: string) => ({ __orderByChild: field }));
 const mockEqualTo = vi.fn((v: unknown) => ({ __equalTo: v }));
+const mockLimitToLast = vi.fn((n: number) => ({ __limitToLast: n }));
 
 vi.mock('firebase/database', () => ({
   ref: (...args: unknown[]) =>
@@ -36,6 +37,7 @@ vi.mock('firebase/database', () => ({
   query: (...args: unknown[]) => mockQuery(args[0]),
   orderByChild: (...args: unknown[]) => mockOrderByChild(args[0] as string),
   equalTo: (...args: unknown[]) => mockEqualTo(args[0]),
+  limitToLast: (...args: unknown[]) => mockLimitToLast(args[0] as number),
 }));
 
 vi.mock('@/config/firebase', () => ({
@@ -55,6 +57,7 @@ import {
   updateVisitStatus,
   deleteVisit,
   subscribeActiveVisit,
+  subscribeRecentVisits,
   listVisitsByPatient,
   listVisitsByDepartment,
 } from '../visit';
@@ -267,6 +270,60 @@ describe('subscribeActiveVisit', () => {
     const v2: Visit = { ...v1, visitId: 'v2', createdAt: 300, status: 'checked-in' };
     onValueCb(fakeSnap([v1, v2]));
     expect(cb).toHaveBeenCalledWith(v2);
+  });
+});
+
+// =====================================================================
+// subscribeRecentVisits
+// =====================================================================
+
+describe('subscribeRecentVisits', () => {
+  function fakeSnap(visits: Visit[]) {
+    return {
+      exists: () => visits.length > 0,
+      forEach: (cb: (child: { val: () => Visit }) => void) => {
+        for (const v of visits) cb({ val: () => v });
+      },
+    };
+  }
+
+  it('snapshot 빔 → empty array emit', () => {
+    const cb = vi.fn();
+    subscribeRecentVisits('demo', 20, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    onValueCb(fakeSnap([]));
+    expect(cb).toHaveBeenCalledWith([]);
+  });
+
+  it('visits 다건 → createdAt desc 정렬', () => {
+    const cb = vi.fn();
+    subscribeRecentVisits('demo', 20, cb);
+    const onValueCb = mockOnValue.mock.calls[0][1] as (s: ReturnType<typeof fakeSnap>) => void;
+    const visits: Visit[] = [
+      { visitId: 'a', patientUid: 'u1', hospitalId: 'demo', type: 'outpatient', status: 'scheduled', zone: 'Z', createdAt: 100, updatedAt: 100, createdBy: 'admin-1' },
+      { visitId: 'b', patientUid: 'u1', hospitalId: 'demo', type: 'outpatient', status: 'scheduled', zone: 'Z', createdAt: 300, updatedAt: 300, createdBy: 'admin-1' },
+      { visitId: 'c', patientUid: 'u1', hospitalId: 'demo', type: 'outpatient', status: 'scheduled', zone: 'Z', createdAt: 200, updatedAt: 200, createdBy: 'admin-1' },
+    ];
+    onValueCb(fakeSnap(visits));
+    const emitted = (cb.mock.calls[0][0] as Visit[]).map((v) => v.visitId);
+    expect(emitted).toEqual(['b', 'c', 'a']); // 300, 200, 100
+  });
+
+  it('limitToLast(N) 호출 검증', () => {
+    subscribeRecentVisits('demo', 5, vi.fn());
+    expect(mockLimitToLast).toHaveBeenCalledWith(5);
+  });
+
+  it('orderByChild("createdAt") 호출 검증', () => {
+    subscribeRecentVisits('demo', 10, vi.fn());
+    expect(mockOrderByChild).toHaveBeenCalledWith('createdAt');
+  });
+
+  it('unsubscribe 함수 반환 (onValue 의 cleanup)', () => {
+    const unsub = subscribeRecentVisits('demo', 20, vi.fn());
+    expect(typeof unsub).toBe('function');
+    unsub();
+    expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
   });
 });
 

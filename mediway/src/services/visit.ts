@@ -8,6 +8,7 @@ import {
   query,
   orderByChild,
   equalTo,
+  limitToLast,
   onValue,
   type Unsubscribe,
 } from 'firebase/database';
@@ -128,6 +129,40 @@ export function subscribeActiveVisit(
       if (!latest || (v.createdAt ?? 0) > (latest.createdAt ?? 0)) latest = v;
     });
     cb(latest);
+  });
+}
+
+/**
+ * 병원의 최근 등록 visit 실시간 구독 (admin 콘솔 리스트용).
+ * `createdAt desc` 정렬, `limit` 개 반환. RTDB 단에서 `limitToLast(limit)` 적용.
+ *
+ * 본 sprint (I.1) 의 admin 페이지 리스트 섹션 + status 변경 dropdown 의 데이터 소스.
+ */
+export function subscribeRecentVisits(
+  slug: string,
+  limit: number,
+  cb: (visits: Visit[]) => void,
+): Unsubscribe {
+  if (!isFirebaseConfigured()) {
+    cb([]);
+    return () => {};
+  }
+  const q = query(
+    ref(db, `visits/${slug}`),
+    orderByChild('createdAt'),
+    limitToLast(limit),
+  );
+  return onValue(q, (snap) => {
+    if (!snap.exists()) {
+      cb([]);
+      return;
+    }
+    const out: Visit[] = [];
+    snap.forEach((child) => {
+      out.push(child.val() as Visit);
+    });
+    out.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+    cb(out);
   });
 }
 
