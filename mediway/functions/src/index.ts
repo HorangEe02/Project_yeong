@@ -22,6 +22,7 @@ export { onQueueCall } from './wait_queue/onQueueCall';
 export { hospitalChatbot } from './chatbot/hospitalChatbot';
 export { onAppointmentCreate } from './appointments/onAppointmentCreate';
 export { appointmentReminderScheduler } from './appointments/appointmentReminderScheduler';
+export { triageSymptoms } from './triage/triageSymptoms';
 
 const region = 'asia-northeast3';
 
