@@ -255,5 +255,5 @@ export function useActiveVisit(slug: string | null, patientUid: string | null): 
 | H.3 | ✅ done | (작업 중) | createVisit/updateVisit/updateVisitStatus/deleteVisit + subscribeActiveVisit + listVisitsByPatient/Department + 4 visit.* AuditAction, vitest 14/14 pass |
 | H.4 | ✅ done | (작업 중) | useActiveVisit hook (subscribe + cleanup), vitest 7/7 pass |
 | H.5 | ✅ done | (작업 중) | QRDisplay 환자 정보 카드 동적 visit 바인딩 + 9 테스트, LIVE `index-OGIVtuQo.js` 배포 |
-| H.6 | pending | — | — |
+| H.6 | ✅ done | (작업 중) | AdminVisitsPage + nested route `/h/:slug/admin/visits` + 10 테스트, LIVE `index-8V4XKXmY.js` 배포 |
 | H.7 | pending | — | — |

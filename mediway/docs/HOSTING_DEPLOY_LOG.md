@@ -6,6 +6,44 @@
 
 ---
 
+## 2026-04-26 — Phase H.6 — AdminVisitsPage (`/h/:slug/admin/visits`) 등록 폼
+
+- **이전 LIVE 번들**: `index-OGIVtuQo.js` + `index-CTDm0AWe.css`
+- **신 LIVE 번들**: `index-8V4XKXmY.js` + `index-BHCQsgut.css` (admin form 스타일 추가)
+- **신규 라우트**: `/h/:hospitalSlug/admin/visits` — ProtectedRoute requireRole=['admin']
+
+### 변경
+- `src/pages/AdminVisitsPage.tsx` 신설 — visit 등록 단일 폼
+- `src/App.tsx` — import + nested route 추가
+- `src/pages/__tests__/AdminVisitsPage.test.tsx` — 10 케이스
+
+### 폼 필드
+- patientUid (필수), displayName (선택)
+- type radio: 외래/입원/검진/응급
+- type 별 conditional:
+  - outpatient/emergency: department + zone
+  - inpatient: ward + room + bed (zone 자동 = `ward-room`)
+  - checkup: zone
+- scheduledFor (datetime-local, 선택)
+- notes (textarea, max 500)
+- 제출 → `createVisit` + visitId 표시
+
+### 권한
+- ProtectedRoute requireRole=['admin'] (RTDB rules 와 일치 — same-hospital admin / platformAdmin write)
+
+### 진입 경로
+- 직접 URL: `/h/{slug}/admin/visits`
+- 향후 admin 메뉴 navigation link 추가 예정 (별도 sprint)
+
+### 테스트
+- vitest 누적 394/394 (384 → 394 = +10)
+- 폼 렌더링 / type 분기 / validation / 정상 제출 / reject 처리
+
+### 롤백
+- Hosting: `index-OGIVtuQo.js` rollback (Firebase console)
+
+---
+
 ## 2026-04-26 — Phase H.5 — QRDisplay 환자 정보 카드 동적 visit 바인딩
 
 - **이전 LIVE 번들**: `index-BxGdUsO2.js` + `index-CTDm0AWe.css`
