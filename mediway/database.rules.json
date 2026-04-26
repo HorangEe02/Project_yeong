@@ -143,6 +143,17 @@
       }
     },
 
+    "qr_token_usage": {
+      ".read": "auth != null && auth.token.role === 'platformAdmin'",
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || auth.token.role === 'platformAdmin')",
+        ".write": "auth != null && auth.uid === $uid",
+        "$epochHour": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 30"
+        }
+      }
+    },
+
     "audit_logs": {
       ".read": "auth != null && (auth.token.role === 'admin' || auth.token.role === 'platformAdmin')",
       ".indexOn": ["timestamp", "actorUid", "target"],
