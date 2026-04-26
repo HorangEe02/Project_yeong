@@ -1,8 +1,11 @@
 import { StaffDashboard } from '@/components/staff/StaffDashboard';
+import { StaffSubNav } from '@/components/staff/StaffSubNav';
 
 export function StaffPage() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-6 lg:max-w-5xl">
+      {/* F1.2: dashboard ↔ queue 발견성 보강 */}
+      <StaffSubNav active="dashboard" />
       {/* 웹: 2열 레이아웃 / 모바일: 1열 */}
       <div className="mb-6">
         <p className="text-xs font-medium uppercase tracking-wider text-on-surface-variant">

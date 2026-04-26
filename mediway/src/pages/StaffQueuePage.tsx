@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { useAuthStore } from '@/stores/authStore';
+import { useHospital } from '@/contexts/HospitalContext';
+import { StaffSubNav } from '@/components/staff/StaffSubNav';
 import {
   callNextWaiting,
   markCompleted,
@@ -13,14 +14,18 @@ import type { WaitQueueEntry, WaitQueueStatus } from '@/types/waitQueue';
 /**
  * 의료진 대기열 콘솔.
  *
- * 경로: `/staff/queue` (현 flat routing 유지 — `/h/:slug/staff/queue` 로의
- *      편입은 B-3 이후 hospital slug 리팩토링과 함께).
+ * 경로: `/h/:slug/staff/queue` (B-3.10 nested routing 이후).
+ *
+ * Slug 소스 (F1.2):
+ *  - 이전: `profile.hospitalId` (사용자 home hospital)
+ *  - 현재: `useHospital().slug` (URL 기준 — staff 가 다른 병원 방문 시 정합)
  *
  * 역할:
- *  - `/hospitals/{hid}/wait_queue/{dept}/{date}` 실시간 구독
+ *  - `/hospitals/{slug}/wait_queue/{dept}/{date}` 실시간 구독
  *  - "다음 환자 호출" → callNextWaiting (lowest-number waiting → called)
  *  - 카드별 [진료 시작] / [완료] 액션
  *  - 상단 stats: 대기 / 호출됨 / 진료 중 카운트
+ *  - 상단 sub-nav (F1.2) — 동선 전송 ↔ 대기열 콘솔
  *
  * UX 원칙:
  *  - Call Next 버튼 urgency 강조 (primary color + 큰 터치 타겟)
@@ -28,8 +33,8 @@ import type { WaitQueueEntry, WaitQueueStatus } from '@/types/waitQueue';
  *  - 액션 실패는 inline 에러 배너 (페이지 reload 없이 복구)
  *  - 빈 상태는 소극적 회색 텍스트
  *
- * TODO(B-2+):
- *  - 부서 목록을 `/hospitals/{hid}/departments` 에서 동기화 (현재는 하드코딩)
+ * TODO(별도 sprint):
+ *  - 부서 목록을 `/hospitals/{slug}/departments` 에서 동기화 (현재는 하드코딩)
  *  - "오늘만" vs "완료 포함" 토글 (includeCompleted)
  *  - 호출 취소 / 재호출 버튼
  *  - 호출 후 N 분 무응답 → 자동 스킵 제안
@@ -54,8 +59,7 @@ const STATUS_LABELS: Record<WaitQueueStatus, string> = {
 };
 
 export function StaffQueuePage() {
-  const profile = useAuthStore((s) => s.profile);
-  const hospitalId = profile?.hospitalId ?? null;
+  const { slug: hospitalId } = useHospital();
 
   const [department, setDepartment] = useState<string>(DEPARTMENTS[0]);
   const [date, setDate] = useState<string>(() => todayDateKST());
@@ -65,7 +69,6 @@ export function StaffQueuePage() {
   const [callingNext, setCallingNext] = useState(false);
 
   useEffect(() => {
-    if (!hospitalId) return;
     const unsub = subscribeDeptQueue(
       hospitalId,
       department,
@@ -90,7 +93,7 @@ export function StaffQueuePage() {
   }, [entries]);
 
   const handleCallNext = useCallback(async () => {
-    if (!hospitalId || callingNext) return;
+    if (callingNext) return;
     setCallingNext(true);
     setActionError(null);
     try {
@@ -105,7 +108,6 @@ export function StaffQueuePage() {
 
   const handleStart = useCallback(
     async (entry: WaitQueueEntry) => {
-      if (!hospitalId) return;
       setActionError(null);
       try {
         await markInProgress(hospitalId, entry);
@@ -118,7 +120,6 @@ export function StaffQueuePage() {
 
   const handleComplete = useCallback(
     async (entry: WaitQueueEntry) => {
-      if (!hospitalId) return;
       setActionError(null);
       try {
         await markCompleted(hospitalId, entry);
@@ -129,16 +130,12 @@ export function StaffQueuePage() {
     [hospitalId],
   );
 
-  if (!hospitalId) {
-    return (
-      <main className="mx-auto max-w-3xl px-4 py-8">
-        <p className="text-sm text-on-surface-variant">병원 소속 정보를 불러오는 중입니다.</p>
-      </main>
-    );
-  }
+  // hospitalId 는 useHospital() 으로부터 항상 보장 — HospitalShell ready 상태에서만 마운트.
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
+      {/* F1.2: dashboard ↔ queue 발견성 보강 */}
+      <StaffSubNav active="queue" />
       <header className="mb-4">
         <p className="text-xs font-medium uppercase tracking-wider text-on-surface-variant">
           Clinical Queue
