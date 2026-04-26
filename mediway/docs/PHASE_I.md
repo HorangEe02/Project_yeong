@@ -225,7 +225,8 @@ Staff 가 본인 부서의 **오늘 active visit 리스트** 를 보고 status �
 | I.1.3 | ✅ done | (작업 중) | LIVE `index-9WOEF1cj.js` + CSS `index-8YhnynKs.css` 배포, HOSTING_DEPLOY_LOG entry |
 | I.2.1 | ✅ done | (작업 중) | RTDB rules — staff status-only write 허용 (immutable: patientUid/hospitalId/type), deploy released |
 | I.2.2 | ✅ done | (작업 중) | subscribeActiveVisitsByDepartment + 8 테스트 (in-memory filter, createdAt asc) |
-| I.2.3 ~ I.2.5 | pending | — | hook / page / docs+deploy |
+| I.2.3 | ✅ done | (작업 중) | useStaffActiveVisits hook + 6 테스트 |
+| I.2.4 ~ I.2.5 | pending | — | page / docs+deploy |
 | I.3.1 ~ I.3.4 | pending | — | session/queue 연동 |
 | I.4.1 ~ I.4.4 | pending | — | patient history |
 | I.5.1 ~ I.5.3 | pending | — | UX 보강 |
