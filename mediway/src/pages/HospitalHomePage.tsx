@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { HomeTab } from '@/components/patient/tabs/HomeTab';
 import { AppointmentsTab } from '@/components/patient/tabs/AppointmentsTab';
@@ -6,8 +6,13 @@ import { InpatientTab } from '@/components/patient/tabs/InpatientTab';
 import { CheckupTab } from '@/components/patient/tabs/CheckupTab';
 import { GuideTab } from '@/components/patient/tabs/GuideTab';
 import { MoreTab } from '@/components/patient/tabs/MoreTab';
-import { normalizeTabId, TAB_ORDER, type TabId } from '@/components/patient/tabs/types';
-import { useHospital } from '@/contexts/HospitalContext';
+import {
+  ensureVisibleTab,
+  normalizeTabId,
+  visibleTabs,
+  type TabId,
+} from '@/components/patient/tabs/types';
+import { useHospital, useHospitalFeatures } from '@/contexts/HospitalContext';
 
 /**
  * `/h/:hospitalSlug/patient/home?tab=<id>` 환자용 탭 셸.
@@ -21,14 +26,42 @@ import { useHospital } from '@/contexts/HospitalContext';
  *
  * 슬러그 검증은 부모 `<HospitalShell>` 가 처리 — 여기에 진입하는 시점에는 profile 보장됨.
  */
+/** TabId → 패널 컴포넌트 매핑. features 에 의해 숨겨진 탭은 마운트도 하지 않는다 (구독 누수 방지). */
+const TAB_PANELS: Record<TabId, () => JSX.Element> = {
+  home: () => <HomeTab />,
+  appointments: () => <AppointmentsTab />,
+  inpatient: () => <InpatientTab />,
+  checkup: () => <CheckupTab />,
+  guide: () => <GuideTab />,
+  more: () => <MoreTab />,
+};
+
 export function HospitalHomePage() {
   const { profile } = useHospital();
+  const features = useHospitalFeatures();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab = useMemo<TabId>(
+  /** 사용자가 의도한 탭 (URL ?tab=) — features 검증 전 raw 값 */
+  const desiredTab = useMemo<TabId>(
     () => normalizeTabId(searchParams.get('tab')),
     [searchParams],
   );
+
+  /** 실제 활성 탭 — features 가 비활성화한 탭이면 'home' 으로 fallback */
+  const activeTab = useMemo<TabId>(
+    () => ensureVisibleTab(desiredTab, features),
+    [desiredTab, features],
+  );
+
+  /** 사용자가 비활성 탭 URL 로 진입한 경우 URL 도 'home' 으로 정정 (지속 가능 상태 만들기) */
+  useEffect(() => {
+    if (activeTab !== desiredTab) {
+      setSearchParams({ tab: activeTab }, { replace: true });
+    }
+  }, [activeTab, desiredTab, setSearchParams]);
+
+  /** features 매트릭스에 따라 노출할 탭만 — admin 토글 즉시 반영 */
+  const tabsToRender = useMemo(() => visibleTabs(features), [features]);
 
   const handleTabChange = useCallback(
     (next: TabId) => {
@@ -49,7 +82,7 @@ export function HospitalHomePage() {
         aria-label="환자 메뉴"
         className="sticky top-[60px] z-10 flex gap-1 overflow-x-auto border-b border-outline-variant bg-surface py-2"
       >
-        {TAB_ORDER.map((tab) => {
+        {tabsToRender.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
             <button
@@ -72,24 +105,19 @@ export function HospitalHomePage() {
       </nav>
 
       <main className="mt-3">
-        <div role="tabpanel" id="tab-panel-home" hidden={activeTab !== 'home'}>
-          <HomeTab />
-        </div>
-        <div role="tabpanel" id="tab-panel-appointments" hidden={activeTab !== 'appointments'}>
-          <AppointmentsTab />
-        </div>
-        <div role="tabpanel" id="tab-panel-inpatient" hidden={activeTab !== 'inpatient'}>
-          <InpatientTab />
-        </div>
-        <div role="tabpanel" id="tab-panel-checkup" hidden={activeTab !== 'checkup'}>
-          <CheckupTab />
-        </div>
-        <div role="tabpanel" id="tab-panel-guide" hidden={activeTab !== 'guide'}>
-          <GuideTab />
-        </div>
-        <div role="tabpanel" id="tab-panel-more" hidden={activeTab !== 'more'}>
-          <MoreTab />
-        </div>
+        {tabsToRender.map((tab) => {
+          const Panel = TAB_PANELS[tab.id];
+          return (
+            <div
+              key={tab.id}
+              role="tabpanel"
+              id={`tab-panel-${tab.id}`}
+              hidden={activeTab !== tab.id}
+            >
+              <Panel />
+            </div>
+          );
+        })}
       </main>
     </div>
   );
