@@ -221,8 +221,8 @@ Staff 가 본인 부서의 **오늘 active visit 리스트** 를 보고 status �
 | Phase | 상태 | Commit | 비고 |
 |-------|------|--------|------|
 | I.1.1 | ✅ done | (작업 중) | subscribeRecentVisits + 5 테스트 (orderByChild createdAt desc + limitToLast) |
-| I.1.2 | pending | — | AdminVisitsPage 리스트 + status 변경 |
-| I.1.3 | pending | — | docs + LIVE deploy |
+| I.1.2 | ✅ done | (작업 중) | RecentVisitsList + VisitCard + status select dropdown + 7 테스트 |
+| I.1.3 | ✅ done | (작업 중) | LIVE `index-9WOEF1cj.js` + CSS `index-8YhnynKs.css` 배포, HOSTING_DEPLOY_LOG entry |
 | I.2.1 ~ I.2.5 | pending | — | Staff console |
 | I.3.1 ~ I.3.4 | pending | — | session/queue 연동 |
 | I.4.1 ~ I.4.4 | pending | — | patient history |

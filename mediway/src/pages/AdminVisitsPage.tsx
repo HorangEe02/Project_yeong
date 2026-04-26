@@ -1,25 +1,27 @@
-import { useCallback, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useHospital } from '@/contexts/HospitalContext';
-import { createVisit } from '@/services/visit';
+import { createVisit, subscribeRecentVisits, updateVisitStatus } from '@/services/visit';
 import {
   VISIT_TYPE_REQUIRED_FIELDS,
   VISIT_NOTES_MAX_LENGTH,
+  isInpatientVisit,
+  type Visit,
+  type VisitStatus,
   type VisitType,
 } from '@/types/visit';
 import { getCurrentUid } from '@/services/auth';
 
 /**
  * Phase H.6 — admin 의 환자 visit 등록 페이지.
- * 라우트: `/h/:slug/admin/visits` (HospitalShell 하위, ProtectedRoute requireRole=['admin', 'platformAdmin'])
+ * 라우트: `/h/:slug/admin/visits` (HospitalShell 하위, ProtectedRoute requireRole=['admin'])
  *
- * 본 sprint 범위:
- *  - 단일 visit 등록 폼 (외래/입원/검진/응급 4종, type 별 conditional 필드)
- *  - 제출 → createVisit + success/error 표시
+ * 본 페이지 구성:
+ *  - 단일 visit 등록 폼 (Phase H.6) — 4종 type conditional 필드
+ *  - 최근 등록 visit 리스트 + status 변경 dropdown (Phase I.1.2)
  *
- * 본 sprint 비범위 (Phase I):
- *  - 환자 검색 / uid 자동 완성
- *  - 등록된 visit 리스트 + status 변경
- *  - 부서별 일별 visit 대시보드
+ * 본 sprint 비범위 (Phase I 후속):
+ *  - 환자 검색 / uid 자동 완성 (I.5)
+ *  - 부서별 일별 visit 대시보드 (I.2 — staff 콘솔 분리)
  */
 
 const TYPE_OPTIONS: ReadonlyArray<{ value: VisitType; label: string }> = [
@@ -28,6 +30,24 @@ const TYPE_OPTIONS: ReadonlyArray<{ value: VisitType; label: string }> = [
   { value: 'checkup', label: '검진' },
   { value: 'emergency', label: '응급' },
 ];
+
+const STATUS_OPTIONS: ReadonlyArray<{ value: VisitStatus; label: string }> = [
+  { value: 'scheduled', label: '예약됨' },
+  { value: 'checked-in', label: '접수' },
+  { value: 'in-progress', label: '진료 중' },
+  { value: 'completed', label: '종료' },
+  { value: 'cancelled', label: '취소' },
+];
+
+const STATUS_BADGE_CLASS: Record<VisitStatus, string> = {
+  scheduled: 'bg-surface-container text-on-surface-variant',
+  'checked-in': 'bg-blue-50 text-blue-700',
+  'in-progress': 'bg-amber-50 text-amber-700',
+  completed: 'bg-green-50 text-green-700',
+  cancelled: 'bg-error-container/30 text-error',
+};
+
+const RECENT_VISITS_LIMIT = 20;
 
 export function AdminVisitsPage() {
   const { slug } = useHospital();
@@ -324,7 +344,138 @@ export function AdminVisitsPage() {
           {submitting ? '등록 중...' : 'visit 등록'}
         </button>
       </form>
+
+      <RecentVisitsList slug={slug} />
     </div>
+  );
+}
+
+/**
+ * Phase I.1.2 — 최근 등록 visit 리스트 + status 변경 dropdown.
+ * `subscribeRecentVisits` 로 실시간 구독, `updateVisitStatus` 로 토글.
+ */
+function RecentVisitsList({ slug }: { slug: string }) {
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
+
+  useEffect(() => {
+    return subscribeRecentVisits(slug, RECENT_VISITS_LIMIT, setVisits);
+  }, [slug]);
+
+  const handleStatusChange = useCallback(
+    async (visitId: string, status: VisitStatus) => {
+      setUpdatingId(visitId);
+      setUpdateError(null);
+      try {
+        await updateVisitStatus(slug, visitId, status);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : '알 수 없는 오류';
+        setUpdateError(`status 변경 실패 (${visitId}): ${msg}`);
+      } finally {
+        setUpdatingId(null);
+      }
+    },
+    [slug],
+  );
+
+  return (
+    <section
+      className="mt-10 border-t border-outline-variant pt-6"
+      data-testid="recent-visits-section"
+    >
+      <h2 className="mb-3 text-lg font-bold text-on-surface">
+        최근 등록된 visit ({visits.length})
+      </h2>
+
+      {updateError && (
+        <div
+          role="alert"
+          data-testid="visit-status-update-error"
+          className="mb-3 rounded-lg bg-error-container/30 p-3 text-sm text-error"
+        >
+          {updateError}
+        </div>
+      )}
+
+      {visits.length === 0 ? (
+        <p
+          data-testid="recent-visits-empty"
+          className="rounded-xl bg-surface-container-low p-4 text-sm text-on-surface-variant"
+        >
+          등록된 visit 없음
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-2" data-testid="recent-visits-list">
+          {visits.map((v) => (
+            <VisitCard
+              key={v.visitId}
+              visit={v}
+              updating={updatingId === v.visitId}
+              onStatusChange={handleStatusChange}
+            />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function VisitCard({
+  visit,
+  updating,
+  onStatusChange,
+}: {
+  visit: Visit;
+  updating: boolean;
+  onStatusChange: (visitId: string, status: VisitStatus) => void;
+}) {
+  const typeLabel = TYPE_OPTIONS.find((o) => o.value === visit.type)?.label ?? visit.type;
+  const location = isInpatientVisit(visit)
+    ? `${visit.ward}-${visit.room}${visit.bed ? `-${visit.bed}` : ''}`
+    : visit.zone;
+  const created = new Date(visit.createdAt).toLocaleString();
+
+  return (
+    <li
+      className="flex flex-col gap-2 rounded-xl border border-outline-variant bg-surface-container-lowest p-3 sm:flex-row sm:items-center sm:justify-between"
+      data-testid={`visit-card-${visit.visitId}`}
+    >
+      <div className="flex flex-col gap-1 text-sm">
+        <div className="flex items-center gap-2">
+          <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+            {typeLabel}
+          </span>
+          <span
+            className={`rounded-md px-2 py-0.5 text-xs font-semibold ${STATUS_BADGE_CLASS[visit.status]}`}
+            data-testid={`visit-status-badge-${visit.visitId}`}
+          >
+            {STATUS_OPTIONS.find((s) => s.value === visit.status)?.label ?? visit.status}
+          </span>
+          <span className="text-on-surface-variant">{location}</span>
+          {visit.department && (
+            <span className="text-on-surface-variant">/ {visit.department}</span>
+          )}
+        </div>
+        <div className="text-xs text-on-surface-variant">
+          {visit.displayName ?? visit.patientUid} · {created}
+        </div>
+      </div>
+
+      <select
+        value={visit.status}
+        disabled={updating}
+        onChange={(e) => onStatusChange(visit.visitId, e.target.value as VisitStatus)}
+        data-testid={`visit-status-select-${visit.visitId}`}
+        className="rounded-lg border border-outline-variant px-2 py-1.5 text-xs disabled:opacity-50"
+      >
+        {STATUS_OPTIONS.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </li>
   );
 }
 

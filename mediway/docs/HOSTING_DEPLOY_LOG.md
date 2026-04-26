@@ -6,6 +6,39 @@
 
 ---
 
+## 2026-04-26 — Phase I.1 — Visit status 변경 UI (admin 콘솔 리스트 + dropdown)
+
+- **이전 LIVE 번들**: `index-8V4XKXmY.js` + `index-BHCQsgut.css`
+- **신 LIVE 번들**: `index-9WOEF1cj.js` + `index-8YhnynKs.css` (status badge 색 추가)
+- **Release time**: 2026-04-26T11:22+ Z (20:22+ KST 추정)
+
+### 변경
+- `src/services/visit.ts` — `subscribeRecentVisits(slug, limit, cb)` 추가 (createdAt desc + limitToLast)
+- `src/pages/AdminVisitsPage.tsx` — RecentVisitsList + VisitCard sub-component 추가
+  - 등록 폼 아래에 "최근 등록된 visit (N)" 섹션
+  - 각 카드: type badge + status badge + 위치 + 환자명 + 시각 + status select
+  - status 변경 → `updateVisitStatus` (audit 자동 — Phase H.3)
+  - select disabled (변경 중) + 실패 시 inline error
+- `src/services/__tests__/visit.test.ts` — +5 케이스
+- `src/pages/__tests__/AdminVisitsPage.test.tsx` — +7 케이스
+
+### 효과 — Phase H.7 manual seed 의존성 해소
+이전엔 visit status 가 admin form 으로 등록되면 'scheduled' 만 가능 → Firebase Console 에서 직접 'checked-in' 으로 변경해야 환자 카드에 표시. 이제 admin 페이지에서 직접 토글 가능.
+
+### 검증 시나리오
+1. admin 으로 `/h/demo/admin/visits` 진입
+2. "최근 등록된 visit" 리스트 확인 (이미 등록된 visit 있으면)
+3. 각 카드의 status select 변경 → "접수" / "진료 중" / "종료" / "취소" 토글
+4. 변경 후 환자 측 (`/h/demo/patient/home?tab=guide`) 에서 카드 즉시 갱신
+
+### 테스트
+- vitest 누적 406/406 (394 → 406 = +12)
+
+### 롤백
+- Hosting: `index-8V4XKXmY.js` rollback (Firebase console)
+
+---
+
 ## 2026-04-26 — Phase H.6 — AdminVisitsPage (`/h/:slug/admin/visits`) 등록 폼
 
 - **이전 LIVE 번들**: `index-OGIVtuQo.js` + `index-CTDm0AWe.css`

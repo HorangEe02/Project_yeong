@@ -1,14 +1,27 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { HospitalProvider } from '@/contexts/HospitalContext';
 import type { HospitalProfile } from '@/types/hospital';
+import type { Visit } from '@/types/visit';
 
 // --- Mocks ---
 
 const mockCreateVisit = vi.fn();
+const mockUpdateVisitStatus = vi.fn();
+const mockUnsubscribeRecent = vi.fn();
+const mockSubscribeRecentVisits = vi.fn();
 vi.mock('@/services/visit', () => ({
   createVisit: (...args: unknown[]) => mockCreateVisit(...args),
+  updateVisitStatus: (...args: unknown[]) => mockUpdateVisitStatus(...args),
+  subscribeRecentVisits: (
+    slug: string,
+    limit: number,
+    cb: (vs: unknown[]) => void,
+  ) => {
+    mockSubscribeRecentVisits(slug, limit, cb);
+    return mockUnsubscribeRecent;
+  },
 }));
 
 vi.mock('@/services/auth', () => ({
@@ -19,8 +32,28 @@ import { AdminVisitsPage } from '../AdminVisitsPage';
 
 beforeEach(() => {
   mockCreateVisit.mockReset();
+  mockUpdateVisitStatus.mockReset();
+  mockSubscribeRecentVisits.mockReset();
+  mockUnsubscribeRecent.mockReset();
   mockCreateVisit.mockResolvedValue('visit-new-1');
+  mockUpdateVisitStatus.mockResolvedValue(undefined);
 });
+
+function makeVisit(overrides: Partial<Visit> = {}): Visit {
+  return {
+    visitId: 'v1',
+    patientUid: 'uid-1',
+    hospitalId: 'demo',
+    type: 'outpatient',
+    status: 'scheduled',
+    zone: 'Zone A-1',
+    department: 'IM',
+    createdAt: 1700000000000,
+    updatedAt: 1700000000000,
+    createdBy: 'admin-1',
+    ...overrides,
+  };
+}
 
 function makeProfile(): HospitalProfile {
   return { id: 'demo', name: 'MediWay 데모', status: 'active' };
@@ -187,5 +220,98 @@ describe('AdminVisitsPage — 제출 흐름', () => {
       expect(screen.getByTestId('visit-error').textContent).toMatch(/PERMISSION_DENIED/);
     });
     expect(screen.queryByTestId('visit-success')).toBeNull();
+  });
+});
+
+// =====================================================================
+// I.1.2 — RecentVisitsList + status 변경 dropdown
+// =====================================================================
+
+describe('AdminVisitsPage — 최근 visit 리스트 (I.1.2)', () => {
+  it('마운트 시 subscribeRecentVisits(slug, 20) 호출', () => {
+    renderPage();
+    expect(mockSubscribeRecentVisits).toHaveBeenCalledTimes(1);
+    expect(mockSubscribeRecentVisits.mock.calls[0][0]).toBe('demo');
+    expect(mockSubscribeRecentVisits.mock.calls[0][1]).toBe(20);
+  });
+
+  it('visits 빔 → "등록된 visit 없음" 표시', () => {
+    renderPage();
+    const cb = mockSubscribeRecentVisits.mock.calls[0][2] as (vs: Visit[]) => void;
+    act(() => cb([]));
+    expect(screen.getByTestId('recent-visits-empty')).toBeTruthy();
+    expect(screen.getByText('등록된 visit 없음')).toBeTruthy();
+  });
+
+  it('visits 다건 → 카드 리스트 표시', () => {
+    renderPage();
+    const cb = mockSubscribeRecentVisits.mock.calls[0][2] as (vs: Visit[]) => void;
+    const v1 = makeVisit({ visitId: 'v1' });
+    const v2 = makeVisit({
+      visitId: 'v2',
+      type: 'inpatient',
+      ward: '3W',
+      room: '302',
+      department: undefined,
+    });
+    act(() => cb([v1, v2]));
+    expect(screen.getByTestId('visit-card-v1')).toBeTruthy();
+    expect(screen.getByTestId('visit-card-v2')).toBeTruthy();
+  });
+
+  it('status select 변경 → updateVisitStatus(slug, visitId, newStatus) 호출', async () => {
+    renderPage();
+    const cb = mockSubscribeRecentVisits.mock.calls[0][2] as (vs: Visit[]) => void;
+    act(() => cb([makeVisit({ visitId: 'v1', status: 'scheduled' })]));
+
+    fireEvent.change(screen.getByTestId('visit-status-select-v1'), {
+      target: { value: 'checked-in' },
+    });
+
+    await waitFor(() => {
+      expect(mockUpdateVisitStatus).toHaveBeenCalledWith('demo', 'v1', 'checked-in');
+    });
+  });
+
+  it('updateVisitStatus reject → error 표시', async () => {
+    mockUpdateVisitStatus.mockRejectedValueOnce(new Error('PERMISSION_DENIED'));
+    renderPage();
+    const cb = mockSubscribeRecentVisits.mock.calls[0][2] as (vs: Visit[]) => void;
+    act(() => cb([makeVisit({ visitId: 'v1' })]));
+
+    fireEvent.change(screen.getByTestId('visit-status-select-v1'), {
+      target: { value: 'completed' },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('visit-status-update-error').textContent).toMatch(
+        /PERMISSION_DENIED/,
+      );
+    });
+  });
+
+  it('inpatient visit → 카드에 ward-room-bed 위치 표시', () => {
+    renderPage();
+    const cb = mockSubscribeRecentVisits.mock.calls[0][2] as (vs: Visit[]) => void;
+    act(() =>
+      cb([
+        makeVisit({
+          visitId: 'v1',
+          type: 'inpatient',
+          ward: '5W',
+          room: '501',
+          bed: 'A',
+          department: undefined,
+        }),
+      ]),
+    );
+    expect(screen.getByTestId('visit-card-v1').textContent).toContain('5W-501-A');
+  });
+
+  it('unmount 시 unsubscribe 호출', () => {
+    const { unmount } = renderPage();
+    expect(mockUnsubscribeRecent).not.toHaveBeenCalled();
+    unmount();
+    expect(mockUnsubscribeRecent).toHaveBeenCalledTimes(1);
   });
 });
