@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-04-26 — Phase I.4 — 환자 Visit History 페이지 + 더보기 진입 링크
+
+- **이전 LIVE 번들**: `index-BKTdpyHQ.js` + `index-8YhnynKs.css`
+- **신 LIVE 번들**: `index-DCZIvWPO.js` + `index-8YhnynKs.css` (CSS 동일)
+- **신규 라우트**: `/h/:hospitalSlug/patient/history` (ProtectedRoute — 인증 필요)
+
+### 변경
+- `src/hooks/useVisitHistory.ts` 신설 — 일회성 fetch + refresh
+- `src/pages/PatientHistoryPage.tsx` 신설 — 본인 visit history 카드 리스트
+- `src/components/patient/tabs/MoreTab.tsx` — "방문 이력" 카드 + 링크 추가 (HistoryLinkCard)
+- `src/App.tsx` — patient/history 라우트 등록
+
+### 화면 정책
+- 헤더: "방문 이력" + "← 홈으로" 링크
+- 분기: 비인증 / loading / error / empty / 카드 리스트
+- 카드: type badge + status badge + 부서 + 위치 + 날짜 + notes preview (60자)
+- 환자 본인만 자기 visit read (Phase H.2 RTDB rules `data.child('patientUid').val() === auth.uid`)
+
+### 진입 경로
+- 환자 home → "더보기" 탭 → "방문 이력" 카드 → 새 페이지
+
+### 테스트
+- useVisitHistory.test.ts — 6 케이스
+- PatientHistoryPage.test.tsx — 8 케이스
+- MoreTab.test.tsx — 3 케이스 (신규 파일, 다른 카드는 별도 sprint)
+- vitest 누적 448/448 (431 → 448 = +17)
+
+### 롤백
+- Hosting: `index-BKTdpyHQ.js` rollback (Firebase console)
+
+---
+
 ## 2026-04-26 — Phase I.2.4/I.2.5 — Staff visit 콘솔 + StaffSubNav 4탭화
 
 - **이전 LIVE 번들**: `index-9WOEF1cj.js` + `index-8YhnynKs.css`

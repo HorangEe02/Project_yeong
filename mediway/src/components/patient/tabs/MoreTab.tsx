@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { History } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { usePreferencesStore } from '@/stores/preferencesStore';
 import { useNotificationPrefsStore } from '@/stores/notificationPrefsStore';
+import { useHospital } from '@/contexts/HospitalContext';
 import {
   CHANNEL_LABELS,
   CHANNEL_ORDER,
@@ -27,6 +30,7 @@ import {
 export function MoreTab() {
   const user = useAuthStore((s) => s.user);
   const uid = user && !user.isAnonymous ? user.uid : null;
+  const { slug } = useHospital();
 
   // 고령자 모드
   const uiSenior = usePreferencesStore((s) => s.uiSenior);
@@ -73,7 +77,36 @@ export function MoreTab() {
 
       {/* 알림 설정 */}
       <NotificationPrefsCard uid={uid} />
+
+      {/* 방문 이력 (Phase I.4.3) */}
+      <HistoryLinkCard slug={slug} />
     </section>
+  );
+}
+
+/** 방문 이력 페이지 진입 카드. 인증 안 된 사용자도 링크는 보이지만 페이지가 ProtectedRoute. */
+function HistoryLinkCard({ slug }: { slug: string }) {
+  return (
+    <article className="rounded-xl bg-surface-container-lowest p-5">
+      <Link
+        to={`/h/${slug}/patient/history`}
+        data-testid="more-history-link"
+        className="flex items-center justify-between gap-3 no-underline"
+      >
+        <div className="flex items-center gap-3">
+          <History className="h-5 w-5 text-primary" aria-hidden="true" />
+          <div>
+            <h3 className="text-base font-semibold text-on-surface">방문 이력</h3>
+            <p className="mt-0.5 text-xs text-on-surface-variant">
+              지난 방문 기록을 확인합니다.
+            </p>
+          </div>
+        </div>
+        <span className="text-xs text-on-surface-variant" aria-hidden="true">
+          →
+        </span>
+      </Link>
+    </article>
   );
 }
 

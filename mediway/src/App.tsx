@@ -9,6 +9,7 @@ import { StaffQueuePage } from '@/pages/StaffQueuePage';
 import { StaffEmergencyPage } from '@/pages/StaffEmergencyPage';
 import { StaffVisitsPage } from '@/pages/StaffVisitsPage';
 import { AdminVisitsPage } from '@/pages/AdminVisitsPage';
+import { PatientHistoryPage } from '@/pages/PatientHistoryPage';
 import { PatientPage } from '@/pages/PatientPage';
 import { HospitalHomePage } from '@/pages/HospitalHomePage';
 import { LoginPage } from '@/pages/auth/LoginPage';
@@ -261,6 +262,14 @@ export default function App() {
             <Route path="patient/home" element={<HospitalHomePage />} />
             {/* 환자 — 익명 + 로그인 모두 허용 (QR 진입) */}
             <Route path="patient/:sessionId" element={<PatientPage />} />
+            <Route
+              path="patient/history"
+              element={
+                <ProtectedRoute>
+                  <PatientHistoryPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="staff"
               element={
