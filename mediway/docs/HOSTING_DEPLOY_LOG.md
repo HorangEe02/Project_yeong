@@ -6,6 +6,53 @@
 
 ---
 
+## 2026-04-26 — Scenario E (AI Triage) 본 배포
+
+- **이전 LIVE 번들**: `index-D_OWDnbO.js` (B-3.10 + F1)
+- **신 LIVE 번들**: `index-paEulSKd.js` + `index-CycsFZ0b.css` (CSS 변경 없음)
+- **Release time**: 2026-04-26T02:49:19Z (11:49 KST)
+- **Functions**: `triageSymptoms(asia-northeast3)` 신규 create — 같은 시점 deploy
+- **Channel**: `live` (mediway-demo.web.app)
+
+### 포함 변경 (7 commit, `b2ebbb0` → `8724cbe`)
+
+E Scenario AI Triage 재작성:
+- `b2ebbb0` triage types + Zod schema
+- `15e1dd4` triageSymptoms cloud function (Gemini + epoch-hour bucket + audit dual-write)
+- `d78ffe6` src/services/triage.ts wrapper
+- `1773eb8` TriageWidget UI
+- `9c4c57a` HomeTab 통합 + features.aiTriage 가드
+- `3fc095e` scenario E 통합 smoke (8 케이스)
+- `8724cbe` docs(E)
+
+### 배포 검증 (자동)
+- HTTP 200 (`https://mediway-demo.web.app/`)
+- 신 번들 hash 로컬 dist / LIVE 3자 일치
+- LIVE etag `728d2a9e39d698e1...`
+- Functions: `Successful create operation` for `triageSymptoms(asia-northeast3)`
+
+### 활성화 조건 (admin 토글 후)
+- platformAdmin 가 `/admin/hospitals/{slug}/profile/features/aiTriage` 를 `true` 로 설정
+- 환자 홈 (`/h/{slug}/patient/home`) 에서 TriageWidget 노출 — RTDB 토글 즉시 반영
+- demo 병원 default `false` 유지 → 토글 전까지는 위젯 숨김 (회귀 없음)
+
+### 후속 시각 검증 체크리스트
+1. platformAdmin 로그인 → `/admin/hospitals/demo` → features.aiTriage 체크
+2. 환자 (`p0107044@gmail.com`) 로 `/h/demo/patient/home` 진입
+3. 홈 탭에 "AI 진료과 추천" 위젯 노출 확인
+4. "2일째 기침과 미열이 있어요" 입력 → 5초 이내 Top-3 카드
+5. 11번째 호출 시 "약 N분 후 다시 시도" 안내
+6. "갑자기 가슴이 너무 아파요" → emergencyNotice + 응급의학과 1순위
+7. Firebase Console → Functions → `triageSymptoms` 로그
+8. RTDB `/triage_audit/<pushId>` + `/triage_usage/<uid>/<epochHour>` 갱신
+
+### 롤백 절차 (필요 시)
+1. Firebase Console → Hosting → 이전 release `index-D_OWDnbO.js` 옆 "Rollback"
+2. Functions: `firebase functions:delete triageSymptoms --region asia-northeast3 --force`
+3. (선택) features.aiTriage 토글 off 만 해도 위젯 즉시 숨김 — 가장 빠른 임시 비활성화
+
+---
+
 ## 2026-04-26 — B-3.10 + F1 결합 본 배포 (prod parity 달성)
 
 - **이전 surgical patch**: `2b52463a288bc8d4`
