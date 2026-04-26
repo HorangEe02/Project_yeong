@@ -251,7 +251,7 @@ export function useActiveVisit(slug: string | null, patientUid: string | null): 
 | Phase | 상태 | Commit | 비고 |
 |-------|------|--------|------|
 | H.1 | ✅ done | (작업 중) | Visit type + 4 type guards + VISIT_TYPE_REQUIRED_FIELDS + isActiveStatus, vitest 19/19 pass |
-| H.2 | pending | — | — |
+| H.2 | ✅ done | (작업 중) | `/visits/{hid}/{visitId}` rules 추가 + deploy released, validate 강화 (type/status enum, zone len, hospitalId match) |
 | H.3 | pending | — | — |
 | H.4 | pending | — | — |
 | H.5 | pending | — | — |

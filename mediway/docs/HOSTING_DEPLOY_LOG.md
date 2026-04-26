@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-04-26 — RTDB rules `/visits` path 추가 (Phase H.2)
+
+- **배포 종류**: RTDB rules (Hosting / Functions 변경 없음)
+- **신규 path**: `/visits/{hospitalId}/{visitId}` — 환자 visit (외래/입원 admission) record
+- **Release**: rules released successfully (mediway-demo-default-rtdb)
+
+### 정책
+- read 권한:
+  - root `/visits`: platformAdmin
+  - `$hospitalId`: same-hospital staff/admin or platformAdmin
+  - `$visitId`: 환자 본인 (visit.patientUid === auth.uid) or same-hospital staff/admin or platformAdmin
+- write 권한: same-hospital admin or platformAdmin (환자/staff read-only)
+- index: patientUid, status, type, scheduledFor
+- validate:
+  - 필수 필드: patientUid, hospitalId, type, status, zone, createdAt
+  - hospitalId === $hospitalId (cross-tenant 방지)
+  - type ∈ {outpatient, inpatient, checkup, emergency}
+  - status ∈ {scheduled, checked-in, in-progress, completed, cancelled}
+  - zone 1-50자
+  - notes ≤ 500자
+
+### 후속 (Phase H.3-H.7)
+- service 레이어 (createVisit/subscribeActiveVisit) — H.3
+- useActiveVisit hook — H.4
+- QRDisplay 동적 바인딩 — H.5
+- AdminVisitsPage 등록 UI — H.6
+- 시드 데이터 + LIVE 검증 — H.7
+
+---
+
 ## 2026-04-26 — 동선 전송 PERMISSION_DENIED + 환자 자동 redirect 회복 (hotfix)
 
 - **이전 LIVE 번들**: `index-CdK89X7D.js` + `index-CTDm0AWe.css`

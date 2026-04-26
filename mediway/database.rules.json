@@ -183,6 +183,26 @@
       }
     },
 
+    "visits": {
+      ".read": "auth != null && auth.token.role === 'platformAdmin'",
+      "$hospitalId": {
+        ".read": "auth != null && (auth.token.role === 'platformAdmin' || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId))",
+        ".indexOn": ["patientUid", "status", "type", "scheduledFor"],
+        "$visitId": {
+          ".read": "auth != null && (data.child('patientUid').val() === auth.uid || ((auth.token.role === 'staff' || auth.token.role === 'admin') && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
+          ".write": "auth != null && ((auth.token.role === 'admin' && auth.token.hospitalId === $hospitalId) || auth.token.role === 'platformAdmin')",
+          ".validate": "newData.hasChildren(['patientUid','hospitalId','type','status','zone','createdAt'])",
+          "hospitalId": { ".validate": "newData.isString() && newData.val() === $hospitalId" },
+          "type": { ".validate": "newData.isString() && (newData.val() === 'outpatient' || newData.val() === 'inpatient' || newData.val() === 'checkup' || newData.val() === 'emergency')" },
+          "status": { ".validate": "newData.isString() && (newData.val() === 'scheduled' || newData.val() === 'checked-in' || newData.val() === 'in-progress' || newData.val() === 'completed' || newData.val() === 'cancelled')" },
+          "zone": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50" },
+          "notes": { ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 500)" },
+          "createdAt": { ".validate": "newData.isNumber()" },
+          "updatedAt": { ".validate": "newData.isNumber()" }
+        }
+      }
+    },
+
     "shared_plans": {
       "$code": {
         ".read": "auth != null",
