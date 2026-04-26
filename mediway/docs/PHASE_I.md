@@ -229,6 +229,7 @@ Staff 가 본인 부서의 **오늘 active visit 리스트** 를 보고 status �
 | I.2.4 | ✅ done | (작업 중) | StaffVisitsPage + StaffSubNav 4탭 + /h/:slug/staff/visits 라우트 + 13 테스트 |
 | I.2.5 | ✅ done | (작업 중) | LIVE `index-BKTdpyHQ.js` 배포 (Hook dateMs default 버그 즉시 hotfix 포함) |
 | I.3.1 ~ I.3.4 | pending | — | session/queue 연동 |
-| I.4.1 ~ I.4.4 | pending | — | patient history |
+| I.4.1 | ✅ done | (작업 중) | useVisitHistory hook + 6 테스트 (idle / loading / 성공 / reject / refresh / limit) |
+| I.4.2 ~ I.4.4 | pending | — | page / link / docs+deploy |
 | I.5.1 ~ I.5.3 | pending | — | UX 보강 |
 | I.6.1 ~ I.6.3 | pending | — | notification + archive |
