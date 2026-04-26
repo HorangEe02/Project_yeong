@@ -13,7 +13,11 @@ StaffQueuePage · AppointmentsTab · ChatbotWidget · MoreTab 고령자 모드. 
 
 **Phase B-3 남은 TODO (주석만 남기고 실구현은 별도 sprint)**:
 - **item 9**: VisitPlanPage 흰 화면 — `src/pages/account/VisitPlanPage.tsx:1` 주석 참고
-- **item 10**: Hospital slug routing 전체 개편 — `src/App.tsx:235` 주석 참고
+- ~~**item 10**: Hospital slug routing 전체 개편~~ → ✅ **2026-04-26 완료**
+  설계: `docs/B-3_ITEM10_HOSPITAL_SLUG_ROUTING.md`
+  6 커밋 (`94077e5` → `5e5f6cc` + 본 docs 커밋)
+  HospitalShell + HospitalContext + LegacyHospitalRedirect + nested `/h/:slug/{patient,staff}/...`
+  hosting 재배포는 §7 체크리스트로 별도 승인 단계.
 
 **주의**: e2e-hospital-isolation.html 시나리오 #7 이 platformAdmin 로 실행될 때
 `hospitals/demo/profile/themeColor` 를 `#deadbe` 로 덮어쓰는 부작용이 있음.
