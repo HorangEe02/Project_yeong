@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-04-26 — emergencyCall default ON (모든 hospital 기본 활성)
+
+- **이전 LIVE 번들**: `index-BIXOAMN-.js` + `index-CTDm0AWe.css`
+- **신 LIVE 번들**: `index-B7my1M0_.js` + `index-CTDm0AWe.css` (CSS 동일)
+- **Release time**: 2026-04-26T06:15:** Z (15:15+ KST)
+- **Channel**: `live`
+
+### 변경
+사용자 요청 — admin 토글 없이 모든 사용자 계정에서 응급 호출 즉시 사용 가능하도록.
+
+`src/contexts/HospitalContext.tsx` — `FEATURE_DEFAULTS.emergencyCall: false → true`
+- demo hospital (features 미설정) → 자동 ON → 모든 사용자에게 노출
+- admin 가 명시적으로 `features.emergencyCall=false` 설정한 hospital 만 비활성
+
+### 윤리 안전 장치 (그대로 유지)
+- 단일 클릭으로 119 통화 트리거되지 않음 — 확인 dialog 강제
+- 「취소」 버튼 노출 — dialog 빠져나갈 수 있음
+- 응급 컨텍스트 명시 — 사용자가 의도적으로 응급 모드 진입해야 함
+
+### 사용자 영향
+| 흐름 | 변화 |
+|------|------|
+| `/h/demo/patient/home?tab=guide` | 「응급 호출」 3rd 모드 즉시 노출 (모든 사용자) |
+| 다른 hospital | features.emergencyCall=undefined 면 ON (admin 가 false 명시 시만 OFF) |
+
+### 롤백 절차
+1. Hosting: 이전 release `index-BIXOAMN-.js` "Rollback"
+2. (또는) FEATURE_DEFAULTS.emergencyCall 을 false 로 되돌리고 재배포
+3. 특정 hospital 만 비활성: admin UI 의 「응급 호출 (119)」 체크박스 → 해제 → 저장
+
+---
+
 ## 2026-04-26 — Admin features 동기화 hotfix (emergencyCall 토글 가능)
 
 - **이전 LIVE 번들**: `index-BjFBq90O.js` + `index-CTDm0AWe.css`
