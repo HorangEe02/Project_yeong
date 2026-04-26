@@ -80,7 +80,7 @@ export function HospitalHomePage() {
       <nav
         role="tablist"
         aria-label="환자 메뉴"
-        className="sticky top-[60px] z-10 flex gap-1 overflow-x-auto border-b border-outline-variant bg-surface py-2"
+        className="sticky top-[60px] z-10 flex justify-center gap-1 overflow-x-auto border-b border-outline-variant bg-surface py-2"
       >
         {tabsToRender.map((tab) => {
           const isActive = tab.id === activeTab;
