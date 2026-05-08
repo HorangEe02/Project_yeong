@@ -1,6 +1,6 @@
 # 운영 배포 가이드
 
-> Cloud Run + Firebase Hosting + Mac Ollama (Plan A 변형) 배포 절차.
+> Cloud Run + Firebase Hosting + 자가 호스팅 Ollama (Plan A 변형) 배포 절차.
 
 ## 1. 사전 준비 (1회)
 
@@ -97,7 +97,7 @@ firebase deploy --only storage  # storage rules
 firebase deploy --only database  # realtime DB rules (있다면)
 ```
 
-## 4. Mac 호스트 셋업 (Ollama 자가 호스팅)
+## 4. 호스트 셋업 (Ollama 자가 호스팅)
 
 ### 4.1 launchd 영속화
 ```bash
@@ -156,7 +156,7 @@ curl -X POST https://ajin-cb.web.app/api/onboarding/chat \
 ### 6.2 모니터링
 - Cloud Run logs: https://console.cloud.google.com/run/detail/asia-northeast3/ajin-backend/logs
 - Firebase Hosting analytics: Firebase Console
-- Mac 측 cloudflared/Caddy: `tail -f ~/.config/ajin/{caddy,watchdog}.stderr.log`
+- 호스트 측 cloudflared/Caddy: `tail -f ~/.config/ajin/{caddy,watchdog}.stderr.log`
 
 ### 6.3 Secret rotation (90일 권장)
 ```bash
@@ -177,7 +177,7 @@ gcloud run services update-traffic ajin-backend --region asia-northeast3 --to-la
 gcloud run services update ajin-backend --region asia-northeast3 \
   --update-env-vars "LLM_ROUTER_PRIMARY=gemini,LLM_ROUTER_FALLBACK_ENABLED=true,OLLAMA_BASE_URL="
 ```
-즉시 Gemini-only 모드 (Mac 무관). 나중에 다시 ollama 우선으로:
+즉시 Gemini-only 모드 (호스트 무관). 나중에 다시 ollama 우선으로:
 ```bash
 NEW_TUNNEL=$(cat ~/.config/ajin/last_tunnel_url.txt)
 gcloud run services update ajin-backend --region asia-northeast3 \
@@ -186,7 +186,7 @@ gcloud run services update ajin-backend --region asia-northeast3 \
 
 ## 7. Plan B 이행 (미래 GPU 서버)
 
-`ARCHITECTURE.md` 의 Section 8 참고. 같은 Caddy + secret + watchdog 패턴 그대로 GPU 서버에 복제 → Mac 측 watchdog 정지 → 다운타임 < 5분.
+`ARCHITECTURE.md` 의 Section 8 참고. 같은 Caddy + secret + watchdog 패턴 그대로 GPU 서버에 복제 → 호스트 측 watchdog 정지 → 다운타임 < 5분.
 
 ## 8. 참고 — Cloud Run 사양
 

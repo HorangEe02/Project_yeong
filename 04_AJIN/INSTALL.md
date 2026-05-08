@@ -46,7 +46,7 @@ AJIN_JWT_SECRET=$(openssl rand -hex 32)  # 32-byte hex
 ```
 
 나머지는 default 그대로 OK (로컬 dev 시):
-- `OLLAMA_BASE_URL=http://localhost:11434` — Mac/Linux 호스트의 Ollama 직접 호출
+- `OLLAMA_BASE_URL=http://localhost:11434` — macOS/Linux 호스트의 Ollama 직접 호출
 - `LLM_ROUTER_PRIMARY=ollama` — Ollama 1순위, 실패 시 Gemini fallback
 - `EMBEDDING_BACKEND=auto` — Ollama 살아있으면 ollama, 아니면 gemini
 - `AJIN_OLLAMA_SECRET=` — 빈값 (로컬은 인증 불요)
@@ -83,7 +83,7 @@ docker compose -f docker-compose.yml up -d
 
 ## 7. 시연 환경 활성화 (Cloud Run 연동)
 
-운영 사이트(`ajin-cb.web.app`)와 Mac Ollama 를 임시 URL 로 연결:
+운영 사이트(`ajin-cb.web.app`)와 자가 호스팅 Ollama 를 임시 URL 로 연결:
 
 ```bash
 bash scripts/demo/start_local_demo.sh
@@ -93,7 +93,7 @@ bash scripts/demo/start_local_demo.sh
 1. Ollama `0.0.0.0:11434` 외부 바인딩 (재시작)
 2. cloudflared 임시 tunnel 발급
 3. Cloud Run env 의 `OLLAMA_BASE_URL` 자동 갱신
-4. caffeinate 로 Mac sleep 방지
+4. caffeinate 로 호스트 sleep 방지
 
 종료:
 ```bash

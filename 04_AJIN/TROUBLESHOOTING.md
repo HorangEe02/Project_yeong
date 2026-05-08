@@ -44,7 +44,7 @@ gcloud run services describe ajin-backend --region asia-northeast3 \
 해결: 두 값 동기화 + Caddy reload + Cloud Run revision rollout.
 
 ### `OllamaHealthMiddleware: AI_UNAVAILABLE 503`
-Mac Ollama 도달성 실패. 확인 순서:
+자가 호스팅 Ollama 도달성 실패. 확인 순서:
 1. `~/Library/LaunchAgents/com.ajin.caddy.plist` 로드 상태: `launchctl list | grep com.ajin`
 2. cloudflared 살아있나: `pgrep cloudflared`
 3. tunnel URL 동기화: `cat ~/.config/ajin/last_tunnel_url.txt` ↔ Cloud Run `OLLAMA_BASE_URL` 일치
@@ -71,7 +71,7 @@ launchctl unload ~/Library/LaunchAgents/com.ajin.tunnel-watchdog.plist
 launchctl load ~/Library/LaunchAgents/com.ajin.tunnel-watchdog.plist
 ```
 
-### Mac 재부팅 후 cloudflared 안 뜸
+### 호스트 재부팅 후 cloudflared 안 뜸
 launchd 등록 확인:
 ```bash
 launchctl list | grep com.ajin
@@ -85,7 +85,7 @@ launchctl load ~/Library/LaunchAgents/com.ajin.tunnel-watchdog.plist
 
 ## 4. Frontend
 
-### TopBar LLM 라벨이 `GEMINI · CLOUD` 로 표시 (Mac 동작 중인데)
+### TopBar LLM 라벨이 `GEMINI · CLOUD` 로 표시 (호스트 동작 중인데)
 `/api/draft/diagnose` 가 ollama.ok=false 반환. 원인 같음 — secret header 누락. 위 [Ollama HTTP 403] 절차로.
 
 또는 frontend 가 캐시된 응답 사용 — `Cmd+Shift+R` 로 hard reload.
@@ -148,7 +148,7 @@ ollama pull qwen3.5:9b  # 등 필요한 모델 재다운로드
 
 또는 외장 디스크에 모델 데이터가 있다면 rsync 로 옮기기 — `MIGRATE_OLLAMA_DATA.md` 참고.
 
-### Ollama OOM (24GB Mac 메모리 부족)
+### Ollama OOM (24GB 호스트 메모리 부족)
 - `OLLAMA_MAX_LOADED_MODELS=1` 으로 동시 로드 제한
 - `OLLAMA_KEEP_ALIVE=10m` 으로 unload 시간 단축
 - 다른 메모리 큰 앱(Xcode, Chrome 등) 종료
@@ -169,8 +169,8 @@ chmod 600 ~/.config/ajin/ollama-secret
 chmod 600 secrets/*
 ```
 
-### Mac sleep 후 cloudflared 끊김
-시스템 환경설정 → 잠금 화면 → "디스플레이가 꺼지면 Mac을 잠자기 모드로 두기" → **사용 안 함**.
+### 호스트 sleep 후 cloudflared 끊김
+시스템 환경설정 → 잠금 화면 → "디스플레이가 꺼지면 호스트를 잠자기 모드로 두기" → **사용 안 함**.
 또는 백그라운드에서:
 ```bash
 caffeinate -d -i &

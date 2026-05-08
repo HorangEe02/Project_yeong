@@ -1,6 +1,6 @@
 # 시스템 아키텍처
 
-> Plan A 변형 — Mac Ollama × Cloud Run × Firebase Hosting 운영급 연동.
+> Plan A 변형 — 자가 호스팅 Ollama × Cloud Run × Firebase Hosting 운영급 연동.
 
 ## 1. 전체 다이어그램
 
@@ -21,19 +21,19 @@
 │  Cloud Run — ajin-backend (asia-northeast3)                  │
 │  - FastAPI + uvicorn (CPU 2 / Mem 2 GiB)                     │
 │  - LLMRouter (provider chain)                                │
-│  - OllamaHealthMiddleware (Mac off 시 503)                    │
+│  - OllamaHealthMiddleware (호스트 미가용 시 503)                    │
 │  - Firestore mirror (사용자 인증)                              │
 └─────────────┬────────────────────────────┬───────────────────┘
               │                            │
    ┌──────────▼─────────┐        ┌─────────▼──────────┐
-   │ Gemini 2.5 Pro API │        │ Mac Ollama         │
+   │ Gemini 2.5 Pro API │        │ 자가 호스팅 Ollama         │
    │ (text-embedding-004│        │ via Cloudflare     │
    │  + chat fallback)  │        │ Tunnel (자가호스팅) │
    └────────────────────┘        └────────────────────┘
                                            │
                                            ▼
                               ┌─────────────────────────┐
-                              │ Mac (M4 Pro, 24GB RAM)  │
+                              │ 호스트 머신 (예: 24GB RAM)  │
                               ├─────────────────────────┤
                               │ launchd 3 daemons:      │
                               │  • ollama serve         │
@@ -60,7 +60,7 @@
 
 **환경변수 토글**: `LLM_ROUTER_PRIMARY=gemini` 로 1줄 변경 시 즉시 Gemini-only 환원 (사고 시 빠른 fallback).
 
-## 3. Mac 호스트 인프라
+## 3. 호스트 인프라
 
 ### 3.1 Caddy (`:8434` reverse proxy + secret 검증)
 ```caddyfile
@@ -102,7 +102,7 @@
 - axios interceptor:
   - 401 → refresh token / Firebase exchange / login redirect
   - 503 + `AI_UNAVAILABLE` → maintenance store activate
-- `MaintenanceBanner` — Mac off 시 자동 표시
+- `MaintenanceBanner` — 호스트 미가용 시 자동 표시
 - `TopBar` LLM 라벨 — `/api/draft/diagnose` polling 으로 동적 (`🐳 DOCKER` / `LOCAL · OLLAMA` / `GEMINI · CLOUD` / `OFFLINE`)
 
 ## 5. 보안 계층
@@ -120,12 +120,12 @@
 ```
 1. 사용자가 frontend 채팅창에 메시지 입력
 2. axios → POST /api/onboarding/chat (JWT 헤더)
-3. Cloud Run OllamaHealthMiddleware 가 Mac 도달성 확인 (5s 캐시)
-   - Mac off → 503 + AI_UNAVAILABLE → frontend banner
-   - Mac on → 통과
+3. Cloud Run OllamaHealthMiddleware 가 호스트 도달성 확인 (5s 캐시)
+   - 호스트 미가용 → 503 + AI_UNAVAILABLE → frontend banner
+   - 호스트 가용 → 통과
 4. LLMRouter → mode=CHAT_KOREAN → chain[0] = ollama qwen3.5:9b
 5. OllamaProvider 가 X-AJIN-Secret 헤더 부착해 Cloudflare Tunnel 호출
-6. trycloudflare.com → Cloudflare Edge → cloudflared (Mac)
+6. trycloudflare.com → Cloudflare Edge → cloudflared (호스트)
 7. Caddy 가 X-AJIN-Secret 검증 → :11434 으로 forward
 8. Ollama 가 SSE 스트림으로 토큰 반환
 9. Cloud Run 이 같은 SSE 로 frontend 까지 전달
@@ -152,5 +152,5 @@
 1. `~/.config/ajin/` 통째로 SCP
 2. Linux launchd 대신 systemd 사용
 3. Cloud Run env 변경 불요 — 같은 watchdog 가 새 URL 추출
-4. Mac 측 `launchctl unload com.ajin.tunnel-watchdog` (이중 가동 방지)
+4. 호스트 측 `launchctl unload com.ajin.tunnel-watchdog` (이중 가동 방지)
 5. 다운타임 < 5분, 백엔드 코드 변경 0

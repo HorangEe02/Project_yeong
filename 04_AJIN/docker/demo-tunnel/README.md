@@ -1,6 +1,6 @@
 # AJIN Demo Tunnel — Docker 시연 환경
 
-Mac 의 Ollama 를 Cloudflare Tunnel 로 외부에 노출시켜 Cloud Run(`ajin-backend`)이 호출하도록 자동화한 컨테이너.
+호스트의 Ollama 를 Cloudflare Tunnel 로 외부에 노출시켜 Cloud Run(`ajin-backend`)이 호출하도록 자동화한 컨테이너.
 
 ## 첫 1회 셋업
 
@@ -89,7 +89,7 @@ environment:
 |---|---|
 | `Ollama 응답 없음` | 호스트에서 `lsof -i :11434` 로 0.0.0.0 바인딩 확인 |
 | `gcloud 인증 없음` | 호스트에서 `gcloud auth login` 후 `~/.config/gcloud` 가 마운트되는지 확인 |
-| `Tunnel URL 발급 실패` | Mac 인터넷 점검 → 컨테이너 재시작 |
+| `Tunnel URL 발급 실패` | 호스트 인터넷 점검 → 컨테이너 재시작 |
 | Stop 버튼 후 Cloud Run env 잔여 | `gcloud run services update ajin-backend --update-env-vars OLLAMA_BASE_URL= --region asia-northeast3` 수동 실행 |
 | Docker Desktop UI 가 sleep 시 종료 | 호스트 caffeinate 별도 실행 필요 (컨테이너 안에서는 호스트 sleep 제어 불가) |
 

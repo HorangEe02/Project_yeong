@@ -43,7 +43,7 @@
 feat(llm-router): add LLM_ROUTER_PRIMARY toggle for ollama/gemini priority
 
 기본 chain 이 항상 Gemini 1순위였던 문제. 환경변수 LLM_ROUTER_PRIMARY=ollama
-설정 시 Mac Ollama 가 1순위, fallback 으로 Gemini. Cloud Run env 1줄 변경으로
+설정 시 자가 호스팅 Ollama 가 1순위, fallback 으로 Gemini. Cloud Run env 1줄 변경으로
 즉시 토글 가능.
 
 Closes #42

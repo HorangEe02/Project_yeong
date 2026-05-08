@@ -67,7 +67,7 @@
 ## 인프라 보안
 
 - Cloud Run service 는 `--ingress=all` (Firebase Hosting 만 호출 가능하게 IAM 으로 추가 제한 가능)
-- Mac Ollama 는 loopback (`127.0.0.1:11434`) 만 — Caddy `:8434` 가 단일 진입점
+- 자가 호스팅 Ollama 는 loopback (`127.0.0.1:11434`) 만 — Caddy `:8434` 가 단일 진입점
 - Caddy access log 의 secret 헤더는 `format filter` 로 redact
 
 ## 사고 대응
