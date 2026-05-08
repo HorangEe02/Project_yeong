@@ -1,6 +1,6 @@
 # =============================================================================
 # Backend CI: Python (FastAPI) 코드 자동 검증
-# 트리거: 03_lemon_healthcare/backend/** 변경 시
+# 트리거: 03_lemon_healthcare/pr1/backend/** 변경 시
 # =============================================================================
 
 name: Backend CI
@@ -9,12 +9,12 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - '03_lemon_healthcare/backend/**'
+      - '03_lemon_healthcare/pr1/backend/**'
       - '03_lemon_healthcare/.github/workflows/ci-backend.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - '03_lemon_healthcare/backend/**'
+      - '03_lemon_healthcare/pr1/backend/**'
       - '03_lemon_healthcare/.github/workflows/ci-backend.yml'
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: 03_lemon_healthcare/backend
+        working-directory: 03_lemon_healthcare/pr1/backend
 
     steps:
       # -----------------------------------------------------------------------
@@ -44,7 +44,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: 03_lemon_healthcare/backend/requirements.txt
+          cache-dependency-path: 03_lemon_healthcare/pr1/backend/requirements.txt
 
       # -----------------------------------------------------------------------
       # 3. Install Dependencies
@@ -88,7 +88,7 @@ jobs:
         if: matrix.python-version == '3.11'
         uses: codecov/codecov-action@v4
         with:
-          file: ./03_lemon_healthcare/backend/coverage.xml
+          file: ./03_lemon_healthcare/pr1/backend/coverage.xml
           flags: backend
           fail_ci_if_error: false
         continue-on-error: true

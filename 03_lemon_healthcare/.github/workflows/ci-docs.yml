@@ -1,7 +1,7 @@
 # =============================================================================
 # Docs CI: 마크다운 린트 + 깨진 링크 검사
-# 트리거: 03_lemon_healthcare/docs/** 또는 *.md 변경 시
-# Spec: 03_lemon_healthcare/docs/05-github-guidelines.md §8.2
+# 트리거: 03_lemon_healthcare/pr1/docs/** 또는 *.md 변경 시
+# Spec: 03_lemon_healthcare/pr1/docs/05-github-guidelines.md §8.2
 # =============================================================================
 
 name: Docs CI
@@ -10,14 +10,14 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - '03_lemon_healthcare/docs/**'
-      - '03_lemon_healthcare/**/*.md'
+      - '03_lemon_healthcare/pr1/docs/**'
+      - '03_lemon_healthcare/pr1/**/*.md'
       - '03_lemon_healthcare/.github/workflows/ci-docs.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - '03_lemon_healthcare/docs/**'
-      - '03_lemon_healthcare/**/*.md'
+      - '03_lemon_healthcare/pr1/docs/**'
+      - '03_lemon_healthcare/pr1/**/*.md'
       - '03_lemon_healthcare/.github/workflows/ci-docs.yml'
 
 jobs:
@@ -36,8 +36,8 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v16
         with:
           globs: |
-            03_lemon_healthcare/**/*.md
-            !03_lemon_healthcare/**/node_modules
+            03_lemon_healthcare/pr1/**/*.md
+            !03_lemon_healthcare/pr1/**/node_modules
         continue-on-error: true
 
       # ---------------------------------------------------------------------
@@ -50,5 +50,5 @@ jobs:
             --no-progress
             --max-concurrency 4
             --exclude-mail
-            '03_lemon_healthcare/**/*.md'
+            '03_lemon_healthcare/pr1/**/*.md'
           fail: false
