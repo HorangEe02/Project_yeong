@@ -1,6 +1,6 @@
 # =============================================================================
 # Mobile CI: Flutter 코드 자동 검증
-# 트리거: mobile/** 변경 시
+# 트리거: 03_lemon_healthcare/mobile/** 변경 시
 # =============================================================================
 
 name: Mobile CI
@@ -9,13 +9,13 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'mobile/**'
-      - '.github/workflows/ci-mobile.yml'
+      - '03_lemon_healthcare/mobile/**'
+      - '03_lemon_healthcare/.github/workflows/ci-mobile.yml'
   pull_request:
     branches: [main, develop]
     paths:
-      - 'mobile/**'
-      - '.github/workflows/ci-mobile.yml'
+      - '03_lemon_healthcare/mobile/**'
+      - '03_lemon_healthcare/.github/workflows/ci-mobile.yml'
 
 jobs:
   lint-and-test:
@@ -24,7 +24,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: mobile
+        working-directory: 03_lemon_healthcare/mobile
 
     steps:
       # -----------------------------------------------------------------------

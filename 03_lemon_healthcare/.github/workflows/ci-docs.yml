@@ -1,0 +1,54 @@
+# =============================================================================
+# Docs CI: 마크다운 린트 + 깨진 링크 검사
+# 트리거: 03_lemon_healthcare/docs/** 또는 *.md 변경 시
+# Spec: 03_lemon_healthcare/docs/05-github-guidelines.md §8.2
+# =============================================================================
+
+name: Docs CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '03_lemon_healthcare/docs/**'
+      - '03_lemon_healthcare/**/*.md'
+      - '03_lemon_healthcare/.github/workflows/ci-docs.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - '03_lemon_healthcare/docs/**'
+      - '03_lemon_healthcare/**/*.md'
+      - '03_lemon_healthcare/.github/workflows/ci-docs.yml'
+
+jobs:
+  lint-and-link-check:
+    name: Markdown Lint & Link Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------------
+      # 1. Markdown lint (markdownlint-cli2)
+      # ---------------------------------------------------------------------
+      - name: Lint markdown
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: |
+            03_lemon_healthcare/**/*.md
+            !03_lemon_healthcare/**/node_modules
+        continue-on-error: true
+
+      # ---------------------------------------------------------------------
+      # 2. Broken link check (lychee)
+      # ---------------------------------------------------------------------
+      - name: Check links with lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-concurrency 4
+            --exclude-mail
+            '03_lemon_healthcare/**/*.md'
+          fail: false

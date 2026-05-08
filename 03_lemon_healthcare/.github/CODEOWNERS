@@ -1,0 +1,18 @@
+# =============================================================================
+# CODEOWNERS — 영역별 자동 리뷰어 지정
+# Spec: 03_lemon_healthcare/docs/05-github-guidelines.md §9.3
+#
+# Path patterns are repo-root-relative. All entries currently point to the
+# repository owner as a placeholder; replace per-area handles when the team
+# is staffed (see follow-up issue).
+# =============================================================================
+
+# Default reviewer
+*                                              @HorangEe02
+
+# Per-area reviewers (placeholders — replace when team handles assigned)
+/03_lemon_healthcare/backend/                  @HorangEe02
+/03_lemon_healthcare/mobile/                   @HorangEe02
+/03_lemon_healthcare/data/                     @HorangEe02
+/03_lemon_healthcare/docs/                     @HorangEe02
+/03_lemon_healthcare/.github/                  @HorangEe02
