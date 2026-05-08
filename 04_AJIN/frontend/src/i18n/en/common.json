@@ -1,0 +1,597 @@
+{
+  "app": {
+    "name": "AJIN AI",
+    "version": "v3.5",
+    "tagline": "KNU SILLI 2026"
+  },
+  "topbar": {
+    "env": "ENV",
+    "auth": "AUTH",
+    "auth_active": "ACTIVE",
+    "auth_inactive": "INACTIVE",
+    "llm": "LLM ENGINE",
+    "vector_db": "VECTOR DB",
+    "rbac": "RBAC LEVEL",
+    "on_premise": "ON-PREMISE",
+    "panel_show": "SYS",
+    "panel_hide": "HIDE"
+  },
+  "sidebar": {
+    "core_modules": "CORE MODULES",
+    "system_registry": "SYSTEM REGISTRY",
+    "security_log": "SECURITY LOG",
+    "registered_depts": "REGISTERED DEPTS",
+    "theme": {
+      "label": "THEME",
+      "light": "LIGHT",
+      "dark": "DARK",
+      "auto": "AUTO"
+    },
+    "logout": "LOGOUT",
+    "profile": "PROFILE"
+  },
+  "modules": {
+    "dashboard": "Dashboard",
+    "search": "Employee Search",
+    "draft": "Document Drafting",
+    "onboarding": "AI Work Assistant",
+    "compliance": "Compliance Monitor",
+    "admin": "HR Admin",
+    "equipment": "Equipment & Process AI"
+  },
+  "right_panel": {
+    "system_analytics": "SYSTEM ANALYTICS",
+    "realtime": "REALTIME",
+    "gpu": "GPU",
+    "latency": "LATENCY",
+    "qps": "QPS",
+    "data_ingestion": "DATA INGESTION",
+    "errors": "ERROR CODES",
+    "molds": "MOLDS",
+    "spc": "SPC",
+    "drawings": "DRAWINGS",
+    "inspections": "INSPECTIONS"
+  },
+  "analytics": {
+    "title": "SYSTEM ANALYTICS",
+    "subtitle": "System Analytics",
+    "realtime": "REALTIME",
+    "gpu": "GPU · UTILIZATION",
+    "latency": "LATENCY",
+    "latency_ko": "Response Time",
+    "qps": "QPS",
+    "qps_ko": "Per Second",
+    "ingestion": {
+      "title": "DATA INGESTION",
+      "subtitle": "Data Ingestion"
+    }
+  },
+  "login": {
+    "title": "Sign In",
+    "subtitle": "Enter your employee ID and password",
+    "employee_id": "Employee ID",
+    "password": "Password",
+    "submit": "Sign In",
+    "policy_title": "Password Policy",
+    "policy": {
+      "min_length": "Min 8 characters",
+      "uppercase": "1+ uppercase",
+      "lowercase": "1+ lowercase",
+      "number": "1+ digit",
+      "special": "1+ special char",
+      "no_repeat": "No 3 repeat chars"
+    },
+    "error": {
+      "title": "Sign-in failed",
+      "invalid_credentials": "Invalid employee ID or password.",
+      "max_attempts": "5 consecutive failures. Try again in 30 minutes.",
+      "locked": "Account is locked.",
+      "inactive": "This account is inactive. Please contact administrator.",
+      "network": "Server unreachable. Check your network.",
+      "retry": "Retry",
+      "unknown": "An unknown error occurred."
+    },
+    "demo": {
+      "label": "Demo Account Quick Login",
+      "hint": "Demo only — visible in DEV mode or with ?demo=1"
+    },
+    "change_pw": {
+      "title": "Password Change Required",
+      "subtitle": "Security policy — set a new password on first login",
+      "current": "Current Password",
+      "new": "New Password",
+      "confirm": "Confirm New Password",
+      "mismatch": "Passwords do not match.",
+      "submit": "Change & Sign In",
+      "back": "← Back to Sign In"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "greeting": "Welcome, {{position}} {{name}}",
+    "context": "{{division}} / {{department}} · {{plant}}",
+    "last_login": "Last login: {{at}}",
+    "first_login": "First login",
+    "metrics": {
+      "equipment_en": "EQUIPMENT ONLINE",
+      "equipment_ko": "Active / Total",
+      "today_alerts_en": "TODAY'S ALERTS",
+      "today_alerts_ko": "Last 24h",
+      "compliance_en": "OPEN COMPLIANCE",
+      "compliance_ko": "Pending",
+      "system_en": "SYSTEM HEALTH",
+      "system_ko": "Latency · QPS"
+    },
+    "alarm": {
+      "title": "Active Alarms",
+      "view_all": "Monitor →",
+      "no_alarms": "No active alarms ●",
+      "ack": "Ack"
+    },
+    "module_card": {
+      "lock_label": "Insufficient permission",
+      "open": "Open →"
+    },
+    "system": {
+      "title": "System Info",
+      "llm": "LLM Engines",
+      "vision": "Vision Models",
+      "embedding": "Embeddings",
+      "router": "Routing",
+      "ml": "ML/DL Models",
+      "data": "Data Volume",
+      "rbac": "Access Control"
+    }
+  },
+  "search": {
+    "hero_title": "Organization / Employee Directory",
+    "hero_eyebrow": "EMPLOYEE DIRECTORY · MODULE A",
+    "hero_sub": "AJIN — 6 Divisions · 19 Teams · {{total}} employees. Select a division and team to view the org structure and employee details at a glance.",
+    "org_title": "Division → Team Structure",
+    "org_eyebrow": "ORG CHART",
+    "org_summary": "Total {{total}} · 6 HQ · 19 TEAMS",
+    "org_teams_label": "{{n}} TEAMS",
+    "org_under": "└ Teams under {{hq}}",
+    "filter_title": "Department / Position Filters",
+    "filter_eyebrow": "FILTERS",
+    "filter_reset": "Reset",
+    "filter_hq": "Division",
+    "filter_team": "Team",
+    "filter_position": "Position",
+    "filter_gender": "Gender",
+    "filter_plant": "Plant",
+    "filter_query": "Name / ID / Email",
+    "filter_query_placeholder": "Search...",
+    "filter_all": "All",
+    "filter_male": "M",
+    "filter_female": "F",
+    "table_title": "Directory",
+    "table_eyebrow": "DIRECTORY",
+    "table_count": "{{n}} found",
+    "table_empty": "No employees match the filters. Try adjusting them.",
+    "table_export_csv": "CSV",
+    "table_export_xlsx": "XLSX",
+    "table_email_action": "Email",
+    "table_doc_action": "Doc",
+    "col_id": "ID",
+    "col_name": "Name",
+    "col_gender": "Gender",
+    "col_dept": "Division / Team",
+    "col_position": "Position",
+    "col_ext": "Ext",
+    "col_mobile": "Mobile",
+    "col_email": "Email",
+    "col_plant": "Plant",
+    "col_action": "",
+    "map_title": "Facilities Map",
+    "map_eyebrow": "FACILITIES · 19 sites",
+    "map_domestic": "Domestic 12",
+    "map_overseas": "Overseas 7",
+    "visibility": {
+      "full": "Full",
+      "partial": "Masked",
+      "hidden": "Hidden"
+    }
+  },
+  "chat": {
+    "title": "C · Onboarding",
+    "subtitle": "AI Work Assistant",
+    "mode": {
+      "label": "Response Mode",
+      "education": "Education",
+      "work": "Work",
+      "educationHint": "New-hire learning — detailed",
+      "workHint": "Quick-answer mode — concise"
+    },
+    "composer": {
+      "placeholder": "Ask anything (Enter to send / Shift+Enter for newline)",
+      "send": "Send",
+      "stop": "Stop"
+    },
+    "empty": {
+      "title": "Start a conversation",
+      "examples": {
+        "0": "Where can I get the 8D Report form?",
+        "1": "What is the REACH compliance status?",
+        "2": "Explain the PPAP process for a new vehicle"
+      }
+    },
+    "status": {
+      "streaming": "Generating response...",
+      "fallback": "{{from}} failed → using {{to}}",
+      "done": "Done ({{model}})",
+      "error": "Response failed"
+    },
+    "provider": {
+      "gemini": "Gemini 2.5 Pro",
+      "ollama": "Ollama (on-prem)",
+      "lm_studio": "LM Studio"
+    },
+    "sop": {
+      "title": "Standard Operating Procedures",
+      "empty": "No SOPs registered.",
+      "open": "Open SOP",
+      "safety": "Safety Warnings",
+      "checklist": "Checklist",
+      "caution": "Caution",
+      "related_terms": "Related Terms",
+      "step_n_of_m": "Step {{n}} of {{m}}",
+      "prev": "Previous",
+      "next": "Next",
+      "mark_done": "Mark as done",
+      "unmark_done": "Unmark"
+    },
+    "scenarios": {
+      "eyebrow": "Collaboration Scenario · 0 LLM calls",
+      "requesting_dept": "Requesting Dept",
+      "deadline": "Deadline",
+      "my_actions": "What you should prepare",
+      "handoff_to": "Hand off to: {{to}}",
+      "tips": "Tips",
+      "open_sop": "Open related SOP ({{id}})",
+      "triggers_title": "5 collaboration scenarios · instant response (0 LLM calls)",
+      "triggers": {
+        "0": "QA needs an 8D report from us",
+        "1": "ECN just arrived — does it affect our team?",
+        "2": "QA wants press-line SPC data",
+        "3": "What deliverables are we owed for new-vehicle PPAP?",
+        "4": "Safety audit next week — what do I prepare?"
+      }
+    },
+    "actions": {
+      "eyebrow": "Work Action",
+      "bridge": "Open {{label}}",
+      "no_match": "No matching action found."
+    },
+    "download": {
+      "title": "Download Response",
+      "docx": "DOCX",
+      "xlsx": "XLSX",
+      "csv": "CSV",
+      "txt": "TXT",
+      "tooltip_docx": "Save as Word document",
+      "tooltip_xlsx": "Save as Excel (parses Markdown tables)",
+      "tooltip_csv": "Save as CSV (UTF-8 BOM for Excel)",
+      "tooltip_txt": "Save as plain text",
+      "failed": "Download failed: {{msg}}"
+    },
+    "feedback": {
+      "title": "Rate this response",
+      "thumbs_up": "This was helpful",
+      "thumbs_down": "Needs improvement",
+      "thanks": "Thanks for your feedback",
+      "anonymous": "anonymous",
+      "count_one": "{{n}} vote",
+      "count_other": "{{n}} votes"
+    },
+    "model": {
+      "label": "Model",
+      "auto": "Auto (fallback)",
+      "gemini": "Gemini 2.5 Pro",
+      "qwen": "Ollama qwen3.5:9b",
+      "gemma": "Ollama gemma4:e4b",
+      "forced_indicator": "(forced)"
+    },
+    "attachment": {
+      "tray": "Attach",
+      "image": "Attach image",
+      "file": "Attach file",
+      "remove": "Remove attachment",
+      "oversize_image": "Image exceeds 5MB — cannot send",
+      "oversize_file": "File exceeds 10MB — cannot send",
+      "default_query": "Please summarize the contents of this file",
+      "preview_image": "Image preview",
+      "preview_file": "File preview"
+    },
+    "vision": {
+      "default_query": "Please analyze this image",
+      "uploading": "Uploading image...",
+      "analyzing": "Analyzing with vision model...",
+      "failed": "Vision analysis failed: {{msg}}"
+    },
+    "session": {
+      "live": "LIVE",
+      "idle": "IDLE",
+      "id": "Session #{{id}}",
+      "label_en": "SESSION"
+    },
+    "tabs": {
+      "sop": "SOP {{n}}",
+      "collab": "Collab {{n}}",
+      "quiz": "Quiz",
+      "quiz_empty": "Auto-generated after SOP completion"
+    },
+    "meta": {
+      "tokens": "Tokens {{n}}/{{max}}",
+      "context": "Context {{n}} turns",
+      "model": "Model {{name}}",
+      "intent": "Intent {{n}}ms"
+    },
+    "ai": {
+      "confidence": "Confidence",
+      "label": {
+        "sop": "SOP_GUIDE",
+        "scenario": "SCENARIO",
+        "action": "ACTION",
+        "chat": "CHAT",
+        "vision": "VISION"
+      }
+    },
+    "quick": {
+      "title": "QUICK",
+      "subtitle": "Quick Prompts",
+      "hint": "Click to send instantly"
+    },
+    "notebox": {
+      "aria_label": "Note box — SOP / Collab / Quick prompts",
+      "tab": {
+        "sop": "SOP",
+        "collab": "COLLAB",
+        "quick": "QUICK"
+      },
+      "toggle": {
+        "expand": "Expand",
+        "collapse": "Collapse"
+      }
+    },
+    "pageTab": {
+      "chat": "CHAT",
+      "chatSub": "· Chat",
+      "learn": "LEARN",
+      "learnSub": "· Learn"
+    },
+    "learn": {
+      "sub": {
+        "sop": "SOP",
+        "collab": "Collab",
+        "quiz": "Quiz"
+      }
+    }
+  },
+  "draft": {
+    "hero": {
+      "eyebrow": "DOCUMENT SEARCH & DRAFTING · MODULE B",
+      "title": "Document Search / Drafting",
+      "subtitle": "AI drafts 13 types of in-house documents — emails, reports, 8D, PPAP, applications, and more. Upload your company form to follow its structure exactly, while internal SOPs, glossary, and past drafts are auto-referenced for consistency."
+    },
+    "main": {
+      "internal": "Internal Docs",
+      "external": "External Docs",
+      "history": "Document History"
+    },
+    "tone": {
+      "formal_internal": "Formal (Internal)",
+      "formal_external": "Formal (External)",
+      "standard": "Standard",
+      "friendly": "Friendly",
+      "concise": "Concise"
+    },
+    "request": {
+      "eyebrow": "REQUEST · Drafting Request",
+      "title": "What shall we write?",
+      "label": "Request",
+      "placeholder": "e.g. Notify Hyundai SQ team of PPAP Level 3 submission",
+      "tone": "Tone",
+      "doctype": "Doc Type · {{n}}",
+      "submit": "Generate ▶",
+      "streaming": "Generating…"
+    },
+    "output": {
+      "eyebrow": "OUTPUT · Generation Result",
+      "placeholder": "Generated content will stream here.",
+      "streaming": "Streaming",
+      "complete": "Done",
+      "compare": "↔ Compare original",
+      "reevaluate": "↻ Re-evaluate"
+    },
+    "quality": {
+      "eyebrow": "QUALITY · Score",
+      "structure": "Structure",
+      "length": "Length",
+      "terminology": "Terminology",
+      "completion": "Completion",
+      "tone": "Tone",
+      "tipReady": "Auto-evaluated after generation.",
+      "tipLoading": "Evaluating…"
+    },
+    "cc": {
+      "eyebrow": "CC · Auto Recommendation",
+      "required": "Required",
+      "recommended": "Recommended",
+      "optional": "Optional"
+    },
+    "fewshot": {
+      "eyebrow": "FEW-SHOT · RAG Context",
+      "footer": "ChromaDB · BGE-M3 1024d · 584 docs"
+    },
+    "history": {
+      "eyebrow": "HISTORY · Document Log",
+      "title": "Firestore persisted: {{n}}",
+      "subtitle": "/ showing latest 30",
+      "refresh": "↻ Refresh",
+      "loading": "Loading…",
+      "empty": "No history yet. Drafts auto-save to Firestore on generation.",
+      "reedit": "Re-edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this draft?",
+      "fbWarn": "Firestore connection failed — {{err}}"
+    },
+    "diff": {
+      "eyebrow": "DIFF · Original ↔ Edited",
+      "title": "Version Compare",
+      "stats": "+{{add}} / −{{del}} · similarity {{sim}}%",
+      "empty": "No changes.",
+      "close": "Close"
+    }
+  },
+  "equipment": {
+    "hero": {
+      "eyebrow": "EQUIPMENT & PROCESS AI · MODULE F",
+      "title": "Equipment / Process AI",
+      "subtitle": "7 ML engines · 14 departments. SPC Nelson 8 Rules · TF-IDF error search · XGBoost lifespan · Markov chain failure prediction in one view."
+    },
+    "main": {
+      "overview": "Dashboard",
+      "manual_error": "Manual / Error",
+      "inspection": "Inspection History"
+    },
+    "sub": {
+      "overview": "Overview",
+      "alerts": "Urgent",
+      "equipment": "Equipment Type",
+      "predictive": "Predictive",
+      "spc": "SPC · Nelson 8",
+      "ml": "ML Engines"
+    },
+    "metrics": {
+      "realtimeTitle": "Real-time Equipment Status",
+      "metricsEyebrow": "METRICS · Key Indicators",
+      "uptime": "Uptime",
+      "avgCpk": "Avg Cpk",
+      "alerts": "Active Alerts",
+      "mtbf": "MTBF",
+      "maintDue": "Maintenance Due"
+    },
+    "overview": {
+      "equipmentEyebrow": "EQUIPMENT · {{count}} types",
+      "equipmentTitle": "Cpk · Alerts by Equipment",
+      "live": "LIVE"
+    },
+    "alerts": {
+      "eyebrow": "URGENT · Action Queue",
+      "title": "Immediate Action Required",
+      "count": "{{n}} items",
+      "actBtn": "Action",
+      "scheduleBtn": "Schedule"
+    },
+    "types": {
+      "eyebrow": "TYPES · ML Signals by Equipment",
+      "title": "Detailed Diagnosis",
+      "mlSignal": "Isolation Forest anomaly + Markov risk",
+      "normal": "Normal range"
+    },
+    "predictive": {
+      "moldEyebrow": "XGBoost MOLD LIFECYCLE",
+      "moldTitle": "{{total}} Molds — Remaining Life",
+      "moldDisplay": "Showing {{shown}}/{{total}}",
+      "mtbfBarEyebrow": "MTBF · Repair Cost Distribution",
+      "mtbfBarTitle": "Cost + Repair Count by Machine ({{count}})",
+      "mtbfTopEyebrow": "MTBF · Top 5 Repair Cost",
+      "mtbfTopTitle": "Predictive Maintenance Priority",
+      "machinesAttention": "{{n}} machines need attention"
+    },
+    "spc": {
+      "healthEyebrow": "SPC · 5 Process Health Cards",
+      "healthTitle": "Nelson 8 Rules Violations",
+      "violation": "{{n}} violations",
+      "chartEyebrow": "CONTROL CHART · X̄ ({{name}})",
+      "chartTitle": "Control Chart",
+      "ruleViolation": "Rule {{rules}} violated",
+      "loading": "Loading…",
+      "csvEyebrow": "DATA MANAGEMENT · CSV Upload",
+      "csvTitle": "SPC Data Management",
+      "csvLabel": "CSV file (UTF-8 BOM, header row)",
+      "uploadBtn": "Upload ▶",
+      "uploading": "Uploading…"
+    },
+    "ml": {
+      "eyebrow": "ML ENGINES · {{count}} Status",
+      "title": "Model Inventory",
+      "active": "{{online}}/{{total}} ACTIVE"
+    },
+    "manual": {
+      "codes": "Error Codes",
+      "symptoms": "Symptom Guide",
+      "rag": "AI Query",
+      "searchEyebrow": "ERROR SEARCH · TF-IDF + {{n}} synonyms",
+      "searchTitle": "Natural Language Error Code Search",
+      "historyPill": "685 history",
+      "resultsEyebrow": "RESULTS · Cosine Similarity TOP 5",
+      "resultsTitle": "Matched Error Codes",
+      "guideBtn": "Action Guide",
+      "manualBtn": "Manual"
+    },
+    "markov": {
+      "eyebrow": "MARKOV CHAIN · DFS depth=3",
+      "title": "Cascade Failure Prediction",
+      "prevention": "Recommended preventive actions: lubrication check → bearing replacement → motor temperature monitoring"
+    },
+    "inspection": {
+      "eyebrow": "INSPECTION · Checklist",
+      "title": "{{total}} Templates (3 equipment × 3 cycles)",
+      "viewBtn": "View",
+      "colEquip": "Equipment",
+      "colCycle": "Cycle",
+      "colDate": "Last Inspection",
+      "colRate": "Completion",
+      "colMiss": "Missing Items"
+    },
+    "access": {
+      "deniedEyebrow": "EQUIPMENT & PROCESS AI · ACCESS DENIED",
+      "deniedTitle": "Access Denied",
+      "deniedDesc": "Equipment / Process AI module is exposed only to 14 allowed departments (Production Eng, QA, Maintenance, Mold, Press, Welding, Painting, Inspection, EHS, Injection, CNC, Conveyor, Materials, System Admin).",
+      "reasonEyebrow": "REASON",
+      "returnDashboard": "Return to Dashboard"
+    },
+    "states": {
+      "low": "LOW",
+      "med": "MED",
+      "high": "HIGH",
+      "ok": "OK",
+      "warn": "WARN",
+      "crit": "CRIT"
+    },
+    "placeholder": {
+      "manual_error": "Day 7 Phase 4~5 — Error Search + Markov Chain Failure + Manual RAG. Coming soon.",
+      "inspection": "Day 12 — Inspection Checklist + History. Coming soon."
+    }
+  },
+  "auth": {
+    "firebase": {
+      "warning": "Firebase auth failed — some features limited",
+      "bootstrap": "First login — Firebase account auto-created",
+      "failed": "Firebase login failed"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "execute": "Execute",
+    "export": "Export",
+    "download": "Download",
+    "results": "Results",
+    "matches": "Matches",
+    "now": "just now",
+    "minutes_ago": "{{n}} min ago",
+    "hours_ago": "{{n}}h ago",
+    "yesterday": "yesterday",
+    "days_ago": "{{n}}d ago"
+  }
+}

@@ -1,0 +1,72 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+body{margin:0;padding:24px;background:#0A0E14;font-family:Pretendard,'Noto Sans KR',sans-serif;}
+/* Wider container, taller bar, no wrapping anywhere */
+.bar{
+  height:56px;
+  width:1280px;
+  background:rgba(17,24,32,0.6);
+  backdrop-filter:blur(24px) saturate(140%);
+  -webkit-backdrop-filter:blur(24px) saturate(140%);
+  border:1px solid rgba(42,37,32,0.7);
+  border-radius:2px;
+  display:flex;align-items:center;
+  padding:0 20px;gap:16px;
+  color:#E8E1D5;font-size:13px;
+  white-space:nowrap;
+}
+.brand{display:inline-flex;align-items:center;gap:10px;flex-shrink:0;}
+.brand img{height:32px;width:auto;display:block;}
+.brand .ver{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:0.14em;color:#FCB132;padding-left:10px;border-left:1px solid #2A2520;}
+
+.pipe{color:#2A2520;flex-shrink:0;}
+
+.seg{
+  display:inline-flex;align-items:center;gap:6px;
+  color:#8A8276;
+  font-family:ui-monospace,monospace;
+  font-size:11px;letter-spacing:0.08em;
+  flex-shrink:0;
+  text-transform:uppercase;
+}
+.seg b{color:#E8E1D5;font-weight:600;}
+.dot{width:6px;height:6px;border-radius:50%;background:#2D8A4E;box-shadow:0 0 6px #2D8A4E;display:inline-block;}
+.grow{flex:1;}
+
+.rbac{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:5px 10px;
+  border:1px solid rgba(252,177,50,0.35);
+  background:rgba(252,177,50,0.08);
+  font-family:ui-monospace,monospace;
+  font-size:11px;letter-spacing:0.12em;
+  color:#FCB132;
+  flex-shrink:0;
+}
+.rbac span{color:#8A8276;}
+
+.user{
+  display:inline-flex;align-items:center;gap:8px;
+  padding-left:14px;border-left:1px solid #2A2520;
+  flex-shrink:0;
+  font-size:12px;color:#E8E1D5;
+}
+.user .role{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:0.12em;color:#8A8276;}
+</style></head>
+<body><div class="bar">
+  <span class="brand">
+    <img src="../assets/ajin_logo_dark.svg" alt="AJIN INDUSTRIAL CO., LTD.">
+    <span class="ver">AI v3.5</span>
+  </span>
+  <span class="pipe">│</span>
+  <span class="seg">ENV <b>ON-PREM</b></span>
+  <span class="pipe">·</span>
+  <span class="seg">AUTH <b>JWT</b></span>
+  <span class="pipe">·</span>
+  <span class="seg">LLM <b>QWEN 3.5</b> <span class="dot"></span></span>
+  <span class="pipe">·</span>
+  <span class="seg">LATENCY <b>124ms</b></span>
+  <span class="grow"></span>
+  <span class="rbac">RBAC <span>·</span> L6 ADMIN</span>
+  <span class="user">김아진 <span class="role">QA TEAM</span></span>
+</div></body></html>

@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# AJIN Tunnel Watchdog
+# - cloudflared 임시 tunnel 영속화
+# - URL 변경 자동 감지 → Cloud Run env 업데이트
+# - Caddy(:8434) 경유한 보안 검증된 ollama 노출
+set -uo pipefail
+
+# ─ 설정 ──────────────────────────────────────────────
+PROJECT="ajin-cb"
+REGION="asia-northeast3"
+SERVICE="ajin-backend"
+LOCAL_PORT=8434  # Caddy listen 포트 (Caddyfile 과 일치)
+CONFIG_DIR="__USER_HOME__/.config/ajin"
+URL_FILE="$CONFIG_DIR/last_tunnel_url.txt"
+CLOUDFLARED_LOG="$CONFIG_DIR/cloudflared.log"
+SECRET_FILE="$CONFIG_DIR/ollama-secret"
+
+# brew 의 gcloud / cloudflared 가 PATH 에 있도록 보장
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+log() { printf "[%s] %s\n" "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
+
+# ─ 의존성 확인 ────────────────────────────────────────
+need() {
+  command -v "$1" >/dev/null 2>&1 || { log "FATAL: '$1' 미설치 (PATH=$PATH)"; exit 1; }
+}
+need cloudflared
+need gcloud
+need curl
+
+# ─ Secret 로드 ────────────────────────────────────────
+if [ ! -r "$SECRET_FILE" ]; then
+  log "FATAL: secret 파일 없음 ($SECRET_FILE)"
+  exit 1
+fi
+SECRET=$(cat "$SECRET_FILE")
+
+# ─ Caddy 도달성 확인 (caddy 가 :8434 에서 응답해야 함) ─
+log "Caddy 도달성 확인 (X-AJIN-Secret 헤더)"
+CADDY_OK=false
+for i in {1..30}; do
+  HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
+    -H "X-AJIN-Secret: $SECRET" \
+    "http://127.0.0.1:$LOCAL_PORT/api/version" --max-time 3 || echo "000")
+  if [ "$HTTP" = "200" ]; then
+    log "  ✓ Caddy + Ollama 응답 OK"
+    CADDY_OK=true
+    break
+  fi
+  log "  대기 중 ($i/30) — HTTP=$HTTP"
+  sleep 2
+done
+
+if [ "$CADDY_OK" != "true" ]; then
+  log "FATAL: Caddy(:$LOCAL_PORT) 응답 없음 — com.ajin.caddy 또는 com.ollama.ollama 상태 확인"
+  exit 1
+fi
+
+# ─ cloudflared 임시 tunnel 시작 ───────────────────────
+log "cloudflared --url http://127.0.0.1:$LOCAL_PORT 시작"
+: > "$CLOUDFLARED_LOG"  # 이전 로그 비움 — URL 추출 정확성
+cloudflared tunnel \
+  --url "http://127.0.0.1:$LOCAL_PORT" \
+  --no-autoupdate \
+  --logfile "$CLOUDFLARED_LOG" \
+  --loglevel info \
+  >/dev/null 2>&1 &
+CF_PID=$!
+log "  cloudflared PID=$CF_PID"
+
+# 30s 동안 URL 추출
+TUNNEL_URL=""
+for i in {1..30}; do
+  sleep 1
+  TUNNEL_URL=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$CLOUDFLARED_LOG" 2>/dev/null | tail -1)
+  [ -n "$TUNNEL_URL" ] && break
+done
+
+if [ -z "$TUNNEL_URL" ]; then
+  log "FATAL: tunnel URL 추출 실패 — log: $CLOUDFLARED_LOG"
+  kill $CF_PID 2>/dev/null
+  exit 1
+fi
+log "  ✓ Tunnel URL: $TUNNEL_URL"
+
+# ─ Tunnel 외부 도달성 검증 (10s 대기 후) ──────────────
+log "Tunnel 외부 도달성 검증"
+sleep 10
+HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
+  -H "X-AJIN-Secret: $SECRET" \
+  "$TUNNEL_URL/api/version" --max-time 15 || echo "000")
+log "  $TUNNEL_URL/api/version → HTTP $HTTP"
+
+# ─ Cloud Run env 업데이트 (URL 변경 시만) ─────────────
+LAST=$(cat "$URL_FILE" 2>/dev/null || true)
+if [ "$TUNNEL_URL" != "$LAST" ]; then
+  log "URL 변경 감지: '$LAST' → '$TUNNEL_URL'"
+  log "Cloud Run env 업데이트 중..."
+  if gcloud run services update "$SERVICE" \
+       --region "$REGION" --project "$PROJECT" \
+       --update-env-vars "OLLAMA_BASE_URL=$TUNNEL_URL" 2>&1 | tail -3; then
+    echo "$TUNNEL_URL" > "$URL_FILE"
+    log "  ✓ Cloud Run env 업데이트 완료"
+  else
+    log "  ✗ Cloud Run env 업데이트 실패 — gcloud 인증 확인"
+  fi
+else
+  log "URL 변경 없음 — Cloud Run env 그대로"
+fi
+
+# ─ Production smoke ──────────────────────────────────
+log "Production /api/health 확인"
+sleep 8  # Cloud Run revision rollout 대기
+PROD=$(curl -s -o /dev/null -w "%{http_code}" \
+  "https://ajin-cb.web.app/api/health" --max-time 10 || echo "000")
+log "  /api/health → HTTP $PROD"
+
+# ─ Foreground 유지 (launchd KeepAlive) ────────────────
+log "Watchdog 모니터링 진입 (cloudflared PID=$CF_PID)"
+trap "log 'SIGTERM — cleanup'; kill $CF_PID 2>/dev/null; exit 0" TERM INT
+
+while kill -0 $CF_PID 2>/dev/null; do
+  sleep 10
+done
+
+log "cloudflared 종료 — exit 1 (launchd 가 30s 후 재시작)"
+exit 1

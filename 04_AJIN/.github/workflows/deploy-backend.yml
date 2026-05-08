@@ -1,0 +1,59 @@
+name: Deploy Backend (Cloud Run)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '04_AJIN/backend/**'
+      - '04_AJIN/core/**'
+      - '04_AJIN/features/**'
+      - '04_AJIN/Dockerfile'
+      - '04_AJIN/cloudbuild.yaml'
+      - '04_AJIN/requirements*.txt'
+      - '04_AJIN/config.py'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Build mode'
+        required: false
+        default: 'slim'
+        type: choice
+        options: [slim, full]
+
+defaults:
+  run:
+    working-directory: 04_AJIN
+
+permissions:
+  contents: read
+  id-token: write   # Workload Identity Federation 용 (선택)
+
+jobs:
+  deploy:
+    name: Cloud Run deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ajin-cb
+      - name: Verify gcloud
+        run: |
+          gcloud --version
+          gcloud config set project ajin-cb
+      - name: Deploy
+        env:
+          MODE: ${{ inputs.mode || 'slim' }}
+        run: |
+          # canary 단계 skip — Actions 환경에서는 사람 모니터링 부재
+          bash scripts/deploy-backend.sh --mode "$MODE" --skip-canary
+      - name: Smoke test
+        run: |
+          sleep 10
+          curl -sf https://ajin-cb.web.app/api/health > /dev/null \
+            || (echo "Smoke test failed" && exit 1)

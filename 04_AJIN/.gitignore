@@ -1,0 +1,134 @@
+# ═══════════════════════════════════════════════════════════════
+# 04_AJIN — 강화된 .gitignore (PUBLIC repo 전용)
+# 사내 데이터·시크릿·대용량 자산 모두 제외. setup-demo-data.py 로 대체.
+# ═══════════════════════════════════════════════════════════════
+
+# ───────── 환경/시크릿 (절대 커밋 금지) ─────────
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development.local
+.env.development.local.example
+.env.development
+secrets/*
+!secrets/README.md
+!secrets/*.example
+**/credentials.json
+**/service-account*.json
+**/*-credentials.json
+**/*-firebase-adminsdk-*.json
+gcp-sa-key.json
+firebase-sa-key.json
+.firebase/
+.firebaserc
+*.pem
+*.key
+
+# ───────── 사내 데이터 (PUBLIC 누설 위험, setup-demo-data.py 로 재생성) ─────────
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/.jwt_secret
+data/.sessions/
+data/equipment/*.db
+data/intent_ml/
+data/markov_ml/
+data/mold_ml/
+data/spc_ml/
+data/spc_samples/
+data/documents/
+data/knowledge_base/
+data/templates/
+data/regulation_ml/
+data/facility_db/
+data/scenarios/
+data/crawled/
+data/compliance_docs/
+data/demo_scenarios/
+data/metadata/
+data/fonts/
+data/vectorstore/
+
+# 디렉토리 구조만 유지 (.gitkeep 으로)
+!data/
+!data/.gitkeep
+!data/equipment/.gitkeep
+
+# ───────── 벡터스토어 (regenerable, scripts/reindex_*.py 로 재빌드) ─────────
+vectorstore/
+**/chroma.sqlite3
+**/*.bin
+
+# ───────── 빌드/캐시 ─────────
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# Node
+node_modules/
+**/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.tsbuildinfo
+
+# Python venv
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# ───────── 로그 ─────────
+logs/
+*.log
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# ───────── OS / Editor ─────────
+.DS_Store
+**/.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ───────── Claude Code / OMC (개인 환경) ─────────
+.claude/
+.omc/
+
+# ───────── 임시 파일 ─────────
+tmp/
+*.tmp
+.cache/
+*.bak
+*.backup
+output/
+
+# ───────── 발표/문서 자료 (개인) ─────────
+*.pptx
+*.pdf
+*.hwp
+*.zip
+
+# ───────── Streamlit 시크릿 ─────────
+.streamlit/secrets.toml
+
+# ───────── 백업 ─────────
+backups/
+*.tar.gz
+
+# ───────── 테스트 산출물 ─────────
+.coverage
+htmlcov/
+.tox/

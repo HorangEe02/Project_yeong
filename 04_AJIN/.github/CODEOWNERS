@@ -1,0 +1,15 @@
+# CODEOWNERS — 자동 reviewer 지정
+# 형식: <pattern> <github-user>
+# 우선순위: 마지막 매칭이 우선
+
+# 기본 — 모든 변경
+* @HorangEe02
+
+# 영역별 (팀원 추가 시 활성화)
+# /04_AJIN/frontend/        @frontend-lead
+# /04_AJIN/backend/         @backend-lead
+# /04_AJIN/core/llm_router.py @HorangEe02
+# /04_AJIN/features/compliance/ @compliance-owner
+# /04_AJIN/.github/         @HorangEe02
+# /04_AJIN/infra/           @HorangEe02
+# /04_AJIN/SECURITY.md      @HorangEe02

@@ -1,0 +1,61 @@
+# 풀 모드 배포 시 사용 — 검색/벡터 자산 포함.
+# 사용법: cp .gcloudignore-full .gcloudignore 후 deploy, 끝나면 원복.
+
+# 프론트엔드 (Cloud Run 백엔드와 무관)
+frontend/
+ajin-ai-assistant/
+uiux/
+
+# 큰 audit/tmp DB (필요 없음)
+data/audit.db
+data/feedback.db
+data/compliance_docs/
+data/demo_scenarios/
+data/crawled/history/
+
+# Python 부산물
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Git/IDE
+.git/
+.vscode/
+.idea/
+.DS_Store
+**/.DS_Store
+
+# OMC / Claude Code
+.claude/
+.omc/
+
+# 로그·임시·env
+logs/
+*.log
+tmp/
+.env.development.local
+.env.development.local.example
+
+# 문서 (배포 무관)
+docs/
+GUIDELINE/
+update_log/
+
+# 노드
+node_modules/
+**/node_modules/
+
+# Cloud Build 메타
+.gcloudignore
+.gcloudignore-full
+.dockerignore
+
+# 슬림 전용 파일 (풀 모드에선 Dockerfile.full 사용)
+Dockerfile
+requirements-cloudrun.txt
+
+# 테스트 코드 (런타임 미필요)
+tests/
+backend/tests/

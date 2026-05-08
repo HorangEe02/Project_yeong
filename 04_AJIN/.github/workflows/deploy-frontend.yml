@@ -1,0 +1,56 @@
+name: Deploy Frontend (Firebase Hosting)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '04_AJIN/frontend/**'
+      - '04_AJIN/firebase.json'
+      - '04_AJIN/firestore.rules'
+      - '04_AJIN/firestore.indexes.json'
+      - '04_AJIN/database.rules.json'
+      - '04_AJIN/storage.rules'
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: 04_AJIN
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  deploy:
+    name: Firebase Hosting deploy
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 04_AJIN/frontend/package-lock.json
+      - name: Build
+        working-directory: 04_AJIN/frontend
+        run: |
+          npm ci
+          npm run build
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SA_KEY }}
+          channelId: live
+          projectId: ajin-cb
+          entryPoint: 04_AJIN
+      - name: Verify deploy
+        run: |
+          sleep 8
+          DEPLOYED_HASH=$(curl -sf https://ajin-cb.web.app/ | shasum -a 256 | awk '{print $1}')
+          LOCAL_HASH=$(shasum -a 256 04_AJIN/frontend/dist/index.html | awk '{print $1}')
+          echo "Local:    $LOCAL_HASH"
+          echo "Deployed: $DEPLOYED_HASH"
+          [ "$LOCAL_HASH" = "$DEPLOYED_HASH" ] || echo "::warning::Hash mismatch (캐시 가능성)"

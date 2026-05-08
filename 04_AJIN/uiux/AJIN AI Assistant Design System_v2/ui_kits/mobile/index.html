@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>AJIN AI Assistant — Mobile / Tablet UI Kit</title>
+<link rel="stylesheet" href="../../colors_and_type.css" />
+<link rel="stylesheet" href="../web_app/theme.css" />
+<link rel="stylesheet" href="mobile-theme.css?v=2" />
+<style>
+  html, body { margin:0; padding:0; height:100%; background:#0E1218; color:#E8E1D5; font-family:'Pretendard','Inter',-apple-system,system-ui,sans-serif; }
+  * { box-sizing: border-box; }
+  /* Make the design-canvas's outer chrome dark-friendly */
+  .dc-canvas { background: radial-gradient(80% 60% at 50% 30%, #15191F 0%, #07090C 100%) !important; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="../web_app/Icons.jsx"></script>
+<script type="text/babel" src="MobScreens.jsx"></script>
+<script type="text/babel" src="PadScreens.jsx"></script>
+<script type="text/babel">
+function App() {
+  // Wrap each AJIN screen body in IOSDevice (iPhone) or PadFrame (iPad).
+  const iphone = (Body, key, theme = 'dark') => (
+    <IOSDevice key={key} dark={theme === 'dark'} width={402} height={874}>
+      <Body theme={theme} />
+    </IOSDevice>
+  );
+  return (
+    <DesignCanvas
+      title="AJIN AI Assistant — Mobile / Tablet"
+      subtitle="iOS 26 · iPadOS 26 · Liquid Glass · 한국어 제조 HUD"
+    >
+      <DCSection id="phones-dark" title="iPhone · 다크 모드 (Dark)">
+        <DCArtboard id="ph-login-d" label="01 · 로그인" width={402} height={874}>
+          {iphone(MobLogin, 'l-d', 'dark')}
+        </DCArtboard>
+        <DCArtboard id="ph-home-d" label="02 · 대시보드" width={402} height={874}>
+          {iphone(MobDashboard, 'd-d', 'dark')}
+        </DCArtboard>
+        <DCArtboard id="ph-search-d" label="03 · 검색 · Hybrid" width={402} height={874}>
+          {iphone(MobSearch, 's-d', 'dark')}
+        </DCArtboard>
+        <DCArtboard id="ph-chat-d" label="04 · AI 채팅" width={402} height={874}>
+          {iphone(MobChat, 'c-d', 'dark')}
+        </DCArtboard>
+        <DCArtboard id="ph-draft-d" label="05 · 문서 작성" width={402} height={874}>
+          {iphone(MobDraft, 'r-d', 'dark')}
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="phones-light" title="iPhone · 라이트 모드 (Light)">
+        <DCArtboard id="ph-login-l" label="01 · 로그인" width={402} height={874}>
+          {iphone(MobLogin, 'l-l', 'light')}
+        </DCArtboard>
+        <DCArtboard id="ph-home-l" label="02 · 대시보드" width={402} height={874}>
+          {iphone(MobDashboard, 'd-l', 'light')}
+        </DCArtboard>
+        <DCArtboard id="ph-search-l" label="03 · 검색 · Hybrid" width={402} height={874}>
+          {iphone(MobSearch, 's-l', 'light')}
+        </DCArtboard>
+        <DCArtboard id="ph-chat-l" label="04 · AI 채팅" width={402} height={874}>
+          {iphone(MobChat, 'c-l', 'light')}
+        </DCArtboard>
+        <DCArtboard id="ph-draft-l" label="05 · 문서 작성" width={402} height={874}>
+          {iphone(MobDraft, 'r-l', 'light')}
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="tablets-dark" title="iPad · 다크 모드 (Dark)">
+        <DCArtboard id="pd-home-d" label="06 · iPad · Dashboard" width={1024} height={720}>
+          <PadDashboard theme="dark" />
+        </DCArtboard>
+        <DCArtboard id="pd-chat-d" label="07 · iPad · AI Chat" width={1024} height={720}>
+          <PadChat theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="tablets-light" title="iPad · 라이트 모드 (Light)">
+        <DCArtboard id="pd-home-l" label="08 · iPad · Dashboard" width={1024} height={720}>
+          <PadDashboard theme="light" />
+        </DCArtboard>
+        <DCArtboard id="pd-chat-l" label="09 · iPad · AI Chat" width={1024} height={720}>
+          <PadChat theme="light" />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

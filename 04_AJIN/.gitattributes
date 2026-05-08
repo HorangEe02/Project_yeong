@@ -1,0 +1,14 @@
+# 줄바꿈 통일 (LF) — Windows 팀원도 일관된 결과
+* text=auto eol=lf
+
+# 바이너리 명시
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.wasm binary
+*.zip binary
+*.tar.gz binary
+*.db binary

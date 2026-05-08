@@ -1,0 +1,597 @@
+{
+  "app": {
+    "name": "아진산업 AI",
+    "version": "v3.5",
+    "tagline": "KNU SILLI 2026"
+  },
+  "topbar": {
+    "env": "환경",
+    "auth": "인증",
+    "auth_active": "활성",
+    "auth_inactive": "비활성",
+    "llm": "LLM 엔진",
+    "vector_db": "벡터 DB",
+    "rbac": "접근 권한",
+    "on_premise": "ON-PREMISE",
+    "panel_show": "패널",
+    "panel_hide": "숨김"
+  },
+  "sidebar": {
+    "core_modules": "핵심 모듈",
+    "system_registry": "시스템 등록 현황",
+    "security_log": "보안 로그",
+    "registered_depts": "등록 부서",
+    "theme": {
+      "label": "테마",
+      "light": "라이트",
+      "dark": "다크",
+      "auto": "자동"
+    },
+    "logout": "로그아웃",
+    "profile": "프로필"
+  },
+  "modules": {
+    "dashboard": "대시보드",
+    "search": "인원 검색",
+    "draft": "문서 검색/작성",
+    "onboarding": "AI 업무 도우미",
+    "compliance": "법규 모니터링",
+    "admin": "인사 관리",
+    "equipment": "설비/공정 AI"
+  },
+  "right_panel": {
+    "system_analytics": "시스템 분석",
+    "realtime": "실시간",
+    "gpu": "GPU",
+    "latency": "지연시간",
+    "qps": "QPS",
+    "data_ingestion": "데이터 수집",
+    "errors": "에러코드",
+    "molds": "금형",
+    "spc": "SPC",
+    "drawings": "도면",
+    "inspections": "검사"
+  },
+  "analytics": {
+    "title": "SYSTEM ANALYTICS",
+    "subtitle": "시스템 분석",
+    "realtime": "REALTIME",
+    "gpu": "GPU · UTILIZATION",
+    "latency": "LATENCY",
+    "latency_ko": "지연시간",
+    "qps": "QPS",
+    "qps_ko": "초당 처리",
+    "ingestion": {
+      "title": "DATA INGESTION",
+      "subtitle": "데이터 수집"
+    }
+  },
+  "login": {
+    "title": "로그인",
+    "subtitle": "사번과 비밀번호를 입력하세요",
+    "employee_id": "사원번호",
+    "password": "비밀번호",
+    "submit": "로그인",
+    "policy_title": "비밀번호 정책",
+    "policy": {
+      "min_length": "8자 이상",
+      "uppercase": "대문자 1자 이상",
+      "lowercase": "소문자 1자 이상",
+      "number": "숫자 1자 이상",
+      "special": "특수문자 1자 이상",
+      "no_repeat": "동일 문자 연속 3회 금지"
+    },
+    "error": {
+      "title": "로그인 실패",
+      "invalid_credentials": "잘못된 사번 또는 비밀번호입니다.",
+      "max_attempts": "5회 연속 실패. 30분 후 다시 시도하세요.",
+      "locked": "계정이 잠금 상태입니다.",
+      "inactive": "비활성화된 계정입니다. 관리자에게 문의하세요.",
+      "network": "서버 연결 실패. 네트워크를 확인해 주세요.",
+      "retry": "다시 시도",
+      "unknown": "알 수 없는 오류가 발생했습니다."
+    },
+    "demo": {
+      "label": "데모 계정 빠른 로그인",
+      "hint": "본선 시연용 — DEV 모드 또는 ?demo=1 파라미터일 때만 노출"
+    },
+    "change_pw": {
+      "title": "비밀번호 변경 필요",
+      "subtitle": "보안 정책 — 최초 로그인 시 새 비밀번호 설정",
+      "current": "현재 비밀번호",
+      "new": "새 비밀번호",
+      "confirm": "새 비밀번호 확인",
+      "mismatch": "두 비밀번호가 일치하지 않습니다.",
+      "submit": "변경 후 로그인",
+      "back": "← 로그인으로"
+    }
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "greeting": "안녕하세요, {{name}} {{position}}님",
+    "context": "{{division}} / {{department}} · {{plant}}",
+    "last_login": "마지막 로그인: {{at}}",
+    "first_login": "첫 로그인입니다",
+    "metrics": {
+      "equipment_en": "EQUIPMENT ONLINE",
+      "equipment_ko": "가동 설비",
+      "today_alerts_en": "TODAY'S ALERTS",
+      "today_alerts_ko": "금일 공정 알람",
+      "compliance_en": "OPEN COMPLIANCE",
+      "compliance_ko": "법규 미해결",
+      "system_en": "SYSTEM HEALTH",
+      "system_ko": "시스템 응답"
+    },
+    "alarm": {
+      "title": "진행 중 알람",
+      "view_all": "모니터 →",
+      "no_alarms": "현재 알람 없음 ●",
+      "ack": "확인"
+    },
+    "module_card": {
+      "lock_label": "권한 미달",
+      "open": "열기 →"
+    },
+    "system": {
+      "title": "시스템 정보",
+      "llm": "LLM 엔진",
+      "vision": "비전 모델",
+      "embedding": "임베딩",
+      "router": "라우팅",
+      "ml": "ML/DL 모델",
+      "data": "데이터 규모",
+      "rbac": "접근 권한"
+    }
+  },
+  "search": {
+    "hero_title": "조직도 / 인원 검색",
+    "hero_eyebrow": "EMPLOYEE DIRECTORY · MODULE A",
+    "hero_sub": "아진산업 6개 본부 · 19개 팀 · {{total}}명. 본부와 팀을 선택해 부서별 체계와 인원 정보를 한눈에 확인하세요.",
+    "org_title": "본부 → 팀 구조",
+    "org_eyebrow": "ORG CHART · 조직도",
+    "org_summary": "총 {{total}}명 · 6 HQ · 19 TEAMS",
+    "org_teams_label": "{{n}} TEAMS",
+    "org_under": "└ {{hq}} 산하 팀",
+    "filter_title": "부서 / 직급별 필터",
+    "filter_eyebrow": "FILTERS · 분류 검색",
+    "filter_reset": "초기화",
+    "filter_hq": "본부",
+    "filter_team": "팀",
+    "filter_position": "직급",
+    "filter_gender": "성별",
+    "filter_plant": "사업장",
+    "filter_query": "이름 / 사번 / 이메일",
+    "filter_query_placeholder": "검색어 입력...",
+    "filter_all": "전체",
+    "filter_male": "남",
+    "filter_female": "여",
+    "table_title": "인원 정보",
+    "table_eyebrow": "DIRECTORY · 인원 정보",
+    "table_count": "{{n}}명 검색됨",
+    "table_empty": "조건에 맞는 인원이 없습니다. 필터를 조정해 보세요.",
+    "table_export_csv": "CSV",
+    "table_export_xlsx": "XLSX",
+    "table_email_action": "이메일",
+    "table_doc_action": "문서",
+    "col_id": "사번",
+    "col_name": "이름",
+    "col_gender": "성별",
+    "col_dept": "본부 / 팀",
+    "col_position": "직급",
+    "col_ext": "내선",
+    "col_mobile": "휴대전화",
+    "col_email": "이메일",
+    "col_plant": "사업장",
+    "col_action": "",
+    "map_title": "사업장 지도",
+    "map_eyebrow": "FACILITIES · 사업장 19개소",
+    "map_domestic": "국내 12",
+    "map_overseas": "해외 7",
+    "visibility": {
+      "full": "전체 공개",
+      "partial": "부분 마스킹",
+      "hidden": "숨김"
+    }
+  },
+  "chat": {
+    "title": "C · 온보딩",
+    "subtitle": "AI 업무 보조",
+    "mode": {
+      "label": "응답 모드",
+      "education": "교육",
+      "work": "업무",
+      "educationHint": "신입 학습용 — 상세 설명",
+      "workHint": "즉답 모드 — 간결"
+    },
+    "composer": {
+      "placeholder": "무엇이든 물어보세요 (Enter 전송 / Shift+Enter 줄바꿈)",
+      "send": "전송",
+      "stop": "중지"
+    },
+    "empty": {
+      "title": "대화를 시작해보세요",
+      "examples": {
+        "0": "8D Report 양식 어디서 받나요?",
+        "1": "REACH 규제 대응 현황은?",
+        "2": "신차 PPAP 절차 알려줘"
+      }
+    },
+    "status": {
+      "streaming": "응답 생성 중...",
+      "fallback": "{{from}} 실패 → {{to}} 사용 중",
+      "done": "완료 ({{model}})",
+      "error": "응답 실패"
+    },
+    "provider": {
+      "gemini": "Gemini 2.5 Pro",
+      "ollama": "Ollama (사내)",
+      "lm_studio": "LM Studio"
+    },
+    "sop": {
+      "title": "표준 작업 절차 (SOP)",
+      "empty": "등록된 SOP가 없습니다.",
+      "open": "SOP 열기",
+      "safety": "안전 경고",
+      "checklist": "체크리스트",
+      "caution": "주의",
+      "related_terms": "관련 용어",
+      "step_n_of_m": "단계 {{n}} / {{m}}",
+      "prev": "이전 단계",
+      "next": "다음 단계",
+      "mark_done": "완료 표시",
+      "unmark_done": "완료 해제"
+    },
+    "scenarios": {
+      "eyebrow": "협업 시나리오 · LLM 호출 0회",
+      "requesting_dept": "요청 부서",
+      "deadline": "기한",
+      "my_actions": "내가 준비할 것",
+      "handoff_to": "넘길 곳: {{to}}",
+      "tips": "신입 팁",
+      "open_sop": "관련 SOP 열기 ({{id}})",
+      "triggers_title": "협업 시나리오 5종 · 즉시 응답 (LLM 호출 0회)",
+      "triggers": {
+        "0": "품질팀에서 8D 올려달라는데?",
+        "1": "ECN 접수됐는데 우리 팀에 영향 있나?",
+        "2": "프레스 라인 SPC 데이터 보내달라는데",
+        "3": "신차 PPAP 서류 우리 부서 산출물은?",
+        "4": "다음 주 안전 점검 뭐 준비?"
+      }
+    },
+    "actions": {
+      "eyebrow": "업무 액션",
+      "bridge": "{{label}}로 이동",
+      "no_match": "관련 액션을 찾지 못했습니다."
+    },
+    "download": {
+      "title": "응답 다운로드",
+      "docx": "DOCX",
+      "xlsx": "XLSX",
+      "csv": "CSV",
+      "txt": "TXT",
+      "tooltip_docx": "Word 문서로 저장",
+      "tooltip_xlsx": "Excel 표로 저장 (마크다운 표 인식)",
+      "tooltip_csv": "CSV로 저장 (Excel 한글 호환 BOM)",
+      "tooltip_txt": "평문 텍스트로 저장",
+      "failed": "다운로드 실패: {{msg}}"
+    },
+    "feedback": {
+      "title": "응답 평가",
+      "thumbs_up": "도움이 됐어요",
+      "thumbs_down": "개선이 필요해요",
+      "thanks": "피드백 감사합니다",
+      "anonymous": "익명",
+      "count_one": "{{n}}건",
+      "count_other": "{{n}}건"
+    },
+    "model": {
+      "label": "모델",
+      "auto": "자동 (폴백)",
+      "gemini": "Gemini 2.5 Pro",
+      "qwen": "Ollama qwen3.5:9b",
+      "gemma": "Ollama gemma4:e4b",
+      "forced_indicator": "(강제 선택)"
+    },
+    "attachment": {
+      "tray": "첨부",
+      "image": "이미지 첨부",
+      "file": "파일 첨부",
+      "remove": "첨부 제거",
+      "oversize_image": "이미지 5MB 초과 — 전송 불가",
+      "oversize_file": "파일 10MB 초과 — 전송 불가",
+      "default_query": "이 파일 내용을 요약해 주세요",
+      "preview_image": "이미지 미리보기",
+      "preview_file": "파일 미리보기"
+    },
+    "vision": {
+      "default_query": "이 이미지에 대해 분석해 주세요",
+      "uploading": "이미지 업로드 중...",
+      "analyzing": "비전 모델 분석 중...",
+      "failed": "비전 분석 실패: {{msg}}"
+    },
+    "session": {
+      "live": "LIVE",
+      "idle": "IDLE",
+      "id": "세션 #{{id}}",
+      "label_en": "SESSION"
+    },
+    "tabs": {
+      "sop": "SOP {{n}}",
+      "collab": "협업 {{n}}",
+      "quiz": "퀴즈",
+      "quiz_empty": "SOP 학습을 마치면 자동으로 출제됩니다"
+    },
+    "meta": {
+      "tokens": "토큰 {{n}}/{{max}}",
+      "context": "컨텍스트 {{n}}턴",
+      "model": "모델 {{name}}",
+      "intent": "의도 분류 {{n}}ms"
+    },
+    "ai": {
+      "confidence": "신뢰도",
+      "label": {
+        "sop": "SOP_GUIDE",
+        "scenario": "SCENARIO",
+        "action": "ACTION",
+        "chat": "CHAT",
+        "vision": "VISION"
+      }
+    },
+    "quick": {
+      "title": "QUICK",
+      "subtitle": "빠른 질문",
+      "hint": "클릭하면 즉시 전송됩니다"
+    },
+    "notebox": {
+      "aria_label": "노트 박스 — SOP / 협업 / 빠른 질문",
+      "tab": {
+        "sop": "SOP",
+        "collab": "COLLAB",
+        "quick": "QUICK"
+      },
+      "toggle": {
+        "expand": "펼치기",
+        "collapse": "접기"
+      }
+    },
+    "pageTab": {
+      "chat": "CHAT",
+      "chatSub": "· 대화",
+      "learn": "LEARN",
+      "learnSub": "· 학습"
+    },
+    "learn": {
+      "sub": {
+        "sop": "SOP",
+        "collab": "협업",
+        "quiz": "퀴즈"
+      }
+    }
+  },
+  "draft": {
+    "hero": {
+      "eyebrow": "DOCUMENT SEARCH & DRAFTING · MODULE B",
+      "title": "문서 검색 / 작성",
+      "subtitle": "이메일·보고서·8D·PPAP·신청서 등 13가지 사내 문서를 AI가 대신 초안 작성. 회사 양식 파일을 업로드하면 그 구조 그대로 작성되고, 사내 SOP·용어집·과거 작성 이력을 자동으로 참고해 일관된 결과를 만들어 드립니다."
+    },
+    "main": {
+      "internal": "내부용 문서",
+      "external": "외부용 문서",
+      "history": "문서 이력"
+    },
+    "tone": {
+      "formal_internal": "격식 (사내)",
+      "formal_external": "격식 (외부)",
+      "standard": "표준",
+      "friendly": "친근",
+      "concise": "간결"
+    },
+    "request": {
+      "eyebrow": "REQUEST · 작성 요청",
+      "title": "무엇을 작성할까요?",
+      "label": "요청 내용",
+      "placeholder": "예: 현대차 SQ팀에 PPAP Level 3 제출 안내",
+      "tone": "어조 · TONE",
+      "doctype": "문서 유형 · {{n}}종",
+      "submit": "생성 ▶",
+      "streaming": "생성 중…"
+    },
+    "output": {
+      "eyebrow": "OUTPUT · 생성 결과",
+      "placeholder": "생성 결과가 여기에 스트리밍됩니다.",
+      "streaming": "스트리밍 중",
+      "complete": "완료",
+      "compare": "↔ 원본 비교",
+      "reevaluate": "↻ 재평가"
+    },
+    "quality": {
+      "eyebrow": "QUALITY · 품질 평가",
+      "structure": "구조",
+      "length": "분량",
+      "terminology": "전문성",
+      "completion": "완성도",
+      "tone": "톤",
+      "tipReady": "생성 후 자동 평가됩니다.",
+      "tipLoading": "평가 중…"
+    },
+    "cc": {
+      "eyebrow": "CC · 자동 추천",
+      "required": "필수",
+      "recommended": "권장",
+      "optional": "선택"
+    },
+    "fewshot": {
+      "eyebrow": "FEW-SHOT · RAG 컨텍스트",
+      "footer": "ChromaDB · BGE-M3 1024d · 584건"
+    },
+    "history": {
+      "eyebrow": "HISTORY · 문서 이력",
+      "title": "Firestore 영구화 {{n}}건",
+      "subtitle": "/ 최근 30개 표시",
+      "refresh": "↻ 새로고침",
+      "loading": "로딩…",
+      "empty": "이력이 없습니다. 초안을 생성하면 자동으로 Firestore 에 저장됩니다.",
+      "reedit": "재편집",
+      "delete": "삭제",
+      "deleteConfirm": "이 초안을 삭제하시겠습니까?",
+      "fbWarn": "Firestore 연결 실패 — {{err}}"
+    },
+    "diff": {
+      "eyebrow": "DIFF · 원본 ↔ 편집본",
+      "title": "버전 비교",
+      "stats": "+{{add}} / −{{del}} · 유사도 {{sim}}%",
+      "empty": "변경 사항이 없습니다.",
+      "close": "닫기"
+    }
+  },
+  "equipment": {
+    "hero": {
+      "eyebrow": "EQUIPMENT & PROCESS AI · MODULE F",
+      "title": "설비 / 공정 AI",
+      "subtitle": "7종 ML 엔진 · 14개 부서. SPC Nelson 8 Rules · TF-IDF 에러 검색 · XGBoost 잔여수명 · Markov 연쇄 고장 예측을 한 화면에서."
+    },
+    "main": {
+      "overview": "대시보드",
+      "manual_error": "매뉴얼 / 에러",
+      "inspection": "점검 이력"
+    },
+    "sub": {
+      "overview": "설비 개요",
+      "alerts": "긴급 조치",
+      "equipment": "장비 유형",
+      "predictive": "예측 정비",
+      "spc": "SPC · Nelson 8",
+      "ml": "ML 엔진"
+    },
+    "metrics": {
+      "realtimeTitle": "실시간 설비 상태",
+      "metricsEyebrow": "METRICS · 핵심 지표",
+      "uptime": "가동률",
+      "avgCpk": "평균 공정능력",
+      "alerts": "활성 알람",
+      "mtbf": "평균 무고장",
+      "maintDue": "정비 임박"
+    },
+    "overview": {
+      "equipmentEyebrow": "EQUIPMENT · {{count}}종 상태",
+      "equipmentTitle": "장비별 Cpk · 알람",
+      "live": "LIVE"
+    },
+    "alerts": {
+      "eyebrow": "URGENT · 긴급 조치 큐",
+      "title": "즉시 대응 필요",
+      "count": "{{n}}건",
+      "actBtn": "조치",
+      "scheduleBtn": "정비 예약"
+    },
+    "types": {
+      "eyebrow": "TYPES · 장비 유형별 ML 신호",
+      "title": "상세 진단",
+      "mlSignal": "Isolation Forest 이상치 + Markov 후속 위험",
+      "normal": "정상 범위"
+    },
+    "predictive": {
+      "moldEyebrow": "XGBoost MOLD LIFECYCLE",
+      "moldTitle": "금형 {{total}}기 잔여 수명",
+      "moldDisplay": "표시 {{shown}}/{{total}}",
+      "mtbfBarEyebrow": "MTBF · 수리 비용 분포",
+      "mtbfBarTitle": "설비별 비용 + 수리 건수 ({{count}}대)",
+      "mtbfTopEyebrow": "MTBF · 수리 비용 TOP 5",
+      "mtbfTopTitle": "예측 정비 우선순위",
+      "machinesAttention": "{{n}}대 점검 필요"
+    },
+    "spc": {
+      "healthEyebrow": "SPC · 5공정 건강 카드",
+      "healthTitle": "Nelson 8 Rules 위반",
+      "violation": "위반 {{n}}건",
+      "chartEyebrow": "CONTROL CHART · X̄ ({{name}})",
+      "chartTitle": "관리도",
+      "ruleViolation": "Rule {{rules}} 위반",
+      "loading": "로딩중…",
+      "csvEyebrow": "DATA MANAGEMENT · CSV 업로드",
+      "csvTitle": "SPC 데이터 관리",
+      "csvLabel": "CSV 파일 (UTF-8 BOM, 헤더 1행)",
+      "uploadBtn": "업로드 ▶",
+      "uploading": "업로드 중…"
+    },
+    "ml": {
+      "eyebrow": "ML ENGINES · {{count}}종 상태",
+      "title": "모델 인벤토리",
+      "active": "{{online}}/{{total}} ACTIVE"
+    },
+    "manual": {
+      "codes": "에러코드",
+      "symptoms": "증상 가이드",
+      "rag": "AI 질의",
+      "searchEyebrow": "ERROR SEARCH · TF-IDF + 동의어 {{n}}",
+      "searchTitle": "에러코드 자연어 검색",
+      "historyPill": "이력 685건",
+      "resultsEyebrow": "RESULTS · 코사인 유사도 TOP 5",
+      "resultsTitle": "매칭 에러 코드",
+      "guideBtn": "조치 가이드",
+      "manualBtn": "매뉴얼"
+    },
+    "markov": {
+      "eyebrow": "MARKOV CHAIN · DFS depth=3",
+      "title": "연쇄 고장 예측",
+      "prevention": "권장 사전 조치: 윤활 점검 → 베어링 교체 → 모터 온도 모니터링"
+    },
+    "inspection": {
+      "eyebrow": "INSPECTION · 점검 체크리스트",
+      "title": "{{total}} 템플릿 (3장비 × 3주기)",
+      "viewBtn": "보기",
+      "colEquip": "장비",
+      "colCycle": "주기",
+      "colDate": "최근 점검",
+      "colRate": "완료율",
+      "colMiss": "미달 항목"
+    },
+    "access": {
+      "deniedEyebrow": "EQUIPMENT & PROCESS AI · ACCESS DENIED",
+      "deniedTitle": "접근 권한 없음",
+      "deniedDesc": "설비/공정 AI 모듈은 14개 허용 부서(생산기술팀·품질보증팀·정비팀·금형팀·프레스팀·용접팀·도장팀·검사팀·환경안전팀·사출팀·CNC팀·컨베이어팀·자재팀·시스템관리팀)에만 노출됩니다.",
+      "reasonEyebrow": "REASON · 사유",
+      "returnDashboard": "대시보드로 돌아가기"
+    },
+    "states": {
+      "low": "LOW",
+      "med": "MED",
+      "high": "HIGH",
+      "ok": "OK",
+      "warn": "WARN",
+      "crit": "CRIT"
+    },
+    "placeholder": {
+      "manual_error": "Day 7 Phase 4~5 — 에러 검색 + Markov 연쇄 고장 + 매뉴얼 RAG. 본격 구현 예정.",
+      "inspection": "Day 12 — 점검 체크리스트 + 점검 이력. 본격 구현 예정."
+    }
+  },
+  "auth": {
+    "firebase": {
+      "warning": "Firebase 인증 실패 — 일부 기능(Storage/피드백)이 제한됩니다",
+      "bootstrap": "첫 로그인 — Firebase 계정 자동 생성",
+      "failed": "Firebase 로그인 실패"
+    }
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "search": "검색",
+    "execute": "실행",
+    "export": "내보내기",
+    "download": "다운로드",
+    "results": "검색 결과",
+    "matches": "일치",
+    "now": "방금",
+    "minutes_ago": "{{n}}분 전",
+    "hours_ago": "{{n}}시간 전",
+    "yesterday": "어제",
+    "days_ago": "{{n}}일 전"
+  }
+}

@@ -1,0 +1,160 @@
+/* AJIN AI Assistant — App-level overrides
+   tokens.css + theme.css 가 기본 디자인 시스템 적용 후 이 파일이 컴포넌트별 미세 조정. */
+
+#root {
+  min-height: 100vh;
+  background: var(--hud-bg);
+  color: var(--hud-text);
+}
+
+/* 스크롤바 (HUD 톤) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--hud-border);
+  border-radius: 1px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--hud-primary);
+}
+
+/* ── 우측 패널 토글 transition ───────────────────────────── */
+.app-body {
+  transition: grid-template-columns 200ms ease-out;
+}
+
+/* ── 모듈 비활성 (스트리밍 중) ───────────────────────────── */
+.module-btn.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ── 모듈 카드 잠금 (RBAC 미달) ─────────────────────────── */
+.module-card.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  position: relative;
+  pointer-events: none;
+}
+.module-card.locked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent 0 8px,
+    color-mix(in oklab, var(--hud-text-muted) 6%, transparent) 8px 9px
+  );
+  pointer-events: none;
+}
+
+/* ── Button 컴포넌트 보강 ────────────────────────────────── */
+.btn { cursor: pointer; }
+.btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn.full { width: 100%; }
+.btn.sm { padding: 6px 10px; font-size: 12px; }
+.btn.lg { padding: 12px 18px; font-size: 15px; }
+.btn.tertiary {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--hud-text);
+}
+.btn.tertiary:hover {
+  background: color-mix(in oklab, var(--hud-primary) 8%, transparent);
+  border-color: var(--hud-border);
+}
+.btn.danger {
+  background: var(--hud-red);
+  color: white;
+  border-color: var(--hud-red);
+}
+.btn-spinner {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--hud-primary);
+  animation: hud-pulse 1.6s ease-in-out infinite;
+}
+.btn-icon {
+  display: inline-flex;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+@keyframes hud-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── 데모 빠른 로그인 칩 ─────────────────────────────────── */
+.demo-chips {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--hud-border);
+}
+.demo-chips .btn {
+  text-align: left !important;
+  align-items: flex-start !important;
+}
+
+/* ── Login 카드 — change_pw 슬라이드 ─────────────────────── */
+.login-card form {
+  animation: hud-slide-in 200ms ease-out;
+}
+@keyframes hud-slide-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── HUD 배지 컴포넌트 ───────────────────────────────────── */
+.hud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hud-badge-glyph {
+  font-size: 10px;
+}
+
+/* ── 모바일 반응형 ───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .right-panel {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    height: calc(100vh - 52px);
+    z-index: 99;
+    transform: translateX(-100%);
+    transition: transform 200ms ease-out;
+  }
+  .sidebar[data-mobile-open="true"] {
+    transform: translateX(0);
+  }
+  .app-body {
+    grid-template-columns: 1fr !important;
+  }
+  .metrics-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .modules-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .login-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+}

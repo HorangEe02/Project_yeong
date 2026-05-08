@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{padding:20px;background:#0A0E14;}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .sw{display:flex;flex-direction:column;}
+  .chip{height:90px;border:1px solid var(--hud-border);position:relative;display:flex;align-items:flex-end;justify-content:flex-start;padding:8px;}
+  .name{font-size:11px;letter-spacing:0.1em;color:var(--hud-text);font-weight:700;text-transform:uppercase;}
+  .meta{padding:8px 0 0;display:flex;justify-content:space-between;}
+  .role{font-size:11px;color:var(--hud-text-dim);text-transform:uppercase;letter-spacing:0.08em;}
+  .hex{font-size:11px;color:var(--hud-text);font-family:var(--hud-font-mono);}
+</style></head>
+<body><div class="grid">
+  <div class="sw"><div class="chip" style="background:#D89400"><span class="name" style="color:#fff">AJIN GOLD</span></div><div class="meta"><span class="role">PRIMARY · LIGHT</span><span class="hex">#D89400</span></div></div>
+  <div class="sw"><div class="chip" style="background:#FCB132;box-shadow:0 0 14px #FCB13255"><span class="name" style="color:#0A0E14">AJIN GOLD</span></div><div class="meta"><span class="role">PRIMARY · DARK</span><span class="hex">#FCB132</span></div></div>
+  <div class="sw"><div class="chip" style="background:#FFD066"><span class="name" style="color:#0A0E14">GOLD LIGHT</span></div><div class="meta"><span class="role">HIGHLIGHT</span><span class="hex">#FFD066</span></div></div>
+</div></body></html>

@@ -1,0 +1,51 @@
+# AJIN AI Assistant — Demo Tunnel Compose
+# Plan v3.0
+#
+# 첫 실행:
+#   cd docker/demo-tunnel
+#   docker compose build
+#   docker compose up
+#
+# 이후 — Docker Desktop UI:
+#   Containers 탭 → ajin-demo-tunnel → ▶ Start / ⏹ Stop
+
+services:
+  ajin-demo-tunnel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ajin-demo-tunnel
+    image: ajin-demo-tunnel:latest
+
+    # Mac 호스트의 Ollama (11434) 도달용
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    # gcloud 인증 — 호스트의 ~/.config/gcloud 마운트 (RW 필요)
+    # 이유: gcloud 가 access token refresh 시 credentials.db 와 logs/ 를 write.
+    # ro 로 마운트하면 'Read-only file system' 오류로 인증 검증 실패.
+    volumes:
+      - ~/.config/gcloud:/root/.config/gcloud
+
+    environment:
+      GCP_PROJECT: ajin-cb
+      GCP_REGION: asia-northeast3
+      GCP_SERVICE: ajin-backend
+      HOSTING_BASE: https://ajin-cb.web.app
+      OLLAMA_HOST_INTERNAL: host.docker.internal:11434
+
+    # SIGTERM 후 cleanup 시간 충분히 부여 (Cloud Run env update ~10초)
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
+
+    # docker desktop 자동 시작 안 함 (사용자가 수동 ▶ Start)
+    restart: "no"
+
+    # Docker Desktop UI 라벨
+    labels:
+      com.docker.compose.service: "AJIN Demo Tunnel"
+      com.ajin.purpose: "Mac Ollama → Cloud Run via Cloudflare Tunnel"
+
+    # 표준 출력 로그 — Docker Desktop "Logs" 탭에서 진행 상황 확인
+    tty: true
+    stdin_open: true

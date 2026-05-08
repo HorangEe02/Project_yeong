@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '04_AJIN/**'
+      - '.github/workflows/ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - '04_AJIN/**'
+
+defaults:
+  run:
+    working-directory: 04_AJIN
+
+jobs:
+  frontend-lint-build:
+    name: Frontend — lint + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 04_AJIN/frontend/package-lock.json
+      - name: Install dependencies
+        working-directory: 04_AJIN/frontend
+        run: npm ci
+      - name: ESLint
+        working-directory: 04_AJIN/frontend
+        run: npm run lint
+        continue-on-error: true   # lint 미설정 시 fail 방지 (점진 도입)
+      - name: TypeScript + Vite build
+        working-directory: 04_AJIN/frontend
+        run: npm run build
+
+  backend-lint:
+    name: Backend — lint (ruff + black)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: 04_AJIN/requirements.txt
+      - name: Install lint tools
+        run: pip install ruff black
+      - name: Ruff
+        run: ruff check . --select=E,F,W,I --ignore=E501
+        continue-on-error: true
+      - name: Black (check only)
+        run: black --check . --extend-exclude '/(\.venv|node_modules|frontend/dist)/'
+        continue-on-error: true
+
+  docker-build:
+    name: Docker — slim build dry-run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Generate demo data (so Dockerfile COPY succeeds)
+        run: |
+          mkdir -p data/equipment data/knowledge_base/templates data/templates
+          touch data/.jwt_secret data/auth.db data/employees.db data/compliance.db data/compliance_changes.db data/scenarios.db
+          touch data/equipment/{drawings,error_codes,error_history,inspection,maintenance,molds,mold_lifecycle}.db
+          mkdir -p data/scenarios data/facility_db data/regulation_ml data/intent_ml data/markov_ml data/mold_ml data/spc_ml data/spc_samples data/documents data/crawled data/metadata data/knowledge_base
+      - name: Docker build (slim target)
+        run: docker build --target slim -t ajin-backend:ci .

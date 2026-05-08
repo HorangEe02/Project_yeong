@@ -1,0 +1,70 @@
+# AJIN Backend — Cloud Run 풀 모드 의존성 (Module A/B/D/E 모두 활성)
+# 이미지 ~3GB, 메모리 ≥2Gi 필요. 데모만 시연 시에는 requirements-cloudrun.txt (슬림) 사용.
+
+# === 슬림 모드 base (변경 없음) ===
+
+# 웹 프레임워크
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+pydantic>=2.0.0
+sse-starlette>=2.0.0
+python-multipart>=0.0.9
+email-validator>=2.0.0
+
+# HTTP
+requests>=2.28.0
+httpx>=0.24.0
+
+# 인증
+PyJWT>=2.8.0
+bcrypt>=4.0.0
+firebase-admin>=6.4.0
+
+# ML/통계
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.11.0
+scikit-learn>=1.3.0
+
+# 시각화
+plotly>=5.18.0
+
+# 한국어 형태소
+kiwipiepy>=0.18.0
+
+# LLM
+langchain-ollama>=0.2.0
+langchain-core>=0.3.0
+google-genai>=0.5.0
+
+# 문서 내보내기
+python-docx>=1.1.0
+fpdf2>=2.8.0
+openpyxl>=3.1.0
+pypdf>=3.0.0
+jinja2>=3.1.0   # Plan v1.0 — DraftPipeline 의 Jinja2 템플릿 렌더링
+
+# 유틸
+python-dotenv>=1.0.0
+rich>=13.0.0
+
+# === 풀 모드 추가 의존성 ===
+
+# Module A — HybridSearcher (벡터 검색)
+chromadb>=0.5.0
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-chroma>=0.2.0
+langchain-text-splitters>=0.3.0
+rank-bm25>=0.2.2
+
+# Module F — Equipment ML
+xgboost>=2.0.0
+
+# GCS 동기화 (vectorstore 영속화)
+google-cloud-storage>=2.16.0
+
+# 옵션: 로컬 sentence-transformers 임베딩 (현재는 Gemini API 사용 → 미설치)
+# 활성 시 이미지 +2.3GB, cold start +30초.
+# sentence-transformers>=2.7.0
+# torch>=2.0.0,<3.0.0  # CPU-only 휠 권장 — pip install --index-url=https://download.pytorch.org/whl/cpu

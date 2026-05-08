@@ -1,0 +1,38 @@
+{
+	admin off
+	auto_https off
+}
+
+:8434 {
+	log {
+		output file __USER_HOME__/.config/ajin/caddy.log {
+			roll_size 10mb
+			roll_keep 3
+		}
+		# Plan A 변형 — 민감 헤더(X-AJIN-Secret/Authorization/Cookie) 를 access log 에서 redact.
+		format filter {
+			wrap json
+			fields {
+				request>headers>X-Ajin-Secret delete
+				request>headers>X-AJIN-Secret delete
+				request>headers>Authorization delete
+				request>headers>Cookie delete
+			}
+		}
+	}
+
+	@authorized header X-AJIN-Secret {env.AJIN_OLLAMA_SECRET}
+
+	handle @authorized {
+		reverse_proxy 127.0.0.1:11434 {
+			transport http {
+				keepalive 90s
+				keepalive_idle_conns 10
+			}
+		}
+	}
+
+	handle {
+		respond "Forbidden — invalid or missing X-AJIN-Secret header" 403
+	}
+}

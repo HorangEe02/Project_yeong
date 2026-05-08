@@ -1,0 +1,62 @@
+# 빌드 컨텍스트에서 제외 (이미지 크기/빌드 속도 절감)
+
+# 프론트엔드 (Cloud Run 백엔드와 무관)
+frontend/
+ajin-ai-assistant/
+uiux/
+
+# slim/full Dockerfile 이 baking 하는 자산은 차단하지 않는다 — Dockerfile 의
+# COPY 와 동시 차단 시 build 가 깨진다 (v3.6.1 회귀 방지).
+# slim 은 employees.db / knowledge_base/templates / templates / equipment/*.db 사용,
+# full 은 추가로 ML 디렉토리 / documents / vectorstore 까지 baking.
+data/audit.db
+data/feedback.db
+data/compliance_docs/
+data/demo_scenarios/
+data/crawled/history/
+
+# 개발 부산물
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Git/IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+**/.DS_Store
+
+# OMC / Claude Code
+.claude/
+.omc/
+
+# 로그·임시
+logs/
+*.log
+tmp/
+.env.development.local
+.env.development.local.example
+.env.development
+
+# 문서/레포트
+docs/
+GUIDELINE/
+update_log/
+*.md
+*.pptx
+*.png
+*.svg
+
+# 테스트
+tests/
+backend/tests/
+
+# 노드 (백엔드 미관련)
+node_modules/
+**/node_modules/

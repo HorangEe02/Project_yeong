@@ -1,0 +1,122 @@
+# AJIN Backend — Cloud Build pipeline
+#
+# 두 인시던트 (sync 누락 / `rank_bm25` ImportError) 후 도입한 표준 빌드·검증 파이프라인.
+# 배포 직전까지 자동 (build → no-traffic deploy → smoke test). **트래픽 promote 는 수동**.
+#
+# 사용법:
+#   # 슬림 (default)
+#   gcloud builds submit --config=cloudbuild.yaml
+#
+#   # 풀 모드
+#   gcloud builds submit --config=cloudbuild.yaml --substitutions=_MODE=full
+#
+#   # tag/리비전 명시
+#   gcloud builds submit --config=cloudbuild.yaml \
+#       --substitutions=_MODE=slim,_TAG=hotfix-bm25
+#
+# 사전 준비 — Artifact Registry 저장소 (1회만):
+#   gcloud artifacts repositories create ajin-backend \
+#     --repository-format=docker --location=asia-northeast3 \
+#     --description="AJIN backend container images"
+#
+# 본 파이프라인은 트래픽을 자동 전환하지 *않는다*. promote 는 deploy-backend.sh 또는 수동:
+#   bash scripts/deploy-backend.sh --tag <TAG>          # canary + promote 자동
+#   gcloud run services update-traffic ajin-backend ...  # 수동 promote
+
+substitutions:
+  _MODE: slim                             # slim | full
+  _SERVICE: ajin-backend
+  _REGION: asia-northeast3
+  _REPO: ajin-backend                     # Artifact Registry repository
+  _TAG: 'build-${BUILD_ID}'               # 새 리비전의 traffic tag
+  # 이미지 ref — REGION-docker.pkg.dev/PROJECT/REPO/IMAGE:SHORT_SHA
+  _IMAGE: '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}'
+
+options:
+  # 풀 모드는 큰 데이터 + chromadb/scikit-learn 빌드라 더 큰 worker 필요.
+  machineType: E2_HIGHCPU_8
+  logging: CLOUD_LOGGING_ONLY
+
+timeout: 1800s   # 30분 (full mode 빌드 여유)
+
+steps:
+  # ────────────────────────────────────────────────────────
+  # 1. Docker build with --target ${_MODE}
+  # ────────────────────────────────────────────────────────
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --target=${_MODE}
+      - --tag=${_IMAGE}:${SHORT_SHA}
+      - --tag=${_IMAGE}:${_MODE}-latest
+      - .
+
+  # ────────────────────────────────────────────────────────
+  # 2. Push image to Artifact Registry
+  # ────────────────────────────────────────────────────────
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args: [push, --all-tags, '${_IMAGE}']
+    waitFor: [build]
+
+  # ────────────────────────────────────────────────────────
+  # 3. Cloud Run deploy --no-traffic --tag
+  # ────────────────────────────────────────────────────────
+  - id: deploy-no-traffic
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_IMAGE}:${SHORT_SHA}
+      - --region=${_REGION}
+      - --project=${PROJECT_ID}
+      - --no-traffic
+      - --tag=${_TAG}
+      - --quiet
+    waitFor: [push]
+
+  # ────────────────────────────────────────────────────────
+  # 4. Smoke test on tag URL
+  #    실패 시 빌드 전체 fail — 트래픽 promote 안 됨.
+  #    tag URL 패턴: https://${_TAG}---${_SERVICE}-<hash>.<region>.run.app
+  #    (hash 는 서비스마다 고정. 본 프로젝트는 'ncsnraqdaa-du')
+  # ────────────────────────────────────────────────────────
+  - id: smoke-test
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        # tag URL 자동 추론 — gcloud run services describe 의 traffic[].url 사용
+        TAG_URL=$(gcloud run services describe ${_SERVICE} \
+            --region=${_REGION} --project=${PROJECT_ID} \
+            --format="value(status.traffic[].url)" \
+            | tr ';' '\n' | grep -v '^$' | head -1)
+        if [ -z "$$TAG_URL" ]; then
+            echo "✗ tag URL 추론 실패"; exit 1
+        fi
+        NEW_REV=$(gcloud run services describe ${_SERVICE} \
+            --region=${_REGION} --project=${PROJECT_ID} \
+            --format='value(status.latestCreatedRevisionName)')
+        echo "TAG_URL=$$TAG_URL"
+        echo "NEW_REV=$$NEW_REV"
+        bash scripts/smoke-test.sh "$$TAG_URL" "$$NEW_REV"
+    waitFor: [deploy-no-traffic]
+
+# 빌드 결과 이미지 등록 (Cloud Build 콘솔 표시용)
+images:
+  - '${_IMAGE}:${SHORT_SHA}'
+  - '${_IMAGE}:${_MODE}-latest'
+
+# Note: 트래픽 promote 는 본 파이프라인에서 수행하지 *않는다*.
+# 의도적 design — production traffic 변경은 명시적 인간 승인 필요.
+# Promote 는 다음 둘 중 하나로:
+#   1) bash scripts/deploy-backend.sh --tag ${_TAG}
+#      → 같은 리비전을 canary 10% → 100% 로 안전 promote
+#   2) gcloud run services update-traffic ${_SERVICE} \
+#        --to-revisions=<리비전명>=100 \
+#        --region=${_REGION}

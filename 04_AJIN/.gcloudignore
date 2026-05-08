@@ -1,0 +1,63 @@
+# gcloud 빌드 컨텍스트 업로드 제외 패턴.
+# 이 파일이 있으면 .gitignore 는 사용되지 않으므로,
+# Cloud Run 배포에 필요한 data/auth.db, data/*.db 등은 포함된다.
+# 추가 필터링은 .dockerignore 가 담당.
+
+# Plan A 변형 — Dockerfile multi-stage (slim/full) 의 모든 COPY 가
+# build context 에서 파일을 찾아야 하므로, .dockerignore 와 동일한 정책을 적용한다.
+# 이전 (~v3.6) 의 ML/documents/vectorstore 차단은 build target=full 빌드를 깨뜨린다.
+# 슬림 빌드는 ML 디렉토리를 baking 하지 않으므로 이미지 사이즈에는 영향 없음 — 단지
+# build context 업로드 시간만 늘어남 (수십 MB 단위, 1~2초).
+data/audit.db
+data/feedback.db
+data/compliance_docs/
+data/demo_scenarios/
+data/crawled/history/
+
+# data/equipment/ 는 dashboard 메트릭(error_codes/molds/drawings)용으로 일부 포함
+# data/employees.db (329명, 240KB) 는 dashboard employees 메트릭용 — 포함
+# data/intent_ml, markov_ml, mold_ml, spc_ml, spc_samples, documents, vectorstore 는
+# full target 의 COPY 대상이라 차단 안 함.
+
+# 프론트엔드 (Cloud Run 백엔드와 무관)
+frontend/
+ajin-ai-assistant/
+uiux/
+
+# Python 부산물
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Git/IDE
+.git/
+.vscode/
+.idea/
+.DS_Store
+**/.DS_Store
+
+# OMC / Claude Code
+.claude/
+.omc/
+
+# 로그·임시·env
+logs/
+*.log
+tmp/
+.env.development.local
+.env.development.local.example
+
+# 문서
+docs/
+GUIDELINE/
+update_log/
+
+# 노드
+node_modules/
+**/node_modules/
+
+# Cloud Build 메타
+.gcloudignore
+.dockerignore

@@ -1,0 +1,252 @@
+/* ==========================================================================
+   AJIN AI Assistant — Design Tokens
+   v3.5 — 2026-04-26
+   Single source of truth for color, type, spacing, shadow, glass.
+   Default theme: DARK (HUD). Toggle [data-theme="light"] for light mode.
+   ========================================================================== */
+
+/* -- External @imports (CSS spec: must precede ALL other rules) ----------- */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap");
+
+/* -- Web fonts ------------------------------------------------------------- */
+/* Brand font (uploaded; original family name redacted in filenames).
+   Mapped to family "AJIN Sans" with full 100–800 weight ladder. */
+@font-face { font-family: "AJIN Sans"; font-weight: 100; font-style: normal; font-display: swap;
+  src: url("/fonts/__________-1Thin.otf") format("opentype"), url("/fonts/__________-1Thin.ttf") format("truetype"); }
+@font-face { font-family: "AJIN Sans"; font-weight: 200; font-style: normal; font-display: swap;
+  src: url("/fonts/__________-2ExtraLight.otf") format("opentype"), url("/fonts/__________-2ExtraLight.ttf") format("truetype"); }
+@font-face { font-family: "AJIN Sans"; font-weight: 300; font-style: normal; font-display: swap;
+  src: url("/fonts/__________-3Light.otf") format("opentype"), url("/fonts/__________-3Light.ttf") format("truetype"); }
+@font-face { font-family: "AJIN Sans"; font-weight: 400; font-style: normal; font-display: swap;
+  src: url("/fonts/__________-4Regular.otf") format("opentype"), url("/fonts/__________-4Regular.ttf") format("truetype"); }
+@font-face { font-family: "AJIN Sans"; font-weight: 500; font-style: normal; font-display: swap;
+  src: url("/fonts/__________-5Medium.otf") format("opentype"), url("/fonts/__________-5Medium.ttf") format("truetype"); }
+@font-face { font-family: "AJIN Sans"; font-weight: 600; font-style: normal; font-display: swap;
+  src: url("/fonts/__________-6SemiBold.otf") format("opentype"), url("/fonts/__________-6SemiBold.ttf") format("truetype"); }
+@font-face { font-family: "AJIN Sans"; font-weight: 700; font-style: normal; font-display: swap;
+  src: url("/fonts/__________-7Bold.otf") format("opentype"), url("/fonts/__________-7Bold.ttf") format("truetype"); }
+@font-face { font-family: "AJIN Sans"; font-weight: 800; font-style: normal; font-display: swap;
+  src: url("/fonts/__________-8ExtraBold.otf") format("opentype"), url("/fonts/__________-8ExtraBold.ttf") format("truetype"); }
+/* Korean fallback: Noto Sans KR — @import 는 파일 상단으로 이동 (CSS 스펙) */
+
+/* -- Root tokens (DARK / HUD mode default) --------------------------------- */
+:root,
+:root[data-theme="dark"] {
+  /* Surface — 60% base */
+  --hud-bg:              #0A0E14;
+  --hud-surface:         #111820;
+  --hud-surface-2:       #1A2030;
+  --hud-surface-3:       #1c2636;
+
+  /* Borders — 30% neutral */
+  --hud-border:          #2A2520;
+  --hud-border-light:    #20262E;
+
+  /* Text — 30% neutral */
+  --hud-text:            #E8E1D5;
+  --hud-text-dim:        #D5CFC5;   /* WCAG AAA 8.5:1 on bg */
+  --hud-text-muted:      #8A8276;
+
+  /* Accent — 10% gold */
+  --hud-primary:         #FCB132;
+  --hud-primary-light:   #FFD066;
+  --hud-primary-dim:     #FCB13233;
+  --hud-primary-glow:
+    0 0 10px #FCB13244,
+    0 0 20px #FCB13222;
+
+  /* Semantic — shared across modes */
+  --hud-green:           #2D8A4E;
+  --hud-orange:          #E8A317;
+  --hud-red:             #C0392B;
+  --hud-blue:            #2980B9;
+  --hud-yellow:          #FCB132;
+
+  /* Liquid Glass — derived */
+  --glass-bg:            color-mix(in oklab, var(--hud-surface) 55%, transparent);
+  --glass-bg-strong:     color-mix(in oklab, var(--hud-surface) 75%, transparent);
+  --glass-border:        color-mix(in oklab, var(--hud-border) 65%, transparent);
+  --glass-highlight:     color-mix(in oklab, white 18%, transparent);
+  --glass-shadow:        color-mix(in oklab, black 8%, transparent);
+  --glass-blur:          24px;
+  --glass-saturate:      140%;
+}
+
+/* -- Light theme ----------------------------------------------------------- */
+:root[data-theme="light"] {
+  --hud-bg:              #FAF8F5;
+  --hud-surface:         #FFFFFF;
+  --hud-surface-2:       #F0EBE3;
+  --hud-surface-3:       #F7F3EC;
+
+  --hud-border:          #D6CFC3;
+  --hud-border-light:    #E8E3DA;
+
+  --hud-text:            #2C241A;
+  --hud-text-dim:        #5C4E3C;
+  --hud-text-muted:      #A09686;
+
+  --hud-primary:         #D89400;
+  --hud-primary-light:   #FCB132;
+  --hud-primary-dim:     rgba(212, 168, 68, 0.13);
+  --hud-primary-glow:    0 0 0 transparent; /* no glow in light */
+
+  --glass-bg:            color-mix(in oklab, white 55%, transparent);
+  --glass-bg-strong:     color-mix(in oklab, white 80%, transparent);
+  --glass-border:        color-mix(in oklab, var(--hud-border) 70%, transparent);
+  --glass-highlight:     color-mix(in oklab, white 60%, transparent);
+  --glass-shadow:        color-mix(in oklab, black 6%, transparent);
+}
+
+/* -- Type tokens ----------------------------------------------------------- */
+:root {
+  --hud-font:        "AJIN Sans", "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
+  --hud-font-mono:   "AJIN Sans", "Pretendard", "Noto Sans KR", "SF Mono", ui-monospace, monospace;
+
+  /* Sizes (v3.4 +2px scale) */
+  --fs-xs:   12px;
+  --fs-sm:   13px;
+  --fs-base: 15px;
+  --fs-md:   16px;
+  --fs-lg:   18px;
+  --fs-xl:   20px;
+  --fs-2xl:  28px;
+  --fs-3xl:  36px;
+
+  /* Line heights */
+  --lh-tight:  1.2;
+  --lh-snug:   1.4;
+  --lh-normal: 1.6;
+
+  /* Weights */
+  --fw-regular:  400;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+
+  /* Letter spacing — English labels only */
+  --ls-wide:   0.08em;
+  --ls-wider:  0.10em;
+  --ls-widest: 2px;     /* version line */
+
+  /* Day 5++ — v2 EN label letter-spacing aliases (DAY5_PLUS_HUD_PLAN Section 9-3) */
+  --ls-en:        0.08em;   /* 영문 라벨 (SYSTEM ANALYTICS, GPU 등) */
+  --ls-en-tight:  0.06em;   /* 작은 영문 (메타 라인) */
+  --ls-en-wide:   0.12em;   /* eyebrow 라벨 */
+}
+
+/* -- Layout tokens --------------------------------------------------------- */
+:root {
+  --top-bar-height:      52px;
+  --left-panel-width:    240px;
+  --left-panel-max:      400px;
+  --right-panel-width:   280px;
+  --card-radius:         2px;
+  --card-padding:        16px;
+  --section-gap:         20px;
+  --main-col-ratio:      4fr 0.8fr;
+
+  /* Tahoe / Liquid-Glass radii — softer corners on chrome & cards */
+  --radius-pill:    9999px;
+  --radius-control: 10px;
+  --radius-card:    14px;
+  --radius-window:  20px;
+  --radius-shell:   24px;
+}
+
+/* -- Shadow & elevation ---------------------------------------------------- */
+:root {
+  --shadow-sm:    0 1px 0 rgba(0,0,0,0.08);
+  --shadow-md:    0 4px 12px rgba(0,0,0,0.18);
+  --shadow-glass: 0 8px 32px rgba(0,0,0,0.24),
+                  inset 0 1px 0 var(--glass-highlight);
+  --shadow-glow:  var(--hud-primary-glow);
+  --shadow-press: inset 0 0 0 1px var(--hud-primary);
+}
+
+/* -- Reset ----------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--hud-font);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  color: var(--hud-text);
+  background: var(--hud-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* -- Semantic type --------------------------------------------------------- */
+h1, .h1 {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  margin: 0;
+  color: var(--hud-text);
+}
+h2, .h2 {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  margin: 0;
+}
+h3, .h3 {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  margin: 0;
+}
+h4, .h4 {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  margin: 0;
+}
+p, .body { font-size: var(--fs-base); line-height: var(--lh-normal); margin: 0; }
+small, .body-sm { font-size: var(--fs-sm); color: var(--hud-text-dim); }
+.label-en {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wider);
+  text-transform: uppercase;
+  color: var(--hud-text-dim);
+}
+.label-ko {
+  font-size: var(--fs-sm);
+  color: var(--hud-text-dim);
+  letter-spacing: 0;
+}
+.metric-value {
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-bold);
+  color: var(--hud-primary);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.code, code, kbd {
+  font-family: var(--hud-font-mono);
+  font-size: var(--fs-sm);
+  color: var(--hud-primary);
+}
+strong { color: var(--hud-primary); font-weight: var(--fw-bold); }
+a { color: var(--hud-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* -- Utility: glass surface ------------------------------------------------ */
+.glass {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--card-radius);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    0 1px 0 var(--glass-shadow);
+}
+.glass-strong {
+  background: var(--glass-bg-strong);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border: 1px solid var(--glass-border);
+}
