@@ -186,7 +186,7 @@ app = create_app()
 
 ### 5. `src/config.py`
 
-`backend/CLAUDE.md` §"Pattern 6. Pydantic Settings" 그대로 구현. 단, 현재 단계에서 미사용 키들은 `Optional`로:
+`backend/CLAUDE.md` §"Pattern 6. Pydantic Settings" 패턴을 사용하되, 런타임 LLM은 Ollama 로컬 기본값으로 고정한다. 외부 LLM 키는 식별 가능 건강정보 처리 경로에서 사용하지 않는다.
 
 ```python
 """애플리케이션 설정."""
@@ -217,10 +217,26 @@ class Settings(BaseSettings):
     database_url: str = Field(default="postgresql+asyncpg://lemon:lemon@localhost:5432/lemon")
     redis_url: str = Field(default="redis://localhost:6379/0")
 
+    # LLM (Phase 2부터 사용)
+    llm_provider: Literal["ollama"] = "ollama"
+    ollama_base_url: str = Field(default="http://127.0.0.1:11434")
+    ollama_model: str = Field(default="qwen3.5:9b")
+    ollama_vision_model: str | None = Field(default="gemma4:e4b")
+    ollama_timeout_sec: int = Field(default=60)
+    ollama_temperature: float = Field(default=0.0)
+    allow_external_llm: bool = Field(default=False)
+
     # External APIs (Phase 2부터 사용, 현재는 선택)
-    anthropic_api_key: SecretStr | None = Field(default=None)
     google_application_credentials: str | None = Field(default=None)
+    clova_ocr_api_url: str | None = Field(default=None)
+    clova_ocr_secret: SecretStr | None = Field(default=None)
     mfds_api_key: SecretStr | None = Field(default=None)
+
+    # Regulated feature flags
+    feature_prescription_ocr_intake: bool = Field(default=True)
+    feature_lab_result_ocr_intake: bool = Field(default=True)
+    feature_dosage_change_recommendation: bool = Field(default=False)
+    feature_medication_safety_alert: bool = Field(default=True)
 
 
 @lru_cache

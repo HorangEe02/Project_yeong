@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lemon Aid 개발자용 기획서 작성 전 팀 검토 보고서</title>
+  <style>
+    :root {
+      --bg: #f7f8f3;
+      --page: #ffffff;
+      --ink: #20241c;
+      --muted: #626b5a;
+      --line: #dfe5d5;
+      --line-strong: #c7d2b8;
+      --accent: #5d7d1f;
+      --accent-dark: #31550f;
+      --accent-soft: #eef5df;
+      --warning: #8a5a00;
+      --warning-bg: #fff7df;
+      --risk: #8a2f2a;
+      --risk-bg: #fff0ef;
+      --shadow: 0 18px 50px rgba(32, 36, 28, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Noto Sans KR", sans-serif;
+      line-height: 1.72;
+      word-break: keep-all;
+    }
+
+    a {
+      color: var(--accent-dark);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: #fbfcf7;
+      border-right: 1px solid var(--line);
+      padding: 28px 22px;
+    }
+
+    .brand {
+      margin-bottom: 26px;
+    }
+
+    .eyebrow {
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand h1 {
+      margin: 8px 0 0;
+      font-size: 20px;
+      line-height: 1.32;
+      letter-spacing: -0.02em;
+    }
+
+    nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    nav a {
+      display: block;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    nav a:hover {
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      text-decoration: none;
+    }
+
+    main {
+      padding: 44px 28px 72px;
+    }
+
+    .page {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      background: var(--page);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 54px 58px 64px;
+    }
+
+    header {
+      padding-bottom: 28px;
+      border-bottom: 2px solid var(--line);
+      margin-bottom: 34px;
+    }
+
+    header h2 {
+      margin: 10px 0 14px;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+    }
+
+    .summary {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .source {
+      margin-top: 22px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfcf8;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    section {
+      margin-top: 44px;
+    }
+
+    h2.section-title {
+      margin: 0 0 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 26px;
+      line-height: 1.28;
+      letter-spacing: -0.03em;
+    }
+
+    h3 {
+      margin: 28px 0 12px;
+      font-size: 19px;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    ul, ol {
+      margin: 10px 0 0 22px;
+      padding: 0;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    code {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #eef1e8;
+      color: #374127;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    .callout {
+      margin: 18px 0;
+      padding: 16px 18px;
+      border-left: 5px solid var(--accent);
+      border-radius: 12px;
+      background: var(--accent-soft);
+    }
+
+    .warning {
+      border-left-color: var(--warning);
+      background: var(--warning-bg);
+    }
+
+    .risk {
+      border-left-color: var(--risk);
+      background: var(--risk-bg);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f6e9;
+      color: #263716;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .checklist td:first-child {
+      width: 72px;
+      color: var(--accent-dark);
+      font-weight: 800;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .footer-note {
+      margin-top: 40px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        display: block;
+      }
+
+      aside {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      nav {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+
+      main {
+        padding: 20px 12px 48px;
+      }
+
+      .page {
+        border-radius: 12px;
+        padding: 34px 22px 42px;
+      }
+
+      table {
+        min-width: 680px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .layout {
+        display: block;
+      }
+
+      aside {
+        display: none;
+      }
+
+      main {
+        padding: 0;
+      }
+
+      .page {
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+      }
+
+      section {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <div class="eyebrow">Lemon Aid</div>
+        <h1>개발자용 기획서 작성 전 팀 검토 보고서</h1>
+      </div>
+      <nav aria-label="문서 목차">
+        <a href="#purpose">1. 보고서 목적</a>
+        <a href="#direction">2. 현재 확정된 기획 방향</a>
+        <a href="#features">3. 개발 대상 기능 범위</a>
+        <a href="#image-processing">4. 이미지 처리 범위 검토</a>
+        <a href="#image-data">5. 이미지 분석 데이터 검토</a>
+        <a href="#hospital-data">6. 향후 병원 데이터 연동 기반</a>
+        <a href="#ai-tech">7. AI Agent 및 기술 구현 질문</a>
+        <a href="#safety">8. 헬스케어 안전/개인정보</a>
+        <a href="#checklist">9. 최종 기획서 전환 체크리스트</a>
+        <a href="#next-doc">10. 최종 개발자용 기획서 구성</a>
+      </nav>
+    </aside>
+
+    <main>
+      <article class="page">
+        <header>
+          <div class="eyebrow">Internal Review Report</div>
+          <h2>Lemon Aid 개발자용 기획서 작성 전 팀 검토 보고서</h2>
+          <p class="summary">개발자 전달용 최종 기획서를 만들기 전, 현재 guide 문서에 정리된 기능 흐름과 기술 구현안을 팀이 검토하고 확정하기 위한 내부 의사결정 문서입니다.</p>
+          <div class="source">
+            참고 문서:
+            <code>01-product-overview.md</code>,
+            <code>02-product-spec.md</code>,
+            <code>03-frontend.md</code>,
+            <code>04-backend-api.md</code>,
+            <code>05-data-model.md</code>,
+            <code>06-ai-agents.md</code>,
+            <code>07-algorithms.md</code>,
+            <code>08-compliance-safety.md</code>,
+            <code>10-demo-release.md</code>
+          </div>
+        </header>
+
+        <section id="purpose">
+          <h2 class="section-title">1. 보고서 목적</h2>
+          <p>이 문서는 Lemon Aid의 개발자 전달용 최종 기획서를 만들기 전, 현재 <code>guide</code> 문서에 정리된 기능 흐름과 기술 구현안을 팀이 검토하고 확정하기 위한 내부 보고서다.</p>
+          <p>제품 방향과 MVP 목표는 현재 확정된 것으로 본다. 다만 프론트엔드, 백엔드, 데이터 모델, 이미지 처리, AI Agent, 병원 데이터 연동 기반, 안전/컴플라이언스 구현 방식은 AI와 함께 초안화된 내용이므로 팀 검토와 확정이 필요하다.</p>
+          <div class="callout">
+            이 문서는 개발자에게 바로 전달하는 최종 명세서가 아니라, 최종 명세서로 전환하기 전 팀이 결정해야 할 질문을 정리하는 문서다.
+          </div>
+        </section>
+
+        <section id="direction">
+          <h2 class="section-title">2. 현재 확정된 기획 방향</h2>
+          <p>Lemon Aid는 영양제, 음식, 복약 정보, 건강 데이터를 바탕으로 사용자에게 건강관리 참고 정보를 제공하는 AI 헬스케어 Assistant MVP다.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>구분</th>
+                  <th>내용</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>서비스 성격</td><td>만성질환자와 예방 단계 사용자를 위한 AI 영양·복약 관리 보조 서비스</td></tr>
+                <tr><td>핵심 메시지</td><td>사진 한 장으로 시작해, 병원 기록과 생활 데이터를 기억하는 AI Agent</td></tr>
+                <tr><td>MVP 핵심 입력</td><td>영양제 라벨 사진, 음식 사진 또는 식단 입력, 복약 정보, 건강 데이터</td></tr>
+                <tr><td>MVP 핵심 출력</td><td>부족 가능 영양소, 권장 섭취량 참고, 주의 성분, 체중 변화 예측, 활동 권고</td></tr>
+                <tr><td>장기 방향</td><td>향후 병원성 데이터와 생활 데이터를 연결한 개인화 건강관리 Agent</td></tr>
+                <tr><td>안전 기준</td><td>진단·처방·치료 판단이 아닌 참고 정보 제공</td></tr>
+                <tr><td>MVP 제외</td><td>실제 병원 데이터 연동, 의료기관 알선, 처방, 치료 효과 보장</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>팀 확인 질문</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>질문</th>
+                  <th>검토 이유</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>위 내용을 팀의 최종 제품 방향으로 확정해도 되는가?</td><td>이후 개발자용 기획서의 최상위 기준이 된다.</td></tr>
+                <tr><td>MVP에서 반드시 보여줘야 하는 핵심 가치는 "사진 기반 분석"인가, "병원 데이터 연동 가능성"인가, 아니면 둘 모두인가?</td><td>시연 구성과 개발 우선순위가 달라진다.</td></tr>
+                <tr><td>만성질환자를 1차 사용자로 확정할 것인가, 예방 단계 직장인까지 같은 비중으로 다룰 것인가?</td><td>온보딩 질문, 화면 문구, 분석 기준이 달라진다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="features">
+          <h2 class="section-title">3. 개발 대상 기능 범위</h2>
+          <p>현재 <code>guide</code> 초안 기준 개발 대상 기능은 다음과 같이 정리되어 있다.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>기능 영역</th>
+                  <th>현재 초안 내용</th>
+                  <th>팀이 결정해야 할 질문</th>
+                  <th>결정 영향</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>온보딩</td><td>사용자 프로필, 만성질환, 복약 정보, 건강 데이터 권한 입력</td><td>MVP에서 필수 입력과 선택 입력을 어떻게 나눌 것인가?</td><td>개인정보 동의, 이탈률, 분석 정확도</td></tr>
+                <tr><td>영양제 분석</td><td>영양제 라벨 촬영 후 OCR·LLM·식약처 매칭</td><td>영양제 분석을 MVP 1순위로 확정할 것인가?</td><td>백엔드, OCR, 데이터 매칭 우선순위</td></tr>
+                <tr><td>음식/식단 분석</td><td>음식 사진 또는 식단 입력으로 영양소 산출</td><td>음식 사진 인식까지 구현할 것인가, 수동/텍스트 입력 중심으로 갈 것인가?</td><td>이미지 AI 난이도, 시연 안정성</td></tr>
+                <tr><td>건강 데이터</td><td>걸음수, 체중, 심박 등 시계열 데이터</td><td>실제 HealthKit/Health Connect 연동을 할 것인가, 시연용 데이터로 대체할 것인가?</td><td>모바일 권한, 심사, 개발 기간</td></tr>
+                <tr><td>복약 정보</td><td>사용자가 복용 중인 약 정보를 입력</td><td>약 이름을 자유 입력으로 받을 것인가, 샘플 선택형으로 받을 것인가?</td><td>안전 문구, 데이터 표준화, 분석 책임</td></tr>
+                <tr><td>AI Agent</td><td>분석, 개인화, 챗봇, 평가 Agent 구조</td><td>MVP에서 4개 Agent를 모두 분리할 것인가, 일부를 통합할 것인가?</td><td>구현 복잡도, 디버깅, 일정</td></tr>
+                <tr><td>결과 화면</td><td>부족 영양소, 주의 가능성, 권장 기준, 활동 권고 표시</td><td>결과를 몇 개 화면으로 나눌 것인가?</td><td>UX, QA, 안전 문구 배치</td></tr>
+                <tr><td>응모권 UX</td><td>사진 기록 참여 기반 응모권</td><td>MVP 시연에 포함할 것인가?</td><td>개발 범위, 차별화 포인트</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>개발자용 최종 기획서에는 위 기능별로 화면, 입력값, 출력값, 실패 상태, 완료 기준이 별도로 정리되어야 한다.</p>
+        </section>
+
+        <section id="image-processing">
+          <h2 class="section-title">4. 이미지 처리 범위 검토</h2>
+          <p>Lemon Aid의 핵심 입력은 사진이다. 따라서 이미지 처리는 단순 업로드 기능이 아니라, 분석 정확도, 개인정보, 저장 정책, 실패 대응, 시연 안정성에 직접 영향을 준다.</p>
+          <p>현재 초안에는 영양제 라벨·음식 사진 촬영, OCR, 이미지 저장, SHA-256 중복 감지, OCR 실패 시 재촬영 또는 수동 입력 흐름이 포함되어 있다. 다만 팀이 최종 확정해야 할 항목이 남아 있다.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>검토 항목</th>
+                  <th>팀이 결정해야 할 질문</th>
+                  <th>선택지 또는 검토 방향</th>
+                  <th>결정 영향</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>이미지 대상</td><td>MVP에서 어떤 이미지를 처리할 것인가?</td><td>영양제 라벨만 / 영양제+음식 / 영양제+음식+검사표·처방 관련 이미지</td><td>개발 난이도와 개인정보 리스크</td></tr>
+                <tr><td>입력 방식</td><td>카메라 촬영만 허용할 것인가, 갤러리 업로드도 허용할 것인가?</td><td>카메라만 / 갤러리 포함 / 시연용 샘플 이미지 선택 포함</td><td>사용성, 시연 안정성</td></tr>
+                <tr><td>이미지 전처리</td><td>회전 보정, 용량 제한, 흐림 감지, 해상도 제한을 MVP에 넣을 것인가?</td><td>최소 제한만 / 전처리 포함 / 실패 감지만 포함</td><td>OCR 정확도, 개발 기간</td></tr>
+                <tr><td>OCR 실패 대응</td><td>OCR 실패 시 어떤 흐름을 제공할 것인가?</td><td>다시 촬영 / 수동 입력 / 샘플 이미지 선택 / 일부 결과 표시 후 수정</td><td>사용자 이탈, QA 범위</td></tr>
+                <tr><td>원본 이미지 저장</td><td>원본 사진을 저장할 것인가?</td><td>분석 후 삭제 / 사용자 동의 후 저장 / 시연용만 저장</td><td>개인정보, 스토리지, 동의 UI</td></tr>
+                <tr><td>이미지 중복 처리</td><td>같은 사진을 다시 분석하지 않게 할 것인가?</td><td>SHA-256 해시 적용 / MVP 제외 / 시연 데이터만 캐시</td><td>비용 절감, 구현 복잡도</td></tr>
+                <tr><td>사용자 수정</td><td>OCR 결과를 사용자가 수정할 수 있게 할 것인가?</td><td>필수 제공 / 영양제만 제공 / MVP 제외</td><td>분석 신뢰도, UI 복잡도</td></tr>
+                <tr><td>이미지 민감도</td><td>어떤 이미지를 민감정보로 볼 것인가?</td><td>영양제 사진은 일반정보, 처방·검사표 이미지는 민감정보 / 모든 건강 관련 이미지를 민감하게 처리</td><td>동의 정책, 저장 정책</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>팀 검토 포인트</h3>
+          <ul>
+            <li>영양제 라벨 이미지는 MVP 핵심이므로 우선 처리 대상으로 보는 것이 자연스럽다.</li>
+            <li>음식 사진은 서비스 차별화에는 중요하지만, 실제 이미지 인식까지 구현하면 난이도가 크게 올라갈 수 있다.</li>
+            <li>처방전, 약 봉투, 검사표 이미지는 향후 가치가 크지만 개인정보와 의료정보 리스크가 높으므로 MVP에서 직접 처리할지 신중히 결정해야 한다.</li>
+            <li>시연 안정성을 위해 실제 촬영 흐름과 샘플 이미지 흐름을 함께 준비할 필요가 있다.</li>
+          </ul>
+        </section>
+
+        <section id="image-data">
+          <h2 class="section-title">5. 이미지 분석을 위한 데이터 검토</h2>
+          <p>이미지 분석은 사진만으로 완료되지 않는다. OCR 또는 이미지 인식 결과를 표준 데이터와 매칭해야 사용자에게 의미 있는 결과를 제공할 수 있다.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>데이터 종류</th>
+                  <th>현재 초안 내용</th>
+                  <th>팀이 결정해야 할 질문</th>
+                  <th>결정 영향</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>영양제 기준 데이터</td><td>식약처 건강기능식품 원료·제품 데이터 활용</td><td>제품명 기준 매칭을 할 것인가, 성분명 기준 매칭을 할 것인가?</td><td>매칭 정확도, 데이터 정제 범위</td></tr>
+                <tr><td>성분명 표준화</td><td>OCR 텍스트를 LLM으로 구조화</td><td>비타민D, Vitamin D, cholecalciferol 같은 표현을 어떻게 표준화할 것인가?</td><td>데이터 모델, QA 케이스</td></tr>
+                <tr><td>함량·단위 변환</td><td>mg, μg, IU 등 단위가 섞일 수 있음</td><td>단위 변환 규칙을 MVP에 포함할 것인가?</td><td>분석 정확도, 안전 리스크</td></tr>
+                <tr><td>음식 영양소 데이터</td><td>식품영양성분 Open API, 농진청 데이터 언급</td><td>음식 사진 분석 결과를 어떤 영양소 DB와 연결할 것인가?</td><td>API 연동, 데이터 출처 표시</td></tr>
+                <tr><td>사용자 보정 데이터</td><td>사용자가 OCR 결과를 수정할 수 있음</td><td>사용자가 수정한 값을 저장해 다음 분석에 재사용할 것인가?</td><td>개인화, 개인정보, 캐싱</td></tr>
+                <tr><td>캐시 데이터</td><td>OCR 결과 캐싱, 동일 사진 중복 방지</td><td>캐싱을 MVP에 넣을 것인가, 데모 안정화용으로만 둘 것인가?</td><td>비용, 성능, 구현 범위</td></tr>
+                <tr><td>데이터 출처</td><td>앱 내 출처 표시 필요</td><td>결과 화면마다 출처를 표시할 것인가, 별도 출처 페이지로 둘 것인가?</td><td>신뢰도, 컴플라이언스</td></tr>
+                <tr><td>데이터 품질</td><td>OCR과 LLM 결과는 오류 가능</td><td>낮은 신뢰도 결과를 사용자에게 어떻게 표시할 것인가?</td><td>안전 문구, UX</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>팀 검토 포인트</h3>
+          <ul>
+            <li>영양제 분석은 "OCR 텍스트 추출"보다 "표준 데이터와의 매칭"이 핵심이다.</li>
+            <li>데이터 출처가 불명확하면 결과 신뢰도와 컴플라이언스 모두 약해진다.</li>
+            <li>단위 변환과 성분 표준화는 건강 관련 결과에 직접 영향을 주므로, MVP에서도 최소 기준이 필요하다.</li>
+          </ul>
+        </section>
+
+        <section id="hospital-data">
+          <h2 class="section-title">6. 향후 병원 데이터 연동 기반 검토</h2>
+          <div class="callout warning">
+            본 MVP는 실제 병원 데이터 연동을 수행하지 않는다. 다만 Lemon Aid의 장기 방향이 병원성 데이터 기반 개인화 Agent이므로, 향후 병원 데이터가 들어올 수 있는 구조와 시연용 대체 데이터는 검토해야 한다.
+          </div>
+          <p>이 섹션의 목적은 실제 연동을 구현하자는 것이 아니라, 개발자용 최종 기획서에서 병원 데이터가 들어올 자리를 어떻게 표현할지 정하는 것이다.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>검토 항목</th>
+                  <th>팀이 결정해야 할 질문</th>
+                  <th>선택지 또는 검토 방향</th>
+                  <th>결정 영향</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>병원 데이터 범위</td><td>향후 어떤 병원 데이터를 가져온다고 가정할 것인가?</td><td>검진 결과 / 검사 수치 / 진단명 태그 / 복약 정보 / 진료 요약</td><td>데이터 모델, 개인화 기준</td></tr>
+                <tr><td>MVP 대체 데이터</td><td>실제 병원 데이터 대신 무엇을 사용할 것인가?</td><td>가상 프로필 / 공개 데이터 / Kaggle 시연 데이터 / 팀이 만든 샘플 데이터</td><td>시연 신뢰도, 윤리 리스크</td></tr>
+                <tr><td>데이터 형식</td><td>향후 표준 연동을 고려할 것인가?</td><td>내부 JSON 우선 / FHIR KR Core 참고 / LDB 인터페이스 설계만 작성</td><td>확장성, 개발 범위</td></tr>
+                <tr><td>사용자 동의</td><td>병원 데이터 연동 전 어떤 동의가 필요한가?</td><td>시연용 고지 / 항목별 민감정보 동의 / 향후 연동 동의 화면 목업</td><td>법적 안전성, UX</td></tr>
+                <tr><td>민감정보 저장</td><td>질환, 복약, 검사값을 저장할 것인가?</td><td>시연 프로필에만 포함 / DB 저장 / 세션 처리</td><td>개인정보 리스크, 백엔드 설계</td></tr>
+                <tr><td>개인화 기준</td><td>병원 데이터가 들어오면 분석 결과가 어떻게 달라지는가?</td><td>질환별 주의 영양소 / 복약 주의 가능성 / 활동 권고 가중치</td><td>Agent 설계, 알고리즘</td></tr>
+                <tr><td>시연 표현</td><td>실제 연동처럼 보이지 않게 어떻게 표시할 것인가?</td><td>"시연용 데이터" 배지 / "향후 연동 가정" 문구 / 발표 자료에서만 설명</td><td>과장 표현 방지</td></tr>
+                <tr><td>LDB/FHIR 연결성</td><td>개발자용 문서에 어느 수준까지 포함할 것인가?</td><td>개념 설명만 / 인터페이스 예시 / 실제 API 스펙 초안</td><td>산출물 범위</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>팀 검토 포인트</h3>
+          <ul>
+            <li>실제 병원 데이터를 가져오지 않으면서도, 향후 연동 가능성을 보여주는 구조가 필요하다.</li>
+            <li>시연용 데이터는 실제 환자 데이터처럼 보이게 하면 안 된다.</li>
+            <li>검사값, 질환 태그, 복약 정보는 민감정보이므로 저장 여부와 동의 흐름을 먼저 확정해야 한다.</li>
+            <li>"병원 기록을 기억하는 Agent"라는 메시지는 강점이지만, MVP에서는 "향후 연동을 가정한 참조 구조"로 표현하는 것이 안전하다.</li>
+          </ul>
+        </section>
+
+        <section id="ai-tech">
+          <h2 class="section-title">7. AI Agent 및 기술 구현 질문</h2>
+          <p>현재 초안은 4개 Agent 구조와 OCR, LLM Tool Use, Pydantic 검증, 의료 표현 필터를 포함한다. 이 구조는 서비스 방향을 잘 보여주지만 MVP 구현 난이도가 높을 수 있으므로 팀 확정이 필요하다.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>검토 항목</th>
+                  <th>현재 초안 내용</th>
+                  <th>팀이 결정해야 할 질문</th>
+                  <th>결정 영향</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Agent 구조</td><td>분석, 개인화, 챗봇, 평가 Agent</td><td>4개 Agent를 모두 분리할 것인가, MVP에서는 하나의 분석 흐름으로 합칠 것인가?</td><td>구현 복잡도, 발표 차별화</td></tr>
+                <tr><td>LLM 역할</td><td>OCR 텍스트 구조화, 개인화 판단, 챗봇 응답</td><td>LLM이 판단하는 범위와 규칙 기반으로 처리할 범위를 어떻게 나눌 것인가?</td><td>안전성, 비용, 재현성</td></tr>
+                <tr><td>OCR Provider</td><td>Google Cloud Vision, CLOVA 폴백</td><td>실제 외부 OCR API를 사용할 것인가, 데모용 OCR 결과를 준비할 것인가?</td><td>비용, API 키, 시연 안정성</td></tr>
+                <tr><td>백엔드 API</td><td>FastAPI 기반 API 목록</td><td>실제 백엔드를 어느 수준까지 구현할 것인가?</td><td>팀 작업 분담, QA</td></tr>
+                <tr><td>캐싱</td><td>Redis OCR 캐시, KDRIs 캐시</td><td>MVP에 캐시를 구현할 것인가, 후속 개선으로 둘 것인가?</td><td>성능, 비용, 일정</td></tr>
+                <tr><td>비동기 처리</td><td>여러 이미지 OCR/LLM 병렬 처리</td><td>병렬 처리를 MVP에 넣을 것인가?</td><td>안정성, 코드 복잡도</td></tr>
+                <tr><td>오류 처리</td><td>OCR 실패, LLM 실패, 의료 표현 차단</td><td>실패 상태별 화면과 API 응답을 얼마나 구체화할 것인가?</td><td>QA 범위, 사용자 신뢰</td></tr>
+                <tr><td>비용 제한</td><td>OCR/LLM 호출 비용 산정</td><td>호출량 제한, 샘플 데이터, 캐시 중 무엇으로 비용을 통제할 것인가?</td><td>운영 비용, 데모 안정성</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>팀 검토 포인트</h3>
+          <ul>
+            <li>Agent 구조는 발표 차별화에 유리하지만, 개발 단계에서는 단순화가 필요할 수 있다.</li>
+            <li>건강 관련 결과는 LLM 단독 판단보다 규칙, 출처, 검증 흐름을 함께 보여주는 것이 안전하다.</li>
+            <li>기술적으로 멋진 구조보다 8주 MVP에서 안정적으로 시연 가능한 구조가 우선이다.</li>
+          </ul>
+        </section>
+
+        <section id="safety">
+          <h2 class="section-title">8. 헬스케어 안전/개인정보 검토 질문</h2>
+          <p>Lemon Aid는 건강 정보, 복약 정보, 영양제, 병원 데이터 연동 가능성을 다루므로 고위험 도메인으로 취급해야 한다. 개발자용 최종 기획서에는 안전 문구와 개인정보 처리 기준이 기능 명세와 함께 들어가야 한다.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>검토 항목</th>
+                  <th>팀이 결정해야 할 질문</th>
+                  <th>결정 영향</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>의료 표현 제한</td><td>"진단", "처방", "치료", "완치", "질환입니다" 같은 표현을 어디서 차단할 것인가?</td><td>프롬프트, 필터, QA 기준</td></tr>
+                <tr><td>결과 문구</td><td>결과를 "주의 가능성", "권장량 대비", "전문가 상담 권장" 형태로 통일할 것인가?</td><td>사용자 신뢰, 법적 안전성</td></tr>
+                <tr><td>면책 문구</td><td>모든 결과 화면에 표준 고지를 넣을 것인가, 일부 화면에만 넣을 것인가?</td><td>UI, 컴플라이언스</td></tr>
+                <tr><td>민감정보 동의</td><td>만성질환, 복약, 검진기록, 걸음수, 심박수를 항목별 동의로 받을 것인가?</td><td>온보딩, 저장 정책</td></tr>
+                <tr><td>사진 데이터</td><td>식단/영양제 사진을 일반정보로 볼 것인가, 건강 관련 이미지로 더 엄격히 볼 것인가?</td><td>저장, 삭제, 동의</td></tr>
+                <tr><td>데이터 삭제</td><td>사용자가 삭제하거나 탈퇴할 때 어떤 데이터까지 삭제할 것인가?</td><td>백엔드 정책, 개인정보처리방침</td></tr>
+                <tr><td>출처 표시</td><td>KDRIs, 식약처, 농진청, AI 분석 출처를 어디에 표시할 것인가?</td><td>화면 설계, 신뢰도</td></tr>
+                <tr><td>위급 상황</td><td>위험 신호 또는 심각 증상 표현이 들어오면 어떻게 안내할 것인가?</td><td>챗봇 안전 정책</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout risk">
+            결과는 진단이나 처방처럼 표현하지 않는다. 입력이 불완전하거나 OCR/LLM 추출이 틀릴 수 있을 때는 불확실성을 표시한다. 특정 영양제, 성분, 약이 누구에게나 안전하다고 단정하지 않는다.
+          </div>
+        </section>
+
+        <section id="checklist">
+          <h2 class="section-title">9. 개발자용 최종 기획서 전환 체크리스트</h2>
+          <p>다음 항목이 팀에서 확정되면, 이 보고서를 개발자 전달용 최종 기획서로 전환한다.</p>
+
+          <div class="table-wrap">
+            <table class="checklist">
+              <thead>
+                <tr>
+                  <th>상태</th>
+                  <th>확정 항목</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>[ ]</td><td>MVP 1순위 기능: 영양제 분석, 음식 분석, 병원 데이터 기반 개인화 중 우선순위</td></tr>
+                <tr><td>[ ]</td><td>MVP 플랫폼: 모바일 앱, 웹, 또는 시연용 프로토타입 범위</td></tr>
+                <tr><td>[ ]</td><td>이미지 처리 대상: 영양제 라벨, 음식 사진, 검사표/처방 관련 이미지 포함 여부</td></tr>
+                <tr><td>[ ]</td><td>이미지 입력 방식: 카메라, 갤러리, 샘플 이미지 선택</td></tr>
+                <tr><td>[ ]</td><td>OCR 실패 시 사용자 흐름: 재촬영, 수동 입력, 샘플 선택</td></tr>
+                <tr><td>[ ]</td><td>원본 이미지 저장 여부와 삭제 정책</td></tr>
+                <tr><td>[ ]</td><td>영양제 기준 데이터와 성분명 표준화 기준</td></tr>
+                <tr><td>[ ]</td><td>음식/영양소 기준 데이터와 출처 표시 방식</td></tr>
+                <tr><td>[ ]</td><td>실제 병원 데이터 미연동 원칙과 시연용 대체 데이터 구성</td></tr>
+                <tr><td>[ ]</td><td>향후 병원 데이터 범위: 검진 결과, 검사값, 진단명 태그, 복약 정보</td></tr>
+                <tr><td>[ ]</td><td>LDB/FHIR 연동 가능성을 문서에 표현하는 수준</td></tr>
+                <tr><td>[ ]</td><td>AI Agent 개수와 책임 범위</td></tr>
+                <tr><td>[ ]</td><td>LLM 판단 범위와 규칙 기반 처리 범위</td></tr>
+                <tr><td>[ ]</td><td>백엔드 API 구현 범위</td></tr>
+                <tr><td>[ ]</td><td>민감정보 수집·저장·동의 기준</td></tr>
+                <tr><td>[ ]</td><td>의료 안전 문구와 금지 표현 기준</td></tr>
+                <tr><td>[ ]</td><td>결과 화면별 데이터 출처 표시 방식</td></tr>
+                <tr><td>[ ]</td><td>개발 완료 기준과 QA 시나리오</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="next-doc">
+          <h2 class="section-title">10. 최종 개발자용 기획서로 전환할 때의 구성</h2>
+          <p>위 체크리스트가 확정되면 개발자용 최종 기획서는 다음 구조로 재작성한다.</p>
+
+          <ol>
+            <li>서비스 개요</li>
+            <li>MVP 범위와 제외 범위</li>
+            <li>사용자 시나리오</li>
+            <li>화면별 기능 명세</li>
+            <li>이미지 입력·처리·저장 정책</li>
+            <li>이미지 분석 기준 데이터</li>
+            <li>병원 데이터 연동 가정과 시연용 대체 데이터</li>
+            <li>API 요구사항</li>
+            <li>데이터 모델</li>
+            <li>AI/OCR 처리 흐름</li>
+            <li>예외·에러 처리</li>
+            <li>보안·개인정보·컴플라이언스 요구사항</li>
+            <li>QA 및 개발 완료 기준</li>
+          </ol>
+
+          <p class="footer-note">이 보고서에서 결정되지 않은 항목은 개발자용 최종 기획서에 확정값처럼 쓰지 않는다. 미확정 항목은 반드시 팀 결정 후 반영한다.</p>
+        </section>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

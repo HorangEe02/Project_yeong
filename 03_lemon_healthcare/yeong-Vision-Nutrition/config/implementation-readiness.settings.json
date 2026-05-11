@@ -1,0 +1,610 @@
+{
+  "metadata": {
+    "service_name": "Lemon Aid",
+    "settings_name": "implementation-readiness",
+    "version": "0.1.0",
+    "status": "pre_implementation_baseline",
+    "updated_at": "2026-05-11",
+    "purpose": "상세 구현을 시작하기 전에 환경변수, 보안, 데이터, OCR, LLM, 규제 기능, 테스트 게이트를 고정하기 위한 설정값입니다.",
+    "source_guides_checked": [
+      "PROJECT_GUIDE.md",
+      "guide.html",
+      "docs/06-tech-stack.md",
+      "docs/08-implementation-plan.md",
+      "docs/09-data-catalog.md",
+      "docs/10-compliance-checklist.md",
+      "docs/11-detailed-feature-implementation-plan.md",
+      "docs/12-local-llm-ollama-migration.md",
+      "docs/14-pre-implementation-scope-and-rules.md",
+      "docs/15-regulated-feature-feasibility-and-compliance-plan.md",
+      "docs/dev-guides/00-setup-environment.md",
+      "docs/dev-guides/07-ocr-pipeline.md",
+      "docs/dev-guides/08-llm-supplement-parsing.md",
+      "docs/dev-guides/09-supplement-registration-api.md",
+      "docs/dev-guides/12-mobile-healthkit-integration.md",
+      "docs/dev-guides/26-operations-manual.md",
+      "docs/dev-guides/27-incident-runbook.md"
+    ]
+  },
+  "source_of_truth": {
+    "persona_priority": "config/service-segmentation.settings.json",
+    "regulated_feature_scope": "config/service-segmentation.settings.json",
+    "runtime_llm_policy": "docs/12-local-llm-ollama-migration.md",
+    "implementation_environment_policy": "config/implementation-readiness.settings.json",
+    "documentation_conflict_rule": "가이드 문서와 설정 파일이 충돌하면 상세 구현에서는 config/*.settings.json을 우선 적용합니다."
+  },
+  "documentation_alignment": {
+    "must_fix_before_or_during_scaffold": [
+      {
+        "location": "PROJECT_GUIDE.md, guide.html",
+        "issue": "일부 구간이 Claude/OpenAI 런타임과 3개 Agent 구조를 전제로 설명합니다.",
+        "required_action": "런타임 LLM은 Ollama 로컬 기본값으로 수정하고, Agent는 4개 논리 모듈 또는 3개 Agent+안전평가 모듈 중 하나로 명확히 고정합니다."
+      },
+      {
+        "location": "docs/dev-guides/00-setup-environment.md",
+        "issue": "Settings 예시가 anthropic_api_key를 포함하고 Ollama, CLOVA, 보안, regulated feature 설정이 부족합니다.",
+        "required_action": "실제 backend/src/config.py 구현 시 이 파일의 environment_variables 값을 기준으로 작성합니다."
+      },
+      {
+        "location": "docs/08-implementation-plan.md",
+        "issue": "초기 계획은 Cloud Vision, 외부 LLM, 기존 MVP 제외 범위를 기준으로 작성된 부분이 있습니다.",
+        "required_action": "Ollama 로컬 LLM, 처방전 OCR intake, 검사표 OCR intake, mock FHIR 계획을 반영합니다."
+      }
+    ],
+    "naming_overrides": {
+      "avoid_code_terms": [
+        "diagnosis",
+        "prescription_recommendation",
+        "treatment_plan",
+        "dose_change_recommendation"
+      ],
+      "preferred_code_terms": [
+        "analysis",
+        "evaluation",
+        "notice",
+        "safety_alert",
+        "professional_review_request"
+      ]
+    }
+  },
+  "environment_variables": {
+    "app": {
+      "APP_ENV": {
+        "required": true,
+        "default": "development",
+        "allowed_values": [
+          "development",
+          "staging",
+          "production"
+        ]
+      },
+      "APP_NAME": {
+        "required": true,
+        "default": "lemon-aid-api"
+      },
+      "API_PREFIX": {
+        "required": true,
+        "default": "/api/v1"
+      },
+      "LOG_LEVEL": {
+        "required": true,
+        "default": "INFO"
+      },
+      "CORS_ALLOWED_ORIGINS": {
+        "required": true,
+        "default": "http://localhost:3000,http://127.0.0.1:3000",
+        "production_note": "운영에서는 실제 모바일/웹 도메인만 허용합니다."
+      }
+    },
+    "database_and_cache": {
+      "DATABASE_URL": {
+        "required": true,
+        "secret": true,
+        "default_for_local_example": "postgresql+asyncpg://lemon:lemon@localhost:5432/lemon"
+      },
+      "REDIS_URL": {
+        "required": true,
+        "secret": false,
+        "default_for_local_example": "redis://localhost:6379/0"
+      },
+      "DB_POOL_SIZE": {
+        "required": true,
+        "default": 5
+      },
+      "DB_MAX_OVERFLOW": {
+        "required": true,
+        "default": 10
+      }
+    },
+    "security": {
+      "JWT_SECRET_KEY": {
+        "required": true,
+        "secret": true,
+        "min_length": 32
+      },
+      "JWT_ALGORITHM": {
+        "required": true,
+        "default": "HS256"
+      },
+      "ACCESS_TOKEN_EXPIRE_MINUTES": {
+        "required": true,
+        "default": 30
+      },
+      "REFRESH_TOKEN_EXPIRE_DAYS": {
+        "required": true,
+        "default": 14
+      },
+      "ENCRYPTION_KEY": {
+        "required": true,
+        "secret": true,
+        "purpose": "민감 건강정보 컬럼 암호화용 키입니다. 운영에서는 KMS 또는 비밀관리 도구로 관리합니다."
+      },
+      "PASSWORD_HASH_SCHEME": {
+        "required": true,
+        "default": "argon2id"
+      }
+    },
+    "ollama_llm": {
+      "LLM_PROVIDER": {
+        "required": true,
+        "default": "ollama"
+      },
+      "OLLAMA_BASE_URL": {
+        "required": true,
+        "default": "http://127.0.0.1:11434"
+      },
+      "OLLAMA_MODEL": {
+        "required": true,
+        "default": "qwen3.5:9b",
+        "verification": "실제 구현 전 ollama list와 ollama run으로 로컬 모델 태그를 확인합니다."
+      },
+      "OLLAMA_VISION_MODEL": {
+        "required": false,
+        "default": "gemma4:e4b",
+        "verification": "이미지 입력 실험 전 실제 Ollama 지원 여부를 확인합니다."
+      },
+      "OLLAMA_TIMEOUT_SEC": {
+        "required": true,
+        "default": 60
+      },
+      "OLLAMA_TEMPERATURE": {
+        "required": true,
+        "default": 0
+      },
+      "LLM_MAX_RETRIES": {
+        "required": true,
+        "default": 1
+      },
+      "ALLOW_EXTERNAL_LLM": {
+        "required": true,
+        "default": false
+      },
+      "RUN_OLLAMA_TESTS": {
+        "required": false,
+        "default": false
+      }
+    },
+    "ocr": {
+      "OCR_PRIMARY_PROVIDER": {
+        "required": true,
+        "default": "google_vision"
+      },
+      "GOOGLE_APPLICATION_CREDENTIALS": {
+        "required": false,
+        "secret": true,
+        "production_note": "서비스 계정 JSON 파일 경로입니다. 파일 자체를 git에 커밋하지 않습니다."
+      },
+      "GOOGLE_CLOUD_PROJECT": {
+        "required": false,
+        "secret": false
+      },
+      "OCR_FALLBACK_PROVIDER": {
+        "required": true,
+        "default": "clova"
+      },
+      "CLOVA_OCR_API_URL": {
+        "required": false,
+        "secret": true
+      },
+      "CLOVA_OCR_SECRET": {
+        "required": false,
+        "secret": true
+      },
+      "OCR_TIMEOUT_SEC": {
+        "required": true,
+        "default": 15
+      },
+      "OCR_CONFIDENCE_THRESHOLD": {
+        "required": true,
+        "default": 0.85
+      },
+      "OCR_CACHE_TTL_DAYS": {
+        "required": true,
+        "default": 30
+      },
+      "OCR_MAX_FILE_SIZE_MB": {
+        "required": true,
+        "default": 10
+      },
+      "OCR_MAX_DIMENSION_PX": {
+        "required": true,
+        "default": 2048
+      },
+      "RUN_OCR_REAL_TESTS": {
+        "required": false,
+        "default": false
+      }
+    },
+    "data_sources": {
+      "MFDS_API_KEY": {
+        "required": false,
+        "secret": true
+      },
+      "KDRIS_DATA_VERSION": {
+        "required": true,
+        "default": "2020"
+      },
+      "KDRIS_DATA_PATH": {
+        "required": true,
+        "default": "data/kdris/kdris_2020.csv"
+      },
+      "NUTRIENT_CODE_PATH": {
+        "required": true,
+        "default": "data/reference/nutrient_codes.json"
+      },
+      "UNIT_CONVERSION_PATH": {
+        "required": true,
+        "default": "data/mfds/unit_conversions.json"
+      },
+      "FOOD_DB_PROVIDER": {
+        "required": true,
+        "default": "mfds"
+      }
+    },
+    "storage": {
+      "OBJECT_STORAGE_PROVIDER": {
+        "required": true,
+        "default": "local"
+      },
+      "OBJECT_STORAGE_BUCKET": {
+        "required": false,
+        "secret": false
+      },
+      "OBJECT_STORAGE_ENDPOINT": {
+        "required": false,
+        "secret": true
+      },
+      "OBJECT_STORAGE_ACCESS_KEY": {
+        "required": false,
+        "secret": true
+      },
+      "OBJECT_STORAGE_SECRET_KEY": {
+        "required": false,
+        "secret": true
+      },
+      "STORE_ORIGINAL_IMAGES": {
+        "required": true,
+        "default": false
+      },
+      "STORE_SENSITIVE_DOCUMENT_IMAGES": {
+        "required": true,
+        "default": false
+      }
+    },
+    "email_and_notifications": {
+      "EMAIL_PROVIDER": {
+        "required": false,
+        "default": "console"
+      },
+      "SMTP_HOST": {
+        "required": false,
+        "secret": true
+      },
+      "SMTP_PORT": {
+        "required": false,
+        "default": 587
+      },
+      "SMTP_USERNAME": {
+        "required": false,
+        "secret": true
+      },
+      "SMTP_PASSWORD": {
+        "required": false,
+        "secret": true
+      },
+      "FCM_SERVER_KEY": {
+        "required": false,
+        "secret": true,
+        "note": "모바일 푸시를 운영 적용할 때만 사용합니다."
+      }
+    },
+    "feature_flags": {
+      "FEATURE_CHRONIC_PATIENT_MODE_DEFAULT": {
+        "required": true,
+        "default": true
+      },
+      "FEATURE_GENERAL_B2C_MODE": {
+        "required": true,
+        "default": true
+      },
+      "FEATURE_PRESCRIPTION_OCR_INTAKE": {
+        "required": true,
+        "default": true
+      },
+      "FEATURE_LAB_RESULT_OCR_INTAKE": {
+        "required": true,
+        "default": true
+      },
+      "FEATURE_HOSPITAL_MOCK_FHIR": {
+        "required": true,
+        "default": true
+      },
+      "FEATURE_HEALTHWAY_API_PILOT": {
+        "required": true,
+        "default": false
+      },
+      "FEATURE_DOSAGE_CHANGE_RECOMMENDATION": {
+        "required": true,
+        "default": false
+      },
+      "FEATURE_MEDICATION_SAFETY_ALERT": {
+        "required": true,
+        "default": true
+      },
+      "FEATURE_CLINICIAN_REVIEW_QUEUE": {
+        "required": true,
+        "default": false
+      }
+    }
+  },
+  "consent_matrix": {
+    "required_before_collection": true,
+    "records_must_include": [
+      "consent_type",
+      "purpose",
+      "data_categories",
+      "retention_period",
+      "accepted_at",
+      "revoked_at",
+      "policy_version"
+    ],
+    "categories": {
+      "general_profile": {
+        "required": true,
+        "data": [
+          "age_range",
+          "sex",
+          "height_cm",
+          "weight_kg",
+          "email"
+        ]
+      },
+      "chronic_conditions": {
+        "required_for_chronic_mode": true,
+        "sensitive": true
+      },
+      "medications": {
+        "required_for_medication_safety": true,
+        "sensitive": true
+      },
+      "prescription_ocr": {
+        "required_for_feature": true,
+        "sensitive": true,
+        "original_image_storage_default": false
+      },
+      "lab_result_ocr": {
+        "required_for_feature": true,
+        "sensitive": true,
+        "original_image_storage_default": false
+      },
+      "health_platform_data": {
+        "required_for_healthkit_or_health_connect": true,
+        "sensitive": true,
+        "read_only": true
+      },
+      "hospital_api_import": {
+        "required_for_feature": true,
+        "sensitive": true,
+        "default_enabled": false
+      }
+    }
+  },
+  "retention_policy": {
+    "supplement_or_meal_original_image_cache_days": 30,
+    "sensitive_document_original_image_retention_seconds": 0,
+    "ocr_operational_log_retention_days": 90,
+    "llm_operational_log_retention_days": 90,
+    "user_confirmed_structured_health_data": "until_user_deletes_or_account_deleted",
+    "access_audit_log_retention_days": 365,
+    "backup_purge_within_days_after_delete": 90,
+    "prompt_or_raw_ocr_text_in_logs": false
+  },
+  "regulated_input_policy": {
+    "allowed_public_b2c_outputs": {
+      "prescription_ocr": [
+        "recognized_medication_name",
+        "recognized_dose_text",
+        "recognized_frequency_text",
+        "recognized_period_text",
+        "user_confirmed_medication_schedule",
+        "consult_professional_notice"
+      ],
+      "lab_result_ocr": [
+        "recognized_test_name",
+        "recognized_value",
+        "recognized_unit",
+        "recognized_reference_range",
+        "trend_view",
+        "consult_professional_notice"
+      ],
+      "hospital_record_import": [
+        "user_authorized_summary",
+        "timeline_view",
+        "nutrition_and_lifestyle_context_summary"
+      ]
+    },
+    "blocked_public_b2c_outputs": [
+      "new_prescription",
+      "dose_change_instruction",
+      "drug_discontinuation_instruction",
+      "drug_substitution_instruction",
+      "disease_diagnosis",
+      "disease_probability_prediction",
+      "treatment_recommendation"
+    ],
+    "requires_professional_review": [
+      "dose_change_request",
+      "medication_side_effect_triage",
+      "personalized_lab_interpretation",
+      "disease_specific_treatment_path"
+    ]
+  },
+  "api_policy": {
+    "allowed_new_endpoint_groups": [
+      "/api/v1/auth",
+      "/api/v1/profile",
+      "/api/v1/consents",
+      "/api/v1/supplements",
+      "/api/v1/meals",
+      "/api/v1/nutrition",
+      "/api/v1/activity",
+      "/api/v1/regulated-inputs/prescriptions",
+      "/api/v1/regulated-inputs/lab-results",
+      "/api/v1/health-records",
+      "/api/v1/medication-safety",
+      "/api/v1/professional-review",
+      "/api/v1/data"
+    ],
+    "blocked_endpoint_patterns": [
+      "/api/v1/diagnosis/*",
+      "/api/v1/treatment/*",
+      "/api/v1/prescriptions/create",
+      "/api/v1/medications/change-dose"
+    ],
+    "required_response_fields_for_health_outputs": [
+      "result",
+      "confidence",
+      "source_refs",
+      "disclaimer",
+      "requires_user_confirmation",
+      "created_at"
+    ]
+  },
+  "database_policy": {
+    "required_tables_before_feature_work": [
+      "users",
+      "consent_records",
+      "access_audit_logs",
+      "user_profiles",
+      "regulated_documents",
+      "ocr_extraction_jobs",
+      "llm_parse_jobs"
+    ],
+    "regulated_feature_tables": [
+      "prescription_items",
+      "lab_result_items",
+      "health_record_imports",
+      "medication_safety_alerts",
+      "professional_review_requests"
+    ],
+    "encrypted_columns_required_for": [
+      "chronic_conditions",
+      "current_medications",
+      "prescription_items",
+      "lab_result_items",
+      "hospital_record_payload",
+      "user_uploaded_health_notes"
+    ],
+    "audit_events_required": [
+      "consent.accepted",
+      "consent.revoked",
+      "sensitive_data.created",
+      "sensitive_data.viewed",
+      "sensitive_data.exported",
+      "sensitive_data.deleted",
+      "regulated_document.ocr_started",
+      "regulated_document.ocr_confirmed",
+      "medication_safety.alert_created",
+      "professional_review.requested"
+    ]
+  },
+  "mobile_policy": {
+    "health_data_mode": "read_only",
+    "required_permission_explanations": [
+      "steps",
+      "heart_rate",
+      "weight"
+    ],
+    "manual_input_fallback_required": true,
+    "camera_upload_confirmation_required": true,
+    "settings_screen_must_include": [
+      "consent_management",
+      "data_export",
+      "data_delete",
+      "account_delete",
+      "local_model_privacy_notice"
+    ]
+  },
+  "quality_gates": {
+    "backend_before_merge": [
+      "pytest",
+      "ruff",
+      "black --check",
+      "mypy"
+    ],
+    "frontend_before_merge": [
+      "flutter analyze",
+      "flutter test"
+    ],
+    "security_before_regulated_feature_release": [
+      "secret_scan",
+      "sensitive_log_scan",
+      "forbidden_expression_test",
+      "consent_flow_test",
+      "deletion_flow_test",
+      "audit_log_test"
+    ],
+    "model_before_use": [
+      "ollama_model_tag_verified",
+      "structured_output_schema_validated",
+      "forbidden_expression_zero_critical",
+      "100_sample_latency_and_accuracy_recorded"
+    ]
+  },
+  "rate_limits": {
+    "ocr_requests_per_user_per_day": 50,
+    "llm_requests_per_user_per_day": 100,
+    "regulated_document_uploads_per_user_per_day": 10,
+    "max_uploads_per_minute_per_user": 5,
+    "api_default_requests_per_minute_per_user": 120
+  },
+  "release_gates": {
+    "public_b2c_mvp": [
+      "local_ollama_path_verified",
+      "external_llm_disabled_for_phi",
+      "consent_matrix_implemented",
+      "forbidden_expression_filter_enabled",
+      "data_delete_and_export_implemented"
+    ],
+    "prescription_or_lab_ocr_public_beta": [
+      "separate_sensitive_consent_implemented",
+      "original_sensitive_image_auto_delete_verified",
+      "manual_user_confirmation_implemented",
+      "professional_consult_cta_implemented",
+      "legal_or_medical_advisor_review_recorded"
+    ],
+    "real_hospital_api_pilot": [
+      "official_api_or_partner_contract_confirmed",
+      "patient_authorization_flow_implemented",
+      "dynamic_consent_and_revocation_implemented",
+      "fhir_mapping_reviewed",
+      "security_review_passed"
+    ],
+    "dosage_change_workflow": [
+      "do_not_release_as_public_b2c_direct_advice",
+      "licensed_professional_review_workflow_confirmed",
+      "liability_and_regulatory_review_recorded",
+      "mfds_medical_device_applicability_review_recorded"
+    ]
+  }
+}

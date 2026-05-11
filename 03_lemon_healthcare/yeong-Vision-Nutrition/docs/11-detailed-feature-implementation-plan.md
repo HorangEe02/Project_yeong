@@ -285,7 +285,7 @@ DB 모델:
 
 - `backend/src/meal/base.py`
 - `backend/src/meal/text_parser.py`
-- `backend/src/meal/claude_vision.py`
+- `backend/src/meal/ollama_vision.py`
 - `backend/src/nutrition/food_matcher.py`
 - `backend/src/api/v1/meals.py`
 
@@ -320,7 +320,51 @@ DB 모델:
 - "효과 보장" 표현을 사용하지 않는다.
 - 의료자문 또는 법무 검토 전에는 고위험 문구를 막는다.
 
-### 5.9 Phase 3: Hall 단순화 모델
+### 5.9 Phase 2~3: 규제 입력 OCR intake
+
+목표: 처방전과 검사표를 의료 판단 대상이 아니라 사용자가 보유한 건강 문서를 구조화하는 입력 기능으로 구현한다. 복용량 변경, 약 중단, 질환 진단, 치료 추천은 직접 제공하지 않는다.
+
+엔드포인트:
+
+| Method | Path | 용도 |
+|---|---|---|
+| `POST` | `/api/v1/regulated-inputs/prescriptions/ocr` | 처방전 OCR 추출 및 사용자 확인 대상 생성 |
+| `POST` | `/api/v1/regulated-inputs/lab-results/ocr` | 검사표 OCR 추출 및 사용자 확인 대상 생성 |
+| `POST` | `/api/v1/regulated-inputs/{document_id}/confirm` | OCR 결과 사용자 수정·확인 |
+| `POST` | `/api/v1/medication-safety/check` | 약·영양제 조합의 주의 가능성 알림 |
+| `POST` | `/api/v1/professional-review/requests` | 전문가 상담 또는 검토 요청 생성 |
+
+구현 파일:
+
+- `backend/src/regulated/base.py`
+- `backend/src/regulated/prescription_ocr.py`
+- `backend/src/regulated/lab_result_ocr.py`
+- `backend/src/regulated/dose_change_blocker.py`
+- `backend/src/regulated/safety_alerts.py`
+- `backend/src/api/v1/regulated_inputs.py`
+- `backend/src/api/v1/medication_safety.py`
+- `backend/src/models/db/regulated_document.py`
+- `backend/src/models/db/prescription_item.py`
+- `backend/src/models/db/lab_result_item.py`
+- `backend/src/models/db/professional_review_request.py`
+
+정책:
+
+- 처방전과 검사표 원본 이미지는 기본 저장하지 않고 OCR 추출 후 삭제한다.
+- OCR 결과는 사용자 수정·확인 전에는 건강 분석에 사용하지 않는다.
+- 처방전은 약품명, 용법, 용량, 기간, 처방일자 구조화까지만 허용한다.
+- 검사표는 검사명, 수치, 단위, 참고범위, 검사일자, 추세 표시까지만 허용한다.
+- 복용량 변경 질문은 직접 안내하지 않고 의료인 또는 약사 상담 CTA로 전환한다.
+
+완료 기준:
+
+- 별도 민감정보 동의 없이는 endpoint가 403을 반환
+- 원본 민감 문서 이미지 저장 비활성화 테스트 통과
+- dose change 요청 차단 테스트 통과
+- 금지 표현 검사 통과
+- audit log에 OCR 시작, 사용자 확인, 안전 알림 이벤트 기록
+
+### 5.10 Phase 3: Hall 단순화 모델
 
 목표: 3개월 예측의 현실성을 높이기 위해 단순화된 동적 체중 모델을 추가한다.
 
@@ -336,7 +380,7 @@ DB 모델:
 - Hall 모델은 30일 이상 예측 또는 고도화 화면에서 선택 적용한다.
 - 결과는 "예측 참고값"으로 표현한다.
 
-### 5.10 Phase 3: 피드백과 푸시 알림
+### 5.11 Phase 3: 피드백과 푸시 알림
 
 목표: 사용자가 분석 결과에 피드백을 남기고, 필요한 경우 푸시 알림을 받을 수 있게 한다.
 
