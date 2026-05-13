@@ -42,13 +42,48 @@ Ollama 공식 문서 기준으로 설치 후 기본 API 주소는 `http://localh
 | 단계 | 모델 후보 | 공식 Ollama 표기 | 용도 | 판단 |
 |------|-----------|------------------|------|------|
 | 1차 기본 | Qwen 3.5 | `qwen3.5:9b` 또는 `qwen3.5:latest` | 영양제 라벨 텍스트 파싱, 식단 텍스트 파싱 | 우선 적용 |
-| 1차 대안 | Gemma 4 | `gemma4:e4b` 또는 `gemma4:latest` | 구조화 출력, 이미지 입력 실험 | 우선 적용 |
+| 1차 대안 | Gemma 4 | `gemma4:e4b` 또는 `gemma4:latest` | 구조화 출력, **Phase 2 멀티모달 보조 채널 정식 채택** (이미지 입력 검증) | 우선 적용, [docs/17 §9](./17-image-collection-consent-plan.md) 게이트 #1 통과 후 활성화 |
 | 성능 비교 | Qwen 3.5 27B | `qwen3.5:27b` | 더 복잡한 한국어 라벨 | 속도·메모리 테스트 후 제한 적용 |
 | 성능 비교 | Gemma 4 26B | `gemma4:26b` | 멀티모달/장문 파싱 후보 | 속도·메모리 테스트 후 제한 적용 |
 | 향후 고사양 | Qwen 3.6 | `qwen3.6:27b`, `qwen3.6:35b` | 더 큰 스펙 장비 또는 사내 서버 | 현 24GB 장비에서는 보수적으로 접근 |
 | 향후 보류 | DeepSeek V4 Pro | `deepseek-v4-pro:cloud` | 고성능 추론 | 클라우드 모델이므로 PHI 처리 금지 |
 
 주의: Ollama 모델 페이지의 크기는 모델 파일 크기 기준이며, 실제 실행 시에는 컨텍스트 길이, 동시 요청 수, OS 메모리 사용량에 따라 추가 메모리가 필요하다. 24GB 장비에서는 24GB로 표시되는 모델을 기본값으로 두지 않는다.
+
+### 3.1 멀티모달 호출 시그니처
+
+`src/llm/base.py`의 `LLMAdapter`에 다음 추상 메서드를 추가한다. 텍스트 전용 어댑터는 `NotImplementedError`를 발생시키고, Gemma 4 등 멀티모달 가능 모델만 구현체를 제공한다.
+
+```python
+from typing import Protocol
+
+class LLMAdapter(Protocol):
+    async def analyze_text(self, prompt: str) -> LLMResult: ...
+
+    async def analyze_multimodal(
+        self,
+        prompt: str,
+        image_bytes: bytes,
+    ) -> LLMResult:
+        """이미지와 텍스트 프롬프트를 함께 받아 영양제 라벨 정보를 구조화한다.
+
+        Args:
+            prompt: 영양제 라벨 파싱 지시 프롬프트(JSON 스키마 포함).
+            image_bytes: JPEG/PNG 이미지(최대 10MB, 2048px).
+
+        Returns:
+            검증된 LLMResult. JSON 스키마 위반 시 1회 재시도.
+
+        Raises:
+            NotImplementedError: 텍스트 전용 어댑터에서 호출된 경우.
+        """
+```
+
+운영 진입 조건:
+
+- `enable_multimodal_llm=true` (환경 변수 또는 `backend/src/core/settings.py`)
+- [docs/17 §8](./17-image-collection-consent-plan.md) 게이트 #1 통과
+- OCR 결과의 보조 검증으로만 사용. 단독으로 영양제 정보를 결정짓지 않는다.
 
 ---
 
