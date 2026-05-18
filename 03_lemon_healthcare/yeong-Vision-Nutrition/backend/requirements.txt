@@ -30,4 +30,6 @@ ollama>=0.4
 
 # Auth (Phase 05)
 PyJWT>=2.8
-passlib[bcrypt]>=1.7
+# bcrypt 직접 사용 — passlib 1.7.x 가 bcrypt 4.x 와 호환되지 않아 우회.
+# 자세한 사유는 src/auth/password.py 모듈 docstring 참조.
+bcrypt>=4.0

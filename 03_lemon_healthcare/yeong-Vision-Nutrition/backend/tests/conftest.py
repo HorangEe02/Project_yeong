@@ -36,6 +36,13 @@ _SAFE_TEST_ENV: dict[str, str] = {
     "IMAGE_RETENTION_HISTORY_DAYS": "90",
     "IMAGE_RETENTION_TRAINING_DAYS": "0",
     "LOG_LEVEL": "INFO",
+    "JWT_SECRET_KEY": "test-secret-key-do-not-use-in-production",
+    "JWT_ALGORITHM": "HS256",
+    "ACCESS_TOKEN_TTL_MINUTES": "15",
+    "REFRESH_TOKEN_TTL_DAYS": "14",
+    "CORS_ALLOWED_ORIGINS": "[]",
+    "RATE_LIMIT_REGISTER_PER_MINUTE": "10",
+    "IP_HASH_SALT": "test-salt",
 }
 
 

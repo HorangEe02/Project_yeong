@@ -129,6 +129,34 @@ class Settings(BaseSettings):
 
     log_level: str = Field(default="INFO")
 
+    # ------------------------------------------------------------------
+    # JWT / 인증 — Phase 05.
+    # ------------------------------------------------------------------
+    jwt_secret_key: SecretStr = Field(
+        ...,
+        description="JWT 서명용 비밀키. 운영 환경에서는 ≥32 바이트 무작위 값.",
+    )
+    jwt_algorithm: Literal["HS256"] = "HS256"
+    access_token_ttl_minutes: int = Field(default=15, ge=1, le=120)
+    refresh_token_ttl_days: int = Field(default=14, ge=1, le=90)
+
+    # ------------------------------------------------------------------
+    # API 미들웨어 — Phase 05.
+    # ------------------------------------------------------------------
+    cors_allowed_origins: list[str] = Field(
+        default_factory=list,
+        description="CORS 허용 origin 목록. 빈 리스트는 모든 origin 차단.",
+    )
+    rate_limit_register_per_minute: int = Field(
+        default=10,
+        ge=1,
+        description="사용자당 supplement.register 1분 한도.",
+    )
+    ip_hash_salt: SecretStr = Field(
+        default=SecretStr("change-me"),
+        description="IP 주소 SHA-256 hash 시 사용할 서버 비밀 salt.",
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:
