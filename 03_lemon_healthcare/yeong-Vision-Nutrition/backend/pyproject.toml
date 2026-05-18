@@ -41,8 +41,10 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["PLR2004", "S101", "ARG"]
-"scripts/**/*.py" = ["T201"]  # print 허용
+# Tests: magic values (assert ==), assert allowed, unused args via fixture,
+# in-function imports for monkeypatch / lazy paths.
+"tests/**/*.py" = ["PLR2004", "S101", "ARG", "PLC0415"]
+"scripts/**/*.py" = ["T201", "PLC0415"]  # print + lazy import 허용
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

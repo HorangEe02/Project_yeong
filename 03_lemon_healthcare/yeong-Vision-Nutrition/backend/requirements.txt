@@ -21,7 +21,9 @@ httpx>=0.27
 # OCR (Phase 01)
 google-cloud-vision>=3.7
 pillow>=10.2
-python-magic>=0.4
+# Note: libmagic 시스템 라이브러리 의존을 피하기 위해 python-magic은 사용하지 않는다.
+# 트랙 B는 JPEG/PNG 2종만 허용하므로 src/ocr/preprocessor.py:sniff_image_mime 에서
+# magic-byte 헤더 비교(FF D8 FF / 89 50 4E 47)로 자체 판별한다.
 
 # LLM (Phase 02)
 ollama>=0.4
