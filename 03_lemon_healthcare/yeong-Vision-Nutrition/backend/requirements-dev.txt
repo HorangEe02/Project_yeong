@@ -1,0 +1,19 @@
+-r requirements.txt
+
+# Test runner
+pytest>=8.0
+pytest-asyncio>=0.23
+pytest-cov>=4.1
+pytest-mock>=3.12
+
+# Code quality
+black>=24.1
+ruff>=0.3
+mypy>=1.9
+types-redis
+
+# Integration test infrastructure (Phase 04+)
+testcontainers>=4.0
+
+# Security audit (CI)
+pip-audit>=2.7
