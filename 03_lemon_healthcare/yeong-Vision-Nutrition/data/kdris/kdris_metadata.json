@@ -1,0 +1,42 @@
+{
+  "name": "한국인 영양소 섭취기준 (PoC 시드)",
+  "version": "KDRIs-2020-poc-v1",
+  "source_url": "https://www.kns.or.kr",
+  "publisher": "한국영양학회 + 보건복지부 (참조). 본 시드는 PoC용 참조값이며 정식 출시 전 영양사 검수 필수.",
+  "license": "공공저작물 자유이용 (KOGL Type 1)",
+  "license_url": "https://www.kogl.or.kr/",
+  "downloaded_at": "2026-05-18",
+  "downloaded_by": "track-b/phase-03",
+  "format": "CSV",
+  "encoding": "UTF-8",
+  "row_count_seed": 76,
+  "nutrient_count": 30,
+  "population_groups": [
+    "male 19-200",
+    "female 19-200",
+    "pregnant",
+    "lactating"
+  ],
+  "limitations": [
+    "PoC 시드 — 정확한 KDRIs 2020 표를 그대로 옮긴 자료가 아니다.",
+    "연령대를 19-200 광범위 단일 row로 단순화. 정식 출시 전 연령대(19-29 / 30-49 / 50-64 / 65-74 / 75+)별 세분화 필요.",
+    "임신부/수유부 row는 핵심 영양소(엽산·철·칼슘·요오드·B12·B6·아연) 위주.",
+    "오메가-3 DHA/EPA, 루테인+지아잔틴, 밀크씨슬, 코엔자임 Q10은 KDRIs 등재 외 — 식약처 건강기능식품 일일 섭취 기준을 시드값으로 사용.",
+    "RDA/AI/EAR/UL 중 영양소별로 정의되지 않은 값은 빈 셀(NaN)."
+  ],
+  "column_definitions": {
+    "code": "표준 영양소 코드. data/reference/nutrient_codes.json 와 1:1.",
+    "name_ko": "한국어 영양소명.",
+    "name_en": "영어 영양소명.",
+    "unit": "단위 (mg, μg, g, IU, μg RAE, mg α-TE 등).",
+    "sex": "성별 — male / female / all.",
+    "age_min": "연령 범위 시작 (만 나이, 포함).",
+    "age_max": "연령 범위 끝 (만 나이, 포함).",
+    "rda": "Recommended Dietary Allowance — 권장 섭취량.",
+    "ai": "Adequate Intake — 충분 섭취량.",
+    "ear": "Estimated Average Requirement — 평균 필요량.",
+    "ul": "Upper Intake Level — 상한 섭취량.",
+    "is_pregnant": "임신부 row 여부.",
+    "is_lactating": "수유부 row 여부."
+  }
+}

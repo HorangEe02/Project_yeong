@@ -38,6 +38,11 @@ ignore = [
     "E501",     # line-length (black이 처리)
     "PLR0913",  # too-many-arguments
     "PLR2004",  # magic value (테스트에서 빈번)
+    # 그리스 α 등 영양학 표준 단위(α-TE, μg, μg RAE 등)는 의도적 사용. 한국어 docstring·
+    # 데이터 row와 동기화되어야 하므로 모호성 경고를 끈다.
+    "RUF001",   # ambiguous unicode (Greek alpha, etc.)
+    "RUF002",   # ambiguous unicode in docstring
+    "RUF003",   # ambiguous unicode in comment
 ]
 
 [tool.ruff.lint.per-file-ignores]
