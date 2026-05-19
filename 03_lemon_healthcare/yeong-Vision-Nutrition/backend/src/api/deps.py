@@ -14,6 +14,7 @@ import redis.asyncio as redis_async
 from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.auth.jwt import InvalidTokenError, decode_token
 from src.cache.ocr_cache import OCRCache
@@ -110,7 +111,9 @@ async def get_current_user(
         ) from exc
 
     result = await session.execute(
-        select(User).where(User.id == user_id, User.deleted_at.is_(None))
+        select(User)
+        .options(selectinload(User.profile))
+        .where(User.id == user_id, User.deleted_at.is_(None))
     )
     user = result.scalar_one_or_none()
     if user is None:
