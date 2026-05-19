@@ -10,6 +10,9 @@ import '../../features/auth/presentation/providers/auth_notifier.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/supplement/domain/supplement_models.dart';
+import '../../features/supplement/presentation/screens/supplement_capture_screen.dart';
+import '../../features/supplement/presentation/screens/supplement_result_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -60,7 +63,20 @@ GoRouter appRouter(AppRouterRef ref) {
         builder: (BuildContext context, GoRouterState state) =>
             const RegisterScreen(),
       ),
-      // /supplement/* 는 M-3 에서 채움.
+      GoRoute(
+        path: '/supplement/capture',
+        name: 'supplement-capture',
+        builder: (BuildContext context, GoRouterState state) =>
+            const SupplementCaptureScreen(),
+      ),
+      GoRoute(
+        path: '/supplement/result',
+        name: 'supplement-result',
+        builder: (BuildContext context, GoRouterState state) =>
+            SupplementResultScreen(
+          response: state.extra! as SupplementResponse,
+        ),
+      ),
     ],
   );
 }

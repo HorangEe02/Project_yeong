@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../features/auth/presentation/providers/auth_notifier.dart';
 import '../../../../shared/widgets/disclaimer.dart';
@@ -49,13 +50,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('영양제 등록은 Phase M-3 에서 활성화됩니다.'),
-                ),
-              );
-            },
+            onPressed: () => context.push('/supplement/capture'),
             icon: const Icon(Icons.medication),
             label: const Text('영양제 등록'),
           ),
