@@ -1,0 +1,58 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# 환경 변수 / 자격증명 — 절대 commit 금지
+.env
+.env.*
+!.env.example
+
+# Flutter plugin metadata (auto-generated)
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# 생성된 코드 (.g.dart / .freezed.dart) — Lemon Healthcare 정책: COMMIT 함
+# (build_runner 재실행 환경 의존을 줄이기 위해)
+# (Rule: generated files are committed per Track B convention)
