@@ -21,6 +21,7 @@ from src.config import Settings, get_settings
 from src.db.session import get_session
 from src.llm.ollama import OllamaAdapter
 from src.models.db.user import User
+from src.ocr.base import OCRAdapter
 from src.ocr.google_vision import GoogleVisionOCR
 from src.ocr.pipeline import OCRPipeline
 from src.services.audit_service import AuditService
@@ -32,8 +33,22 @@ SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
 def get_ocr_pipeline(settings: SettingsDep) -> OCRPipeline:
-    """주력 OCR 어댑터 + Redis 캐시로 파이프라인 구성."""
-    primary = GoogleVisionOCR()
+    """주력 OCR 어댑터 + Redis 캐시로 파이프라인 구성.
+
+    ``settings.ocr_provider`` 분기:
+        - ``"paddleocr"`` (default): host-local PaddleOCR, 외부 자격 증명 X
+        - ``"google_vision"``: cloud Google Vision, ``GOOGLE_APPLICATION_CREDENTIALS`` 필요
+
+    PaddleOCRAdapter 는 lazy import 로 paddleocr 미설치 환경에서도 google_vision
+    경로가 동작하도록 설계.
+    """
+    primary: OCRAdapter
+    if settings.ocr_provider == "paddleocr":
+        from src.ocr.paddleocr_adapter import PaddleOCRAdapter
+
+        primary = PaddleOCRAdapter(lang=settings.paddleocr_lang)
+    else:
+        primary = GoogleVisionOCR()
     redis_client: redis_async.Redis[bytes] = redis_async.from_url(
         settings.redis_url, decode_responses=False
     )

@@ -75,7 +75,7 @@ disallow_untyped_defs = false
 disallow_incomplete_defs = false
 
 [[tool.mypy.overrides]]
-module = ["ollama.*", "google.cloud.*", "google.api_core.*", "magic.*", "passlib.*", "testcontainers.*", "alembic.*"]
+module = ["ollama.*", "google.cloud.*", "google.api_core.*", "magic.*", "passlib.*", "testcontainers.*", "alembic.*", "paddleocr.*", "paddle.*", "paddlex.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

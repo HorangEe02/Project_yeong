@@ -1,0 +1,49 @@
+# Lemon Healthcare 백엔드 dev infra — Postgres + Redis 만.
+#
+# Backend(FastAPI) 와 Ollama 는 host native 로 실행해 hot-reload + Apple
+# Silicon GPU 가속을 유지한다. 이 compose 는 DB / cache 만 컨테이너로 격리.
+#
+# 사용:
+#   docker compose up -d
+#   docker compose ps      # postgres, redis 둘 다 healthy 확인
+#   docker compose down    # stop + 컨테이너 제거 (volume 보존)
+#   docker compose down -v # volume 까지 삭제 (DB 초기화)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: lemon-postgres
+    environment:
+      POSTGRES_USER: lemon
+      POSTGRES_PASSWORD: lemon
+      POSTGRES_DB: lemon_dev
+    ports:
+      # host 5436 (127.0.0.1 only) → 컨테이너 5432. 5432/5433 등 일반 포트는 호스트의
+      # 다른 dev 컨테이너 (lemon-aid-*, lemon-ocr-smoke-postgres 등) 와 충돌 가능 —
+      # 비표준 5436 + IPv4 localhost 만 bind 로 격리.
+      - "127.0.0.1:5436:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lemon -d lemon_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: lemon-redis
+    ports:
+      # host 6381 (127.0.0.1 only) → 컨테이너 6379. 동일 격리 원칙.
+      - "127.0.0.1:6381:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg-data: {}
+  redis-data: {}

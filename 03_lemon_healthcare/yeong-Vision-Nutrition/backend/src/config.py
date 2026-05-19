@@ -80,6 +80,21 @@ class Settings(BaseSettings):
     mfds_api_key: SecretStr = Field(default=SecretStr(""))
 
     # ------------------------------------------------------------------
+    # OCR provider — host-local PaddleOCR (default) 또는 cloud Google Vision.
+    # ------------------------------------------------------------------
+    ocr_provider: Literal["paddleocr", "google_vision"] = Field(
+        default="paddleocr",
+        description=(
+            "OCR 엔진 선택. paddleocr=host-local (모델 자동 다운로드), "
+            "google_vision=cloud (GOOGLE_APPLICATION_CREDENTIALS 필요)."
+        ),
+    )
+    paddleocr_lang: str = Field(
+        default="korean",
+        description="PaddleOCR 언어 코드 — 한국어='korean', 영어='en'.",
+    )
+
+    # ------------------------------------------------------------------
     # 게이트 플래그 — docs/17 §9 매핑. 운영 활성화 전에는 절대 변경 금지.
     # ------------------------------------------------------------------
 
