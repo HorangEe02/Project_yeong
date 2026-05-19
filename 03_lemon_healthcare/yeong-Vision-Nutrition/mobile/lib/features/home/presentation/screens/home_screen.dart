@@ -1,17 +1,30 @@
-/// 임시 홈 화면 — Phase M-3 진입 버튼 (라우트는 M-2/M-3 에서 연결).
+/// 임시 홈 화면 — 면책 표시 + 로그아웃 버튼 + 영양제 등록 (M-3 placeholder).
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../features/auth/presentation/providers/auth_notifier.dart';
 import '../../../../shared/widgets/disclaimer.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: const Text('레몬헬스케어')),
+      appBar: AppBar(
+        title: const Text('레몬헬스케어'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: '로그아웃',
+            onPressed: () async {
+              await ref.read(authNotifierProvider.notifier).logout();
+            },
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: <Widget>[
@@ -37,7 +50,6 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: () {
-              // M-3 에서 /supplement/capture 라우트로 push 연결.
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('영양제 등록은 Phase M-3 에서 활성화됩니다.'),

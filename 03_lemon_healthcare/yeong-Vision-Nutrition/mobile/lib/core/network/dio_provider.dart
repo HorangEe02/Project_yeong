@@ -1,10 +1,15 @@
-/// Dio Provider — 단일 인스턴스 + 인터셉터 (Auth / Error / Logger).
+/// Dio Provider — 단일 인스턴스 + 인터셉터 3종 (Auth / Error / PrettyLogger).
+///
+/// AuthInterceptor 의 refresh / logout 콜백은 lazy ref.read 로 wiring 해
+/// authRepositoryProvider / authNotifierProvider 와의 provider 순환 의존을 피한다.
 library;
 
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../features/auth/data/auth_repository.dart';
+import '../../features/auth/presentation/providers/auth_notifier.dart';
 import '../config/env.dart';
 import '../storage/token_storage.dart';
 import 'interceptors.dart';
@@ -27,7 +32,14 @@ Dio dio(DioRef ref) {
   );
 
   dio.interceptors.addAll(<Interceptor>[
-    AuthInterceptor(ref.watch(tokenStorageProvider)),
+    AuthInterceptor(
+      tokenStorage: ref.watch(tokenStorageProvider),
+      refresh: (String refreshToken) async =>
+          ref.read(authRepositoryProvider).refresh(refreshToken),
+      onLogoutRequested: () async =>
+          ref.read(authNotifierProvider.notifier).logout(),
+      retryDio: dio,
+    ),
     ErrorInterceptor(),
     if (Env.isDebug)
       PrettyDioLogger(

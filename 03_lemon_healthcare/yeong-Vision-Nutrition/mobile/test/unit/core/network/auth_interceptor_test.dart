@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lemon_healthcare/core/network/interceptors.dart';
 import 'package:lemon_healthcare/core/storage/secure_storage.dart';
 import 'package:lemon_healthcare/core/storage/token_storage.dart';
+import 'package:lemon_healthcare/features/auth/domain/auth_models.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _FakeSecureStorage implements SecureStorage {
@@ -29,14 +30,26 @@ class _FakeSecureStorage implements SecureStorage {
   Future<void> deleteAll() async => _map.clear();
 }
 
-class _MockRequestHandler extends Mock
-    implements RequestInterceptorHandler {}
+class _MockRequestHandler extends Mock implements RequestInterceptorHandler {}
+
+class _MockDio extends Mock implements Dio {}
+
+AuthInterceptor _interceptor({
+  required TokenStorage tokenStorage,
+  Future<TokenResponse> Function(String)? refresh,
+  Future<void> Function()? onLogoutRequested,
+}) {
+  return AuthInterceptor(
+    tokenStorage: tokenStorage,
+    refresh: refresh ?? (String _) async => throw UnimplementedError(),
+    onLogoutRequested: onLogoutRequested ?? () async {},
+    retryDio: _MockDio(),
+  );
+}
 
 void main() {
   setUpAll(() {
-    registerFallbackValue(
-      RequestOptions(path: '/fallback'),
-    );
+    registerFallbackValue(RequestOptions(path: '/fallback'));
   });
 
   group('AuthInterceptor.onRequest', () {
@@ -50,7 +63,8 @@ void main() {
         ),
       );
 
-      final AuthInterceptor interceptor = AuthInterceptor(tokenStorage);
+      final AuthInterceptor interceptor =
+          _interceptor(tokenStorage: tokenStorage);
       final RequestOptions options = RequestOptions(path: '/api/v1/test');
       final _MockRequestHandler handler = _MockRequestHandler();
 
@@ -63,7 +77,8 @@ void main() {
     test('token 이 없으면 Authorization 헤더 미첨부', () async {
       final TokenStorage tokenStorage = TokenStorage(_FakeSecureStorage());
 
-      final AuthInterceptor interceptor = AuthInterceptor(tokenStorage);
+      final AuthInterceptor interceptor =
+          _interceptor(tokenStorage: tokenStorage);
       final RequestOptions options = RequestOptions(path: '/api/v1/test');
       final _MockRequestHandler handler = _MockRequestHandler();
 
