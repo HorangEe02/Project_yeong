@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <path d="M10 50 L26 22 L38 22 L54 50 Z" fill="none" stroke="currentColor" stroke-width="2" opacity="0.6"/>
+  <path d="M22 36 L42 36" stroke="currentColor" stroke-width="2" opacity="0.6" stroke-dasharray="3 2"/>
+  <circle cx="32" cy="36" r="3" fill="currentColor" opacity="0.65"/>
+  <path d="M32 18 L32 12" stroke="currentColor" stroke-width="1.5" opacity="0.55"/>
+  <text x="32" y="62" text-anchor="middle" font-family="ui-monospace, monospace" font-size="6" fill="currentColor" opacity="0.55">WELD</text>
+</svg>

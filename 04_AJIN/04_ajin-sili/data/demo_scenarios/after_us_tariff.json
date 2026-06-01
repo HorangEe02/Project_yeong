@@ -1,0 +1,14 @@
+{
+  "regulation_type": "trade",
+  "title": "미국 자동차 부품 관세 (변경)",
+  "items": [
+    {
+      "id": "US-TARIFF-AUTO",
+      "subject": "자동차 부품 관세 (HS 8708)",
+      "current_rate": "25%",
+      "effective_date": "2026-07-01",
+      "estimated_annual_impact": "약 400억 원 (아진산업 기준)"
+    }
+  ],
+  "crawled_at": "2026-04-01T09:00:00"
+}

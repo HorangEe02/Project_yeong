@@ -1,0 +1,54 @@
+{
+  "scenario_id": "SCN-001",
+  "title": "프레스 안전거리 기준 강화",
+  "description": "산업안전보건기준에 관한 규칙 개정으로 프레스 안전거리가 300mm에서 400mm로 강화",
+  "regulation": {
+    "name": "산업안전보건기준에 관한 규칙",
+    "article": "제99조 (프레스 등의 위험 방지)",
+    "authority": "고용노동부",
+    "category": "safety"
+  },
+  "change_detail": {
+    "before": {
+      "text": "제99조(프레스 등의 위험 방지) ① 사업주는 프레스 및 전단기(이하 \"프레스 등\"이라 한다)에 대하여 다음 각 호의 사항을 준수하여야 한다.\n1. 프레스 등의 금형 사이에 손이 들어갈 수 있는 위험이 있는 경우에는 양수조작식, 게이트가드식, 손쳐내기식, 수인식 등의 방호장치를 설치할 것\n2. 양수조작식 방호장치의 경우 양손 간 거리를 300밀리미터 이상으로 하고, 외측 누름버튼에서 위험한도까지의 거리가 300밀리미터 이상이 되도록 할 것",
+      "effective_date": "2020-01-16",
+      "version": "v2020"
+    },
+    "after": {
+      "text": "제99조(프레스 등의 위험 방지) ① 사업주는 프레스 및 전단기(이하 \"프레스 등\"이라 한다)에 대하여 다음 각 호의 사항을 준수하여야 한다.\n1. 프레스 등의 금형 사이에 손이 들어갈 수 있는 위험이 있는 경우에는 양수조작식, 게이트가드식, 손쳐내기식, 수인식 등의 방호장치를 설치할 것\n2. 양수조작식 방호장치의 경우 양손 간 거리를 400밀리미터 이상으로 하고, 외측 누름버튼에서 위험한도까지의 거리가 400밀리미터 이상이 되도록 할 것\n3. 광전자식 방호장치를 설치하는 경우 안전거리는 400밀리미터 이상으로 하며, 연속차단 기능을 갖출 것",
+      "effective_date": "2026-07-01",
+      "version": "v2026"
+    }
+  },
+  "severity": "high",
+  "impact_areas": [
+    "프레스 공정",
+    "방호장치",
+    "설비 개조"
+  ],
+  "affected_facility_ids": [
+    "STD-PRESS-01"
+  ],
+  "affected_process_types": [
+    "stamping"
+  ],
+  "deadline": "2026-07-01",
+  "required_actions": [
+    "프레스 안전거리 현황 조사 (전 공장)",
+    "300mm → 400mm 미달 설비 파악",
+    "방호장치 교체/개조 계획 수립",
+    "광전자식 방호장치 도입 검토",
+    "작업자 재교육 실시"
+  ],
+  "estimated_cost": "설비당 500만~2,000만원",
+  "reference_url": "https://law.go.kr/lsSc.do?tabMenuId=tab18&section=&eventGubun=060101",
+  "applicable_plants": [
+    "PLANT-KS-HQ",
+    "PLANT-KS-2",
+    "PLANT-GJ",
+    "PLANT-GJ-KAINTECH",
+    "PLANT-KS-MOLDTECH",
+    "SUB-US-JOON",
+    "SUB-US-AJIN"
+  ]
+}

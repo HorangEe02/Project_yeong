@@ -1,0 +1,61 @@
+{
+  "department": "바디선행개발팀",
+  "division": "기술연구소",
+  "description": "신소재·신공법 핵심 부품 개발·미래 모빌리티 차체 기술·경량화 소재(CFRP/AL/핫스탬핑) 연구",
+  "questions": [
+    {
+      "id": "body-rd-material",
+      "label": "신소재 적용",
+      "promptText": "신소재(CFRP·핫스탬핑·알루미늄) 적용 사례와 검토 가이드",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["신소재", "경량화"]
+    },
+    {
+      "id": "body-rd-roadmap",
+      "label": "선행 로드맵",
+      "promptText": "차체 선행 기술 개발 중장기 로드맵",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["로드맵", "선행"]
+    },
+    {
+      "id": "body-rd-test-plan",
+      "label": "시험 계획",
+      "promptText": "신소재 시험·평가 계획 표준 수립 절차",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["시험", "평가"]
+    },
+    {
+      "id": "body-rd-cae",
+      "label": "CAE 사전 검증",
+      "promptText": "신공법 적용 전 CAE 사전 검증 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["CAE", "사전검증"]
+    },
+    {
+      "id": "body-rd-patent",
+      "label": "특허 검토",
+      "promptText": "선행 개발 결과 특허 출원 절차와 사내 검토",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["특허", "지식재산"]
+    },
+    {
+      "id": "body-rd-collab",
+      "label": "산학 협력",
+      "promptText": "외부 연구기관·학교 산학 협력 진행 현황",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["산학", "협력"]
+    }
+  ]
+}

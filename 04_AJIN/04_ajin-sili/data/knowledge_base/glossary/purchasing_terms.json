@@ -1,0 +1,27 @@
+{
+  "citation_id": "GLOSSARY-purchasing_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "category": "purchasing",
+  "description": "아진산업 구매팀 현장 은어 및 조달·협력사 관리 용어",
+  "terms": {
+    "PO": "Purchase Order - 구매발주서 (발주 핵심 문서)",
+    "견적": "RFQ - Request for Quotation (견적요청)",
+    "ECR": "Engineering Change Request - 설계변경요청",
+    "ECN": "Engineering Change Notice - 설계변경통보",
+    "SQ": "Supplier Quality - 협력사 품질 관리",
+    "SRM": "Supplier Relationship Management - 협력사 관계관리",
+    "VMI": "Vendor Managed Inventory - 공급자 관리 재고",
+    "JIT": "Just In Time - 적시 납품",
+    "단가": "Unit Price - 단위 가격 (원가 절감 핵심)",
+    "발주": "Purchase Order Issuance - 발주 실행",
+    "입찰": "Bidding - 경쟁 입찰",
+    "소싱": "Sourcing - 공급처 선정",
+    "AP": "Advanced Purchasing - 선구매",
+    "Global Sourcing": "글로벌 소싱 (해외 조달)",
+    "원가 분석": "Cost Analysis - 원가 분석 (단가 협상 기반)"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "citation_id": "GLOSSARY-advanced_quality_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "category": "advanced_quality",
+  "description": "IATF 16949 코어툴 및 품질보증팀 현장 은어 (전 부서 공통)",
+  "terms": {
+    "8D": "8 Disciplines Report - 8단계 문제 해결 보고서 (클레임 대응 표준)",
+    "Cpk": "Process Capability Index - 공정능력지수 (1.67 이상 목표)",
+    "PPAP": "Production Part Approval Process - 생산부품승인절차 (18개 항목)",
+    "PSW": "Part Submission Warrant - 부품 제출 보증서 (PPAP 최종 서류)",
+    "FMEA": "Failure Mode and Effects Analysis - 고장모드영향분석 (DFMEA/PFMEA)",
+    "RPN": "Risk Priority Number - 위험우선순위수 (FMEA에서 위험도 평가)",
+    "APQP": "Advanced Product Quality Planning - 사전제품품질계획",
+    "MSA": "Measurement System Analysis - 측정시스템분석",
+    "SPC": "Statistical Process Control - 통계적 공정관리",
+    "CP": "Control Plan - 관리계획서 (양산 공정별 품질 관리 항목)",
+    "빠가사리": "불량품 집합 / 품질 이슈 모음",
+    "품확": "품질확인 단계",
+    "량확": "양산확인 단계",
+    "Containment": "임시 봉쇄 조치 (불량 유출 방지)",
+    "Root Cause": "근본원인 (8D D4 단계)",
+    "ECR": "Engineering Change Request - 설계변경요청",
+    "ECN": "Engineering Change Notice - 설계변경통보",
+    "SQ": "Supplier Quality - 협력사 품질 관리"
+  }
+}

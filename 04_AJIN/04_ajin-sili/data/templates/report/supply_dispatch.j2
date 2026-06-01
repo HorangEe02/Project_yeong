@@ -1,0 +1,50 @@
+{# 사급 반출 요청서 양식 (v2.6) #}
+
+# 사급 반출 요청서
+
+| 항목 | 내용 |
+|---|---|
+| 문서번호 | {{ doc_number | default("SD-2026-XXX") }} |
+| 작성일 | {{ created_date }} |
+| 요청부서 | {{ department | default("구매팀") }} |
+| 요청자 | {{ author | default("OOO") }} |
+
+---
+
+## 1. 반출 대상
+
+| 항목 | 내용 |
+|---|---|
+| 자재명 | {{ material_name }} |
+| 자재코드 | {{ material_code | default("확인 중") }} |
+| 규격/사양 | {{ material_spec }} |
+| 수량 | {{ quantity }} |
+| 단위 | {{ unit | default("EA") }} |
+
+## 2. 반출 사유
+
+{{ dispatch_reason }}
+
+## 3. 반출/반입 정보
+
+| 항목 | 내용 |
+|---|---|
+| 반출처 (From) | {{ from_location | default("경산 본사 자재창고") }} |
+| 반입처 (To) | {{ to_location }} |
+| 반출 희망일 | {{ dispatch_date }} |
+| 반입 예정일 | {{ return_date | default("해당 없음 (소모성)") }} |
+| 운송 방법 | {{ transport_method | default("자가 운송") }} |
+
+## 4. 비고
+
+{{ remarks | default("") }}
+
+---
+
+**승인:**
+
+| 요청 | 검토 (자재팀) | 승인 |
+|---|---|---|
+| {{ author | default("OOO") }} | | |
+
+*아진산업(주) {{ department | default("구매팀") }}*

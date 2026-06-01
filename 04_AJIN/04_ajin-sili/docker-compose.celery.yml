@@ -1,0 +1,67 @@
+# D3 — Celery + Redis + Beat + Flower 4-서비스 스택.
+#
+# 기동:
+#   docker compose -f docker-compose.celery.yml up -d
+#   docker compose -f docker-compose.celery.yml logs -f worker
+#
+# Flower UI: http://localhost:5555
+# Redis:     localhost:6379
+
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ajin_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: ajin_celery_worker
+    command: celery -A backend.celery_app worker -l info -Q celery
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      SMTP_ENABLED: "false"
+    volumes:
+      - ./data:/app/data
+      - ./vectorstore:/app/vectorstore
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: ajin_celery_beat
+    # --pidfile: heartbeat — admin.py system-health-extended 의 data/celery_beat.pid mtime 으로 lag 계산
+    command: celery -A backend.celery_app beat -l info --pidfile=data/celery_beat.pid
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: ajin_flower
+    command: celery -A backend.celery_app flower --port=5555 --address=0.0.0.0
+    environment:
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "5555:5555"
+    depends_on:
+      redis:
+        condition: service_healthy

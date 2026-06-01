@@ -1,0 +1,1008 @@
+/* AJIN Mobile / Tablet — Liquid Glass theme tokens scoped for native iOS-style frames.
+   Layered on top of /colors_and_type.css. */
+
+.aj-mobile {
+  font-family: -apple-system, "SF Pro Text", "SF Pro", "Pretendard", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--hud-text);
+  --r-card: 22px;
+  --r-row: 16px;
+  --r-pill: 999px;
+  --safe-x: 16px;
+  --aj-gold: var(--hud-primary, #FCB132);
+  --aj-gold-soft: color-mix(in oklab, var(--hud-primary) 18%, transparent);
+}
+
+/* ===== iPhone screen surface ===== */
+.aj-screen { height: 100%; display: flex; flex-direction: column; }
+.aj-screen.dark { background: #07090C; color: #F2F0EA; }
+.aj-screen.light { background: #F2EFE9; color: #1B1B1B; }
+
+/* Layered gradient backdrop (visible behind glass) */
+.aj-bg-grad {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+}
+.aj-bg-grad.dark {
+  background:
+    #0E1218;
+}
+.aj-bg-grad.light {
+  background:
+    #FAF6EE;
+}
+
+/* Generic glass card on dark frame */
+.aj-glass {
+  position: relative;
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  box-shadow: 0 6px 24px -8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+  border-radius: var(--r-card);
+}
+.aj-screen.light .aj-glass {
+  background: rgba(255,255,255,0.82);
+  border-color: rgba(28,22,12,0.08);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 6px 16px -8px rgba(80,55,15,0.18);
+  box-shadow: 0 6px 22px -10px rgba(20,15,5,0.18), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+/* Section title (large title under nav) */
+.aj-title {
+  padding: 8px 16px 14px;
+}
+.aj-title h1 {
+  margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1;
+}
+.aj-title .sub {
+  margin-top: 4px; font-size: 12px; letter-spacing: 0.18em;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  text-transform: uppercase; color: var(--aj-gold); opacity: 0.9;
+}
+.aj-screen.light .aj-title .sub { color: #B57600; }
+
+/* Mono accent label */
+.aj-mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+.aj-screen.light .aj-mono { color: rgba(0,0,0,0.5); }
+
+/* Brand mark cluster */
+.aj-brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.aj-brand .mark {
+  width: 38px; height: 38px; border-radius: 11px;
+  background-image:
+    #FCB132;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.55),
+    inset 0 -1px 1px rgba(60,30,0,0.25),
+    0 4px 14px -4px rgba(252,177,50,0.55);
+  display: flex; align-items: center; justify-content: center;
+}
+.aj-brand .mark img { width: 70%; height: 70%; object-fit: contain; filter: drop-shadow(0 1px 0 rgba(0,0,0,0.18)); }
+.aj-brand .mark[data-old]{
+  display: flex; align-items: center; justify-content: center;
+  color: #07090C; font-weight: 800; font-size: 18px; letter-spacing: -0.04em;
+  box-shadow: 0 2px 10px rgba(252,177,50,0.4);
+}
+.aj-brand .word { font-weight: 800; letter-spacing: 0.18em; font-size: 13px; }
+.aj-brand .word i { font-style: normal; color: var(--aj-gold); }
+.aj-brand .ko { font-size: 10px; letter-spacing: 0.18em;
+  font-family: "JetBrains Mono", ui-monospace, monospace; opacity: 0.6; }
+
+/* Buttons */
+.aj-btn {
+  border: 0; cursor: pointer; font-family: inherit;
+  height: 50px; border-radius: 16px; padding: 0 18px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-size: 16px; font-weight: 600; letter-spacing: -0.01em;
+}
+.aj-btn.primary {
+  background: #FFD066;
+  color: #1A1004; box-shadow: 0 6px 18px -6px rgba(252,177,50,0.6);
+}
+.aj-btn.ghost {
+  background: rgba(255,255,255,0.08); color: inherit;
+  border: 0.5px solid rgba(255,255,255,0.16);
+}
+.aj-screen.light .aj-btn.ghost {
+  background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.06);
+}
+.aj-btn.full { width: 100%; }
+
+/* Capsule chips */
+.aj-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; padding: 0 14px; border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 0.5px solid rgba(255,255,255,0.14);
+  font-size: 13px; font-weight: 500;
+}
+.aj-screen.light .aj-chip {
+  background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.06);
+}
+.aj-chip.gold { background: var(--aj-gold-soft); border-color: rgba(252,177,50,0.4); color: var(--aj-gold); }
+.aj-chip.dot::before {
+  content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--aj-gold);
+}
+
+/* Status pill (mono uppercase) */
+.aj-status {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px;
+}
+.aj-status.ok { background: rgba(79,183,116,0.18); color: #4FB774; }
+.aj-status.warn { background: rgba(232,163,23,0.2); color: #E8A317; }
+.aj-status.crit { background: rgba(192,57,43,0.2); color: #FF7565; }
+.aj-status.gold { background: rgba(252,177,50,0.18); color: var(--aj-gold); }
+
+/* Module card row in lists */
+.aj-row {
+  display: grid; grid-template-columns: 44px 1fr auto; gap: 12px;
+  padding: 14px 16px; align-items: center; min-height: 64px;
+}
+.aj-row .ico {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--aj-gold-soft); color: var(--aj-gold);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.aj-row .ko { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.aj-row .en { font-size: 11px; opacity: 0.55;
+  font-family: "JetBrains Mono", ui-monospace, monospace; letter-spacing: 0.12em; }
+.aj-row .meta { font-size: 12px; opacity: 0.55;
+  font-family: "JetBrains Mono", ui-monospace, monospace; }
+.aj-row + .aj-row { border-top: 0.5px solid rgba(255,255,255,0.06); }
+.aj-screen.light .aj-row + .aj-row { border-top-color: rgba(0,0,0,0.06); }
+
+/* KPI card */
+.aj-kpi { padding: 14px 16px; }
+.aj-kpi .k { font-size: 10px; letter-spacing: 0.18em; opacity: 0.55;
+  font-family: "JetBrains Mono", ui-monospace, monospace; text-transform: uppercase; }
+.aj-kpi .v { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-top: 4px;
+  font-feature-settings: "tnum"; }
+.aj-kpi .v i { font-style: normal; font-size: 14px; opacity: 0.55; margin-left: 4px; }
+.aj-kpi .delta { font-size: 11px; margin-top: 2px;
+  font-family: "JetBrains Mono", ui-monospace, monospace; }
+.aj-kpi .delta.up { color: #4FB774; }
+.aj-kpi .delta.down { color: #FF7565; }
+
+/* Tab-bar (bottom) — liquid glass */
+.aj-tabbar {
+  position: relative; z-index: 12; margin: 0 12px 14px;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 0;
+  height: 64px; border-radius: 28px; padding: 6px;
+  background: rgba(28,28,32,0.55);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 0.5px solid rgba(255,255,255,0.14);
+  box-shadow: 0 14px 40px -12px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.aj-screen.light .aj-tabbar {
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(0,0,0,0.06);
+  box-shadow: 0 14px 36px -14px rgba(20,15,5,0.18), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.aj-tabbar button {
+  border: 0; background: transparent; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; color: inherit; opacity: 0.5; font-size: 10px; letter-spacing: 0.06em;
+  border-radius: 22px;
+}
+.aj-tabbar button.on {
+  opacity: 1; color: var(--aj-gold);
+  background: var(--aj-gold-soft);
+}
+.aj-tabbar button .icn { font-size: 18px; }
+
+/* Composer (bottom) */
+.aj-composer {
+  margin: 6px 12px 14px;
+  display: flex; gap: 8px; align-items: center;
+  padding: 8px; border-radius: 28px;
+  background: rgba(28,28,32,0.6);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 0.5px solid rgba(255,255,255,0.14);
+}
+.aj-screen.light .aj-composer {
+  background: rgba(255,255,255,0.72);
+  border-color: rgba(0,0,0,0.06);
+}
+.aj-composer .att, .aj-composer .send {
+  width: 38px; height: 38px; border-radius: 999px; border: 0; cursor: pointer;
+  background: rgba(255,255,255,0.1); color: inherit; font-size: 16px;
+}
+.aj-screen.light .aj-composer .att,
+.aj-screen.light .aj-composer .send { background: rgba(0,0,0,0.05); }
+.aj-composer .send { background: var(--aj-gold); color: #1A1004; }
+.aj-composer input {
+  flex: 1; height: 38px; padding: 0 14px; border: 0; outline: none; background: transparent;
+  font-family: inherit; font-size: 15px; color: inherit;
+}
+
+/* Chat bubbles */
+.aj-msg { max-width: 80%; padding: 12px 14px; border-radius: 22px; font-size: 15px; line-height: 1.45; }
+.aj-msg.ai {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.08);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  border-bottom-left-radius: 8px;
+}
+.aj-msg.user {
+  align-self: flex-end;
+  background: #FFD066; color: #1A1004;
+  border-bottom-right-radius: 8px;
+}
+.aj-screen.light .aj-msg.ai {
+  background: rgba(255,255,255,0.78); border-color: rgba(0,0,0,0.06);
+}
+.aj-msg .meta { font-size: 10px; opacity: 0.6; margin-bottom: 4px;
+  font-family: "JetBrains Mono", ui-monospace, monospace; letter-spacing: 0.12em; text-transform: uppercase; }
+
+/* Search bar with mic */
+.aj-search {
+  display: flex; align-items: center; gap: 8px;
+  height: 44px; padding: 0 12px; border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 0.5px solid rgba(255,255,255,0.12);
+}
+.aj-screen.light .aj-search {
+  background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.06);
+}
+.aj-search input {
+  flex: 1; border: 0; outline: none; background: transparent; color: inherit;
+  font-size: 15px; font-family: inherit;
+}
+.aj-search .icn { opacity: 0.5; font-size: 16px; width: 20px; text-align: center; }
+
+/* Section header */
+.aj-sect-h {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 14px 16px 8px;
+}
+.aj-sect-h h3 { margin: 0; font-size: 13px; letter-spacing: 0.16em;
+  text-transform: uppercase; opacity: 0.6; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.aj-sect-h .more { font-size: 13px; color: var(--aj-gold); font-weight: 500; }
+
+/* Scrollable content area */
+.aj-scroll { flex: 1; overflow-y: auto; padding: 0 0 4px; }
+.aj-scroll::-webkit-scrollbar { width: 0; }
+
+/* Stack */
+.aj-stack { display: flex; flex-direction: column; gap: 10px; padding: 0 12px; }
+.aj-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 12px; }
+
+/* iPad split layout */
+.aj-pad {
+  display: grid; grid-template-columns: 280px minmax(0, 1fr);
+  height: 100%; gap: 0;
+}
+.aj-pad .rail {
+  padding: 80px 16px 16px; display: flex; flex-direction: column; gap: 6px;
+  border-right: 0.5px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.aj-pad.light .rail {
+  background: rgba(255,255,255,0.7);
+  border-right-color: rgba(0,0,0,0.06);
+}
+.aj-pad .rail-row {
+  display: grid; grid-template-columns: 28px 1fr; gap: 12px;
+  padding: 10px 12px; border-radius: 14px; align-items: center;
+  font-size: 15px; cursor: pointer;
+}
+.aj-pad .rail-row.on { background: var(--aj-gold-soft); color: var(--aj-gold); }
+.aj-pad .rail-row .icn { width: 28px; height: 28px; border-radius: 8px; display: flex;
+  align-items: center; justify-content: center; background: rgba(255,255,255,0.06); font-size: 14px; }
+.aj-pad.light .rail-row .icn { background: rgba(0,0,0,0.04); }
+.aj-pad .rail-row.on .icn { background: var(--aj-gold); color: #1A1004; }
+.aj-pad .work { padding: 64px 24px 24px; overflow-y: auto; min-width: 0; }
+
+/* Login screen */
+.aj-login-card {
+  margin: 32px 16px 0; padding: 24px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.aj-login-card .field {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.aj-login-card label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  font-family: "JetBrains Mono", ui-monospace, monospace; opacity: 0.6; }
+.aj-login-card input {
+  height: 48px; padding: 0 14px; border-radius: 14px;
+  border: 0.5px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.05);
+  color: inherit; font-size: 16px; font-family: inherit;
+}
+.aj-screen.light .aj-login-card input {
+  background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.08);
+}
+
+/* Dot strip (e.g. SPC chart) */
+.aj-spark {
+  display: flex; align-items: flex-end; gap: 3px; height: 36px;
+}
+.aj-spark span {
+  flex: 1; background: var(--aj-gold); opacity: 0.85; border-radius: 2px;
+}
+
+/* Quality bars */
+.aj-q-bar {
+  display: grid; grid-template-columns: 70px 1fr 36px; gap: 8px; align-items: center;
+  font-size: 11px;
+}
+.aj-q-bar .lbl { font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.1em; opacity: 0.7; }
+.aj-q-bar .track { height: 5px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden; }
+.aj-q-bar .track i { display: block; height: 100%;
+  background: #FCB132; border-radius: 999px; }
+.aj-q-bar .v { font-family: "JetBrains Mono", ui-monospace, monospace; text-align: right; }
+
+/* Notification toast */
+.aj-toast {
+  margin: 0 16px; padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: center;
+}
+.aj-toast .icn { width: 28px; height: 28px; border-radius: 8px;
+  background: var(--aj-gold-soft); color: var(--aj-gold);
+  display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.aj-toast .ttl { font-size: 14px; font-weight: 600; }
+.aj-toast .sub { font-size: 12px; opacity: 0.65; }
+
+/* Selected glass card (gold edge) */
+.aj-glass.on-gold {
+  background: rgba(252,177,50,0.12);
+  border: 1px solid rgba(252,177,50,0.45);
+  box-shadow: 0 0 0 1px rgba(252,177,50,0.25), 0 8px 22px rgba(252,177,50,0.10);
+}
+.aj-screen.light .aj-glass.on-gold {
+  background: rgba(252,177,50,0.16);
+  border-color: rgba(181,118,0,0.45);
+}
+
+/* Section divider list */
+.aj-divlist > div + div { border-top: 0.5px solid rgba(255,255,255,0.06); }
+.aj-screen.light .aj-divlist > div + div { border-top-color: rgba(0,0,0,0.06); }
+
+
+/* ─────────────────────────────────────────────────────────────
+ * App Store-style HERO card (Today page reference)
+ * ─────────────────────────────────────────────────────────── */
+.aj-as-hero {
+  position: relative;
+  border-radius: 26px;
+  overflow: hidden;
+  height: 380px;
+  isolation: isolate;
+  box-shadow: 0 24px 60px -22px rgba(0,0,0,0.55), 0 0 0 0.5px rgba(255,255,255,0.06);
+}
+.aj-as-hero .bg {
+  position: absolute; inset: 0;
+  background:
+    #2A1B05;
+}
+.aj-as-hero .overlay {
+  position: absolute; inset: 0;
+  background:
+    rgba(255,255,255,0.018);
+}
+.aj-as-hero .content {
+  position: relative; z-index: 2; height: 100%;
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 18px 20px;
+  color: #FFF;
+}
+.aj-as-hero .overline {
+  font: 600 10.5px/1.4 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: #FCB132;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+}
+.aj-as-hero .ttl {
+  font-size: 30px; font-weight: 700;
+  letter-spacing: -0.025em; line-height: 1.05;
+  margin-top: 8px;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.45);
+}
+.aj-as-hero .sub {
+  font-size: 13px; opacity: 0.75;
+  margin-top: 10px; max-width: 80%;
+  line-height: 1.45;
+}
+.aj-as-hero .cta {
+  display: grid; grid-template-columns: 44px 1fr auto;
+  gap: 12px; align-items: center;
+  background: rgba(20,14,4,0.55);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 0.5px solid rgba(255,255,255,0.10);
+  border-radius: 16px; padding: 10px 12px;
+  margin-top: 12px;
+}
+.aj-as-hero .cta .ico-tile {
+  width: 44px; height: 44px; border-radius: 11px;
+  background: #FCB132;
+  display: flex; align-items: center; justify-content: center;
+  color: #1A1004;
+  box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.5);
+}
+.aj-as-hero .cta .meta .t { font-size: 13px; font-weight: 600; }
+.aj-as-hero .cta .meta .s { font-size: 11px; opacity: 0.65; margin-top: 2px;
+  font-family: "JetBrains Mono", ui-monospace, monospace; }
+.aj-as-hero .cta .get {
+  background: rgba(255,255,255,0.18);
+  color: #FFF;
+  border: 0; padding: 6px 16px;
+  border-radius: 999px;
+  font-weight: 600; font-size: 13px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+/* light variant */
+.aj-screen.light .aj-as-hero .bg {
+  background:
+    #FFE9B8;
+}
+.aj-screen.light .aj-as-hero .content { color: #1A1004; }
+.aj-screen.light .aj-as-hero .ttl { text-shadow: 0 1px 0 rgba(255,255,255,0.4); }
+.aj-screen.light .aj-as-hero .overline { color: #6B3F00; }
+.aj-screen.light .aj-as-hero .sub { opacity: 0.75; }
+.aj-screen.light .aj-as-hero .cta {
+  background: rgba(255,255,255,0.55);
+  border-color: rgba(60,40,10,0.10);
+}
+.aj-screen.light .aj-as-hero .cta .get {
+  background: #1A1004; color: #FFF;
+}
+
+/* App Store-style large section header (used in Dashboard) */
+.aj-as-sect {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 18px 20px 10px;
+}
+.aj-as-sect .label {
+  font: 600 10.5px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: #FCB132;
+  margin-bottom: 4px;
+}
+.aj-as-sect h2 {
+  margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+}
+.aj-as-sect .more {
+  font-size: 14px; color: #FCB132; font-weight: 500;
+}
+
+
+/* ════════════════════════════════════════════════════════════════════
+ * APP STORE TEMPLATES — extended primitives for module pages
+ * Today · Apps · Arcade · Search forms applied to AJIN modules
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* Large title area (used at top of every page, App Store style) */
+.aj-as-title {
+  padding: 12px 20px 16px;
+}
+.aj-as-title .ddate {
+  font: 600 12px/1 -apple-system, "SF Pro Display", system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.aj-as-title h1 {
+  margin: 0; font-size: 34px; font-weight: 800;
+  letter-spacing: -0.025em; line-height: 1.05;
+}
+.aj-as-title .ttl-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.aj-as-title .av {
+  width: 36px; height: 36px; border-radius: 999px;
+  background: #FCB132;
+  display: flex; align-items: center; justify-content: center;
+  color: #07090C; font-weight: 700; font-size: 14px; flex: 0 0 36px;
+  box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.4);
+}
+.aj-screen.light .aj-as-title .ddate { color: rgba(26,16,4,0.55); }
+
+/* App-row (60×60 tile + name + subtitle + GET) — core App Store row */
+.aj-as-approw {
+  display: grid; grid-template-columns: 60px 1fr auto;
+  gap: 14px; align-items: center;
+  padding: 14px 16px;
+  position: relative;
+}
+.aj-as-approw + .aj-as-approw::before {
+  content: ""; position: absolute; top: 0; left: 88px; right: 16px;
+  height: 0.5px; background: rgba(255,255,255,0.08);
+}
+.aj-screen.light .aj-as-approw + .aj-as-approw::before {
+  background: rgba(0,0,0,0.08);
+}
+.aj-as-approw .tile {
+  width: 60px; height: 60px; border-radius: 14px;
+  background: #2A1B05;
+  display: flex; align-items: center; justify-content: center;
+  color: #FCB132;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.1),
+    inset 0 0 0 0.5px rgba(255,255,255,0.06),
+    0 4px 10px -4px rgba(0,0,0,0.5);
+  position: relative; overflow: hidden;
+}
+.aj-as-approw .tile.gold {
+  background: #FCB132;
+  color: #1A1004;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.5),
+    0 4px 12px -3px rgba(252,177,50,0.45);
+}
+.aj-as-approw .tile.blue {
+  background: #5BAFFF;
+  color: #FFF;
+}
+.aj-as-approw .tile.green {
+  background: #6FD49A;
+  color: #FFF;
+}
+.aj-as-approw .tile.red {
+  background: #FF9682;
+  color: #FFF;
+}
+.aj-as-approw .tile.purple {
+  background: #C5A5F5;
+  color: #FFF;
+}
+.aj-as-approw .meta { min-width: 0; }
+.aj-as-approw .meta .nm {
+  font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.aj-as-approw .meta .sub {
+  font-size: 12px; opacity: 0.55; margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.aj-as-approw .meta .iap {
+  font-size: 10px; opacity: 0.45; margin-top: 2px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.aj-as-approw .get {
+  height: 30px; min-width: 74px; padding: 0 14px;
+  border-radius: 999px; border: 0;
+  background: rgba(255,255,255,0.12);
+  color: #FCB132; font-weight: 700; font-size: 13px;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; font-family: inherit;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.aj-screen.light .aj-as-approw .get {
+  background: rgba(0,0,0,0.06);
+  color: #B57600;
+}
+.aj-as-approw .get.dark { background: rgba(0,0,0,0.5); color: #FCB132; }
+.aj-as-approw .get.solid { background: #FCB132; color: #1A1004; }
+
+/* Category tile grid (App Store Search categories) */
+.aj-as-catgrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 0 16px;
+}
+.aj-as-cat {
+  height: 84px; border-radius: 14px;
+  position: relative; overflow: hidden;
+  display: flex; align-items: flex-end; padding: 14px;
+  cursor: pointer;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.18),
+    0 8px 22px -10px rgba(0,0,0,0.55);
+}
+.aj-as-cat .lbl {
+  font-size: 15px; font-weight: 700; letter-spacing: -0.01em;
+  color: #FFF; z-index: 2; line-height: 1.15;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.45);
+}
+.aj-as-cat .glyph {
+  position: absolute; top: 10px; right: 10px; opacity: 0.65;
+  color: rgba(255,255,255,0.85); z-index: 2;
+}
+.aj-as-cat.t1 { background: #FCB132; }
+.aj-as-cat.t2 { background: #5BAFFF; }
+.aj-as-cat.t3 { background: #6FD49A; }
+.aj-as-cat.t4 { background: #C5A5F5; }
+.aj-as-cat.t5 { background: #FF9682; }
+.aj-as-cat.t6 { background: #4A5A78; }
+
+/* Story card (App Store Today — full-bleed feature) */
+.aj-as-story {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  min-height: 320px;
+  display: flex; flex-direction: column;
+  margin: 0 16px 16px;
+  box-shadow:
+    0 20px 50px -22px rgba(0,0,0,0.6),
+    inset 0 0.5px 0 rgba(255,255,255,0.1);
+}
+.aj-as-story .ovr {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1;
+}
+.aj-as-story .stack {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; justify-content: space-between;
+  flex: 1; padding: 20px;
+}
+.aj-as-story .eyebrow {
+  font: 700 11px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+}
+.aj-as-story h2 {
+  margin: 8px 0 0; font-size: 26px; font-weight: 800;
+  letter-spacing: -0.02em; line-height: 1.1;
+  color: #FFF; max-width: 88%;
+  text-shadow: 0 1px 10px rgba(0,0,0,0.4);
+}
+.aj-as-story .bottom {
+  display: flex; align-items: center; gap: 12px;
+}
+.aj-as-story .bottom .tile {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  color: #FFF; flex: 0 0 48px;
+  box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.3);
+}
+.aj-as-story .bottom .nm { color: #FFF; font-size: 14px; font-weight: 600; }
+.aj-as-story .bottom .sub { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 2px;
+  font-family: "JetBrains Mono", ui-monospace, monospace; letter-spacing: 0.06em; }
+.aj-as-story .bottom .get {
+  margin-left: auto;
+  height: 30px; padding: 0 16px; border-radius: 999px; border: 0;
+  background: rgba(255,255,255,0.18); color: #FFF;
+  font-weight: 700; font-size: 13px; text-transform: uppercase;
+  letter-spacing: 0.04em; cursor: pointer; backdrop-filter: blur(8px);
+}
+
+/* Recent-search row (App Store search recents) */
+.aj-as-rec {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  font-size: 15px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+}
+.aj-screen.light .aj-as-rec { border-bottom-color: rgba(0,0,0,0.08); }
+.aj-as-rec:last-child { border-bottom: 0; }
+.aj-as-rec .icn { opacity: 0.5; flex: 0 0 20px; }
+.aj-as-rec .lbl { flex: 1; }
+.aj-as-rec .x { opacity: 0.4; }
+
+/* Star rating row (App Store style) — used for Quality score */
+.aj-as-rating {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+}
+.aj-as-rating .big {
+  font-size: 44px; font-weight: 800; letter-spacing: -0.04em;
+  line-height: 1; color: inherit;
+}
+.aj-as-rating .stars {
+  display: flex; gap: 2px; color: #FCB132; margin-bottom: 4px;
+}
+.aj-as-rating .out { font-size: 11px; opacity: 0.55;
+  font-family: "JetBrains Mono", ui-monospace, monospace; letter-spacing: 0.06em; }
+
+/* Tab nav (App Store bottom tabs already in aj-tabbar, plus a header-tab variant) */
+.aj-as-tabs {
+  display: flex; gap: 24px; padding: 0 20px 8px;
+  font-size: 14px; font-weight: 600;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+.aj-screen.light .aj-as-tabs { border-bottom-color: rgba(0,0,0,0.08); }
+.aj-as-tabs .tab { padding: 10px 0; opacity: 0.5; cursor: pointer; position: relative; }
+.aj-as-tabs .tab.on { opacity: 1; }
+.aj-as-tabs .tab.on::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; background: #FCB132; border-radius: 2px;
+}
+
+/* Editor's review block (App Store "Editor's Notes" style) */
+.aj-as-review {
+  margin: 0 16px 16px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.05);
+  border: 0.5px solid rgba(255,255,255,0.08);
+}
+.aj-screen.light .aj-as-review {
+  background: rgba(255,255,255,0.65);
+  border-color: rgba(0,0,0,0.06);
+}
+.aj-as-review .head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.aj-as-review .head .av {
+  width: 30px; height: 30px; border-radius: 999px;
+  background: #FCB132; color: #07090C;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+}
+.aj-as-review .head .nm { font-size: 13px; font-weight: 600; }
+.aj-as-review .head .ts { font-size: 11px; opacity: 0.55; margin-left: auto;
+  font-family: "JetBrains Mono", ui-monospace, monospace; }
+.aj-as-review .body { font-size: 13.5px; line-height: 1.55; }
+
+/* Screenshot strip (App Store horizontal preview rail) */
+.aj-as-shots {
+  display: flex; gap: 10px;
+  padding: 0 16px 16px;
+  overflow-x: auto;
+}
+.aj-as-shots .shot {
+  flex: 0 0 220px;
+  height: 156px; border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  padding: 12px; font-size: 11px; line-height: 1.45;
+  display: flex; flex-direction: column; gap: 6px;
+  position: relative; overflow: hidden;
+}
+.aj-as-shots .shot .head { display: flex; align-items: center; justify-content: space-between;
+  font: 600 9px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.2em; opacity: 0.6; }
+.aj-as-shots .shot .ttl { font-size: 13px; font-weight: 600; }
+.aj-as-shots .shot .body { opacity: 0.7; font-size: 11px; }
+.aj-screen.light .aj-as-shots .shot {
+  background: rgba(255,255,255,0.7);
+  border-color: rgba(0,0,0,0.06);
+}
+
+/* iPad: App-Store-style section that's wider */
+.aj-pad .as-pad-h {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 4px 4px 14px;
+}
+.aj-pad .as-pad-h .label {
+  font: 700 11px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: #FCB132; opacity: 0.95; margin-bottom: 6px;
+}
+.aj-pad .as-pad-h h2 {
+  margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.025em;
+}
+.aj-pad .as-pad-h .more {
+  font-size: 15px; color: #FCB132; font-weight: 500; display: flex; align-items: center; gap: 4px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+ * LIQUID GLASS · v2 — Apple-style lensing layer for AJIN Mobile.
+ * Adds specular highlights, layered blur depth, and refraction tint
+ * on top of every .aj-glass surface. Scoped to .aj-mobile so it
+ * never bleeds into the web app or design canvas chrome.
+ * ═══════════════════════════════════════════════════════════════ */
+
+.aj-mobile { --lg-tint: 252, 177, 50; }
+
+/* Stronger, more transparent base glass with two-tone tint */
+.aj-mobile .aj-glass {
+  background:
+    var(--lg-tint);
+  backdrop-filter: blur(34px) saturate(180%) brightness(1.05);
+  -webkit-backdrop-filter: blur(34px) saturate(180%) brightness(1.05);
+  border: 0.5px solid transparent;
+  background-clip: padding-box;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.18) inset,
+    0 -1px 0 rgba(255,255,255,0.04) inset,
+    0 14px 40px -16px rgba(0,0,0,0.55),
+    0 4px 12px -6px rgba(0,0,0,0.35);
+  isolation: isolate;
+}
+.aj-mobile .aj-glass::before {
+  /* specular top edge — the Apple "wet glass" highlight */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background:
+    rgba(255,255,255,0.55) top/100% 1.5px no-repeat,
+    rgba(255,255,255,0.18) bottom/100% 1.5px no-repeat;
+  mix-blend-mode: screen; opacity: 0.9;
+}
+.aj-mobile .aj-glass::after {
+  /* lens-flare sheen across the surface */
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background:
+    var(--lg-tint);
+  mix-blend-mode: screen; opacity: 0.85;
+}
+.aj-mobile .aj-glass > * { position: relative; z-index: 1; }
+
+/* Light mode — invert the lensing logic for cream backdrops */
+.aj-mobile .aj-screen.light .aj-glass {
+  background:
+    var(--lg-tint);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.95) inset,
+    0 -0.5px 0 rgba(30,20,10,0.06) inset,
+    0 10px 28px -14px rgba(60,40,10,0.18),
+    0 2px 8px -4px rgba(60,40,10,0.10);
+}
+.aj-mobile .aj-screen.light .aj-glass::before {
+  background:
+    rgba(255,255,255,1) top/100% 1px no-repeat;
+  mix-blend-mode: normal; opacity: 0.7;
+}
+.aj-mobile .aj-screen.light .aj-glass::after {
+  background:
+    var(--lg-tint);
+  mix-blend-mode: normal; opacity: 0.6;
+}
+
+/* Liquid Glass nav / tab bar — pill with refractive edge */
+.aj-mobile .aj-tabbar,
+.aj-mobile [class*="aj-nav"] {
+  backdrop-filter: blur(38px) saturate(200%);
+  -webkit-backdrop-filter: blur(38px) saturate(200%);
+  background:
+    var(--lg-tint) !important;
+  border: 0.5px solid rgba(255,255,255,0.18) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.22) inset,
+    0 18px 48px -18px rgba(0,0,0,0.55) !important;
+}
+
+/* Buttons — primary becomes glass capsule with inner gold core */
+.aj-mobile .aj-btn.primary {
+  background:
+    rgba(255,255,255,0.45);
+  border: 0.5px solid rgba(255,255,255,0.35);
+  color: #1a1206;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.6) inset,
+    0 -1px 0 rgba(120,75,10,0.25) inset,
+    0 10px 24px -10px rgba(252,177,50,0.55);
+}
+.aj-mobile .aj-btn.ghost {
+  background:
+    rgba(255,255,255,0.08);
+  border: 0.5px solid rgba(255,255,255,0.16);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset;
+  backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* Chips — refractive pebbles */
+.aj-mobile .aj-chip {
+  background:
+    rgba(255,255,255,0.10);
+  border: 0.5px solid rgba(255,255,255,0.14);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.16) inset;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+.aj-mobile .aj-chip.gold {
+  background:
+    rgba(255,225,160,0.55);
+  color: #1a1206; border-color: rgba(255,255,255,0.4);
+}
+.aj-mobile .aj-screen.light .aj-chip {
+  background:
+    rgba(255,255,255,0.95);
+  border-color: rgba(30,20,10,0.10);
+  box-shadow: 0 1px 0 rgba(255,255,255,1) inset, 0 1px 3px rgba(60,40,10,0.08);
+}
+
+/* App-Store cards — heightened lensing on hero / story */
+.aj-mobile .aj-as-story,
+.aj-mobile .aj-as-hero {
+  position: relative;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.18) inset,
+    0 24px 60px -22px rgba(0,0,0,0.6),
+    0 6px 16px -8px rgba(0,0,0,0.4);
+}
+.aj-mobile .aj-as-story::after,
+.aj-mobile .aj-as-hero::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background:
+    rgba(255,255,255,0.10);
+  mix-blend-mode: screen;
+}
+
+/* Status bar / Dynamic Island visual context — soften the screen bg */
+.aj-mobile .aj-screen {
+  background-attachment: fixed;
+}
+
+/* iOS list rows — Liquid Glass divider style */
+.aj-mobile .aj-divlist > *:not(:last-child) {
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+}
+.aj-mobile .aj-screen.light .aj-divlist > *:not(:last-child) {
+  border-bottom: 0.5px solid rgba(20,15,5,0.06);
+}
+
+/* Search field — concave glass */
+.aj-mobile .aj-search {
+  background:
+    rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.10);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.10) inset,
+    0 -1px 0 rgba(0,0,0,0.20) inset;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+.aj-mobile .aj-screen.light .aj-search {
+  background:
+    rgba(20,15,5,0.06);
+  border-color: rgba(20,15,5,0.10);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset;
+}
+
+/* ===========================================================================
+   2026-05-28 — 사용자 모바일 피드백: 다크/라이트 토글 통합.
+   ---------------------------------------------------------------------------
+   React 컴포넌트들이 className="aj-screen dark" 를 hardcode 하고 있어 토글
+   설정과 무관하게 강제 dark 였음. data-theme="light" 일 때 hardcoded .dark
+   변형을 .light 색상으로 cascade override. 모든 모바일 페이지 (Chat /
+   Compliance / Equipment / Admin / Search) 코드 변경 없이 즉시 반영.
+   useThemeStore.setPreference('light'|'dark'|'auto') 가 html data-theme
+   attribute 를 설정함.
+   =========================================================================== */
+html[data-theme="light"] .aj-mobile .aj-screen.dark {
+  background: #F2EFE9;
+  color: #1B1B1B;
+}
+html[data-theme="light"] .aj-mobile .aj-bg-grad.dark {
+  background:
+    radial-gradient(60% 40% at 12% 8%, rgba(252,177,50,0.30), transparent 70%),
+    radial-gradient(50% 36% at 92% 88%, rgba(111,177,252,0.20), transparent 70%),
+    linear-gradient(180deg, #FAF6EE 0%, #EFE8DA 100%);
+}
+html[data-theme="light"] .aj-mobile .aj-screen.dark .aj-glass {
+  background: rgba(255,255,255,0.82);
+  border-color: rgba(28,22,12,0.08);
+  box-shadow: 0 6px 22px -10px rgba(20,15,5,0.18), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+html[data-theme="light"] .aj-mobile .aj-screen.dark .aj-mono {
+  color: rgba(0,0,0,0.5);
+}
+html[data-theme="light"] .aj-mobile .aj-screen.dark .aj-chip {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.75);
+}
+html[data-theme="light"] .aj-mobile .aj-screen.dark .aj-chip.gold {
+  background: var(--aj-gold-soft, rgba(252,177,50,0.18));
+  border-color: rgba(252,177,50,0.45);
+  color: #5C3A00;
+}
+html[data-theme="light"] .aj-mobile .aj-screen.dark .aj-kpi .k {
+  color: rgba(0,0,0,0.5);
+}
+html[data-theme="light"] .aj-mobile .aj-screen.dark .aj-kpi .v {
+  color: #1B1B1B;
+}

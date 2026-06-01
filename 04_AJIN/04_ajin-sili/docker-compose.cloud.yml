@@ -1,0 +1,122 @@
+# AJIN Compliance — Phase 1.5 / Phase 2 Cloud override.
+#
+# 사용 (NVIDIA GPU 환경 — AWS ECS GPU instance, GCP Cloud Run for GPU, 사내 NVIDIA 서버):
+#   docker compose -f docker-compose.yml -f docker-compose.cloud.yml up -d
+#
+# Phase 2 변경 (LLM 풀 분리):
+#   • ollama-large (qwen3.5:9b) + ollama-fast (gemma4:e2b · qwen3.5:4b · bge-m3) 두 service
+#   • backend 가 OLLAMA_BASE_URL_LARGE / _FAST 로 라우팅 (config.py LLM_FEATURE_ROUTES)
+#   • OLLAMA_BASE_URL 은 LARGE 로 폴백 → Phase 1 호환
+#   • postgres 활성 (Phase 3 sqlite → PG 마이그 시)
+
+services:
+  ollama-large:
+    image: ollama/ollama:latest
+    container_name: ajin-ollama-large
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ollama-large-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    networks: [ajin_net]
+    restart: unless-stopped
+
+  ollama-fast:
+    image: ollama/ollama:latest
+    container_name: ajin-ollama-fast
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ollama-fast-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    networks: [ajin_net]
+    restart: unless-stopped
+
+  # LARGE 모델 사전 pull (1회 실행 후 자동 종료)
+  ollama-large-init:
+    image: ollama/ollama:latest
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        sleep 5
+        for m in qwen3.5:9b; do
+          echo "→ pull (large) $$m"
+          ollama --host http://ollama-large:11434 pull "$$m" || true
+        done
+    depends_on:
+      ollama-large:
+        condition: service_healthy
+    networks: [ajin_net]
+    restart: "no"
+
+  # FAST 모델 + 임베딩 사전 pull
+  ollama-fast-init:
+    image: ollama/ollama:latest
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        sleep 5
+        for m in gemma4:e2b qwen3.5:4b bge-m3; do
+          echo "→ pull (fast) $$m"
+          ollama --host http://ollama-fast:11434 pull "$$m" || true
+        done
+    depends_on:
+      ollama-fast:
+        condition: service_healthy
+    networks: [ajin_net]
+    restart: "no"
+
+  backend:
+    environment:
+      # Phase 2 — feature 별 라우팅
+      OLLAMA_BASE_URL_LARGE: http://ollama-large:11434
+      OLLAMA_BASE_URL_FAST: http://ollama-fast:11434
+      # 미등록 feature / 기존 호출처 폴백 — LARGE 로 (Phase 1 동작 호환)
+      OLLAMA_BASE_URL: http://ollama-large:11434
+    depends_on:
+      ollama-large:
+        condition: service_healthy
+      ollama-fast:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ─── Phase 3 — PostgreSQL 활성 (sqlite → PG 마이그) ────────
+  # postgres:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_DB: ajin
+  #     POSTGRES_USER: ajin
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD 필요}
+  #   volumes:
+  #     - pg-data:/var/lib/postgresql/data
+  #   networks: [ajin_net]
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ajin"]
+  #     interval: 5s
+  #     retries: 10
+
+volumes:
+  ollama-large-models:
+  ollama-fast-models:
+  # pg-data:

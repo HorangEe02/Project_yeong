@@ -1,0 +1,33 @@
+{
+  "scope": "common",
+  "description": "부서·직급 무관 공통 — Quick Questions 6개 슬롯 중 상단 3개 차지",
+  "questions": [
+    {
+      "id": "cmn-today-schedule",
+      "label": "오늘 일정",
+      "promptText": "오늘 내 일정과 회의 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["일정", "캘린더"]
+    },
+    {
+      "id": "cmn-notice-latest",
+      "label": "사내 공지 최신",
+      "promptText": "사내 공지사항 최근 5건 보여줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["공지", "사내정보"]
+    },
+    {
+      "id": "cmn-chatbot-help",
+      "label": "챗봇 사용법",
+      "promptText": "AI 챗봇으로 무엇을 할 수 있는지 알려줘",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["가이드", "도움말"]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{# 2차 협력사 수신 이메일 양식 #}
+
+수신: {{ supplier_name }} {{ recipient_name }} {{ recipient_title }}
+발신: 아진산업(주) {{ sender_department }} {{ sender_name }}
+일자: {{ date }}
+제목: [아진산업] {{ subject }}
+
+{{ recipient_name }} {{ recipient_title }},
+
+안녕하세요, 아진산업 {{ sender_department }} {{ sender_name }}입니다.
+
+{{ main_body }}
+
+{% if request_items %}
+■ 협조 요청 사항
+{% for req in request_items %}
+  {{ loop.index }}. {{ req }}
+{% endfor %}
+{% endif %}
+
+{% if deadline %}
+■ 회신 기한: {{ deadline }}
+{% endif %}
+
+원활한 업무 진행을 위해 협조 부탁드립니다.
+감사합니다.
+
+─────────────────────────────
+아진산업(주) {{ sender_department }}
+{{ sender_name }}
+─────────────────────────────

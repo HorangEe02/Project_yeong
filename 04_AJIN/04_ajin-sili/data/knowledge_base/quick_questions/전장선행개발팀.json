@@ -1,0 +1,61 @@
+{
+  "department": "전장선행개발팀",
+  "division": "기술연구소",
+  "description": "전동화 부품(EWP·CCH)·열관리·AI 안전시스템·미래차/스마트팩토리 융합 선행 연구",
+  "questions": [
+    {
+      "id": "ee-rd-ewp",
+      "label": "EWP 개발",
+      "promptText": "전동워터펌프(EWP) 개발 진행 현황과 검증 단계",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["EWP", "전동화"]
+    },
+    {
+      "id": "ee-rd-cch",
+      "label": "CCH 개발",
+      "promptText": "CCH(쿨링체인히터) 사양 검토와 시험 결과",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["CCH", "열관리"]
+    },
+    {
+      "id": "ee-rd-thermal",
+      "label": "열해석",
+      "promptText": "전장 부품 열해석 표준 셋업 방법",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["열해석", "시뮬레이션"]
+    },
+    {
+      "id": "ee-rd-ai-safety",
+      "label": "AI 안전시스템",
+      "promptText": "AI 기반 공장 안전시스템 연구 현황",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["AI", "안전"]
+    },
+    {
+      "id": "ee-rd-future-mobility",
+      "label": "미래차 트렌드",
+      "promptText": "미래 모빌리티 기술 트렌드와 사내 적용 방향",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["미래차", "트렌드"]
+    },
+    {
+      "id": "ee-rd-smart-factory",
+      "label": "스마트팩토리 연구",
+      "promptText": "스마트팩토리 융합 연구과제 진행 현황",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["스마트팩토리", "연구"]
+    }
+  ]
+}

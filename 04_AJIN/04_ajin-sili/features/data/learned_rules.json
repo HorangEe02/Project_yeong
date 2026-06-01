@@ -1,0 +1,47 @@
+{
+  "auto_added_departments": [
+    {
+      "department": "새부서",
+      "occurrences": 6,
+      "applied_at": "2026-05-17T19:11:50.205120"
+    },
+    {
+      "department": "새부서",
+      "occurrences": 6,
+      "applied_at": "2026-05-17T19:43:01.769697"
+    },
+    {
+      "department": "새부서",
+      "occurrences": 6,
+      "applied_at": "2026-05-17T20:06:46.914092"
+    },
+    {
+      "department": "새부서",
+      "occurrences": 6,
+      "applied_at": "2026-05-17T20:21:01.012723"
+    },
+    {
+      "department": "새부서",
+      "occurrences": 6,
+      "applied_at": "2026-05-17T20:46:06.105668"
+    },
+    {
+      "department": "새부서",
+      "occurrences": 6,
+      "applied_at": "2026-05-17T20:49:11.250083"
+    },
+    {
+      "department": "새부서",
+      "occurrences": 6,
+      "applied_at": "2026-05-17T20:50:26.952598"
+    },
+    {
+      "department": "새부서",
+      "occurrences": 6,
+      "applied_at": "2026-05-17T20:57:06.476048"
+    }
+  ],
+  "fewshot_legal_class": [],
+  "last_updated_at": "2026-05-17T20:57:06.476053",
+  "window_days": 30
+}

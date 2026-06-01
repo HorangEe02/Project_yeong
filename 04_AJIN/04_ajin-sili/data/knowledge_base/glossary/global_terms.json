@@ -1,0 +1,107 @@
+{
+  "citation_id": "GLOSSARY-global_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "category": "글로벌/HMGMA 용어",
+  "terms": [
+    {
+      "term": "HMGMA",
+      "full_name": "Hyundai Motor Group Metaplant America",
+      "korean_name": "현대차 메타플랜트 아메리카",
+      "category": "글로벌/HMGMA",
+      "definition": "현대자동차그룹이 미국 조지아주 엘라벨에 건설한 전기차 전용 공장입니다. 76억 달러를 투자하여 연간 30만대 생산 규모이며, Ioniq 5/9, Genesis GV70 EV 등을 생산합니다.",
+      "ajin_context": "아진산업 JOON INC가 HMGMA의 1차 협력사로 선정되어 EWP, CCH, EV Body Parts를 독점 공급합니다. 아진산업 최대 규모 해외 프로젝트입니다.",
+      "related_terms": ["JOON INC", "EWP", "CCH", "IRA"],
+      "departments_involved": ["기술영업팀", "해외지원팀", "품질보증팀"],
+      "difficulty": "beginner",
+      "tags": ["HMGMA", "현대차", "조지아", "전기차", "메타플랜트"]
+    },
+    {
+      "term": "JOON INC",
+      "full_name": "JOON INC",
+      "korean_name": "준 주식회사",
+      "category": "글로벌/HMGMA",
+      "definition": "아진산업이 2024년 미국 조지아주 Statesboro에 설립한 현지법인입니다. $3.12억 투자, 630명 고용 목표의 아진산업 최대 해외 투자 프로젝트입니다.",
+      "ajin_context": "HMGMA 전용 EV 부품 공급을 위해 설립. EWP(전동워터펌프), CCH(쿨링채널하우징), EV Body Parts를 생산합니다.",
+      "related_terms": ["HMGMA", "EWP", "CCH", "AJIN USA"],
+      "departments_involved": ["해외지원팀", "기술영업팀", "품질보증팀"],
+      "difficulty": "beginner",
+      "tags": ["JOON", "조지아", "미국법인", "해외공장"]
+    },
+    {
+      "term": "IRA",
+      "full_name": "Inflation Reduction Act",
+      "korean_name": "인플레이션감축법",
+      "category": "글로벌/무역",
+      "definition": "2022년 미국에서 제정된 법률로, 전기차 세액공제($7,500)의 조건으로 북미 최종 조립, 배터리/핵심광물 북미 조달 비율 등을 요구합니다.",
+      "ajin_context": "IRA로 인해 현대차가 미국 현지 생산(HMGMA)을 결정했고, 아진산업도 JOON INC를 설립하여 현지 부품 공급 체계를 구축했습니다. IRA 준수는 HMGMA 납품의 전제조건입니다.",
+      "related_terms": ["HMGMA", "JOON INC", "USMCA", "Section 30D"],
+      "departments_involved": ["기술영업팀", "해외지원팀", "ESG경영팀"],
+      "difficulty": "intermediate",
+      "tags": ["IRA", "인플레이션감축법", "세액공제", "전기차", "미국"]
+    },
+    {
+      "term": "KMMG",
+      "full_name": "Kia Motors Manufacturing Georgia",
+      "korean_name": "기아 조지아 공장",
+      "category": "글로벌/HMGMA",
+      "definition": "기아자동차의 미국 조지아주 West Point 생산공장입니다. Telluride, Sorento, K5 등을 생산합니다.",
+      "ajin_context": "AJIN USA(앨라배마)가 KMMG에 차체 부품을 공급하는 1차 협력사입니다.",
+      "related_terms": ["HMMA", "AJIN USA", "HMGMA"],
+      "departments_involved": ["기술영업팀"],
+      "difficulty": "beginner",
+      "tags": ["KMMG", "기아", "조지아", "미국"]
+    },
+    {
+      "term": "HMMA",
+      "full_name": "Hyundai Motor Manufacturing Alabama",
+      "korean_name": "현대차 앨라배마 공장",
+      "category": "글로벌/HMGMA",
+      "definition": "현대자동차의 미국 앨라배마주 Montgomery 생산공장입니다. Tucson, Santa Cruz, Elantra 등을 생산합니다.",
+      "ajin_context": "AJIN USA(앨라배마)가 HMMA에 차체/무빙 부품을 공급하는 1차 협력사입니다.",
+      "related_terms": ["KMMG", "AJIN USA"],
+      "departments_involved": ["기술영업팀"],
+      "difficulty": "beginner",
+      "tags": ["HMMA", "현대차", "앨라배마", "미국"]
+    },
+    {
+      "term": "SDF",
+      "full_name": "Software Defined Factory",
+      "korean_name": "소프트웨어 정의 공장",
+      "category": "글로벌/HMGMA",
+      "definition": "HMGMA가 도입한 차세대 스마트팩토리 개념입니다. 소프트웨어로 생산라인을 유연하게 재구성할 수 있어, 다품종 전기차를 하나의 라인에서 생산합니다.",
+      "ajin_context": "JOON INC는 HMGMA의 SDF 체계에 맞춰 JIT(Just-In-Time) 및 JIS(Just-In-Sequence) 납품 시스템을 구축해야 합니다.",
+      "related_terms": ["HMGMA", "스마트팩토리", "JIT", "JIS"],
+      "departments_involved": ["생산관리팀", "IT전략팀", "해외지원팀"],
+      "difficulty": "advanced",
+      "tags": ["SDF", "스마트팩토리", "소프트웨어", "HMGMA"]
+    },
+    {
+      "term": "USMCA",
+      "full_name": "United States-Mexico-Canada Agreement",
+      "korean_name": "미국-멕시코-캐나다 협정",
+      "category": "글로벌/무역",
+      "definition": "NAFTA를 대체한 북미 3국 무역협정입니다. 자동차 부품의 역내가치 비율 75%를 충족해야 관세 면제 혜택을 받습니다.",
+      "ajin_context": "JOON INC와 AJIN USA에서 생산하는 부품의 원산지 관리에 직접 영향. 한국산 원자재 사용 비율을 관리하여 USMCA 준수 여부를 확인해야 합니다.",
+      "related_terms": ["IRA", "관세", "원산지증명"],
+      "departments_involved": ["해외지원팀", "구매팀", "ESG경영팀"],
+      "difficulty": "intermediate",
+      "tags": ["USMCA", "무역협정", "북미", "관세", "원산지"]
+    },
+    {
+      "term": "AEO",
+      "full_name": "Authorized Economic Operator",
+      "korean_name": "수출입안전관리우수업체",
+      "category": "글로벌/무역",
+      "definition": "관세청이 인증하는 수출입 안전관리 우수업체 제도입니다. AAA등급은 최고 등급으로 통관 우대를 받습니다.",
+      "ajin_context": "아진산업은 AEO AAA등급을 보유하고 있어 수출입 통관 시 검사 면제 등 혜택을 받습니다.",
+      "related_terms": ["관세", "수출입", "통관"],
+      "departments_involved": ["해외지원팀", "구매팀"],
+      "difficulty": "intermediate",
+      "tags": ["AEO", "관세", "수출입", "인증"]
+    }
+  ]
+}

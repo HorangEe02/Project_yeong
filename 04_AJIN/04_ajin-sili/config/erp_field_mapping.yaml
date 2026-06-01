@@ -1,0 +1,16 @@
+# ERP CSV → EmployeeRecord 컬럼 매핑 (Sprint 1 P0).
+# 키: EmployeeRecord 의 dataclass 필드 / 값: CSV 헤더 이름.
+# 사내 ERP 의 컬럼 이름이 다를 경우 이 파일만 수정.
+# 환경변수 AJIN_ERP_FIELD_MAPPING 로 경로 오버라이드 가능.
+
+canonical_id: canonical_id
+name: name
+email: email
+phone: phone
+department: department
+division: division
+position: position
+position_level: position_level
+plant: plant
+hire_date: hire_date
+is_active: is_active

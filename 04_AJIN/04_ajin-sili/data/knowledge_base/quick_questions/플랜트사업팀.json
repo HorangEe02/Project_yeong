@@ -1,0 +1,61 @@
+{
+  "department": "플랜트사업팀",
+  "division": "생산기술본부",
+  "description": "공장 건축~설비 설치·시운전 통합 프로젝트 관리",
+  "questions": [
+    {
+      "id": "plant-project-list",
+      "label": "플랜트 프로젝트",
+      "promptText": "현재 진행 중인 공장 건설/증설 프로젝트 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["플랜트", "프로젝트"]
+    },
+    {
+      "id": "plant-layout-review",
+      "label": "레이아웃 검토",
+      "promptText": "공장 레이아웃 검토 절차와 체크포인트",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["레이아웃", "설계"]
+    },
+    {
+      "id": "plant-construction-safety",
+      "label": "건설 안전",
+      "promptText": "공장 건설 현장 안전 관리 절차",
+      "category": "scenario",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["안전", "건설"]
+    },
+    {
+      "id": "plant-installation-test",
+      "label": "설비 시운전",
+      "promptText": "신규 설비 설치 후 시운전 체크리스트",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["시운전", "설치"]
+    },
+    {
+      "id": "plant-cost-tracking",
+      "label": "프로젝트 원가",
+      "promptText": "프로젝트 진행률과 누적 원가 집행률",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["원가", "진행률"]
+    },
+    {
+      "id": "plant-handover",
+      "label": "프로젝트 인수인계",
+      "promptText": "준공 후 운영팀 인수인계 표준 절차",
+      "category": "sop",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["인수인계", "준공"]
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "department": "용기운영팀",
+  "division": "생산기술본부",
+  "description": "납품용기 설계·개발·제작·물류 효율 최적화",
+  "questions": [
+    {
+      "id": "container-design",
+      "label": "용기 설계",
+      "promptText": "신규 부품용 납품용기 설계 표준 절차",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["용기", "설계"]
+    },
+    {
+      "id": "container-stock",
+      "label": "용기 재고",
+      "promptText": "현재 사내 용기 재고 현황과 부족 품목",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["재고", "용기"]
+    },
+    {
+      "id": "container-customer-spec",
+      "label": "고객 용기 사양",
+      "promptText": "현대·기아 납품용기 사양서 검색",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["고객", "사양"]
+    },
+    {
+      "id": "container-damage",
+      "label": "용기 파손",
+      "promptText": "용기 파손/분실 발생 시 처리 절차",
+      "category": "scenario",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["파손", "처리"]
+    },
+    {
+      "id": "container-logistics",
+      "label": "물류 효율",
+      "promptText": "용기 회전율·적재 효율 분석 보고서",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["물류", "회전율"]
+    },
+    {
+      "id": "container-cost",
+      "label": "용기 단가 절감",
+      "promptText": "용기 제작 단가 절감 방안 검토",
+      "category": "scenario",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["원가", "단가"]
+    }
+  ]
+}

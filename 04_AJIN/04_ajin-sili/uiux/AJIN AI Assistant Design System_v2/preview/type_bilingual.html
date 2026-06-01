@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body{padding:20px;background:#0A0E14;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .ex{padding:14px;border:1px solid #2A2520;background:#111820;}
+  .en{font-size:13px;font-weight:700;color:#FCB132;letter-spacing:0.12em;text-transform:uppercase;}
+  .ko{font-size:13px;color:#D5CFC5;margin-top:4px;}
+  .stacked .ko{display:block;}
+  .inline{display:flex;align-items:baseline;gap:10px;}
+  .inline .ko{margin-top:0;}
+  .meta{font-size:10px;letter-spacing:0.1em;color:#8A8276;text-transform:uppercase;margin-bottom:8px;}
+</style></head>
+<body><div class="grid">
+  <div class="ex stacked"><div class="meta">STACKED</div><div class="en">CORE MODULES</div><div class="ko">핵심 모듈</div></div>
+  <div class="ex stacked"><div class="meta">STACKED</div><div class="en">SYSTEM REGISTRY</div><div class="ko">시스템 등록 현황</div></div>
+  <div class="ex"><div class="meta">INLINE</div><div class="inline"><span class="en">QUERY RESULTS</span><span class="ko">검색 결과</span></div></div>
+  <div class="ex"><div class="meta">INLINE · TAB</div><div class="inline"><span class="en">INTERNAL</span><span class="ko">내부용</span></div></div>
+</div></body></html>

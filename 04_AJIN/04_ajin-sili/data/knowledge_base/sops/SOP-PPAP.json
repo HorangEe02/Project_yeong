@@ -1,0 +1,135 @@
+{
+  "sop_id": "SOP-PPAP",
+  "title": "PPAP(생산부품승인절차) 진행",
+  "department": "부품개발팀",
+  "category": "품질",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "설계 도면 및 사양서 접수",
+      "description": "완성차로부터 도면(2D/3D), 사양서, ECR/ECN 접수. 도면 번호·리비전·소재 규격 확인.",
+      "checklist": [
+        "도면 번호 및 리비전 확인",
+        "소재 규격(SPFC, SAPH 등) 확인",
+        "변경 이력(ECR/ECN) 기록",
+        "관련 부서에 도면 배포"
+      ],
+      "caution": "도면 리비전이 최신인지 반드시 확인 — 구 리비전 진행 시 전체 재작업",
+      "related_terms": [
+        "ECR",
+        "ECN",
+        "리비전"
+      ],
+      "estimated_time": "1일",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 2,
+      "title": "공정 FMEA 작성",
+      "description": "생산기술팀 주관, 각 공정별 잠재 고장모드·영향·원인 분석, RPN 산출.",
+      "checklist": [
+        "공정 흐름도 최신화",
+        "잠재 고장모드 식별",
+        "심각도(S)×발생도(O)×검출도(D)=RPN 계산",
+        "RPN 100 이상 개선 계획 수립"
+      ],
+      "caution": "FMEA는 Control Plan과 반드시 연동 — 항목 불일치 시 SQ 반려",
+      "related_terms": [
+        "FMEA",
+        "RPN",
+        "고장모드"
+      ],
+      "estimated_time": "3~5일",
+      "responsible": "생산기술팀",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 3,
+      "title": "관리계획서(Control Plan) 작성",
+      "description": "품질보증팀 주관. FMEA 관리 항목을 공정별 정리, 측정 방법·빈도·반응 계획 명시.",
+      "checklist": [
+        "FMEA 주요 항목 전수 반영",
+        "측정 방법·게이지 번호 기재",
+        "샘플링 주기 명시",
+        "이상 시 반응 계획 기재"
+      ],
+      "caution": "Control Plan과 FMEA 항목 1:1 미매핑 → 승인 반려 사유",
+      "related_terms": [
+        "Control Plan",
+        "측정시스템",
+        "게이지"
+      ],
+      "estimated_time": "2~3일",
+      "responsible": "품질보증팀",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 4,
+      "title": "시작품 제작 및 치수 측정",
+      "description": "양산 금형/설비로 시작품 제작, 도면 공차 기준 측정 수행.",
+      "checklist": [
+        "양산 조건과 동일 조건으로 제작",
+        "CMM/게이지로 주요 치수 측정",
+        "측정 데이터 기록(Balloon Drawing 대비)",
+        "외관 검사(크랙, 주름, 스프링백)"
+      ],
+      "caution": "양산 라인에서 제작 필수 — 시작 금형/별도 라인 SQ 미인정",
+      "related_terms": [
+        "CMM",
+        "시작품",
+        "Balloon Drawing"
+      ],
+      "estimated_time": "2~3일",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 5,
+      "title": "PPAP 서류 패키지 구성 및 제출",
+      "description": "PPAP 18개 항목(레벨 따라 일부 생략 가능) 패키지 구성하여 SQ 제출.",
+      "checklist": [
+        "PSW 작성",
+        "치수 측정 결과 첨부",
+        "재료 시험 성적서 첨부",
+        "공정 FMEA+CP+Flow 첨부",
+        "MSA 결과 첨부",
+        "SPC 초기 Cpk 첨부"
+      ],
+      "caution": "현대차 SQ: 제출 후 10영업일 내 회신, 2회 반려 시 긴급 회의 소집",
+      "related_terms": [
+        "PSW",
+        "MSA",
+        "Cpk"
+      ],
+      "estimated_time": "1~2일",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    }
+  ],
+  "prerequisites": [
+    "도면/사양서 접수 완료",
+    "양산 금형 제작 완료",
+    "측정 장비 교정 완료"
+  ],
+  "safety_warnings": [
+    "시작품은 반드시 양산 라인에서 제작 — 별도 라인 사용 시 SQ 미인정"
+  ],
+  "related_sops": [
+    "SOP-ECN"
+  ],
+  "citation_id": "SOP-PPAP",
+  "owner_department": "품질보증팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "title_en": "PPAP (Production Part Approval Process)",
+  "department_en": "QA Team",
+  "category_en": "Quality"
+}

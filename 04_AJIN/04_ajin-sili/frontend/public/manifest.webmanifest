@@ -1,0 +1,21 @@
+{
+  "name": "AJIN AI Assistant — Field Mode",
+  "short_name": "AJIN Field",
+  "description": "아진산업 설비 AI 현장 모드 — Cpk · Nelson 8 · 금형 알람.",
+  "start_url": "/equipment/field",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d10",
+  "theme_color": "#003366",
+  "icons": [
+    {
+      "src": "/logos/ajin_symbol.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "ko-KR"
+}

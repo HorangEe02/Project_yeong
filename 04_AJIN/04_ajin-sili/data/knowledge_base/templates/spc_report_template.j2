@@ -1,0 +1,73 @@
+{# usage_hint: "통계적 공정 관리(SPC) 분석 결과를 공정/품질팀에 정기 보고. Cp/Cpk, Nelson Rules" #}
+{# dept_recommend: ["품질관리팀", "생산기술팀", "품질보증팀"] #}
+{# required_vars: ["process", "period"] #}
+{# optional_vars: ["part_number", "characteristic", "sample_size", "cp", "cpk", "nelson_violations", "conclusion"] #}
+{# example_output: "EWP-001 회로 보호 다이오드 SPC / 2026-04 / Cpk 1.42 (수용) / Nelson Rule 1 위반 0건" #}
+{# var_metadata:
+  - {name: "process", label_ko: "공정명", required: true, group: "기본", placeholder: "예: 프레스 1라인 / 도장 2라인"}
+  - {name: "part_number", label_ko: "부품 번호", required: false, group: "기본", placeholder: "예: EWP-001"}
+  - {name: "characteristic", label_ko: "측정 특성", required: false, group: "내용", placeholder: "예: 외경 ø8.0 ± 0.05"}
+  - {name: "period", label_ko: "분석 기간", required: true, group: "일정", placeholder: "예: 2026-04 (4/1 ~ 4/30)"}
+  - {name: "sample_size", label_ko: "샘플 수", required: false, group: "내용", placeholder: "예: n=125 (5개 × 25 부분군)"}
+  - {name: "cp", label_ko: "Cp", required: false, group: "내용", placeholder: "예: 1.58"}
+  - {name: "cpk", label_ko: "Cpk", required: false, group: "내용", placeholder: "예: 1.42 (수용 기준 1.33 이상)"}
+  - {name: "nelson_violations", label_ko: "Nelson Rules 위반", required: false, group: "내용", placeholder: "예: Rule 1: 0건 / Rule 2: 1건"}
+  - {name: "conclusion", label_ko: "결론", required: false, group: "내용", placeholder: "공정 안정 / 보완 필요 / 즉시 정지"}
+#}
+
+# SPC 분석 보고서
+
+**공정**: {{ process }}
+**부품 번호**: {{ part_number | default("(부품 번호)") }}
+**측정 특성**: {{ characteristic | default("(특성 + 공차)") }}
+**분석 기간**: {{ period }}
+**샘플 수**: {{ sample_size | default("(n)") }}
+
+---
+
+## 1. 공정 능력 지수 (Process Capability)
+
+| 지표 | 값 | 판정 | 비고 |
+|---|---:|:-:|---|
+| Cp (잠재 능력) | {{ cp | default("—") }} | — | 1.33 이상 수용 |
+| Cpk (실제 능력) | {{ cpk | default("—") }} | — | 1.33 이상 수용 / 1.67 이상 우수 |
+| 표준편차 σ | — | — | — |
+| 평균 (X̄) | — | — | — |
+
+## 2. Nelson 8 Rules 검증
+
+| Rule | 정의 | 위반 횟수 | 비고 |
+|---:|---|:-:|---|
+| 1 | 1점이 ±3σ 외부 | 0 | — |
+| 2 | 9점 연속 같은 측 | — | — |
+| 3 | 6점 연속 증가/감소 | — | — |
+| 4 | 14점 교번 | — | — |
+| 5 | 3점 중 2점이 ±2σ 외부 (같은 측) | — | — |
+| 6 | 5점 중 4점이 ±1σ 외부 (같은 측) | — | — |
+| 7 | 15점 연속 ±1σ 내부 | — | — |
+| 8 | 8점 연속 ±1σ 외부 (양측) | — | — |
+
+{{ nelson_violations | default("") }}
+
+## 3. 공정 차트 (X-Bar / R Chart)
+
+(첨부 — Plotly 또는 Excel 차트)
+
+## 4. 결론 및 조치
+
+**결론**: {{ conclusion | default("(공정 안정 / 보완 필요 / 즉시 정지 — 근거와 함께 기재)") }}
+
+**조치 사항**:
+- [ ] 이상 원인 분석 (Why-Why 5단계)
+- [ ] 공정 파라미터 재설정
+- [ ] 운전자 재교육
+- [ ] 검사 빈도 강화 / 완화
+
+## 5. 차기 분석 일정
+
+- **다음 보고 주기**: (월 1회 / 분기 1회)
+- **트렌드 추적 KPI**: Cpk, 위반율, 폐기율
+
+---
+
+본 보고서는 IATF 16949 Clause 9.1.1.1 통계적 공정 관리 요건을 따릅니다.

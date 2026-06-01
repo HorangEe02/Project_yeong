@@ -1,0 +1,115 @@
+{
+  "api_version": "1.1.0",
+  "openapi_version": "3.1.0",
+  "path_count": 215,
+  "operation_count": 229,
+  "openapi_size_kb": 469,
+  "feature_counts": [
+    {
+      "code": "A",
+      "domain": "검색·조직도",
+      "tags": [
+        "search",
+        "employee",
+        "directory"
+      ],
+      "endpoint_count": 15,
+      "doc": "[docs/FEATURE_A_SEARCH.md](FEATURE_A_SEARCH.md)"
+    },
+    {
+      "code": "B",
+      "domain": "문서 작성",
+      "tags": [
+        "draft"
+      ],
+      "endpoint_count": 27,
+      "doc": "[docs/FEATURE_B_DRAFT.md](FEATURE_B_DRAFT.md)"
+    },
+    {
+      "code": "C",
+      "domain": "AI 업무 도우미",
+      "tags": [
+        "onboarding",
+        "scenarios",
+        "feature-flags"
+      ],
+      "endpoint_count": 39,
+      "doc": "[docs/FEATURE_C_ONBOARDING.md](FEATURE_C_ONBOARDING.md)"
+    },
+    {
+      "code": "D",
+      "domain": "법규 모니터링",
+      "tags": [
+        "compliance",
+        "notifications"
+      ],
+      "endpoint_count": 25,
+      "doc": "[docs/FEATURE_D_COMPLIANCE.md](FEATURE_D_COMPLIANCE.md)"
+    },
+    {
+      "code": "E",
+      "domain": "인사·관리",
+      "tags": [
+        "admin",
+        "admin-scenarios",
+        "auth",
+        "idp"
+      ],
+      "endpoint_count": 74,
+      "doc": "[docs/FEATURE_E_ADMIN.md](FEATURE_E_ADMIN.md)"
+    },
+    {
+      "code": "F",
+      "domain": "설비·SPC",
+      "tags": [
+        "equipment"
+      ],
+      "endpoint_count": 19,
+      "doc": "[docs/FEATURE_F_EQUIPMENT.md](FEATURE_F_EQUIPMENT.md)"
+    },
+    {
+      "code": "공통",
+      "domain": "인프라·헬스·모델",
+      "tags": [
+        "dashboard",
+        "models",
+        "export",
+        "health",
+        "me",
+        "slack",
+        "untagged",
+        "feedback",
+        "live-alarms",
+        "storage"
+      ],
+      "endpoint_count": 30,
+      "doc": "—"
+    }
+  ],
+  "tag_counts": {
+    "admin": 48,
+    "admin-scenarios": 9,
+    "auth": 12,
+    "compliance": 19,
+    "dashboard": 6,
+    "directory": 1,
+    "draft": 27,
+    "employee": 5,
+    "equipment": 19,
+    "export": 3,
+    "feature-flags": 3,
+    "feedback": 1,
+    "health": 2,
+    "idp": 5,
+    "live-alarms": 2,
+    "me": 2,
+    "models": 8,
+    "notifications": 6,
+    "onboarding": 31,
+    "scenarios": 5,
+    "search": 9,
+    "slack": 2,
+    "storage": 3,
+    "untagged": 1
+  }
+}

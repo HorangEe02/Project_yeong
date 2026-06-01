@@ -1,0 +1,13 @@
+{
+  "regulation_type": "eu_reach",
+  "title": "EU REACH SVHC 후보 목록",
+  "items": [
+    {
+      "id": "ECHA-SVHC-LIST",
+      "subject": "SVHC 후보 물질 목록",
+      "total_substances": 235,
+      "last_updated": "2025-12-01"
+    }
+  ],
+  "crawled_at": "2026-03-01T09:00:00"
+}

@@ -1,0 +1,38 @@
+{# 해외 법인 수신 이메일 양식 (영문) #}
+
+To: {{ recipient_name }}, {{ recipient_title }}
+    {{ recipient_company }} {{ recipient_department | default("") }}
+From: {{ sender_name }}, {{ sender_title }}
+      AJIN Industrial Co., Ltd. {{ sender_department }}
+Date: {{ date }}
+Subject: {{ subject }}
+
+Dear {{ recipient_name }},
+
+{{ opening_paragraph }}
+
+{% if structured_items %}
+{% for item in structured_items %}
+- {{ item.label }}: {{ item.value }}
+{% endfor %}
+{% endif %}
+
+{{ main_body }}
+
+{% if action_items %}
+Action Items:
+{% for action in action_items %}
+  {{ loop.index }}. {{ action }}
+{% endfor %}
+{% endif %}
+
+{{ closing_paragraph }}
+
+Best regards,
+
+{{ sender_name }}
+{{ sender_title }}
+{{ sender_department }}
+AJIN Industrial Co., Ltd.
+Tel: {{ sender_phone | default("+82-54-XXX-XXXX") }}
+Email: {{ sender_email | default("") }}

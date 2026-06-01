@@ -1,0 +1,30 @@
+{
+  "citation_id": "GLOSSARY-dept_rnd_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "status": "published",
+  "category": "연구소·부품개발팀 현장 용어",
+  "department": ["기술연구소", "부품개발팀", "선행개발팀", "연구개발팀"],
+  "version": "1.0",
+  "description": "자동차 부품 설계, 개발, 시험 업무에서 사용하는 설계·규격·프로젝트 관련 용어 모음.",
+  "terms": [
+    {"term": "ECR", "full_name": "Engineering Change Request (설계변경요청)", "definition": "부품의 설계 변경을 요청하는 공식 문서. 품질 문제, 원가 절감, 법규 대응 등의 사유로 발행된다. ECR 승인 후 ECN으로 통보된다.", "usage_example": "\"ECR 올려\" = 설계변경 요청서 작성·제출해", "aliases": ["이씨알", "설변요청"]},
+    {"term": "ECN", "full_name": "Engineering Change Notice (설계변경통보)", "definition": "승인된 설계변경을 관련 부서·협력사에 공식 통보하는 문서. 변경 전후 사양, 적용 시점, 영향 범위 등이 포함된다.", "usage_example": "\"ECN 떨어졌다\" = 설계변경 통보가 내려왔다", "aliases": ["이씨엔", "설변통보"]},
+    {"term": "도면", "full_name": "Drawing (설계 도면)", "definition": "부품의 형상, 치수, 공차, 재질, 표면처리 등을 규정한 기술 문서. 2D 도면과 3D CAD 데이터가 있다.", "usage_example": "\"도면 나왔어?\" = 설계 도면 완성됐어?", "aliases": ["DWG", "드로잉"]},
+    {"term": "3D 데이터", "full_name": "CAD Data (3차원 모델링 데이터)", "definition": "CATIA, NX, SolidWorks 등의 CAD 프로그램으로 만든 3차원 부품 형상 데이터.", "usage_example": "\"3D 보내줘\" = CAD 파일 전달해줘", "aliases": ["캐드 데이터", "모델링"]},
+    {"term": "GD&T", "full_name": "Geometric Dimensioning & Tolerancing (기하공차)", "definition": "부품의 형상(진원도, 평면도, 직각도 등)과 위치(동심도, 대칭도 등)에 대한 공차를 규정하는 국제 표준 표기법.", "usage_example": "\"GD&T 잡아줘\" = 기하공차 설정해줘", "aliases": ["기하공차", "지디앤티"]},
+    {"term": "시작품", "full_name": "Prototype (시제품)", "definition": "양산 전 시험·검증 목적으로 제작하는 초기 제품. 금형이 완성되기 전에는 시작 금형(soft tool)으로 제작하기도 한다.", "usage_example": "\"시작품 나왔다\", \"시작품으로 시험 돌려\"", "aliases": ["프로토", "시제품", "샘플"]},
+    {"term": "DVPR", "full_name": "Design Verification Plan & Report (설계검증 계획/보고서)", "definition": "설계 요구사항을 충족하는지 검증하기 위한 시험 계획과 그 결과를 정리한 문서.", "usage_example": "\"DVPR 작성해\" = 설계검증 시험 계획서 만들어", "aliases": ["디브이피알", "설계검증"]},
+    {"term": "DR", "full_name": "Design Review (설계 검토 회의)", "definition": "설계 단계별로 관련 부서가 모여 설계의 적합성, 문제점, 개선 방안을 검토하는 회의.", "usage_example": "\"DR 잡자\" = 설계 검토 회의 일정 잡자", "aliases": ["설계리뷰", "디자인 리뷰"]},
+    {"term": "BIW", "full_name": "Body in White (백차체)", "definition": "도장 전 용접·조립이 완료된 차체 골격 상태. 차체 부품사에게 가장 중요한 구조물이다.", "usage_example": "\"BIW 간섭 확인해\" = 차체 골격에서 부품 간 간섭 없는지 확인해", "aliases": ["백차체", "비아이더블유"]},
+    {"term": "레이아웃", "full_name": "Layout (배치도/정합 확인)", "definition": "부품의 위치 배치를 확인하거나, 실제 차체에 부품을 장착하여 조립 상태를 검증하는 것.", "usage_example": "\"레이아웃 맞춰봐\" = 실차에 부품 장착해서 확인해봐", "aliases": ["L/O", "정합"]},
+    {"term": "피팅", "full_name": "Fitting (조립 상태 확인)", "definition": "부품을 실제 차체나 조립체에 장착하여 간섭, 갭(Gap), 단차(Flush) 등을 확인하는 것.", "usage_example": "\"피팅 해봤어?\" = 실제로 끼워봤어?", "aliases": ["조립확인", "장착확인"]},
+    {"term": "매칭", "full_name": "Matching (접합면 맞춤)", "definition": "용접이나 조립을 위해 두 부품의 접합면(매칭면)이 정확하게 맞는지 확인하는 것.", "usage_example": "\"매칭 안 맞아\" = 두 부품이 서로 안 맞는다", "aliases": ["매칭면", "접합면"]},
+    {"term": "경량화", "full_name": "Light-weighting", "definition": "부품의 무게를 줄이는 것. 전기차 시대에 배터리 무게 상쇄를 위해 더욱 중요해졌다. CFRP, 알루미늄, 핫스탬핑 등이 대표적 경량화 기술이다.", "usage_example": "\"경량화 몇 % 달성?\"", "aliases": ["중량절감", "무게저감"]},
+    {"term": "해석", "full_name": "CAE Analysis (컴퓨터 시뮬레이션 해석)", "definition": "성형 해석, 구조 해석, 충돌 해석, 유동 해석 등 컴퓨터 시뮬레이션으로 설계 타당성을 검증하는 것.", "usage_example": "\"해석 돌렸어?\" = 시뮬레이션 돌려봤어?", "aliases": ["시뮬", "CAE"]},
+    {"term": "스펙", "full_name": "Specification (사양/규격)", "definition": "제품이 갖춰야 할 성능, 치수, 재질, 표면처리 등의 요구 조건.", "usage_example": "\"스펙 맞춰\" = 규격에 맞게 만들어", "aliases": ["사양", "규격", "SPEC"]},
+    {"term": "스펙아웃", "full_name": "Spec Out (규격 이탈)", "definition": "측정값이 규격(스펙)의 허용 범위를 벗어난 것. 부적합(NG)과 동의어.", "usage_example": "\"스펙아웃 났다\" = 규격을 벗어났다", "aliases": ["규격이탈", "OOS (Out of Spec)"]},
+    {"term": "양산설계", "full_name": "Production Design", "definition": "시작품 설계를 양산(대량생산)에 적합하도록 수정·최적화하는 것. 생산성, 원가, 품질을 동시에 고려한다.", "usage_example": "\"양산설계로 전환해\"", "aliases": ["양산이관", "프로덕션 디자인"]}
+  ]
+}

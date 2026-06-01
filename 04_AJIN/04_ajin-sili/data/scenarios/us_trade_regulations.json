@@ -1,0 +1,142 @@
+{
+  "category": "us_trade",
+  "category_name": "미국 무역/통상 규제",
+  "scenarios": [
+    {
+      "id": "US-TRADE-001",
+      "title": "자동차 부품 관세 25% 부과",
+      "regulation_name": "Section 232 Auto Tariff",
+      "authority": "U.S. Department of Commerce / USTR",
+      "status": "active",
+      "effective_date": "2025-04-03",
+      "severity": "high",
+      "summary": "미국이 수입 자동차 및 자동차 부품에 25% 관세를 부과. 한국산 부품, 금형 수입, 전자부품 서브어셈블리 등이 대상.",
+      "impact_on_ajin": {
+        "severity": "high",
+        "affected_plants": ["SUB-US-JOON", "SUB-US-AJIN"],
+        "affected_products": ["Body Parts (한국산 소재 사용)", "금형 (한국 수입)", "전자 서브어셈블리"],
+        "estimated_annual_tariff_usd": 4500000,
+        "mitigation": [
+          "현지 생산 비율 확대 — JOON INC에서 직접 프레스/용접 수행",
+          "미국산/FTA 체결국 소재로 전환 (강판, 알루미늄 등)",
+          "USMCA 원산지 기준 75% 충족 관리",
+          "금형 현지 제작 비중 확대 (아진금형텍 → JOON INC 기술 이전)"
+        ]
+      },
+      "monitoring_urls": [
+        "https://ustr.gov/issue-areas/enforcement/section-301-investigations",
+        "https://www.federalregister.gov"
+      ],
+      "review_cycle_days": 30,
+      "applicable_plants": ["SUB-US-JOON", "SUB-US-AJIN"],
+      "deadline": "2025-04-03"
+    },
+    {
+      "id": "US-TRADE-002",
+      "title": "IRA Section 30D 전기차 세액공제 요건",
+      "regulation_name": "Inflation Reduction Act — Section 30D",
+      "authority": "U.S. Internal Revenue Service (IRS)",
+      "status": "active",
+      "effective_date": "2022-08-16",
+      "severity": "medium",
+      "summary": "전기차 $7,500 세액공제를 받기 위해 (1) 북미 최종 조립, (2) 배터리 핵심광물 북미 조달 비율, (3) 배터리 부품 북미 제조 비율을 충족해야 함.",
+      "impact_on_ajin": {
+        "severity": "medium",
+        "affected_plants": ["SUB-US-JOON"],
+        "affected_products": ["EWP", "CCH", "EV Body Parts"],
+        "mitigation": [
+          "JOON INC 생산 부품의 원산지 증명 체계 구축",
+          "북미 조달 비율 관리 시스템 도입",
+          "한국산 핵심 소재/부품의 대체 공급원 확보"
+        ]
+      },
+      "monitoring_urls": [
+        "https://www.irs.gov/credits-deductions/credits-for-new-clean-vehicles-purchased-in-2023-or-after"
+      ],
+      "review_cycle_days": 90,
+      "applicable_plants": ["SUB-US-JOON"],
+      "deadline": null
+    },
+    {
+      "id": "US-TRADE-003",
+      "title": "USMCA 자동차 원산지 규정",
+      "regulation_name": "USMCA Rules of Origin — Automotive",
+      "authority": "U.S. Customs and Border Protection (CBP)",
+      "status": "active",
+      "effective_date": "2020-07-01",
+      "severity": "medium",
+      "summary": "북미 자유무역협정(USMCA) 하에서 자동차 부품의 역내가치 비율(RVC) 75%를 충족해야 관세 면제.",
+      "impact_on_ajin": {
+        "severity": "medium",
+        "affected_plants": ["SUB-US-JOON", "SUB-US-AJIN"],
+        "affected_products": ["철강/알루미늄 부품", "프레스 성형 부품"],
+        "mitigation": [
+          "미국/캐나다/멕시코산 강판 조달 비율 관리",
+          "부품별 RVC 계산 체계 구축",
+          "원산지 증명서(Certificate of Origin) 관리 프로세스"
+        ]
+      },
+      "monitoring_urls": [
+        "https://www.cbp.gov/trade/free-trade-agreements/usmca"
+      ],
+      "review_cycle_days": 180,
+      "applicable_plants": ["SUB-US-JOON", "SUB-US-AJIN"],
+      "deadline": null
+    },
+    {
+      "id": "US-TRADE-004",
+      "title": "OSHA 안전보건 기준 (미국 공장)",
+      "regulation_name": "OSHA General Industry Standards (29 CFR 1910)",
+      "authority": "Occupational Safety and Health Administration (OSHA)",
+      "status": "active",
+      "effective_date": null,
+      "severity": "high",
+      "summary": "미국 내 제조 공장에 적용되는 산업안전보건 기준. 프레스/용접 안전, 화학물질 관리, 개인보호구(PPE), 잠금/태그아웃(LOTO) 등.",
+      "impact_on_ajin": {
+        "severity": "high",
+        "affected_plants": ["SUB-US-JOON", "SUB-US-AJIN"],
+        "affected_products": ["전 공정"],
+        "mitigation": [
+          "OSHA 기준 안전 매뉴얼 영문 작성",
+          "프레스 안전거리/인터록 장치 미국 기준 적용",
+          "용접 흄 관리 OSHA PEL 기준 준수",
+          "LOTO(잠금/태그아웃) 프로세스 전 라인 적용",
+          "현지 안전 담당자 채용 및 OSHA 30-Hour 교육"
+        ]
+      },
+      "monitoring_urls": [
+        "https://www.osha.gov/laws-regs/regulations/standardnumber"
+      ],
+      "review_cycle_days": 90,
+      "applicable_plants": ["SUB-US-JOON", "SUB-US-AJIN"],
+      "deadline": null
+    },
+    {
+      "id": "US-TRADE-005",
+      "title": "EPA 환경 규제 (미국 공장)",
+      "regulation_name": "EPA Clean Air Act / RCRA / TSCA",
+      "authority": "U.S. Environmental Protection Agency (EPA)",
+      "status": "active",
+      "effective_date": null,
+      "severity": "medium",
+      "summary": "미국 제조 시설에 적용되는 환경 규제. 대기오염물질 배출(Clean Air Act), 유해폐기물 관리(RCRA), 화학물질 관리(TSCA) 등.",
+      "impact_on_ajin": {
+        "severity": "medium",
+        "affected_plants": ["SUB-US-JOON"],
+        "affected_products": ["도장/코팅 공정", "용접 공정"],
+        "mitigation": [
+          "VOC(휘발성유기화합물) 배출 모니터링 시스템 구축",
+          "용접 흄/분진 포집 시설 설치",
+          "RCRA 유해폐기물 분류 및 처리 절차 수립",
+          "TSCA 화학물질 목록 관리 및 신고"
+        ]
+      },
+      "monitoring_urls": [
+        "https://www.epa.gov/regulatory-information-sector/manufacturing-sector"
+      ],
+      "review_cycle_days": 180,
+      "applicable_plants": ["SUB-US-JOON"],
+      "deadline": null
+    }
+  ]
+}

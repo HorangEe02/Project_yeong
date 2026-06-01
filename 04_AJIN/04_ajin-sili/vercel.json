@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": false
+  },
+  "ignoreCommand": "exit 0",
+  "buildCommand": "echo 'root build skipped — git.deploymentEnabled=false (legacy ajin-ai-assistant-react project, real frontend = frontend/ project)'",
+  "outputDirectory": "public",
+  "framework": null
+}

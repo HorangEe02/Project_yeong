@@ -1,0 +1,37 @@
+# PPAP Checklist — {{ part_name }}
+
+| Field | Value |
+|---|---|
+| Part Name | {{ part_name }} |
+| Part No. | {{ part_no }} |
+| Supplier | {{ supplier }} |
+| Customer | {{ customer }} |
+| Submission Level | {{ submission_level | default('Level 3') }} |
+| Date | {{ date }} |
+
+## 18 PPAP Elements
+
+| No. | Element | Required | Status | Notes |
+|-----|---------|----------|--------|-------|
+| 1 | Design Records | {{ e01_required | default('Yes') }} | {{ e01_status | default('Pending') }} | {{ e01_notes | default('') }} |
+| 2 | Engineering Change Documents | {{ e02_required | default('Yes') }} | {{ e02_status | default('Pending') }} | {{ e02_notes | default('') }} |
+| 3 | Customer Engineering Approval | {{ e03_required | default('Yes') }} | {{ e03_status | default('Pending') }} | {{ e03_notes | default('') }} |
+| 4 | Design FMEA (DFMEA) | {{ e04_required | default('Yes') }} | {{ e04_status | default('Pending') }} | {{ e04_notes | default('') }} |
+| 5 | Process Flow Diagram | {{ e05_required | default('Yes') }} | {{ e05_status | default('Pending') }} | {{ e05_notes | default('') }} |
+| 6 | Process FMEA (PFMEA) | {{ e06_required | default('Yes') }} | {{ e06_status | default('Pending') }} | {{ e06_notes | default('') }} |
+| 7 | Control Plan | {{ e07_required | default('Yes') }} | {{ e07_status | default('Pending') }} | {{ e07_notes | default('') }} |
+| 8 | MSA (Gage R&R) | {{ e08_required | default('Yes') }} | {{ e08_status | default('Pending') }} | {{ e08_notes | default('') }} |
+| 9 | Dimensional Results | {{ e09_required | default('Yes') }} | {{ e09_status | default('Pending') }} | {{ e09_notes | default('') }} |
+| 10 | Material/Performance Test | {{ e10_required | default('Yes') }} | {{ e10_status | default('Pending') }} | {{ e10_notes | default('') }} |
+| 11 | Initial Process Study (SPC) | {{ e11_required | default('Yes') }} | {{ e11_status | default('Pending') }} | {{ e11_notes | default('') }} |
+| 12 | Qualified Lab Documentation | {{ e12_required | default('Yes') }} | {{ e12_status | default('Pending') }} | {{ e12_notes | default('') }} |
+| 13 | Appearance Approval (AAR) | {{ e13_required | default('If applicable') }} | {{ e13_status | default('N/A') }} | {{ e13_notes | default('') }} |
+| 14 | Sample Production Parts | {{ e14_required | default('Yes') }} | {{ e14_status | default('Pending') }} | {{ e14_notes | default('') }} |
+| 15 | Master Sample | {{ e15_required | default('Yes') }} | {{ e15_status | default('Pending') }} | {{ e15_notes | default('') }} |
+| 16 | Checking Aids | {{ e16_required | default('Yes') }} | {{ e16_status | default('Pending') }} | {{ e16_notes | default('') }} |
+| 17 | Customer-Specific Requirements | {{ e17_required | default('Yes') }} | {{ e17_status | default('Pending') }} | {{ e17_notes | default('') }} |
+| 18 | Part Submission Warrant (PSW) | {{ e18_required | default('Yes') }} | {{ e18_status | default('Pending') }} | {{ e18_notes | default('') }} |
+
+## Approval
+- PSW Signed By: {{ psw_signed_by | default('Pending') }}
+- Customer Approval: {{ customer_approval | default('Pending') }}

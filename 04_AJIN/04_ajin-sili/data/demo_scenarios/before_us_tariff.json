@@ -1,0 +1,13 @@
+{
+  "regulation_type": "trade",
+  "title": "미국 자동차 부품 관세",
+  "items": [
+    {
+      "id": "US-TARIFF-AUTO",
+      "subject": "자동차 부품 관세 (HS 8708)",
+      "current_rate": "0%",
+      "status": "면제 적용 중"
+    }
+  ],
+  "crawled_at": "2026-03-01T09:00:00"
+}

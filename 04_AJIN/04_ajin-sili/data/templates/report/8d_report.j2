@@ -1,0 +1,80 @@
+{# 8D Report 양식 #}
+
+# 8D REPORT
+
+| 항목 | 내용 |
+|---|---|
+| 문서번호 | {{ doc_number }} |
+| 작성일 | {{ created_date }} |
+| 작성부서 | {{ department | default("품질관리팀") }} |
+| 작성자 | {{ author | default("OOO") }} |
+| 대상 부품 | {{ part_name }} (품번: {{ part_number }}) |
+| 고객사 | {{ customer }} |
+| 클레임 접수일 | {{ claim_date }} |
+| 불량 현상 | {{ defect_summary }} |
+| 불량 수량 | {{ defect_quantity | default("확인 중") }} |
+
+---
+
+## D1. 팀 구성
+
+| 역할 | 이름 | 부서 |
+|---|---|---|
+{% for member in d1_team %}
+| {{ member.role }} | {{ member.name }} | {{ member.department }} |
+{% endfor %}
+
+## D2. 문제 정의
+
+{{ d2_problem }}
+
+{% if d2_5w1h %}
+| 항목 | 내용 |
+|---|---|
+| What (무엇이) | {{ d2_5w1h.what }} |
+| When (언제) | {{ d2_5w1h.when }} |
+| Where (어디서) | {{ d2_5w1h.where }} |
+| Who (누가 발견) | {{ d2_5w1h.who }} |
+| Why (왜 문제인가) | {{ d2_5w1h.why }} |
+| How (어떻게 발생) | {{ d2_5w1h.how }} |
+{% endif %}
+
+## D3. 긴급 대응 조치
+
+{{ d3_containment }}
+
+{% if d3_actions %}
+| 조치 내용 | 담당자 | 완료일 | 상태 |
+|---|---|---|---|
+{% for action in d3_actions %}
+| {{ action.description }} | {{ action.owner }} | {{ action.due_date }} | {{ action.status }} |
+{% endfor %}
+{% endif %}
+
+## D4. 근본 원인 분석
+
+{{ d4_root_cause }}
+
+## D5. 시정 조치 선정
+
+{{ d5_corrective }}
+
+## D6. 시정 조치 실행
+
+{{ d6_implementation }}
+
+{% if d6_schedule %}
+| 시정 조치 | 담당자 | 시작일 | 완료 예정일 | 상태 |
+|---|---|---|---|---|
+{% for item in d6_schedule %}
+| {{ item.action }} | {{ item.owner }} | {{ item.start }} | {{ item.end }} | {{ item.status }} |
+{% endfor %}
+{% endif %}
+
+## D7. 재발 방지 대책
+
+{{ d7_prevention }}
+
+## D8. 팀 축하 및 종료
+
+{{ d8_closure | default("본 8D 활동의 유효성이 검증되면 종료 처리 예정입니다.") }}

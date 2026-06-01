@@ -1,0 +1,47 @@
+{# 설계변경통보서 (ECN) 양식 #}
+
+# 설계변경통보서 (ECN)
+
+| 항목 | 내용 |
+|---|---|
+| 문서번호 | {{ doc_number }} |
+| 발행일 | {{ issue_date }} |
+| 대상 부품 | {{ part_name }} (품번: {{ part_number }}) |
+| 변경 유형 | {{ change_type }} |
+| 적용 차종 | {{ vehicle_model }} |
+| 변경 요청 출처 | {{ change_origin }} |
+
+---
+
+## 1. 변경 내용
+
+### 변경 전
+{{ before_description }}
+
+### 변경 후
+{{ after_description }}
+
+## 2. 변경 사유
+{{ change_reason }}
+
+## 3. 영향 범위
+{{ impact_scope }}
+
+## 4. 적용 일정
+
+| 단계 | 예정일 | 비고 |
+|---|---|---|
+{% for step in schedule %}
+| {{ step.phase }} | {{ step.date }} | {{ step.note | default("") }} |
+{% endfor %}
+
+## 5. 관련 부서 조치 사항
+{% for dept_action in department_actions %}
+- **{{ dept_action.department }}**: {{ dept_action.action }}
+{% endfor %}
+
+## 6. 승인
+
+| 작성 | 검토 | 승인 |
+|---|---|---|
+| {{ author | default("OOO") }} | {{ reviewer | default("") }} | {{ approver | default("") }} |

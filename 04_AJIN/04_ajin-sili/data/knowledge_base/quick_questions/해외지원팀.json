@@ -1,0 +1,61 @@
+{
+  "department": "해외지원팀",
+  "division": "구매본부",
+  "description": "수출입 통관·KD 부품·AEO·FTA 원산지·관세환급·해외사업 무역 실무",
+  "questions": [
+    {
+      "id": "intl-customs",
+      "label": "통관 진행",
+      "promptText": "오늘 진행 중인 수출입 통관 건과 지연 우려",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["통관", "수출입"]
+    },
+    {
+      "id": "intl-fta-origin",
+      "label": "FTA 원산지",
+      "promptText": "FTA 원산지 증명서 발급 절차",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["FTA", "원산지"]
+    },
+    {
+      "id": "intl-aeo",
+      "label": "AEO 관리",
+      "promptText": "AEO 공인기업 유지 관리 핵심 항목",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["AEO"]
+    },
+    {
+      "id": "intl-kd-supply",
+      "label": "KD 부품 수급",
+      "promptText": "KD 부품 수급 일정과 해외법인별 재고",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["KD", "해외법인"]
+    },
+    {
+      "id": "intl-tariff-refund",
+      "label": "관세 환급",
+      "promptText": "관세 환급 신청 절차와 누적 환급액",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["관세", "환급"]
+    },
+    {
+      "id": "intl-trade-regulation",
+      "label": "무역 규제",
+      "promptText": "최근 변경된 수출입 규제(REACH·반덤핑 등) 알려줘",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["규제", "REACH"]
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "processes": [
+    {
+      "process_id": "PRC-KS-HQ-STAMP-A",
+      "name": "프레스 성형 라인A (경산 본사)",
+      "plant_id": "PLANT-KS-HQ",
+      "type": "stamping",
+      "equipment": ["2000톤 서보프레스", "1200톤 유압프레스", "블랭킹라인"],
+      "hazards": ["소음", "진동", "끼임", "비산물"],
+      "chemicals_used": ["CHEM-001", "CHEM-002"],
+      "safety_standards": ["STD-NOISE-01", "STD-PRESS-01"],
+      "workers": 45,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.65
+    },
+    {
+      "process_id": "PRC-KS-HQ-STAMP-B",
+      "name": "프레스 성형 라인B (경산 본사)",
+      "plant_id": "PLANT-KS-HQ",
+      "type": "stamping",
+      "equipment": ["1500톤 서보프레스", "800톤 유압프레스", "코일 피더라인"],
+      "hazards": ["소음", "진동", "끼임", "비산물"],
+      "chemicals_used": ["CHEM-001", "CHEM-002"],
+      "safety_standards": ["STD-NOISE-01", "STD-PRESS-01"],
+      "workers": 40,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.70
+    },
+    {
+      "process_id": "PRC-KS-HQ-WELD-A",
+      "name": "용접 라인A (경산 본사)",
+      "plant_id": "PLANT-KS-HQ",
+      "type": "welding",
+      "equipment": ["스팟용접 로봇 12대", "CO2 아크용접기 6대", "용접지그"],
+      "hazards": ["용접흄", "화상", "자외선", "감전"],
+      "chemicals_used": ["CHEM-003"],
+      "safety_standards": ["STD-WELD-01", "STD-FIRE-01"],
+      "workers": 35,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.80
+    },
+    {
+      "process_id": "PRC-KS-HQ-WELD-B",
+      "name": "용접 라인B (경산 본사)",
+      "plant_id": "PLANT-KS-HQ",
+      "type": "welding",
+      "equipment": ["6축 용접로봇 8대", "MIG 용접기 4대", "용접 포지셔너"],
+      "hazards": ["용접흄", "화상", "자외선", "감전", "로봇 충돌"],
+      "chemicals_used": ["CHEM-003"],
+      "safety_standards": ["STD-WELD-01", "STD-FIRE-01"],
+      "workers": 30,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.85
+    },
+    {
+      "process_id": "PRC-KS-HQ-ASSY",
+      "name": "조립 (경산 본사)",
+      "plant_id": "PLANT-KS-HQ",
+      "type": "assembly",
+      "equipment": ["조립 컨베이어", "너트러너", "리벳팅 장비", "검사 지그"],
+      "hazards": ["근골격계 부담", "끼임", "소음"],
+      "chemicals_used": ["CHEM-007"],
+      "safety_standards": ["STD-ERGO-01", "STD-NOISE-01"],
+      "workers": 55,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.50
+    },
+    {
+      "process_id": "PRC-KS-HQ-LOG",
+      "name": "물류 (경산 본사)",
+      "plant_id": "PLANT-KS-HQ",
+      "type": "logistics",
+      "equipment": ["지게차 8대", "컨베이어", "자동 적재 시스템"],
+      "hazards": ["지게차 충돌", "낙하물", "끼임"],
+      "chemicals_used": [],
+      "safety_standards": ["STD-FORK-01"],
+      "workers": 25,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.40
+    },
+    {
+      "process_id": "PRC-KS-2-STAMP",
+      "name": "프레스 (경산 제2공장)",
+      "plant_id": "PLANT-KS-2",
+      "type": "stamping",
+      "equipment": ["1500톤 서보프레스", "800톤 유압프레스"],
+      "hazards": ["소음", "진동", "끼임", "비산물"],
+      "chemicals_used": ["CHEM-001", "CHEM-002"],
+      "safety_standards": ["STD-NOISE-01", "STD-PRESS-01"],
+      "workers": 50,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.70
+    },
+    {
+      "process_id": "PRC-KS-2-WELD",
+      "name": "용접 (경산 제2공장)",
+      "plant_id": "PLANT-KS-2",
+      "type": "welding",
+      "equipment": ["스팟용접 로봇 6대", "CO2 용접기 4대"],
+      "hazards": ["용접흄", "화상", "자외선", "감전"],
+      "chemicals_used": ["CHEM-003"],
+      "safety_standards": ["STD-WELD-01", "STD-FIRE-01"],
+      "workers": 40,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.78
+    },
+    {
+      "process_id": "PRC-GJ-STAMP-A",
+      "name": "프레스 (경주 구어)",
+      "plant_id": "PLANT-GJ",
+      "type": "stamping",
+      "equipment": ["2500톤 트랜스퍼 프레스", "1000톤 유압프레스", "디스태커"],
+      "hazards": ["소음", "진동", "끼임", "비산물"],
+      "chemicals_used": ["CHEM-001", "CHEM-002"],
+      "safety_standards": ["STD-NOISE-01", "STD-PRESS-01"],
+      "workers": 50,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.75
+    },
+    {
+      "process_id": "PRC-GJ-WELD-A",
+      "name": "용접 (경주 구어)",
+      "plant_id": "PLANT-GJ",
+      "type": "welding",
+      "equipment": ["스팟용접 로봇 8대", "CO2 용접기 4대", "용접지그"],
+      "hazards": ["용접흄", "화상", "자외선", "감전"],
+      "chemicals_used": ["CHEM-003"],
+      "safety_standards": ["STD-WELD-01", "STD-FIRE-01"],
+      "workers": 35,
+      "shift_pattern": "주야 2교대",
+      "automation_rate": 0.78
+    },
+    {
+      "process_id": "PRC-GJ-LOG",
+      "name": "물류 (경주 구어)",
+      "plant_id": "PLANT-GJ",
+      "type": "logistics",
+      "equipment": ["지게차 4대", "컨베이어"],
+      "hazards": ["지게차 충돌", "낙하물", "끼임"],
+      "chemicals_used": [],
+      "safety_standards": ["STD-FORK-01"],
+      "workers": 15,
+      "shift_pattern": "주간 1교대",
+      "automation_rate": 0.30
+    }
+  ],
+  "_metadata": {
+    "version": "2.0.0",
+    "last_updated": "2026-03-22",
+    "source": "AJIN_ORGANIZATION_REFERENCE.md",
+    "description": "아진산업 공정 마스터 데이터 — 실제 공장ID 체계 기준"
+  }
+}

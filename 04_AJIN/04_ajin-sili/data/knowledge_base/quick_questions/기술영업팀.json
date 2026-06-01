@@ -1,0 +1,61 @@
+{
+  "department": "기술영업팀",
+  "division": "개발본부",
+  "description": "아이템 수주·제품가 결정·투자비 회수·양산 제품가 관리 (개발본부 산하 영업)",
+  "questions": [
+    {
+      "id": "tech-sales-quote",
+      "label": "견적 산출",
+      "promptText": "신규 아이템 견적 산출 표준 절차",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["견적", "수주"]
+    },
+    {
+      "id": "tech-sales-rfq",
+      "label": "RFQ 대응",
+      "promptText": "고객사 RFQ 접수 후 사내 회신 절차",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["RFQ", "고객"]
+    },
+    {
+      "id": "tech-sales-eo-cost",
+      "label": "EO비 회수",
+      "promptText": "EO비(투자비) 회수 진행률과 미회수 건",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["EO비", "투자"]
+    },
+    {
+      "id": "tech-sales-price-update",
+      "label": "양산 제품가 변경",
+      "promptText": "양산 제품가 인상/인하 협상 절차",
+      "category": "scenario",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["제품가", "협상"]
+    },
+    {
+      "id": "tech-sales-portfolio",
+      "label": "수주 포트폴리오",
+      "promptText": "현재 수주 중인 아이템 포트폴리오와 양산 일정",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["수주", "포트폴리오"]
+    },
+    {
+      "id": "tech-sales-monthly",
+      "label": "수주 월간 보고",
+      "promptText": "이번 달 수주 실적 요약 보고서 초안",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["보고서", "수주실적"]
+    }
+  ]
+}

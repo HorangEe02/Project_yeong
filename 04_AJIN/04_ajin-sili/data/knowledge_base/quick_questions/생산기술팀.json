@@ -1,0 +1,61 @@
+{
+  "department": "생산기술팀",
+  "division": "생산기술본부",
+  "description": "생산설비·공법 연구·개선·금형 Try-out·4M 변경 — 공정 최적화 핵심",
+  "questions": [
+    {
+      "id": "pe-press-tryout",
+      "label": "프레스 트라이",
+      "promptText": "프레스 트라이 SOP 7단계 알려줘",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["프레스", "트라이", "SOP"]
+    },
+    {
+      "id": "pe-mold-replacement",
+      "label": "금형 교체",
+      "promptText": "금형 교체 절차와 안전 체크리스트",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["금형", "교체"]
+    },
+    {
+      "id": "pe-4m-change",
+      "label": "4M 변경",
+      "promptText": "4M 변경 신청 절차 (Man·Machine·Material·Method)",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["4M", "변경관리"]
+    },
+    {
+      "id": "pe-cae-result",
+      "label": "CAE 해석 활용",
+      "promptText": "CAE 해석 결과를 공정 개선에 적용하는 방법",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["CAE", "해석"]
+    },
+    {
+      "id": "pe-spc-nelson",
+      "label": "Nelson Rule",
+      "promptText": "SPC 관리도에서 Nelson Rule 위반 발생 시 조치",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["SPC", "Nelson", "관리도"]
+    },
+    {
+      "id": "pe-improvement-history",
+      "label": "공정 개선 이력",
+      "promptText": "최근 6개월 공정 개선 활동 이력 보여줘",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["개선", "이력"]
+    }
+  ]
+}

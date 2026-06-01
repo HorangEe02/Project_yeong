@@ -1,0 +1,148 @@
+{
+  "sop_id": "SOP-001",
+  "title": "프레스 금형 교체 절차",
+  "department": "금형생산팀",
+  "category": "설비",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "생산 중지 및 안전 조치",
+      "description": "프레스 운전 정지 -> 메인 전원 OFF -> 잔압 확인 -> 안전 블록 삽입",
+      "checklist": [
+        "프레스 정지 확인",
+        "메인 전원 OFF",
+        "잔압 0 확인",
+        "안전 블록 삽입"
+      ],
+      "caution": "잔압이 남아있으면 슬라이드 낙하 위험",
+      "related_terms": [
+        "잔압",
+        "안전블록",
+        "슬라이드"
+      ],
+      "estimated_time": "5분",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 2,
+      "title": "기존 금형 분리",
+      "description": "클램프 해제 -> 유압/공압 라인 분리 -> 상형 크레인 체결 -> 상형 인양 -> 하형 인출",
+      "checklist": [
+        "클램프 전수 해제",
+        "유압라인 분리",
+        "크레인 와이어 체결 확인",
+        "상형 인양 완료"
+      ],
+      "caution": "인양 시 하부 작업자 퇴피 확인",
+      "related_terms": [
+        "클램프",
+        "크레인",
+        "인양"
+      ],
+      "estimated_time": "15분",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 3,
+      "title": "볼스터/슬라이드 청소",
+      "description": "금형 설치면 이물 제거 -> 볼스터 상면 청소 -> T홈 확인",
+      "checklist": [
+        "이물 제거 완료",
+        "볼스터 상면 청소",
+        "T홈 손상 없음"
+      ],
+      "caution": "",
+      "related_terms": [],
+      "estimated_time": "10분",
+      "responsible": "",
+      "title_en": ""
+    },
+    {
+      "step_number": 4,
+      "title": "신규 금형 설치",
+      "description": "하형 볼스터 진입 -> 기준핀 정렬 -> 하형 클램핑 -> 상형 크레인 인양 -> 상형 정렬 -> 상형 클램핑",
+      "checklist": [
+        "기준핀 정렬 완료",
+        "하형 클램핑 완료",
+        "상형 정렬 완료",
+        "상형 클램핑 완료",
+        "유압/공압 라인 연결"
+      ],
+      "caution": "기준핀 미정렬 시 금형 파손 위험",
+      "related_terms": [
+        "볼스터",
+        "클램핑",
+        "기준핀"
+      ],
+      "estimated_time": "20분",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 5,
+      "title": "시운전 및 초품 검사",
+      "description": "저속 1회 운전 -> 상하사점 확인 -> 초품 생산 3매 -> 치수 측정 -> OK 판정",
+      "checklist": [
+        "저속 시운전 완료",
+        "상하사점 정상",
+        "초품 3매 생산",
+        "치수 검사 합격"
+      ],
+      "caution": "초품 NG 시 금형 재조정 필요",
+      "related_terms": [
+        "초품",
+        "치수검사",
+        "상하사점"
+      ],
+      "estimated_time": "15분",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 6,
+      "title": "양산 개시 및 기록",
+      "description": "자동 운전 전환 -> SPM 설정 -> 생산 일보 기록 -> 금형 이력 카드 업데이트",
+      "checklist": [
+        "자동 운전 전환",
+        "SPM 설정 완료",
+        "생산 일보 기록",
+        "금형 이력 카드 업데이트"
+      ],
+      "caution": "",
+      "related_terms": [
+        "SPM",
+        "생산일보",
+        "금형이력카드"
+      ],
+      "estimated_time": "5분",
+      "responsible": "",
+      "title_en": ""
+    }
+  ],
+  "prerequisites": [
+    "교체 금형 사전 점검 완료",
+    "크레인 운전 자격 보유",
+    "안전장구 착용"
+  ],
+  "safety_warnings": [
+    "금형 중량물 취급 -- 크레인/호이스트 필수",
+    "프레스 잔압 확인 후 작업",
+    "상/하형 분리 시 핀 위치 확인"
+  ],
+  "related_sops": [],
+  "citation_id": "SOP-001",
+  "owner_department": "금형생산팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "title_en": "Press Mold Replacement Procedure",
+  "department_en": "Mold Production Team",
+  "category_en": "Equipment"
+}

@@ -1,0 +1,56 @@
+{
+  "scenario_id": "SCN-002",
+  "title": "EU REACH 6가 크롬 화합물 인가(Authorization) 필수화",
+  "description": "EU REACH 규정 Annex XIV 업데이트로 6가 크롬 화합물(Chromium trioxide 등)이 SVHC 후보물질에서 인가 대상 물질로 전환되어, 인가 없이는 사용이 전면 금지됨",
+  "regulation": {
+    "name": "EU REACH Regulation (EC) No 1907/2006",
+    "article": "Annex XIV (List of Substances Subject to Authorisation) 업데이트",
+    "authority": "European Chemicals Agency (ECHA)",
+    "category": "chemical"
+  },
+  "change_detail": {
+    "before": {
+      "text": "Regulation (EC) No 1907/2006, Article 59 - SVHC Candidate List\n\n삼산화크롬(Chromium trioxide, CAS 1333-82-0) 및 6가 크롬 화합물은 고위험성우려물질(SVHC) 후보목록(Candidate List)에 등재되어 있으며, 다음의 의무가 적용된다.\n\n1. 제33조에 따른 정보전달 의무: 완제품 내 SVHC 농도가 0.1%(w/w) 초과 시 수급자에게 안전사용 정보를 제공할 것\n2. 제7조제2항에 따른 신고 의무: 연간 1톤 이상 수입/생산하는 완제품에 대해 ECHA에 신고할 것\n3. 사용 자체에 대한 제한은 없으며, 인가(Authorization) 의무 미적용\n\n※ 적용 물질: Chromium trioxide (CAS 1333-82-0), Sodium dichromate (CAS 7789-12-0, 10588-01-9), Potassium dichromate (CAS 7778-50-9) 등",
+      "effective_date": "2024-06-15",
+      "version": "v2024"
+    },
+    "after": {
+      "text": "Regulation (EC) No 1907/2006, Annex XIV Entry No. 28~31 신규 추가\n\n삼산화크롬(Chromium trioxide, CAS 1333-82-0) 및 6가 크롬 화합물이 인가 대상 물질목록(Annex XIV)에 추가되어, 다음의 의무가 적용된다.\n\n1. 제56조에 따른 인가 의무: 해당 물질의 상시(上市) 및 사용에 대해 유럽화학물질청(ECHA)의 인가를 받아야 하며, 인가 없이는 사용이 전면 금지됨\n2. 일몰일(Sunset date): 2027년 1월 1일 - 해당 일자까지 인가를 받지 못한 경우 즉시 사용 중단\n3. 인가 신청 최종기한(Latest application date): 2026년 1월 1일\n4. 대체물질 분석(Analysis of Alternatives) 및 대체계획서(Substitution Plan) 제출 필수\n5. 사회경제적 분석(Socio-Economic Analysis) 첨부 시 한시적 사용 허가 가능\n\n※ 적용 물질: Chromium trioxide (Entry 28), Sodium dichromate (Entry 29), Potassium dichromate (Entry 30), Dichromium tris(chromate) (Entry 31)\n※ 자동차 부품 표면처리 공정에 사용되는 6가 크롬 도금액, 크로메이트 처리제, 부동태화 처리제 포함",
+      "effective_date": "2026-03-01",
+      "version": "v2026"
+    }
+  },
+  "severity": "high",
+  "impact_areas": [
+    "표면처리 공정",
+    "도금 공정",
+    "OEM 승인",
+    "IMDS 데이터",
+    "수출 규제 대응"
+  ],
+  "affected_facility_ids": [
+    "CHEM-006"
+  ],
+  "affected_process_types": [
+    "PRC-PAINT-01"
+  ],
+  "deadline": "2027-01-01",
+  "required_actions": [
+    "6가 크롬 사용 현황 전수 조사 (사용량, 농도, 공정별 용도)",
+    "대체물질(3가 크롬, 지르코늄계 등) 전환 기술 검토",
+    "OEM별 대체물질 승인 절차 착수 (현대/기아, GM, VW 등)",
+    "대체물질 적용 시 공정 검증(내식성, 밀착성, 외관 품질 시험)",
+    "IMDS(International Material Data System) 데이터 업데이트",
+    "대체 불가 공정에 대한 ECHA 인가 신청 검토 (2026-01-01 이전)",
+    "협력업체 대체물질 전환 지원 및 일정 관리"
+  ],
+  "estimated_cost": "공정당 3,000만~1억원 (대체물질 전환 비용), 인가 신청 시 건당 5만~10만 유로",
+  "reference_url": "https://echa.europa.eu/authorisation-list",
+  "applicable_plants": [
+    "PLANT-KS-HQ",
+    "PLANT-KS-2",
+    "PLANT-GJ",
+    "PLANT-GJ-KAINTECH",
+    "PLANT-KS-MOLDTECH"
+  ]
+}

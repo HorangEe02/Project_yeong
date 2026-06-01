@@ -1,0 +1,31 @@
+{
+  "citation_id": "GLOSSARY-dept_management_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "status": "published",
+  "category": "경영지원·IT팀 현장 용어",
+  "department": ["경영지원팀", "총무팀", "인사팀", "IT전략팀", "재무팀"],
+  "version": "1.0",
+  "description": "사내 시스템 운영, 경영관리, 인사·총무 업무에서 사용하는 시스템·경영·관리 용어 모음.",
+  "terms": [
+    {"term": "ERP", "full_name": "Enterprise Resource Planning (전사 자원 관리)", "definition": "생산, 구매, 재고, 회계, 인사 등 회사 전체의 자원을 통합 관리하는 시스템. SAP, Oracle, 더존 등이 대표적이다.", "usage_example": "\"ERP에 올려\" = 시스템에 데이터 입력해", "aliases": ["이알피", "전사시스템"]},
+    {"term": "MES", "full_name": "Manufacturing Execution System (제조실행시스템)", "definition": "생산 현장의 실시간 데이터(생산량, 불량, 설비 상태 등)를 수집·관리하는 시스템. ERP와 현장을 연결하는 중간 계층이다.", "usage_example": "\"MES 데이터 확인해\", \"MES에 실적 안 잡힌다\"", "aliases": ["엠이에스", "제조시스템"]},
+    {"term": "그룹웨어", "full_name": "Groupware (사내 협업 시스템)", "definition": "전자결재, 사내메일, 게시판, 일정관리 등을 통합 제공하는 사내 협업 플랫폼.", "usage_example": "\"그룹웨어에 공지 올려\"", "aliases": ["GW", "사내시스템"]},
+    {"term": "전결", "full_name": "전자결재 (Electronic Approval)", "definition": "그룹웨어를 통한 온라인 결재 프로세스. 기안자→검토자→결재자 순서로 진행된다.", "usage_example": "\"전결 올려\" = 전자결재 상신해", "aliases": ["결재", "이결재"]},
+    {"term": "품의서", "full_name": "品議書 (지출/구매 승인 요청서)", "definition": "경비 지출이나 자재 구매에 대한 사전 승인을 요청하는 문서.", "usage_example": "\"품의서 올려\" = 지출 승인 요청해", "aliases": ["지출품의"]},
+    {"term": "기안", "full_name": "起案 (문서 작성·상신)", "definition": "공식 문서를 작성하여 결재 라인에 올리는 것.", "usage_example": "\"기안 올려\" = 문서 작성해서 결재 상신해", "aliases": ["상신", "기안서"]},
+    {"term": "결재 라인", "full_name": "Approval Line (승인 경로)", "definition": "문서가 승인되는 순서. 담당→팀장→부서장→임원 등의 경로를 말한다.", "usage_example": "\"결재 라인에 누구 넣어야 해?\"", "aliases": ["결재경로", "결재선"]},
+    {"term": "기표", "full_name": "記票 (회계 전표 입력)", "definition": "회계 시스템에 거래 내역(매출, 매입, 경비 등)을 전표로 입력하는 것.", "usage_example": "\"기표 처리해\" = 회계 전표 입력해", "aliases": ["전표처리", "회계입력"]},
+    {"term": "마감", "full_name": "Closing (월/분기/연간 마감)", "definition": "일정 기간의 회계·생산·품질 실적을 확정하고 보고서를 작성하는 것. 월 마감, 분기 마감, 연 마감이 있다.", "usage_example": "\"마감 끝났어?\", \"마감일까지 올려\"", "aliases": ["클로징", "결산"]},
+    {"term": "CAPEX", "full_name": "Capital Expenditure (자본적 지출)", "definition": "설비, 금형, 건물 등 장기 자산에 대한 투자 비용. 감가상각 대상이 된다.", "usage_example": "\"올해 CAPEX 예산 얼마야?\"", "aliases": ["설비투자", "캐펙스"]},
+    {"term": "OPEX", "full_name": "Operating Expenditure (운영 비용)", "definition": "인건비, 원자재비, 전기료 등 일상적인 운영에 들어가는 비용.", "usage_example": "\"OPEX 줄여야 해\"", "aliases": ["운영비", "오펙스"]},
+    {"term": "KPI", "full_name": "Key Performance Indicator (핵심 성과 지표)", "definition": "부서별·개인별 업무 성과를 측정하는 핵심 지표. 예: 품질팀 KPI는 PPM, 생산팀 KPI는 가동률 등.", "usage_example": "\"KPI 달성률 확인해\", \"KPI 리뷰 하자\"", "aliases": ["핵심지표", "케이피아이"]},
+    {"term": "R&R", "full_name": "Roles & Responsibilities (역할과 책임)", "definition": "각 부서·담당자의 역할과 책임을 명확히 정의하는 것. 프로젝트나 이슈 발생 시 R&R을 명확히 해야 혼선을 방지한다.", "usage_example": "\"R&R 정리해\" = 누가 뭘 할지 역할 분담해", "aliases": ["역할분담", "알앤알"]},
+    {"term": "F/UP", "full_name": "Follow Up (후속 추적)", "definition": "제기된 이슈나 업무에 대해 결론이 날 때까지 지속적으로 진행 상황을 추적·관리하는 것.", "usage_example": "\"이 건 계속 F/UP 해\" = 계속 추적 관리해", "aliases": ["팔로우업", "후속조치"]},
+    {"term": "컨펌", "full_name": "Confirm (확인/승인)", "definition": "상사나 고객에게 문서, 계획, 결정 사항에 대한 확인 또는 승인을 받는 것.", "usage_example": "\"팀장님 컨펌 받았어?\" = 승인 받았어?", "aliases": ["확인", "승인"]},
+    {"term": "CC", "full_name": "Carbon Copy (참조)", "definition": "이메일 발송 시 주 수신자 외에 내용을 공유할 사람을 참조로 넣는 것.", "usage_example": "\"팀장님 CC 넣어\" = 팀장님도 참조에 포함해", "aliases": ["참조", "씨씨"]},
+    {"term": "RSVP", "full_name": "Répondez s'il vous plaît (회신 바랍니다)", "definition": "이메일이나 초대장 하단에 쓰는 문구로, 참석 여부 등을 회신해달라는 뜻. 프랑스어 유래.", "usage_example": "\"회의 메일에 RSVP 달아\" = 참석 여부 회신 요청해", "aliases": ["회신요망"]},
+    {"term": "TBD / TBA", "full_name": "To Be Determined / To Be Announced", "definition": "TBD는 '추후 결정', TBA는 '추후 공지'의 약어. 아직 확정되지 않은 사항에 사용한다.", "usage_example": "\"일정 TBD\" = 일정은 아직 미정", "aliases": ["미정", "추후결정"]}
+  ]
+}

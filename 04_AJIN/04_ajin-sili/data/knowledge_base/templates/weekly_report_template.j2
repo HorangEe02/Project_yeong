@@ -1,0 +1,54 @@
+{# usage_hint: "주간 단위 업무 진행 사항·KPI·이슈를 부서장 또는 본부장에게 보고할 때" #}
+{# dept_recommend: ["전 부서"] #}
+{# required_vars: ["week", "summary"] #}
+{# optional_vars: ["author", "team", "kpi_table", "achievements", "issues", "next_week_plan"] #}
+{# example_output: "2026 W17 (4/22~4/28) 생산기술팀 주간 보고 / KPI 4건 / 이슈 2건 / 차주 액션 6건" #}
+{# var_metadata:
+  - {name: "week", label_ko: "보고 주차", required: true, group: "일정", placeholder: "예: 2026 W17 (2026-04-22 ~ 04-28)"}
+  - {name: "summary", label_ko: "주간 요약", required: true, group: "내용", placeholder: "주요 진행 사항 2-3 문장"}
+  - {name: "author", label_ko: "작성자", required: false, group: "수신/발신", placeholder: "예: 박준영"}
+  - {name: "team", label_ko: "부서", required: false, group: "수신/발신", placeholder: "예: 생산기술팀"}
+  - {name: "achievements", label_ko: "주요 성과", required: false, group: "내용", placeholder: "이번 주 완료 항목"}
+  - {name: "issues", label_ko: "이슈/리스크", required: false, group: "내용", placeholder: "방해 요소 + 필요한 지원"}
+  - {name: "next_week_plan", label_ko: "차주 계획", required: false, group: "내용", placeholder: "다음 주 우선 실행 항목"}
+#}
+
+# 주간 보고서
+
+**주차**: {{ week }}
+**부서**: {{ team | default("[부서]") }}
+**작성자**: {{ author | default("[작성자]") }}
+
+---
+
+## 1. 주간 요약
+
+{{ summary }}
+
+## 2. KPI
+
+| 지표 | 목표 | 실적 | 달성률 | 비고 |
+|---|---:|---:|:-:|---|
+| (KPI 1) | — | — | — | — |
+| (KPI 2) | — | — | — | — |
+| (KPI 3) | — | — | — | — |
+
+## 3. 주요 성과
+
+{{ achievements | default("- 완료 항목 1\n- 완료 항목 2\n- 완료 항목 3") }}
+
+## 4. 이슈 및 리스크
+
+{{ issues | default("- 이슈 1: (내용 + 영향 + 필요 지원)\n- 이슈 2: (내용 + 영향)") }}
+
+## 5. 차주 계획
+
+{{ next_week_plan | default("- 우선 1: (산출물 + 기한)\n- 우선 2: (산출물 + 기한)\n- 우선 3: (산출물 + 기한)") }}
+
+## 6. 지원 요청
+
+(타 부서 / 상위 부서로부터 필요한 협조 사항)
+
+---
+
+**다음 주 보고 마감**: 매주 월요일 17:00

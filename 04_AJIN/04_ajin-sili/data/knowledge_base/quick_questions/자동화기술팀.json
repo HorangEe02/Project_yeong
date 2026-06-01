@@ -1,0 +1,61 @@
+{
+  "department": "자동화기술팀",
+  "division": "생산기술본부",
+  "description": "3D 스캐닝·라인 자동화·로봇·스마트팩토리 AI — 자동화 기술 구현",
+  "questions": [
+    {
+      "id": "auto-line-3d-scan",
+      "label": "라인 3D 스캔",
+      "promptText": "신차 라인 3D 스캐닝 절차와 데이터 활용 방법",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["3D스캔", "신차"]
+    },
+    {
+      "id": "auto-robot-program",
+      "label": "로봇 프로그래밍",
+      "promptText": "산업용 로봇 프로그래밍 표준 절차와 안전기준",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["로봇", "프로그래밍"]
+    },
+    {
+      "id": "auto-plc-troubleshoot",
+      "label": "PLC 트러블슈팅",
+      "promptText": "PLC 통신 끊김 또는 알람 발생 시 조치 절차",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["PLC", "통신"]
+    },
+    {
+      "id": "auto-ai-deploy",
+      "label": "AI 모델 배포",
+      "promptText": "스마트팩토리 AI 알고리즘 운영 환경 배포 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["AI", "스마트팩토리"]
+    },
+    {
+      "id": "auto-line-availability",
+      "label": "자동화 라인 가동률",
+      "promptText": "현재 자동화 라인별 가동률·다운타임 분석",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["가동률", "다운타임"]
+    },
+    {
+      "id": "auto-simulation",
+      "label": "시뮬레이션 결과",
+      "promptText": "최근 라인 시뮬레이션 결과와 적용 가능성",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["시뮬레이션"]
+    }
+  ]
+}

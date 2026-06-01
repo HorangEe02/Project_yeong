@@ -1,0 +1,60 @@
+{# usage_hint: "고객사·협력사에 부품·서비스 견적 제출. 단가·납기·결제 조건 명시" #}
+{# dept_recommend: ["영업팀", "구매팀"] #}
+{# required_vars: ["customer", "items"] #}
+{# optional_vars: ["quote_number", "quote_date", "valid_until", "currency", "delivery_terms", "payment_terms"] #}
+{# example_output: "견적서 Q-2026-A-014 / 현대자동차 / EWP-001 5,000개 / USD 28,000 / 60일 결제" #}
+{# var_metadata:
+  - {name: "quote_number", label_ko: "견적 번호", required: false, group: "기본", placeholder: "예: Q-2026-A-014"}
+  - {name: "customer", label_ko: "고객사", required: true, group: "수신/발신", placeholder: "예: 현대자동차 부품개발팀"}
+  - {name: "items", label_ko: "품목 / 수량", required: true, group: "내용", placeholder: "예: EWP-001 / 5,000 EA"}
+  - {name: "quote_date", label_ko: "견적일", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "valid_until", label_ko: "유효 기간", required: false, group: "일정", placeholder: "예: 견적일 +30일"}
+  - {name: "currency", label_ko: "통화", required: false, group: "내용", placeholder: "KRW / USD / EUR"}
+  - {name: "delivery_terms", label_ko: "납기 조건", required: false, group: "내용", placeholder: "예: PO 후 8주, FCA 인천공항"}
+  - {name: "payment_terms", label_ko: "결제 조건", required: false, group: "내용", placeholder: "예: 납품 후 60일 T/T"}
+#}
+
+# 견적서 (Quote)
+
+**견적 번호**: {{ quote_number | default("Q-YYYY-A-XXX") }}
+**견적일**: {{ quote_date | default("YYYY-MM-DD") }}
+**유효 기간**: {{ valid_until | default("견적일 +30일") }}
+
+**수신**: {{ customer }}
+**발신**: 아진산업주식회사 영업팀
+
+---
+
+## 1. 견적 품목
+
+| 번호 | 부품 번호 | 품명 | 수량 | 단가 ({{ currency | default("KRW") }}) | 금액 ({{ currency | default("KRW") }}) |
+|---:|---|---|---:|---:|---:|
+| 1 | (PART-NO) | (품명) | (수량) | (단가) | (금액) |
+
+{{ items }}
+
+## 2. 합계
+
+| 항목 | 금액 |
+|---|---:|
+| 소계 | — |
+| 부가세 (10%) | — |
+| **합계** | **—** |
+
+## 3. 거래 조건
+
+- **납기**: {{ delivery_terms | default("PO 후 8주, FCA 인천공항") }}
+- **결제 조건**: {{ payment_terms | default("납품 후 60일 T/T") }}
+- **포장**: 표준 수출 포장
+- **품질 보증**: PPAP Level 3, 12개월 품질 보증
+- **운송 조건**: Incoterms 2020 기준
+
+## 4. 비고
+
+(특수 요구사항, 옵션 사양, 대량 할인 정책 등)
+
+---
+
+본 견적은 {{ valid_until | default("견적일 +30일") }} 까지 유효하며, 이후 시장 상황에 따라 조정될 수 있습니다. 발주서 (PO) 접수 후 양산 일정을 확정합니다.
+
+**문의**: 영업팀 / sales@ajin.co.kr / +82-53-XXX-XXXX

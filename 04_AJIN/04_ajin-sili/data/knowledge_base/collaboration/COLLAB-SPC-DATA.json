@@ -1,0 +1,31 @@
+{
+  "id": "COLLAB-SPC-DATA",
+  "trigger_keywords": [
+    "SPC",
+    "공정 능력",
+    "Cpk",
+    "관리도",
+    "측정 데이터"
+  ],
+  "situation": "품질팀 또는 완성차 SQ에서 특정 공정의 SPC 데이터(관리도, Cpk) 요청",
+  "requesting_dept": "품질보증팀",
+  "my_actions": [
+    "요청 부품/공정의 측정 데이터 추출 (해당 기간)",
+    "X-bar R 관리도 작성",
+    "Cpk 계산 (기준: Cpk >= 1.33)",
+    "이상점(관리 한계 이탈) 유무 확인 및 조치 이력 정리"
+  ],
+  "hand_off_to": "품질보증팀 SPC 담당",
+  "hand_off_items": [
+    "관리도 (X-bar R Chart) 이미지/파일",
+    "Cpk 산출 결과표",
+    "이상점 발생 시 조치 이력"
+  ],
+  "deadline_info": "정기 보고: 월 1회 / 긴급 요청: 2영업일 이내",
+  "related_sop_id": "",
+  "tips": [
+    "Cpk < 1.33이면 공정 능력 부족 판정 — 사전 확인하세요",
+    "AI 시스템의 SPC 분석 기능(Feature F)에서 자동 관리도 생성 가능합니다"
+  ],
+  "citation_id": "COLLAB-SPC-DATA"
+}

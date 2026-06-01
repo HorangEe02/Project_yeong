@@ -1,0 +1,61 @@
+{
+  "department": "구매팀",
+  "division": "구매본부",
+  "description": "협력사 발굴·원가절감·공급망 관리·협력사 서신 — 구매 핵심",
+  "questions": [
+    {
+      "id": "po-status",
+      "label": "발주 현황",
+      "promptText": "오늘·이번주 신규 발주 건수와 미입고",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["발주", "ERP"]
+    },
+    {
+      "id": "po-supplier-search",
+      "label": "협력사 검색",
+      "promptText": "특정 자재/품목 협력사 검색",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["협력사", "검색"]
+    },
+    {
+      "id": "po-supplier-eval",
+      "label": "협력사 평가",
+      "promptText": "협력사 품질·납기·가격 평가 기준",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["평가"]
+    },
+    {
+      "id": "po-cost-saving-report",
+      "label": "원가 절감 실적",
+      "promptText": "이번 분기 구매 원가절감 실적과 누적",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["원가", "실적"]
+    },
+    {
+      "id": "po-letter-template",
+      "label": "협력사 서신",
+      "promptText": "협력사 가격 인상 회신 메일 초안",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["메일", "협력사"]
+    },
+    {
+      "id": "po-contract-renew",
+      "label": "계약 갱신",
+      "promptText": "올해 만료 예정 협력사 계약 목록과 갱신 일정",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["계약", "갱신"]
+    }
+  ]
+}

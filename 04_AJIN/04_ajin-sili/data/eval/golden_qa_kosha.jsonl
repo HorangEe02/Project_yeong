@@ -1,0 +1,25 @@
+{"id": "g01", "query": "도장 공정 자동차 노동자 직업병 사례", "expected_doc_id_prefix": "REAL-KOSHA", "expected_verdict": "correct", "category": "안전보건", "note": "KOSHA OSHRI 직업병 사례"}
+{"id": "g02", "query": "프레스 작업 산재 사망 사고 분석", "expected_doc_id_prefix": "REAL-KOSHA", "expected_verdict": "correct", "category": "안전보건"}
+{"id": "g03", "query": "용접 흄 분진 노출 호흡기 질환", "expected_doc_id_prefix": "REAL-KOSHA", "expected_verdict": "correct", "category": "안전보건"}
+{"id": "g04", "query": "스팟용접 작업자 근골격계 질환 예방", "expected_doc_id_prefix": "REAL-KOSHA", "expected_verdict": "correct", "category": "안전보건"}
+{"id": "g05", "query": "핫스탬핑 고온 작업 화상 사고 사례", "expected_doc_id_prefix": "REAL-KOSHA", "expected_verdict": "correct", "category": "안전보건"}
+{"id": "g06", "query": "자동차 부품 제조업 청력 손실 소음 노출", "expected_doc_id_prefix": "REAL-KOSHA", "expected_verdict": "correct", "category": "안전보건"}
+{"id": "g07", "query": "산업안전보건법 중대재해처벌법 자동차 부품 업체 적용", "expected_doc_id_prefix": "REAL-LAW", "expected_verdict": "correct", "category": "법령"}
+{"id": "g08", "query": "고용노동부 사업장 안전점검 의무 사항", "expected_doc_id_prefix": "REAL-MOEL", "expected_verdict": "correct", "category": "행정"}
+{"id": "g09", "query": "한국자동차연구원 KATECH 차체 부품 기술 동향", "expected_doc_id_prefix": "REAL-KATECH", "expected_verdict": "correct", "category": "기술동향"}
+{"id": "g10", "query": "ECN 변경통보서 작성 양식 8D 보고서", "expected_doc_id_prefix": "DEMO-ECN", "expected_verdict": "correct", "category": "품질문서"}
+{"id": "g11", "query": "PPAP 체크리스트 품질 관리 양산 승인", "expected_doc_id_prefix": "DEMO-PPAP", "expected_verdict": "correct", "category": "품질문서"}
+{"id": "g12", "query": "OEM 이메일 작성 현대자동차 협력사 공급망", "expected_doc_id_prefix": "DEMO-OEM", "expected_verdict": "correct", "category": "문서양식"}
+{"id": "g13", "query": "쿼터패널 대시패널 차체 부품 가공 공정", "expected_doc_id_prefix": "DEMO", "expected_verdict": "correct", "category": "도메인"}
+{"id": "g14", "query": "안전 인시던트 리포트 작성 방법 사례", "expected_doc_id_prefix": "DEMO-INCIDENT", "expected_verdict": "correct", "category": "품질문서"}
+{"id": "g15", "query": "IATF 16949 ISO 14001 인증 요구사항", "expected_doc_id_prefix": "DEMO", "expected_verdict": "correct", "category": "인증"}
+{"id": "g16", "query": "품질문제 개선대책서 양식 작성 가이드", "expected_doc_id_prefix": "DEMO", "expected_verdict": "correct", "category": "품질문서"}
+{"id": "g17", "query": "납입용기 규격 설정서 컨테이너 스펙", "expected_doc_id_prefix": "DEMO", "expected_verdict": "correct", "category": "문서양식"}
+{"id": "g18", "query": "사급 반출 요청서 작성 절차", "expected_doc_id_prefix": "DEMO", "expected_verdict": "correct", "category": "문서양식"}
+{"id": "g19", "query": "회의록 작성 양식 사내 협의 기록", "expected_doc_id_prefix": "DEMO", "expected_verdict": "correct", "category": "문서양식"}
+{"id": "g20", "query": "MSDS 물질안전보건자료 화학물질 취급", "expected_doc_id_prefix": "DEMO", "expected_verdict": "correct", "category": "안전보건"}
+{"id": "n01", "query": "회사 주식 시세 어제 종가", "expected_doc_id_prefix": null, "expected_verdict": "incorrect", "category": "negative", "note": "사내 KB 무관 — 강제 차단 대상"}
+{"id": "n02", "query": "오늘 점심 식당 메뉴 추천", "expected_doc_id_prefix": null, "expected_verdict": "incorrect", "category": "negative"}
+{"id": "n03", "query": "넷플릭스 신규 드라마 추천", "expected_doc_id_prefix": null, "expected_verdict": "incorrect", "category": "negative"}
+{"id": "n04", "query": "내일 서울 날씨 강수확률", "expected_doc_id_prefix": null, "expected_verdict": "incorrect", "category": "negative"}
+{"id": "n05", "query": "비트코인 가격 전망 투자 의견", "expected_doc_id_prefix": null, "expected_verdict": "incorrect", "category": "negative"}

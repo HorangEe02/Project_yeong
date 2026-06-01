@@ -1,0 +1,62 @@
+{# usage_hint: "출장 복귀 후 결과·산출물·후속 액션을 보고. 출장 신청서와 페어로 사용" #}
+{# dept_recommend: ["전 부서"] #}
+{# required_vars: ["destination", "purpose"] #}
+{# optional_vars: ["author", "team", "start_date", "end_date", "summary", "outcomes", "action_items", "expenses"] #}
+{# example_output: "조지아 HMGMA 출장 보고서 / 2026-06-10~17 / EWP 라인 시운전 입회 완료" #}
+{# var_metadata:
+  - {name: "author", label_ko: "작성자", required: false, group: "수신/발신", placeholder: "예: 박준영"}
+  - {name: "team", label_ko: "부서", required: false, group: "수신/발신", placeholder: "예: 생산기술팀"}
+  - {name: "destination", label_ko: "출장지", required: true, group: "기본", placeholder: "예: 조지아주 HMGMA"}
+  - {name: "purpose", label_ko: "출장 목적", required: true, group: "내용", placeholder: "예: EWP 라인 시운전 입회"}
+  - {name: "start_date", label_ko: "출발일", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "end_date", label_ko: "복귀일", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "summary", label_ko: "출장 요약", required: false, group: "내용", placeholder: "주요 진행 사항 2-3 문장"}
+  - {name: "outcomes", label_ko: "주요 성과", required: false, group: "내용", placeholder: "달성한 결과 + 산출물"}
+  - {name: "action_items", label_ko: "후속 액션", required: false, group: "내용", placeholder: "후속 처리 항목 + 담당 + 기한"}
+  - {name: "expenses", label_ko: "지출 내역", required: false, group: "참조", placeholder: "(KRW) 항공/숙박/식비/기타"}
+#}
+
+# 출장 보고서
+
+**작성자**: {{ author | default("[성명]") }}
+**부서**: {{ team | default("[부서]") }}
+
+---
+
+## 1. 출장 개요
+
+| 항목 | 내용 |
+|---|---|
+| 출장지 | {{ destination }} |
+| 기간 | {{ start_date | default("YYYY-MM-DD") }} ~ {{ end_date | default("YYYY-MM-DD") }} |
+| 목적 | {{ purpose }} |
+| 동행자 | (동행자 명단) |
+
+## 2. 출장 요약
+
+{{ summary | default("(주요 진행 사항 2-3 문장 — 누구를 만났고, 무엇을 보았고, 무엇이 결정되었는가)") }}
+
+## 3. 일자별 활동
+
+| 일차 | 일자 | 주요 활동 | 상대 / 장소 |
+|---:|---|---|---|
+| 1 | {{ start_date | default("D1") }} | (도착 / 첫 미팅) | — |
+| 2 | — | (현장 점검) | — |
+| 3 | — | (마지막 회의 / 출국) | — |
+
+## 4. 주요 성과
+
+{{ outcomes | default("- 성과 1: (산출물 / 결과)\n- 성과 2: (산출물)\n- 성과 3: (산출물)") }}
+
+## 5. 후속 액션
+
+{{ action_items | default("| 번호 | 내용 | 담당 | 기한 |\n|---:|---|---|---|\n| 1 | (후속 항목 1) | — | — |\n| 2 | (후속 항목 2) | — | — |") }}
+
+## 6. 지출 내역
+
+{{ expenses | default("| 항목 | 금액 (KRW) | 영수증 |\n|---|---:|:-:|\n| 항공 | — | ✓ |\n| 숙박 | — | ✓ |\n| 식비 | — | ✓ |\n| 기타 | — | ✓ |\n| **합계** | **—** | — |") }}
+
+---
+
+**첨부**: 회의록 / 측정 데이터 / 사진 / 영수증 원본
+**제출**: 복귀 후 5일 이내

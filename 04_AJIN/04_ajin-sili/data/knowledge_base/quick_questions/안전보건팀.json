@@ -1,0 +1,61 @@
+{
+  "department": "안전보건팀",
+  "division": "생산본부",
+  "description": "산안법·위험성평가·안전교육·산재 — 현장 안전 확보",
+  "questions": [
+    {
+      "id": "safe-rule-update",
+      "label": "산안법 최신",
+      "promptText": "산업안전보건법 최근 개정 사항과 시행일 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["산안법", "법규", "컴플라이언스"]
+    },
+    {
+      "id": "safe-press-distance",
+      "label": "프레스 안전거리",
+      "promptText": "프레스 안전거리 기준 (개정 후) 알려줘",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["프레스", "안전거리", "산안법"]
+    },
+    {
+      "id": "safe-risk-assessment",
+      "label": "위험성평가",
+      "promptText": "위험성 평가 절차와 양식 다운로드",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["위험성평가", "절차"]
+    },
+    {
+      "id": "safe-incident-report",
+      "label": "산재 보고",
+      "promptText": "산업재해 발생 시 보고 절차 알려줘",
+      "category": "scenario",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["산재", "보고"]
+    },
+    {
+      "id": "safe-training-schedule",
+      "label": "안전교육 일정",
+      "promptText": "이번 분기 법정 안전교육 일정과 미이수자 보여줘",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["교육", "법정"]
+    },
+    {
+      "id": "safe-msds",
+      "label": "MSDS 검색",
+      "promptText": "사내 사용 화학물질 MSDS 검색하고 싶어",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["MSDS", "화학물질"]
+    }
+  ]
+}

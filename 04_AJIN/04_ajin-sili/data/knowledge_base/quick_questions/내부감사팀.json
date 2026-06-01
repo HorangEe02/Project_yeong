@@ -1,0 +1,61 @@
+{
+  "department": "내부감사팀",
+  "division": "(독립)",
+  "description": "업무·프로세스 효율성·투명성 점검·리스크 분석·개선 권고·준법 점검",
+  "questions": [
+    {
+      "id": "audit-annual-plan",
+      "label": "연간 감사 계획",
+      "promptText": "올해 내부감사 연간 계획과 분기별 일정",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["감사계획"]
+    },
+    {
+      "id": "audit-checklist",
+      "label": "감사 체크리스트",
+      "promptText": "프로세스 감사 표준 체크리스트 템플릿",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["체크리스트"]
+    },
+    {
+      "id": "audit-finding-report",
+      "label": "감사 지적 보고",
+      "promptText": "감사 지적사항 보고서 작성 가이드",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["지적", "보고서"]
+    },
+    {
+      "id": "audit-risk-register",
+      "label": "리스크 등록",
+      "promptText": "사내 리스크 레지스터 최신 현황",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["리스크"]
+    },
+    {
+      "id": "audit-compliance-check",
+      "label": "준법 점검",
+      "promptText": "준법 점검 대상 항목과 최근 결과",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["준법"]
+    },
+    {
+      "id": "audit-followup",
+      "label": "후속 조치",
+      "promptText": "감사 지적 후속 조치 진행 현황",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["후속조치"]
+    }
+  ]
+}

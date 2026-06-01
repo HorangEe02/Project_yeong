@@ -1,0 +1,47 @@
+{# usage_hint: "인사 발령 (승진·전보·신규 채용·휴직 등) 을 사내에 공식 통지" #}
+{# dept_recommend: ["인사팀"] #}
+{# required_vars: ["target_employee", "effective_date"] #}
+{# optional_vars: ["notice_type", "from_position", "to_position", "from_team", "to_team", "issuer", "remark"] #}
+{# example_output: "인사발령 / 박준영 대리 → 과장 승진 / 2026-07-01 발효" #}
+{# var_metadata:
+  - {name: "target_employee", label_ko: "대상자", required: true, group: "기본", placeholder: "예: 박준영 (사번 12345)"}
+  - {name: "notice_type", label_ko: "발령 종류", required: false, group: "기본", placeholder: "승진 / 전보 / 신규 / 휴직 / 복직 / 퇴직"}
+  - {name: "from_team", label_ko: "전 부서", required: false, group: "내용", placeholder: "예: 생산기술팀"}
+  - {name: "from_position", label_ko: "전 직급", required: false, group: "내용", placeholder: "예: 대리"}
+  - {name: "to_team", label_ko: "신 부서", required: false, group: "내용", placeholder: "예: 생산기술팀 (동일)"}
+  - {name: "to_position", label_ko: "신 직급", required: false, group: "내용", placeholder: "예: 과장"}
+  - {name: "effective_date", label_ko: "발효일", required: true, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "issuer", label_ko: "발령 부서", required: false, group: "수신/발신", placeholder: "예: 인사관리팀"}
+  - {name: "remark", label_ko: "비고", required: false, group: "참조", placeholder: "(선택) 환영회 / 인수인계 일정 등"}
+#}
+
+# 인사 발령 통지
+
+**발령 번호**: HR-{{ effective_date | replace("-", "") | default("YYYYMMDD") }}-XXX
+**발령일**: 작성일
+**발효일**: {{ effective_date }}
+**발령 부서**: {{ issuer | default("인사관리팀") }}
+
+---
+
+## 발령 사항
+
+| 항목 | 내용 |
+|---|---|
+| 대상자 | {{ target_employee }} |
+| 발령 종류 | {{ notice_type | default("승진 / 전보 / 신규 / 휴직 / 복직") }} |
+| 전 부서 / 직급 | {{ from_team | default("—") }} {{ from_position | default("") }} |
+| 신 부서 / 직급 | {{ to_team | default("—") }} {{ to_position | default("") }} |
+| 발효일 | {{ effective_date }} |
+
+{% if remark %}
+## 비고
+
+{{ remark }}
+{% endif %}
+
+---
+
+상기 발령 사항은 {{ effective_date }} 부터 효력이 발생합니다. 발령 대상자의 적극적인 협조와 안착을 바라며, 관련 부서는 인수인계 및 환영 절차를 진행해 주시기 바랍니다.
+
+**아진산업주식회사 인사관리팀장 (직인)**

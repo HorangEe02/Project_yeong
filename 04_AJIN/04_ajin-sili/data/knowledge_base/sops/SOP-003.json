@@ -1,0 +1,105 @@
+{
+  "sop_id": "SOP-003",
+  "title": "EWP 하우징 CNC 가공 절차",
+  "department": "생산기술본부",
+  "category": "생산",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "소재 세팅",
+      "description": "소재 바이스 고정 -> 원점 설정 -> 공구 오프셋 확인",
+      "checklist": [
+        "바이스 클램핑 확인",
+        "원점 설정 완료",
+        "공구 오프셋 확인"
+      ],
+      "caution": "",
+      "related_terms": [
+        "바이스",
+        "원점",
+        "공구오프셋"
+      ],
+      "estimated_time": "5분",
+      "responsible": "",
+      "title_en": ""
+    },
+    {
+      "step_number": 2,
+      "title": "황삭 가공",
+      "description": "NC 프로그램 실행 -> 황삭 가공 -> 칩 배출 확인 -> 중간 치수 확인",
+      "checklist": [
+        "황삭 프로그램 실행",
+        "칩 배출 정상",
+        "중간 치수 OK"
+      ],
+      "caution": "",
+      "related_terms": [
+        "황삭",
+        "NC프로그램"
+      ],
+      "estimated_time": "15분",
+      "responsible": "",
+      "title_en": ""
+    },
+    {
+      "step_number": 3,
+      "title": "정삭 가공",
+      "description": "공구 교환 -> 정삭 프로그램 실행 -> 표면 조도 확인",
+      "checklist": [
+        "정삭 공구 장착",
+        "정삭 완료",
+        "표면 조도 Ra 확인"
+      ],
+      "caution": "공구 마모 시 표면 조도 불량 발생",
+      "related_terms": [
+        "정삭",
+        "표면조도",
+        "Ra"
+      ],
+      "estimated_time": "20분",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 4,
+      "title": "세척 및 검사",
+      "description": "절삭유 세척 -> 버 제거 -> CMM 치수 측정 -> 합부 판정",
+      "checklist": [
+        "세척 완료",
+        "버 제거 완료",
+        "CMM 측정 합격",
+        "검사 성적서 발행"
+      ],
+      "caution": "",
+      "related_terms": [
+        "CMM",
+        "버",
+        "검사성적서"
+      ],
+      "estimated_time": "10분",
+      "responsible": "",
+      "title_en": ""
+    }
+  ],
+  "prerequisites": [
+    "NC 프로그램 로딩 완료",
+    "공구 마모도 확인",
+    "소재 입고 검사 합격"
+  ],
+  "safety_warnings": [
+    "회전체 접근 금지",
+    "칩 비산 보호구 착용",
+    "절삭유 피부 접촉 주의"
+  ],
+  "related_sops": [],
+  "citation_id": "SOP-003",
+  "owner_department": "CNC생산팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "title_en": "CNC / EWP Precision Machining Procedure",
+  "department_en": "CNC Team",
+  "category_en": "Production"
+}

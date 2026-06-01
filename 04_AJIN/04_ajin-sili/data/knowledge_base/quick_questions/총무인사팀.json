@@ -1,0 +1,76 @@
+{
+  "department": "총무인사팀",
+  "division": "관리본부",
+  "description": "복리후생·시설관리·채용·배치·평가·보상·노사문화 — 인사·총무 전반",
+  "questions": [
+    {
+      "id": "hr-leave-policy",
+      "label": "연차 정책",
+      "promptText": "연차 발생·소진·이월 정책 알려줘",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["연차", "복리후생"],
+      "kb_doc_path": "department_guides/총무인사팀_복리후생.md"
+    },
+    {
+      "id": "hr-recruitment-process",
+      "label": "채용 절차",
+      "promptText": "신규 인원 채용 요청~입사 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["채용", "인사"],
+      "kb_doc_path": "department_guides/총무인사팀_채용.md"
+    },
+    {
+      "id": "hr-evaluation-cycle",
+      "label": "평가 주기",
+      "promptText": "이번 분기 인사평가 일정과 등급 기준",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["평가", "보상"]
+    },
+    {
+      "id": "hr-benefit-list",
+      "label": "직원 복리후생",
+      "promptText": "사내 복리후생 항목 전체 안내",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["복리", "혜택"],
+      "kb_doc_path": "department_guides/총무인사팀_복리후생.md"
+    },
+    {
+      "id": "hr-facility-request",
+      "label": "시설관리",
+      "promptText": "회의실·차량·사옥 시설 사용 신청 방법",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["시설", "신청"],
+      "kb_doc_path": "department_guides/총무인사팀_시설관리.md"
+    },
+    {
+      "id": "hr-csr-activities",
+      "label": "사회 환원활동 지원",
+      "promptText": "사내 사회 환원활동·CSR·봉사·기부 프로그램 안내",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["CSR", "봉사", "환원"],
+      "kb_doc_path": "department_guides/총무인사팀_사회환원.md"
+    },
+    {
+      "id": "hr-onboarding-checklist",
+      "label": "온보딩 체크",
+      "promptText": "신규 입사자 온보딩 첫 주 인사팀 체크리스트",
+      "category": "sop",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["온보딩"],
+      "kb_doc_path": "department_guides/총무인사팀_채용.md"
+    }
+  ]
+}

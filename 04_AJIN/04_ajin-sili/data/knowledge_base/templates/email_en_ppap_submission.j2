@@ -1,0 +1,38 @@
+To: {{ recipient_name }}, {{ recipient_title }}, {{ recipient_company }}
+CC: {{ cc_list | default('') }}
+Subject: [JOON INC] PPAP Submission Notice — {{ part_name }} ({{ part_no }})
+
+Dear {{ recipient_name }},
+
+We are pleased to submit the Production Part Approval Process (PPAP) documentation for the following part:
+
+**Part Information:**
+- Part Name: {{ part_name }}
+- Part No.: {{ part_no }}
+- Revision: {{ revision }}
+- Submission Level: {{ submission_level | default('Level 3') }}
+
+**Submission Summary:**
+| No. | PPAP Element | Status |
+|-----|-------------|--------|
+{% for element in ppap_elements %}
+| {{ loop.index }} | {{ element.name }} | {{ element.status }} |
+{% endfor %}
+
+**Key Highlights:**
+{% for note in key_notes %}
+- {{ note }}
+{% endfor %}
+
+**Requested Approval Date:** {{ requested_approval_date }}
+**Target SOP Date:** {{ target_sop_date }}
+
+Please review the attached documentation and advise if any additional information is required.
+
+Best regards,
+
+{{ sender_name }}
+{{ sender_title }}, {{ sender_department }}
+AJIN Industrial (JOON INC)
+Tel: {{ sender_phone }}
+Email: {{ sender_email }}

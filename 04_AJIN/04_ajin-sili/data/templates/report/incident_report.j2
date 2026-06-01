@@ -1,0 +1,75 @@
+{# 안전 인시던트 리포트 양식 (v2.6) #}
+
+# 안전 인시던트 리포트
+
+| 항목 | 내용 |
+|---|---|
+| 보고 번호 | {{ report_number | default("INC-2026-XXX") }} |
+| 작성일 | {{ created_date }} |
+| 작성자 | {{ author | default("OOO") }} |
+| 보고 부서 | {{ department | default("안전보건팀") }} |
+
+---
+
+## 1. 사고 개요
+
+| 항목 | 내용 |
+|---|---|
+| 발생 일시 | {{ incident_date }} |
+| 발생 장소 | {{ incident_location }} |
+| 사고 유형 | {{ incident_type }} |
+| 피해자 | {{ victim_info | default("없음") }} |
+| 피해 정도 | {{ injury_severity | default("무재해") }} |
+| 목격자 | {{ witnesses | default("없음") }} |
+
+---
+
+## 2. 사고 경위
+
+{{ incident_description }}
+
+## 3. 피해 현황
+
+| 구분 | 내용 |
+|---|---|
+| 인적 피해 | {{ human_damage | default("없음") }} |
+| 물적 피해 | {{ property_damage | default("없음") }} |
+| 생산 영향 | {{ production_impact | default("없음") }} |
+| 환경 영향 | {{ environmental_impact | default("없음") }} |
+
+## 4. 긴급 조치 사항
+
+{{ emergency_action }}
+
+## 5. 원인 분석
+
+### 5-1. 직접 원인
+
+{{ direct_cause }}
+
+### 5-2. 간접 원인 (관리적 원인)
+
+{{ indirect_cause | default("조사 중") }}
+
+## 6. 재발 방지 대책
+
+{{ preventive_measures }}
+
+## 7. 후속 조치 계획
+
+| 조치 사항 | 담당 | 기한 | 비고 |
+|---|---|---|---|
+| 현장 안전 점검 | 안전보건팀 | {{ inspection_deadline | default("즉시") }} | |
+| 관련자 교육 | 안전보건팀 | {{ training_deadline | default("1주 이내") }} | |
+| 설비 개선 | {{ responsible_dept | default("생산기술팀") }} | {{ improvement_deadline | default("2주 이내") }} | |
+| 재발 방지 검증 | 안전보건팀 | {{ verification_deadline | default("1개월") }} | |
+
+---
+
+**보고 체계:**
+
+| 작성 | 검토 | 승인 |
+|---|---|---|
+| {{ author | default("OOO") }} | 안전보건팀장 | 공장장 |
+
+*아진산업(주) 안전보건팀 — 산업안전보건법 제57조에 의거 작성*

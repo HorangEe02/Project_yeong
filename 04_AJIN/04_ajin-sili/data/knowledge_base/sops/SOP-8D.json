@@ -1,0 +1,123 @@
+{
+  "sop_id": "SOP-8D",
+  "title": "8D Report 작성 (고객 클레임 대응)",
+  "department": "품질보증팀",
+  "category": "품질",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "D1: 팀 구성",
+      "description": "클레임 내용 파악 후 대응팀 구성. 품질+생산기술+해당 공정 담당자 포함.",
+      "checklist": [
+        "클레임 접수 내용 확인(부품명, 불량, 수량, 로트)",
+        "팀 리더 지정(품질보증팀 과장급)",
+        "관련 부서 담당자 소집"
+      ],
+      "caution": "접수 당일 내로 팀 구성 완료",
+      "related_terms": [],
+      "estimated_time": "당일",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 2,
+      "title": "D2: 문제 기술",
+      "description": "불량 현상을 5W2H 기준으로 정확히 기술.",
+      "checklist": [
+        "불량 부위 사진 첨부",
+        "불량 현상 수치 포함 서술",
+        "발생 빈도·영향 범위 파악",
+        "해당 로트 생산 일시/설비/작업자 확인"
+      ],
+      "caution": "",
+      "related_terms": [
+        "5W2H",
+        "로트"
+      ],
+      "estimated_time": "반일",
+      "responsible": "",
+      "title_en": ""
+    },
+    {
+      "step_number": 3,
+      "title": "D3: 잠정 조치",
+      "description": "추가 불량 유출 방지 위한 즉각 격리/선별/교체 조치.",
+      "checklist": [
+        "라인 내 재고+납품 대기분 전수 선별",
+        "불량품 격리(적색 태그)",
+        "대체품 긴급 납품 계획",
+        "잠정 조치 SQ에 즉시 보고"
+      ],
+      "caution": "잠정 조치는 접수 후 24시간 이내 실행 및 보고",
+      "related_terms": [],
+      "estimated_time": "24시간 이내",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 4,
+      "title": "D4~D5: 근본 원인 분석 + 영구 대책",
+      "description": "4M, 5-Why, FTA 등으로 근본 원인 규명, 재발 방지 영구 대책 수립.",
+      "checklist": [
+        "4M(Man/Machine/Material/Method) 분석",
+        "5-Why로 근본 원인 도달",
+        "영구 대책 수립(설비개선/금형수정/검사강화)",
+        "대책 실행 일정·담당자 명시"
+      ],
+      "caution": "'작업자 부주의'로 종결하면 SQ 반려 — 시스템적 원인 필수",
+      "related_terms": [
+        "4M",
+        "5-Why",
+        "FTA"
+      ],
+      "estimated_time": "2~3일",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 5,
+      "title": "D6~D8: 대책 실행 + 효과 검증 + 종결",
+      "description": "영구 대책 실행, 효과 검증(SPC/Cpk), 표준화 후 종결.",
+      "checklist": [
+        "대책 실행 전후 비교 데이터 확보",
+        "Cpk 개선 데이터 첨부",
+        "SOP/CP/FMEA 업데이트",
+        "유사 공정 수평 전개",
+        "최종 8D Report SQ 제출"
+      ],
+      "caution": "현대차 기준: 접수 후 5영업일 이내 최종 보고",
+      "related_terms": [
+        "Cpk",
+        "수평전개",
+        "표준화"
+      ],
+      "estimated_time": "1~2일",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    }
+  ],
+  "prerequisites": [
+    "클레임 접수 완료",
+    "불량 샘플 확보"
+  ],
+  "safety_warnings": [
+    "접수 당일 내로 팀 구성 완료",
+    "잠정 조치 24시간 이내 실행"
+  ],
+  "related_sops": [
+    "SOP-PPAP"
+  ],
+  "citation_id": "SOP-8D",
+  "owner_department": "품질보증팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "title_en": "8D Customer-Claim Response Procedure",
+  "department_en": "QA Team",
+  "category_en": "Quality"
+}

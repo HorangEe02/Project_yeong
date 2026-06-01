@@ -1,0 +1,33 @@
+template_id: spc_violation
+template_name: SPC 위반 알림 메일
+category: incident_report
+required_context:
+  - violation_id
+  - process
+  - lot_id
+  - rule_number
+  - rule_name
+  - violating_count
+  - recommended_action
+  - detected_at
+subject_template: "[긴급] {process} 라인 Nelson Rule {rule_number} 위반 — Lot {lot_id}"
+body_template: |
+  안녕하세요,
+
+  {process} 라인에서 SPC 관리도 이상이 감지되어 공유드립니다.
+
+  **위반 정보**
+  - 시점: {detected_at}
+  - 공정: {process}
+  - Lot: {lot_id}
+  - 위반 규칙: Nelson Rule {rule_number} — {rule_name}
+  - 위반 포인트 수: {violating_count}
+
+  **권장 조치**
+  {recommended_action}
+
+  관련 SOP 및 영향 분석은 대시보드에서 확인하실 수 있습니다.
+  https://ajin-cb.web.app/equipment?focus={violation_id}
+
+  감사합니다.
+  AJIN AI Assistant

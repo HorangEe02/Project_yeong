@@ -1,0 +1,106 @@
+{
+  "sop_id": "SOP-PRESS-TRIAL",
+  "title": "프레스 트라이(시타) 참관 준비",
+  "department": "생산기술팀",
+  "category": "생산",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "사전 준비",
+      "description": "트라이 전날까지 부품 도면, 금형 정보, 프레스 조건표 확인.",
+      "checklist": [
+        "부품 도면 출력/태블릿 준비",
+        "금형 번호·공정 수 확인",
+        "이전 트라이 기록 확인(있으면)",
+        "필기구+카메라(불량 사진용) 준비"
+      ],
+      "caution": "",
+      "related_terms": [
+        "금형 번호",
+        "프레스 조건표"
+      ],
+      "estimated_time": "30분",
+      "responsible": "",
+      "title_en": ""
+    },
+    {
+      "step_number": 2,
+      "title": "안전 장구 착용",
+      "description": "프레스 작업장 진입 전 반드시 안전 장구 착용.",
+      "checklist": [
+        "안전모 착용",
+        "안전화 착용",
+        "귀마개 착용(프레스 소음 80dB 이상)",
+        "안전 조끼 착용(방문자 표시)"
+      ],
+      "caution": "안전 장구 미착용 시 작업장 출입 불가 — 산안법 위반",
+      "related_terms": [
+        "PPE",
+        "산안법"
+      ],
+      "estimated_time": "5분",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 3,
+      "title": "트라이 중 관찰 포인트",
+      "description": "프레스 가동 중 소리, 성형성, 제품 상태 관찰·기록.",
+      "checklist": [
+        "프레스 타격음 일정한지 확인",
+        "성형 제품 크랙/주름/스프링백 확인",
+        "소재 이송(피더) 원활한지 확인",
+        "쿠션 압력계 수치 기록",
+        "생산 속도(SPM) 기록"
+      ],
+      "caution": "가동 중 프레스에 절대 손 넣지 않기 — 안전거리 준수",
+      "related_terms": [
+        "SPM",
+        "스프링백",
+        "쿠션압"
+      ],
+      "estimated_time": "1~2시간",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 4,
+      "title": "트라이 후 데이터 기록",
+      "description": "결과 정리 및 관련 부서에 공유.",
+      "checklist": [
+        "최종 프레스 조건(톤수, SPM, 쿠션압) 기록",
+        "불량 시 사진+유형+발생 위치 기록",
+        "판정 결과(OK/NG/조건부 OK) 기록",
+        "다음 트라이/양산 전환 일정 확인"
+      ],
+      "caution": "",
+      "related_terms": [
+        "트라이 판정",
+        "프레스 조건"
+      ],
+      "estimated_time": "30분",
+      "responsible": "",
+      "title_en": ""
+    }
+  ],
+  "prerequisites": [
+    "해당 부품 도면 준비",
+    "금형 정보 확인"
+  ],
+  "safety_warnings": [
+    "안전 장구 미착용 시 작업장 출입 불가 — 산안법 위반",
+    "가동 중 프레스에 절대 손 넣지 말 것 — 안전거리 준수"
+  ],
+  "related_sops": [],
+  "citation_id": "SOP-PRESS-TRIAL",
+  "owner_department": "생산기술팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "title_en": "Press Mold Trial Run Procedure",
+  "department_en": "Production Tech Team",
+  "category_en": "Production"
+}

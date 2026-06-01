@@ -1,0 +1,153 @@
+{
+  "citation_id": "GLOSSARY-dept_production_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "status": "published",
+  "category": "생산관리·생산팀 현장 용어",
+  "department": ["생산관리팀", "생산팀", "제조팀"],
+  "version": "1.0",
+  "description": "자동차 부품 생산 현장에서 일상적으로 사용하는 생산 지표, 라인 운영, 일본어 유래 은어 모음.",
+  "terms": [
+    {
+      "term": "UPH",
+      "full_name": "Units Per Hour (시간당 생산량)",
+      "definition": "1시간 동안 생산 가능한 제품 수량. 생산관리의 가장 핵심적인 효율 지표이며, 설비 가동시간과 사이클타임에 의해 결정된다.",
+      "usage_example": "\"UPH 120 찍어야 해\" = 시간당 120개 생산해야 한다",
+      "aliases": ["시간당 생산량"]
+    },
+    {
+      "term": "택타임",
+      "full_name": "Tact Time / Takt Time",
+      "definition": "고객 수요를 충족하기 위해 제품 1개를 생산하는 데 허용되는 시간. 가용 생산시간 ÷ 고객 요구 수량으로 계산한다. 사이클타임(C/T)과 구분해야 한다.",
+      "usage_example": "\"택타임 55초야\" = 55초마다 1개씩 나와야 한다",
+      "aliases": ["T/T", "탁트타임"]
+    },
+    {
+      "term": "C/T",
+      "full_name": "Cycle Time (사이클타임)",
+      "definition": "한 공정에서 제품 1개를 처리하는 데 실제로 소요되는 시간. 택타임보다 짧아야 납기를 맞출 수 있다.",
+      "usage_example": "\"C/T 줄여야 해\", \"이 공정 C/T가 병목이야\"",
+      "aliases": ["사이클", "싸이클타임"]
+    },
+    {
+      "term": "가동률",
+      "full_name": "Operating Rate (설비 가동률)",
+      "definition": "총 가용시간 대비 실제 설비가 운전된 시간의 비율. 100%에 가까울수록 설비를 효율적으로 사용하고 있다는 뜻이다.",
+      "usage_example": "\"가동률 떨어졌다\", \"가동률 90% 이상 유지해\"",
+      "aliases": ["가동율"]
+    },
+    {
+      "term": "비가동",
+      "full_name": "Non-operating Time (비가동 시간)",
+      "definition": "설비가 생산하지 못하고 멈춰 있는 시간. 고장, 금형 교체, 자재 대기, 품질 이상 등 원인별로 분류하여 관리한다.",
+      "usage_example": "\"비가동 원인 뭐야?\", \"비가동 줄이는 게 핵심이야\"",
+      "aliases": ["다운타임", "정지시간"]
+    },
+    {
+      "term": "라인오프",
+      "full_name": "Line Off",
+      "definition": "최종 완성품이 생산라인 끝에서 나오는 것. 또는 해당 시점을 말한다.",
+      "usage_example": "\"라인오프 몇 시?\" = 마지막 제품 몇 시에 나와?",
+      "aliases": ["L/O"]
+    },
+    {
+      "term": "증산 / 감산",
+      "full_name": "Production Increase / Decrease",
+      "definition": "완성차 업체의 생산 일정 변동에 따라 부품 생산량을 늘리거나(증산) 줄이는(감산) 것. 협력사는 완성차 일정에 즉시 대응해야 한다.",
+      "usage_example": "\"다음 주 증산이야, 특근 편성해\", \"감산 들어가서 한 라인 멈춰\"",
+      "aliases": []
+    },
+    {
+      "term": "잔업 / 특근",
+      "full_name": "잔업(Overtime) / 특근(Weekend/Holiday Work)",
+      "definition": "잔업은 정규 근무시간 이후 초과근무, 특근은 주말·공휴일 근무를 말한다. 납기를 맞추기 위해 수시로 발생한다.",
+      "usage_example": "\"납기 맞추려면 특근 돌려야 해\", \"잔업 2시간 붙었다\"",
+      "aliases": ["OT", "초과근무"]
+    },
+    {
+      "term": "교대",
+      "full_name": "Shift (교대근무)",
+      "definition": "주간과 야간을 번갈아 근무하는 체계. 2교대(주간·야간), 3교대(조·중·석)가 있다.",
+      "usage_example": "\"2교대 돌려\", \"야간 교대조 인원 확인해\"",
+      "aliases": ["시프트", "주야간"]
+    },
+    {
+      "term": "LOB",
+      "full_name": "Line of Balance (라인 밸런싱)",
+      "definition": "생산라인 내 각 공정의 작업 시간을 균등하게 배분하여 병목을 제거하는 것. LOB율이 높을수록 라인 효율이 좋다.",
+      "usage_example": "\"LOB 맞춰\" = 공정 간 작업 시간 균형 잡아",
+      "aliases": ["라인밸런스", "편성효율"]
+    },
+    {
+      "term": "칸반",
+      "full_name": "Kanban (看板, 간판)",
+      "definition": "도요타 생산방식(TPS)에서 유래한 생산 지시·자재 요청 카드 시스템. '필요한 것을, 필요한 때에, 필요한 만큼' 생산하는 풀(Pull) 방식의 핵심 도구.",
+      "usage_example": "\"칸반 돌려\" = 생산 지시 카드 순환 시작",
+      "aliases": ["간판"]
+    },
+    {
+      "term": "안돈",
+      "full_name": "Andon (行灯, 안돈)",
+      "definition": "생산라인에 이상이 발생했을 때 작업자가 당기는 끈이나 누르는 버튼으로, 경고등·알림이 울리며 라인 정지 또는 관리자 호출을 한다. 도요타 생산방식의 핵심 개념.",
+      "usage_example": "\"안돈 울렸다\" = 라인 이상 발생 경고",
+      "aliases": ["안돈 시스템"]
+    },
+    {
+      "term": "JIT",
+      "full_name": "Just In Time (적시생산)",
+      "definition": "재고를 최소화하기 위해 필요한 부품을 필요한 시점에 맞춰 생산·납품하는 방식. 자동차 산업의 기본 생산 철학이다.",
+      "usage_example": "\"JIT 체제라 안전재고가 거의 없어\"",
+      "aliases": ["적시생산", "저스트 인 타임"]
+    },
+    {
+      "term": "원스톱",
+      "full_name": "One Stop (라인 정지 1회)",
+      "definition": "생산라인이 1회 정지된 것. 라인 정지는 생산 손실에 직결되므로 일일 원스톱 횟수를 관리한다.",
+      "usage_example": "\"오늘 원스톱 2건이야\" = 라인이 2번 멈췄다",
+      "aliases": ["라인스톱"]
+    },
+    {
+      "term": "OEE",
+      "full_name": "Overall Equipment Effectiveness (설비종합효율)",
+      "definition": "가동률 × 성능효율 × 양품률로 계산하는 설비 효율 종합 지표. 세계적 수준(World Class)은 85% 이상이다.",
+      "usage_example": "\"OEE 85% 찍어야 해\", \"OEE 떨어졌다\"",
+      "aliases": ["설비종합효율"]
+    },
+    {
+      "term": "작지",
+      "full_name": "작업지시서 (Work Order)",
+      "definition": "생산할 제품, 수량, 일정 등을 지시하는 문서. ERP/MES 시스템에서 발행된다.",
+      "usage_example": "\"작지 내려왔다\" = 생산 지시가 발행됐다",
+      "aliases": ["W/O", "워크오더"]
+    },
+    {
+      "term": "일보",
+      "full_name": "작업일보 / 생산일보 (Daily Production Report)",
+      "definition": "일일 생산 실적(생산량, 불량 수, 가동시간, 비가동 사유 등)을 기록한 보고서.",
+      "usage_example": "\"일보 올려\" = 오늘 생산 실적 보고서 제출해",
+      "aliases": ["생산일보", "데일리 리포트"]
+    },
+    {
+      "term": "투입",
+      "full_name": "Material Input (자재 투입)",
+      "definition": "원자재나 부품을 생산라인에 넣는 것.",
+      "usage_example": "\"투입 시작\", \"블랭크 투입해\"",
+      "aliases": ["자재투입", "인풋"]
+    },
+    {
+      "term": "POP",
+      "full_name": "Point of Production",
+      "definition": "생산 현장에 설치된 데이터 입력 단말기. 작업자가 생산 실적, 불량 수, 설비 상태 등을 실시간으로 입력한다.",
+      "usage_example": "\"POP 찍어\" = 생산 실적 단말기에 입력해",
+      "aliases": ["팝 단말기"]
+    },
+    {
+      "term": "포카요케",
+      "full_name": "Poka-Yoke (ポカヨケ, 실수 방지)",
+      "definition": "작업자의 실수를 물리적으로 방지하는 장치나 설계. 예: 부품을 거꾸로 끼우면 조립이 안 되게 하는 핀 구조.",
+      "usage_example": "\"포카요케 안 걸려\" = 실수 방지 장치가 작동 안 한다",
+      "aliases": ["풀프루프", "방지장치"]
+    }
+  ]
+}

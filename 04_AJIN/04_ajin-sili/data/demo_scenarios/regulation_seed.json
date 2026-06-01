@@ -1,0 +1,249 @@
+{
+  "_meta": {
+    "version": "2.0.0",
+    "created_at": "2026-05-24T00:00:00+09:00",
+    "demo_date": "2026-06-10",
+    "description": "P0-2 법규 모니터링 시연 시드 — regulation_changes 3건 + live_alarms 3건 + notification_outbox 4건 (실제 Supabase 스키마 기준)",
+    "plan_ref": "docs/demo-prep/seeding/P0-2_regulation_changes_seed_plan.md",
+    "supabase_project": "ycjuzwltwbeudanjykag"
+  },
+  "regulation_changes": [
+    {
+      "id": "REG-2025-12-001-PRESS-SAFETY",
+      "source": "domestic_law",
+      "title": "산업안전보건기준 제103조 — 프레스 안전거리 강화 (300mm → 400mm)",
+      "severity": "CRITICAL",
+      "status": "pending",
+      "url": "https://www.law.go.kr/법령/산업안전보건기준에관한규칙",
+      "payload": {
+        "regulation_name": "산업안전보건기준에 관한 규칙",
+        "article": "제103조 (프레스 등의 위험방지)",
+        "change_type": "modified",
+        "before_text": "프레스의 작업점으로부터 작업자가 손가락 등 신체일부를 다치지 아니하도록 안전거리(300mm 이상)를 확보하여야 한다.",
+        "after_text": "프레스의 작업점으로부터 작업자가 손가락 등 신체일부를 다치지 아니하도록 안전거리(400mm 이상)를 확보하여야 한다.",
+        "effective_date": "2026-09-01",
+        "legal_class": "산안법",
+        "grade": "CRITICAL",
+        "affected_facilities": ["경산1공장 B3라인", "경산1공장 B5라인", "경산2공장 B5라인"],
+        "affected_processes": ["프레스 스탬핑", "트리밍", "피어싱"],
+        "facility_count": 3,
+        "law_gazette_no": "제2025-127호",
+        "penalty_severity_krw_mn": 50.0,
+        "penalty_risk_score": 300.0,
+        "penalty_explanation": "산안법 산업안전보건법 제175조·제167조 기준: 설비 3개 × 최대 10백만원 × 긴급도1.5 = ₩50,000,000",
+        "audit_trail": [
+          {
+            "ts": "2026-06-09T02:35:00+09:00",
+            "actor": "system:domestic_law_crawler",
+            "action": "detected",
+            "note": "국가법령정보센터 Open API — 산안법 시행규칙 개정 감지"
+          },
+          {
+            "ts": "2026-06-09T09:00:00+09:00",
+            "actor": "user:박성훈(안전관리자)",
+            "action": "reviewing",
+            "note": "안전관리자 검토 진행 중 — 설비 영향 범위 확인 요청"
+          }
+        ]
+      },
+      "data_class": "demo",
+      "source_system": "domestic_law_crawler",
+      "source_label": "국가법령정보센터"
+    },
+    {
+      "id": "REG-2025-12-002-CHROMIUM-SVHC",
+      "source": "eu_regulation",
+      "title": "EU REACH Annex XIV — Chromium trioxide 허가 물질 등재 (Sunset 2027-12-31)",
+      "severity": "HIGH",
+      "status": "reviewing",
+      "url": "https://echa.europa.eu/candidate-list-table",
+      "payload": {
+        "regulation_name": "REACH Regulation (EC) No 1907/2006",
+        "article": "Annex XIV (Authorisation List)",
+        "change_type": "added",
+        "before_text": null,
+        "after_text": "Chromium trioxide 추가 — Sunset date 2027-12-31. AJIN 도금 라인 영향. 권한 취득 또는 대체물질 전환 필요.",
+        "effective_date": "2026-12-15",
+        "legal_class": "EU REACH",
+        "grade": "HIGH",
+        "affected_facilities": ["경산1공장 도금라인"],
+        "affected_processes": ["크롬 도금", "표면처리"],
+        "facility_count": 1,
+        "echa_substance_id": "100.014.521",
+        "cas_no": "1333-82-0",
+        "penalty_severity_krw_mn": 500.0,
+        "penalty_risk_score": 25.0,
+        "penalty_explanation": "EU_REACH (REACH 규정 제5조 (수출 금지 + 리콜)): 수출 차단 비용 기준 추정 ₩500,000,000",
+        "audit_trail": [
+          {
+            "ts": "2026-06-08T03:00:00+09:00",
+            "actor": "system:eu_regulation_crawler",
+            "action": "detected",
+            "note": "ECHA SVHC 후보 물질 리스트 갱신 — Chromium trioxide Annex XIV 등재 감지"
+          }
+        ]
+      },
+      "data_class": "demo",
+      "source_system": "eu_regulation_crawler",
+      "source_label": "ECHA"
+    },
+    {
+      "id": "REG-2026-Q1-003-EV-HV",
+      "source": "ev_battery",
+      "title": "UN ECE R100 Rev.3 — EV 절연저항 기준 강화 (AC 500→800 Ω/V, DC 100→200 Ω/V)",
+      "severity": "MEDIUM",
+      "status": "planning",
+      "url": "https://unece.org/transport/standards/transport/vehicle-regulations-wp29/regulations-addenda-1958-agreement",
+      "payload": {
+        "regulation_name": "UN ECE Regulation No. 100 Rev.3",
+        "article": "Annex 5 (Insulation Resistance)",
+        "change_type": "modified",
+        "before_text": "절연저항: AC 회로 500 Ω/V 이상 / DC 회로 100 Ω/V 이상",
+        "after_text": "절연저항: AC 회로 800 Ω/V 이상 / DC 회로 200 Ω/V 이상 (2027-01-01 시행)",
+        "effective_date": "2027-01-01",
+        "legal_class": "UN ECE",
+        "grade": "MEDIUM",
+        "affected_facilities": ["EV 부품 라인 (해당 시)", "고전압 배터리 조립 라인"],
+        "affected_processes": ["절연 저항 검사", "고전압 시스템 검증", "EV 부품 인증"],
+        "facility_count": 2,
+        "ece_reg_no": "R100",
+        "revision": "Rev.3",
+        "penalty_severity_krw_mn": 2.0,
+        "penalty_risk_score": 10.0,
+        "penalty_explanation": "_default (산업안전보건법 일반 기준 (§175)): 설비 2개 × 최대 5백만원 × 긴급도1.0 = ₩2,000,000",
+        "audit_trail": [
+          {
+            "ts": "2026-06-07T02:50:00+09:00",
+            "actor": "system:ev_battery_crawler",
+            "action": "detected",
+            "note": "UN ECE R100 Rev.3 개정 감지 — KATS 국제 기준 모니터링"
+          },
+          {
+            "ts": "2026-06-07T14:00:00+09:00",
+            "actor": "user:이지수(품질팀)",
+            "action": "planning",
+            "note": "시행일(2027-01-01)까지 여유. 품질팀 대응 계획 수립 예정."
+          }
+        ]
+      },
+      "data_class": "demo",
+      "source_system": "ev_battery_crawler",
+      "source_label": "KATS / UNECE"
+    }
+  ],
+  "live_alarms": [
+    {
+      "id": "ALARM-2026-06-09-001",
+      "domain": "compliance",
+      "severity": "CRITICAL",
+      "message": "🚨 프레스 안전거리 300mm → 400mm 변경 감지 — 경산1공장 B3라인 영향. 시행일까지 84일.",
+      "acknowledged_at": null,
+      "payload": {
+        "regulation_change_id": "REG-2025-12-001-PRESS-SAFETY",
+        "title": "프레스 안전거리 300mm → 400mm 변경 감지",
+        "module": "D",
+        "penalty_krw_mn": 50,
+        "days_to_effective": 84,
+        "affected_facilities": ["경산1공장 B3라인"]
+      },
+      "data_class": "demo",
+      "source_system": "domestic_law_crawler"
+    },
+    {
+      "id": "ALARM-2026-06-08-002",
+      "domain": "compliance",
+      "severity": "HIGH",
+      "message": "⚠️ Chromium trioxide SVHC 등재 (EU REACH) — 도금 라인 영향. Sunset date 2027-12-31.",
+      "acknowledged_at": null,
+      "payload": {
+        "regulation_change_id": "REG-2025-12-002-CHROMIUM-SVHC",
+        "title": "Chromium trioxide SVHC 등재 (EU REACH)",
+        "module": "D",
+        "penalty_krw_mn": 500,
+        "days_to_effective": 190,
+        "affected_facilities": ["경산1공장 도금라인"]
+      },
+      "data_class": "demo",
+      "source_system": "eu_regulation_crawler"
+    },
+    {
+      "id": "ALARM-2026-06-07-003",
+      "domain": "compliance",
+      "severity": "MEDIUM",
+      "message": "📋 EV 절연저항 기준 강화 (UN ECE R100) — AC 500→800 Ω/V, DC 100→200 Ω/V. 시행일 2027-01-01.",
+      "acknowledged_at": "2026-06-07T14:00:00+09:00",
+      "payload": {
+        "regulation_change_id": "REG-2026-Q1-003-EV-HV",
+        "title": "EV 절연저항 기준 강화 (UN ECE R100)",
+        "module": "D",
+        "penalty_krw_mn": 2,
+        "days_to_effective": 205,
+        "affected_facilities": ["EV 부품 라인 (해당 시)", "고전압 배터리 조립 라인"]
+      },
+      "data_class": "demo",
+      "source_system": "ev_battery_crawler"
+    }
+  ],
+  "notification_outbox": [
+    {
+      "id": "NOTIF-2026-06-09-001-SAFETY",
+      "event_type": "regulation_change_critical",
+      "target": "안전환경팀",
+      "status": "queued",
+      "payload": {
+        "regulation_change_id": "REG-2025-12-001-PRESS-SAFETY",
+        "recipient": "안전환경팀",
+        "recipient_email": "safety@ajin-demo.local",
+        "subject": "[CRITICAL] 프레스 안전거리 강화 — 즉시 조치 필요",
+        "body": "산업안전보건기준 제103조 개정. 시행일 2026-09-01. 경산1공장 B3라인 영향. 미준수 시 추정 과태료 ₩5천만."
+      },
+      "available_at": null,
+      "data_class": "demo"
+    },
+    {
+      "id": "NOTIF-2026-06-08-002-SAFETY",
+      "event_type": "regulation_change_high",
+      "target": "안전환경팀",
+      "status": "sent",
+      "payload": {
+        "regulation_change_id": "REG-2025-12-002-CHROMIUM-SVHC",
+        "recipient": "안전환경팀",
+        "recipient_email": "safety@ajin-demo.local",
+        "subject": "[주의] EU REACH — Chromium trioxide SVHC 등재",
+        "body": "Chromium trioxide가 EU REACH Annex XIV (허가 물질)에 등재되었습니다. Sunset date: 2027-12-31. EU 수출 제품의 도금 공정 영향을 즉시 확인하십시오."
+      },
+      "available_at": "2026-06-08T09:00:00+09:00",
+      "data_class": "demo"
+    },
+    {
+      "id": "NOTIF-2026-06-08-003-ENV",
+      "event_type": "regulation_change_high",
+      "target": "환경팀",
+      "status": "sent",
+      "payload": {
+        "regulation_change_id": "REG-2025-12-002-CHROMIUM-SVHC",
+        "recipient": "환경팀",
+        "recipient_email": "environment@ajin-demo.local",
+        "subject": "[참조] EU REACH — Chromium trioxide SVHC 등재 (CC)",
+        "body": "안전환경팀 동일 건 참조 통보. 환경법 관점에서 도금 폐수 처리 규정 추가 검토 요망."
+      },
+      "available_at": "2026-06-08T09:01:00+09:00",
+      "data_class": "demo"
+    },
+    {
+      "id": "NOTIF-2026-06-07-004-QA",
+      "event_type": "regulation_change_medium",
+      "target": "품질팀",
+      "status": "sent",
+      "payload": {
+        "regulation_change_id": "REG-2026-Q1-003-EV-HV",
+        "recipient": "품질팀",
+        "recipient_email": "quality@ajin-demo.local",
+        "subject": "[정보] UN ECE R100 절연저항 기준 강화 (2027-01-01 시행)",
+        "body": "UN ECE Regulation No. 100 Rev.3 Annex 5 개정으로 EV 절연저항 기준이 강화됩니다. AC: 500→800 Ω/V, DC: 100→200 Ω/V. 시행일까지 충분한 여유가 있으나 선제적 대응 계획 수립 권장."
+      },
+      "available_at": "2026-06-07T10:30:00+09:00",
+      "data_class": "demo"
+    }
+  ]
+}

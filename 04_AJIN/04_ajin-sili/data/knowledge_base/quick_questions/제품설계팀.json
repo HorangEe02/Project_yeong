@@ -1,0 +1,61 @@
+{
+  "department": "제품설계팀",
+  "division": "생산기술본부",
+  "description": "차체/클로저/의장 파트 제품 설계·시작품 개발·기술 표준·고객사 평가 대응",
+  "questions": [
+    {
+      "id": "design-catia-template",
+      "label": "CATIA 템플릿",
+      "promptText": "차체 파트 설계용 CATIA 표준 템플릿 위치 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["CATIA", "템플릿"]
+    },
+    {
+      "id": "design-ecn-process",
+      "label": "ECN 발행",
+      "promptText": "설계 변경 요청 — ECN 발행 절차 알려줘",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["ECN", "설계변경"]
+    },
+    {
+      "id": "design-tech-standard",
+      "label": "기술 표준",
+      "promptText": "사내 기술 표준류 검색하고 싶어",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["표준", "사내문서"]
+    },
+    {
+      "id": "design-cae-handover",
+      "label": "CAE 연동",
+      "promptText": "설계 데이터 CAE 해석팀 전달 표준 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["CAE", "데이터"]
+    },
+    {
+      "id": "design-customer-review",
+      "label": "고객 설계 평가",
+      "promptText": "현대·기아 설계 평가 대응 가이드",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["고객평가", "현대기아"]
+    },
+    {
+      "id": "design-prototype",
+      "label": "시작품 개발",
+      "promptText": "시작품 개발 일정과 양산 이행 체크포인트",
+      "category": "scenario",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["시작품", "양산"]
+    }
+  ]
+}

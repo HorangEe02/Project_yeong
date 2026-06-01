@@ -1,0 +1,61 @@
+{
+  "department": "비전연구팀",
+  "division": "생산기술본부",
+  "description": "AI 비전·머신러닝 기반 자동 검사 시스템 개발·운영",
+  "questions": [
+    {
+      "id": "vision-defect-model",
+      "label": "불량 검출 모델",
+      "promptText": "현재 운영 중인 AI 비전 불량 검출 모델 정확도와 재현율",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["AI비전", "검출"]
+    },
+    {
+      "id": "vision-camera-spec",
+      "label": "카메라 사양",
+      "promptText": "검사 공정용 머신비전 카메라 표준 사양",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["카메라", "사양"]
+    },
+    {
+      "id": "vision-data-labeling",
+      "label": "데이터 라벨링",
+      "promptText": "불량 이미지 라벨링 가이드와 품질 기준",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["라벨링", "데이터"]
+    },
+    {
+      "id": "vision-deploy",
+      "label": "모델 배포",
+      "promptText": "신규 학습 모델을 검사 라인에 배포하는 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["배포", "MLOps"]
+    },
+    {
+      "id": "vision-false-positive",
+      "label": "오검출 분석",
+      "promptText": "최근 1주 오검출(FP)·미검출(FN) 케이스 분석",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["FP", "FN", "분석"]
+    },
+    {
+      "id": "vision-gpu-resource",
+      "label": "GPU 자원",
+      "promptText": "GPU 서버 사용률과 학습 작업 큐 상태",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["GPU", "자원"]
+    }
+  ]
+}

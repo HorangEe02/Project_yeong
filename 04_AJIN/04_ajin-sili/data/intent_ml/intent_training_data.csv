@@ -1,0 +1,1501 @@
+text,intent
+해외법인 어디에 있어,company_info
+회사 매출이 얼마야,company_info
+회의록 만들어줘,document_compose
+내선번호4387번이 누구야,employee_lookup
+장 사원 이메일 뭐야,employee_lookup
+품질문제 개선대책서 양식 찾아줘,document_search
+미국 규제 언제부터 적용이야,regulation_query
+8D 보고서 양식?,document_search
+품질 개선대책서 작성해줘,document_compose
+CBAM 규제 현황 알려 줘,regulation_query
+최근 작성된 이메일 보여줘요,document_search
+서 대리 부서가 어디야,employee_lookup
+산안법 최근 변경사항,regulation_query
+PPAP 서류 검색,document_search
+회사복지 제도 알려줘,company_info
+EU REACH 준수 사항,regulation_query
+복지 혜택 뭐 있어,company_info
+품질 보고서 찾아주세요,document_search
+해외법인 어디에 있어,company_info
+환경 규제 모니터링,regulation_query
+최근 작성된 품질문제 개선대책서보여줘요,document_search
+영업팀 사람들 목록,employee_lookup
+ESG경영팀에 보낼 공문 써줘,document_compose
+8D 보고서 양식,document_search
+사장님이 누구야,company_info
+IRA 세액공제 조건,regulation_query
+미국 규제 현황,regulation_query
+규제 위반 시 과징금,regulation_query
+품질 보고서 찾아줘,document_search
+자동화기술팀 사람들 목록,employee_lookup
+송 차장 전화번호,employee_lookup
+이메일 초안 써줘,document_compose
+보고서 초안작성해줘,document_compose
+IRA 세액공제 조건,regulation_query
+오 과장에게 이메일 써줘,document_compose
+이에게 보낼 메일 작성,document_compose
+8D 보고서 양식,document_search
+서보 절차서 어디 있어,document_search
+신 부장 이메일 뭐야,employee_lookup
+정에게 보낼 메일 작성,document_compose
+HMGMA 관련 정보,company_info
+품질개선대책서 작성해줘,document_compose
+아진산업 설립연도,company_info
+CNC 절차서 어디 있어,document_search
+해외법인 어디에 있어.,company_info
+CBAM 대응 방안,regulation_query
+안 사원 전화번호,employee_lookup
+이메일 작성해줘,document_compose
+납기 지연 사과 이메일 작성,document_compose
+프리프레그 관련 문서 검색해줘,document_search
+재경 팀원들 누구야,employee_lookup
+이 과장 이메일 뭐야,employee_lookup
+품질 보고서 찾아줘,document_search
+경산 본사 위치,company_info
+물류팀 사원 찾아줘,employee_lookup
+신입사원 교육 일정,company_info
+생산관리팀 구성원 현황?,employee_lookup
+물류팀 구성원 현황,employee_lookup
+회의록 만들어줘,document_compose
+홍 부장 부서가 어디야?,employee_lookup
+최근 작성된 공문 보여줘,document_search
+CNC 절차서 어디 있어,document_search
+EU 규제 언제부터 적용이야,regulation_query
+회사 매출이 얼마야,company_info
+유압 관련 문서 검색해줘,document_search
+조지아 공장 정보,company_info
+안전보건팀 팀장이 누구야,employee_lookup
+산안법 최근 변경사항,regulation_query
+8D 보고서 작성,document_compose
+EU 규제 대응 방안,regulation_query
+한 차장이메일 뭐야,employee_lookup
+신입사원 교육 일정,company_info
+이메일 양식으로 문서 생성,document_compose
+산안법 최근 변경사항,regulation_query
+최근 작성된 8D 보고서 보여줘,document_search
+내선번호 7447번이 누구야,employee_lookup
+이메일 양식 찾아줘,document_search
+품질 개선대책서 작성해줘,document_compose
+안전 인시던트 리포트 템플릿 어디 있어,document_search
+아진산업 설립연도,company_info
+복지 혜택 뭐가 있어,company_info
+PPAP 템플릿 어디 있어,document_search
+경산 본사 위치,company_info
+품질 보고서 찾아줘,document_search
+규제 위반 시 과징금,regulation_query
+IRA 세액공제 조건,regulation_query
+PPAP 용어가 뭐야,company_info
+서 차장 연락처 알려줘,employee_lookup
+신입사원 교육 일정,company_info
+SPC 관련 문서 검색해줘,document_search
+이 과장 전화번호,employee_lookup
+IRA 세액공제 조건,regulation_query
+EU 규제 언제부터 적용이야?,regulation_query
+PPAP 서류 검색,document_search
+금형생산팀 조직도 보여줘,employee_lookup
+미국 규제 현황?,regulation_query
+규제 위반 시 과징금?,regulation_query
+8D 보고서양식?,document_search
+이메일 초안 써줘,document_compose
+8D 보고서 양식?,document_search
+CNC 절차서 어디 있어,document_search
+규제 위반 시 과징금,regulation_query
+ECN 양식으로 문서 생성,document_compose
+개발팀 사람들 목록,employee_lookup
+8D 보고서 작성,document_compose
+설비보전팀 대리 찾아 줘,employee_lookup
+품질보증팀 사람들 목록,employee_lookup
+ISO 설명해줘,company_info
+납기 지연 사과 이메일 작성,document_compose
+이 대리 부서가 어디야,employee_lookup
+조지아 공장 정보,company_info
+EU REACH 준수 사항,regulation_query
+이메일 초안 써줘,document_compose
+자동화기술팀 관련 문서 보여줘,document_search
+물류팀 구성원 현황,employee_lookup
+품질 개선대책서 작성해줘,document_compose
+내선번호 2977번이 누구야,employee_lookup
+서보 관련 문서 검색해줘,document_search
+PPAP 서류 검색,document_search
+PPAP 서류 검색,document_search
+사장님 누구야,company_info
+정 대리 내선번호,employee_lookup
+오에게 보낼 메일 작성,document_compose
+관세25% 영향 분석,regulation_query
+Cpk 설명해줘,company_info
+EWP 설명해줘,company_info
+PPAP 템플릿 어디 있어,document_search
+금형생산팀 조직도 보여줘,employee_lookup
+PPAP 뜻 알려줘,company_info
+최 대리 전화번호,employee_lookup
+금형생산팀 조직도 보여줘,employee_lookup
+사장님이 누구야,company_info
+회의록 만들어줘,document_compose
+품질 개선대책서 작성해줘,document_compose
+품질 보고서 찾아줘,document_search
+물류 팀원들 누구야,employee_lookup
+ECN 용어가 뭐야?,company_info
+공문 템플릿 어디 있어,document_search
+품질 개선대책서 작성해줘?,document_compose
+8D 보고서 양식,document_search
+복지 혜택 뭐가 있어,company_info
+규제 위반 시 과징금,regulation_query
+류 팀장 내선번호,employee_lookup
+CBAM 탄소국경조정 현황,regulation_query
+ECN 문서 만들어줘,document_compose
+회사 매출이 얼마야,company_info
+개발팀 소속 인원 보여줘,employee_lookup
+회의록 만들어줘,document_compose
+Cpk 용어가 뭐야,company_info
+장 대리 연락처 알려줘,employee_lookup
+QA 멤버,employee_lookup
+복지 혜택 뭐가 있어,company_info
+품질 개선대책서 작성해줘,document_compose
+규제 위반 시 과징금,regulation_query
+아진산업 연혁 알려줘,company_info
+황 팀장 전화번호,employee_lookup
+아진산업 연혁 알려줘,company_info
+안보팀 팀원들 누구야,employee_lookup
+8D 보고서 양식,document_search
+내선번호 9056번이 누구야,employee_lookup
+신입사원 교육 일정,company_info
+관세 25% 영향 분석,regulation_query
+산안법 최근 변경사항,regulation_query
+PPAP 서류 검색,document_search
+아진산업 연혁 알려줘,company_info
+QA 멤버,employee_lookup
+해외법인 어디에 있어,company_info
+OSHA 규제 현황 알려줘,regulation_query
+PPAP 템플릿 어디 있어,document_search
+PPAP 서류 검색,document_search
+CBAM 규제 현황 알려줘?,regulation_query
+인사팀 소속 인원 보여줘,employee_lookup
+환경 규제 모니터링,regulation_query
+인사팀사람들 목록,employee_lookup
+산안법 규제 현황 알려줘,regulation_query
+안전 인시던트 리포트 템플릿 어디 있어,document_search
+공문템플릿 어디 있어,document_search
+APQP 관련 문서 검색해줘,document_search
+공문 템플릿어디 있어,document_search
+HMGMA 관련 정보,company_info
+관세 관련 공장 영향,regulation_query
+최근 작성된 회의록 보여줘,document_search
+이 대리에게 이메일 써줘,document_compose
+최근 작성된 이메일 보여줘,document_search
+EPA 규제 현황 알려줘,regulation_query
+IRA 세액공제 조건,regulation_query
+보고서 초안 작성해줘,document_compose
+최근 작성된 PPAP 보여줘,document_search
+8D 보고서 작성,document_compose
+이 과장 내선번호,employee_lookup
+경산 본사 위치,company_info
+IRA 관련 문서 검색해줘,document_search
+구매팀 사람들 목록,employee_lookup
+ECN 문서만들어줘,document_compose
+규제 위반 시 과징금.,regulation_query
+구매 멤버,employee_lookup
+QA 팀원들 누구야,employee_lookup
+HMGMA관련 정보,company_info
+환경 규제 모니터링?,regulation_query
+최근 작성된 PPAP 보여줘,document_search
+신입사원 교육 일정,company_info
+ECN 문서 만들어줘,document_compose
+내선번호 5168번이 누구야,employee_lookup
+내선번호 9007번이 누구야,employee_lookup
+EPA 언제부터 적용이야,regulation_query
+납기 지연 사과 이메일 작성,document_compose
+산안법 대응 방안,regulation_query
+개발팀에 보낼 공문 써줘,document_compose
+영업팀에보낼 공문 써줘,document_compose
+납입용기 규격 설정서 양식으로 문서 생성,document_compose
+IT전략팀 사람들 목록,employee_lookup
+경산 본사 위치,company_info
+물류팀 조직도 보여줘,employee_lookup
+김차장 연락처 알려줘,employee_lookup
+납입용기 규격 설정서 양식 찾아줘,document_search
+환경 규제 관련 공장 영향,regulation_query
+개발팀 구성원 현황.,employee_lookup
+품질보증팀 과장 찾아줘,employee_lookup
+환경 규제 모니터링,regulation_query
+보고서 초안 작성해줘,document_compose
+내선번호 2249번이 누구야,employee_lookup
+재경팀 소속 인원 보여줘,employee_lookup
+SPC 절차서 어디 있어,document_search
+8D 보고서 양식,document_search
+ECN 관련 문서,document_search
+회사 복지 제도 알려주세요,company_info
+금형 절차서 어디 있어,document_search
+회의록 만들어줘,document_compose
+HMGMA 관련 정보,company_info
+조직도 알려줘,employee_lookup
+인사팀에 보낼 공문 작성해줘,document_compose
+규제 위반 시 과징금,regulation_query
+납입용기 규격 설정서 작성해줘,document_compose
+8D 보고서 작성해줘,document_compose
+관리도 뜻 알려줘,company_info
+안전보건팀 사람들 목록,employee_lookup
+아진산업 설립연도,company_info
+안전보건팀 관련 문서 보여줘,document_search
+품질 개선대책서 작성해줘,document_compose
+해외법인 어디에 있어,company_info
+자동화기술팀 팀장 누구야,employee_lookup
+최근 작성된 PPAP 보여줘,document_search
+개발팀 팀장 누구야,employee_lookup
+규제위반 시 과징금,regulation_query
+8D 보고서 작성해줘,document_compose
+권 차장 이메일 뭐야.,employee_lookup
+관세 25% 영향 분석,regulation_query
+JOON INC가 뭐야?,company_info
+회의록 만들어줘.,document_compose
+영업팀에 보낼 공문 써줘,document_compose
+EU REACH 준수 사항,regulation_query
+회사 매출이 얼마야,company_info
+생관팀 팀원들 누구야,employee_lookup
+HMGMA 관련 정보,company_info
+IRA 세액공제 조건,regulation_query
+불량률 용어가 뭐임,company_info
+8D 보고서 작성,document_compose
+CFRP 관련 문서 검색해줘,document_search
+유압 관련 문서 검색해줘,document_search
+전 대리 연락처 알려줘,employee_lookup
+JOONINC가 뭐야,company_info
+아진산업 연혁 알려줘,company_info
+USMCA 관련 문서 검색해줘,document_search
+박 팀장 연락처알려줘,employee_lookup
+품질 개선대책서 작성해 줘?,document_compose
+관세 관련 공장 영향,regulation_query
+보고서 초안 작성해줘,document_compose
+IATF 절차서 어디 있어,document_search
+ESG경영팀 소속 인원 보여줘,employee_lookup
+8D 보고서 양식,document_search
+조지아 공장 정보,company_info
+정 부장 전화번호?,employee_lookup
+사장님이 누구야,company_info
+개발팀 사람들 목록,employee_lookup
+아진산업 연혁 알려줘,company_info
+환경 규제 모니터링,regulation_query
+EU REACH 준수 사항,regulation_query
+ECN 문서만들어줘,document_compose
+조직도 알려줘,employee_lookup
+공문 작성해 줘.,document_compose
+OBC 관련 문서 검색해줘,document_search
+산안법 규제 현황 알려조,regulation_query
+8D 보고서 작성,document_compose
+홍 대리에게 이메일 작성해줘?,document_compose
+IT전략팀 차장 찾아줘,employee_lookup
+ESG팀 팀원들 누구야,employee_lookup
+PPAP 절차서 어디 있어,document_search
+환경 규제 모니터링,regulation_query
+EU REACH 준수 사항,regulation_query
+이메일 초안 써줘,document_compose
+회사 매출이 얼마야,company_info
+납기 지연 사과 이메일 작성,document_compose
+미국 규제현황?,regulation_query
+8D 보고서 작성,document_compose
+PPAP 서류 검색,document_search
+안전기준 관련 공장 영향,regulation_query
+ESG경영팀 조직도보여줘요,employee_lookup
+보고서 초안작성해줘,document_compose
+PPAP 관련 문서.,document_search
+회사 복지 제도 알려줘,company_info
+오 과장 부서가 어디야?,employee_lookup
+8D 보고서 양식 찾아줘,document_search
+아진산업 설립연도,company_info
+경산 본사 위치.,company_info
+PPAP 서류 검색,document_search
+회의록 만들어줘,document_compose
+임 팀장 연락처 알려줘,employee_lookup
+EU REACH 준수 사항,regulation_query
+ECN 문서 만들어줘,document_compose
+납입용기 규격 설정서 작성해줘,document_compose
+DASHCOMPL 관련 문서 검색해줘,document_search
+SPC 절차서 어디 있어,document_search
+아진산업 설립연도,company_info
+품질 개선대책서 작성해줘,document_compose
+납입용기 규격설정서 관련 문서,document_search
+박차장 부서가 어디야,employee_lookup
+회사 복지 제도 알려줘,company_info
+JOON INC가 뭐야,company_info
+김 대리 이메일 뭐야,employee_lookup
+조직도 알려줘,employee_lookup
+관세 25%영향 분석,regulation_query
+EPA 대응 방안.,regulation_query
+안전기준 대응 방안,regulation_query
+PPAP 서류 검색,document_search
+IRA세액공제 조건?,regulation_query
+조지아 공장정보,company_info
+규제 위반 시 과징금,regulation_query
+8D 보고서 양식으로 문서생성?,document_compose
+아진산업 설립연도,company_info
+보고서 초안 작성해줘,document_compose
+권 팀장에게 이메일 써줘,document_compose
+안전 인시던트 리포트 템플릿 어디 있어,document_search
+신입사원교육 일정,company_info
+EPA 규제 현황 알려줘,regulation_query
+관세 관련 공장영향,regulation_query
+ECN 문서 만들어줘,document_compose
+아진산업 설립연도,company_info
+회사 복지 제도 알려줘,company_info
+관리도 절차서 어디 있어,document_search
+공문 양식으로 문서 생성?,document_compose
+회의록 만들어줘,document_compose
+CFRP 뜻 알려줘,company_info
+해외법인 어디에 있어,company_info
+품질 개선대책서 작성해 줘,document_compose
+8D 보고서 작성,document_compose
+품질 개선대책서 작성해줘,document_compose
+8D 보고서 양식,document_search
+IRA 용어가 뭐야,company_info
+관세 25% 영향 분석.,regulation_query
+신입사원 교육 일정,company_info
+ECN 템플릿 어디 있어,document_search
+회사 매출이 얼마야,company_info
+이메일 초안 써줘,document_compose
+IRA 세액공제 조건?,regulation_query
+미국 규제 현황,regulation_query
+안전보건팀관련 문서 보여줘,document_search
+이 차장 연락처 알려줘,employee_lookup
+환경 규제모니터링,regulation_query
+이메일 초안 써줘,document_compose
+복지 혜택 뭐가 있어,company_info
+장에게 보낼 메일 작성,document_compose
+보고서 초안 작성해줘,document_compose
+서 사원 내선번호,employee_lookup
+규제 위반 시 과징금,regulation_query
+공문 양식 찾아줘,document_search
+PPAP 양식 찾아줘요.,document_search
+권 차장 부서가 어디야,employee_lookup
+이메일 관련 문서,document_search
+미국 규제 현황,regulation_query
+품질문제 개선대책서 양식으로 문서 생성,document_compose
+SPC 설명해줘,company_info
+품질문제 개선대책서 관련 문서,document_search
+이 과장 전화번호,employee_lookup
+관세 25% 영향 분석,regulation_query
+미국 규제현황,regulation_query
+ECN 양식 찾아줘,document_search
+이메일 초안 써줘,document_compose
+관세 25% 영향 분석?,regulation_query
+아진산업 설립연도,company_info
+ECN 문서 만들어줘,document_compose
+조직도 알려줘,employee_lookup
+내선번호 6816번이 누구야,employee_lookup
+PPAP 서류 검색,document_search
+안전 인시던트 리포트 관련 문서,document_search
+IATF 관련 문서 검색해줘,document_search
+경산 본사 위치,company_info
+IRA 세액공제 조건,regulation_query
+물류팀 관련 문서 보여줘,document_search
+CBAM 탄소국경조정 현황,regulation_query
+안전보건팀 조직도 보여줘,employee_lookup
+8D 보고서 작성,document_compose
+회사 복지 제도 알려줘,company_info
+해외지원팀 구성원 현황,employee_lookup
+자동화팀 팀원들 누구야,employee_lookup
+미국 규제 현황,regulation_query
+품질 보고서 찾아줘,document_search
+회의록 만들어줘,document_compose
+해외지원팀에 보낼 공문 써줘,document_compose
+신입사원 교육 일정,company_info
+OSHA 관련 공장 영향,regulation_query
+사장님이 누구야,company_info
+규제 위반 시 과징금.,regulation_query
+자동화기술팀 관련 문서 보여줘,document_search
+PPAP 템플릿 어디있어,document_search
+CBAM 탄소국경조정 현황,regulation_query
+CBAM 탄소국경조정 현황,regulation_query
+물류팀 조직도 보여줘,employee_lookup
+IRA 세액공제 조건,regulation_query
+홍 차장 내선번호,employee_lookup
+JOON INC가 뭐임,company_info
+납기 지연 사과 이메일 작성,document_compose
+해외지원팀 조직도 보여주세요,employee_lookup
+품질 개선대책서 작성해줘?,document_compose
+환경규제 모니터링.,regulation_query
+규제 위반 시 과징금,regulation_query
+품질 개선대책서 작성해줘,document_compose
+납기 지연 사과 이메일 작성,document_compose
+품질 보고서 찾아 줘,document_search
+ESG경영팀 구성원 현황,employee_lookup
+규제 위반 시 과징금,regulation_query
+내선번호 7867번이 누구야,employee_lookup
+IT전략팀 관련 문서 보여줘,document_search
+IRA 세액공제 조건,regulation_query
+8D 보고서 작성,document_compose
+ECN 관련 문서,document_search
+물류팀 팀장이 누구야,employee_lookup
+물류팀 팀장이 누구야,employee_lookup
+IT전략팀 관련 문서 보여줘,document_search
+안보팀 멤버?,employee_lookup
+회사 매출이 얼마야,company_info
+회의록 양식 찾아줘,document_search
+EU 규제 관련 공장 영향,regulation_query
+물류팀 조직도 보여줘,employee_lookup
+메일 작성해줘,document_compose
+자동화기술팀 사람들 목록,employee_lookup
+규제 위반 시 과징금,regulation_query
+미국 규제 현황,regulation_query
+ECN 양식 찾아줘,document_search
+ESG경영팀 구성원 현황,employee_lookup
+조직도 알려줘?,employee_lookup
+회의록 만들어줘,document_compose
+황 팀장게 이메일 써줘?,document_compose
+환경 규제 모니터링,regulation_query
+ECN 양식으로 문서 생성,document_compose
+최근 작성된 이메일 보여줘,document_search
+프레스용어가 뭐야,company_info
+ESG경영팀 구성원 현황,employee_lookup
+한에게 보낼 메일 작성,document_compose
+이메일 초안 써줘,document_compose
+조직도 알려줘,employee_lookup
+안전 인시던트 리포트 양식 찾아줘,document_search
+회의록 만들어줘,document_compose
+PPAP 서류 검색,document_search
+재경팀 소속 인원 보여줘,employee_lookup
+회사 복지 제도 알려줘,company_info
+납입용기 규격 설정서 양식 찾아줘,document_search
+EWP 용어가뭐야,company_info
+미국 규제 현황,regulation_query
+회의록 템플릿 어디 있어,document_search
+물류 팀원들 누구야,employee_lookup
+EU 규제 대응 방안,regulation_query
+회사 복지 제도 알려줘,company_info
+Cpk 관련 문서 검색해줘,document_search
+자동화기술팀 팀장누구야,employee_lookup
+복지 혜택 뭐가 있어,company_info
+해외지원팀 사원 찾아줘,employee_lookup
+최근 작성된 이메일 보여줘,document_search
+경산 본사 위치,company_info
+용접 관련 문서 검색해줘,document_search
+8D 보고서 양식,document_search
+FMEA 관련 문서 검색해줘,document_search
+금형생산팀 관련 문서 보여줘,document_search
+8D 보고서 양식,document_search
+강 팀장 내선번호,employee_lookup
+사장님이 누구야,company_info
+보고서 초안 작성해줘,document_compose
+EU REACH 준수 사항,regulation_query
+안전 인시던트 리포트 관련 문서.,document_search
+품질 개선대책서 작성해줘,document_compose
+품질 보고서 찾아줘.,document_search
+환경 규제 모니터링,regulation_query
+류 팀장 이메일 뭐야,employee_lookup
+안 차장 연락처 알려줘,employee_lookup
+아진산업 연혁 알려줘,company_info
+정 부장 부서가 어디야,employee_lookup
+품질문제 개선대책서 관련 문서,document_search
+내선번호 1508번이 누구야,employee_lookup
+회사 매출이 얼마야,company_info
+산안법 최근 변경사항,regulation_query
+신입사원 교육 일정,company_info
+금형생산팀 관련 문서 보여줘,document_search
+박에게 보낼 메일 작성,document_compose
+품질문제 개선대책서 템플릿 어디 있어,document_search
+품질 보고서 찾아줘,document_search
+산안법 최근 변경사항,regulation_query
+미국 규제 현황,regulation_query
+JOON INC가 뭐야,company_info
+보고서 초안 작성해줘,document_compose
+최근 작성된 품질문제 개선대책서 보여줘,document_search
+자동화기술팀 관련 문서 보여줘,document_search
+윤 팀장 내선번호,employee_lookup
+EU 규제 관련 공장 영향,regulation_query
+품질 개선대책서 작성해줘,document_compose
+HMGMA 관련 정보,company_info
+IRA 세액공제 조건,regulation_query
+HMGMA 관련 정보,company_info
+8D 보고서 양식 찾아줘,document_search
+영업팀 구성원 현황,employee_lookup
+회사 매출이 얼마야,company_info
+물류팀 소속 인원 보여줘,employee_lookup
+JOON INC가 뭐야,company_info
+회의록 템플릿 어디 있어,document_search
+품질 보고서 찾아줘,document_search
+로봇 관련 문서검색해줘,document_search
+전 대리 부서가 어디야,employee_lookup
+품질 개선대책서 작성해줘,document_compose
+품질 보고서 찾아줘,document_search
+품질 개선대책서 작성해줘.,document_compose
+아진산업 연혁 알려줘,company_info
+생관팀 멤버,employee_lookup
+8D 보고서 양식,document_search
+CBAM 대응 방안,regulation_query
+EU REACH 준수 사항,regulation_query
+미국 규제 현황,regulation_query
+8D 보고서 양식,document_search
+아진산업 설립연도,company_info
+이메일 관련 문서,document_search
+사장님이 누구야,company_info
+내선번호 4826번이 누구야,employee_lookup
+8D 보고서양식,document_search
+황 팀장 연락처 알려줘,employee_lookup
+최게 보낼 메일 작성,document_compose
+PPAP 관련 문서 검색해줘,document_search
+신입사원 교육 일정.,company_info
+CBAM 탄소국경조정 현황,regulation_query
+IRA 관련 공장 영향,regulation_query
+경산 본사 위치,company_info
+자동화기술팀에 보낼 공문 써줘,document_compose
+CBAM 탄소국경조정 현황,regulation_query
+산안법 최근 변경사항,regulation_query
+설비보전팀 팀장이 누구야,employee_lookup
+미국 규제 규제 현황 알려줘,regulation_query
+IRA 규제 현황 알려줘,regulation_query
+너겟 뜻 알려줘,company_info
+회사 매출이 얼마야,company_info
+8D 보고서 양식,document_search
+APQP 용어가 뭔가요,company_info
+최에게 보낼 메일 작성,document_compose
+설비보전팀 차장 찾아줘,employee_lookup
+USMCA 언제부터 적용이야,regulation_query
+HMGMA 관련 정보,company_info
+아진산업 설립연도,company_info
+보고서 초안 작성해줘,document_compose
+황 부장 이메일 뭐야,employee_lookup
+QA 팀원들 누구야,employee_lookup
+회사 복지 제도 알려줘,company_info
+8D 보고서 양식,document_search
+산안법 관련 공장 영향,regulation_query
+EU 규제 규제 현황 알려줘,regulation_query
+송에게 보낼 메일 작성,document_compose
+납기 지연 사과 이메일 작성,document_compose
+ECN 문서 만들어줘,document_compose
+미국 규제 대응 방안,regulation_query
+IRA언제부터 적용이야,regulation_query
+8D 보고서 작성,document_compose
+신 차장 전화번호,employee_lookup
+이 팀장 부서가 어디야,employee_lookup
+설비보전팀 팀장이 누구야,employee_lookup
+DASH COMPL 용어가 뭐에요?,company_info
+개발팀 사람들 목록,employee_lookup
+규제 위반 시 과징금,regulation_query
+품보팀 멤버,employee_lookup
+경산 본사 위치,company_info
+조직도 알려줘?,employee_lookup
+품질 보고서 찾아줘,document_search
+HMGMA 관련 정보,company_info
+아진산업 설립연도,company_info
+납입용기 규격 설정서 작성해줘,document_compose
+ECN 양식으로 문서 생성,document_compose
+REACH 대응 방안,regulation_query
+품질 보고서 찾아줘,document_search
+산안법 최근 변경사항,regulation_query
+미국 규제 현황,regulation_query
+사장님이 누구야,company_info
+자동화기술팀 조직도 보여줘,employee_lookup
+8D 보고서 양식,document_search
+EPA 대응 방안,regulation_query
+류 팀장 내선번호,employee_lookup
+미국 규제 대응 방안,regulation_query
+유압 관련 문서 검색해줘,document_search
+ESG팀팀원들 누구야,employee_lookup
+회사 매출이 얼마야,company_info
+구매 팀원들 누구야?,employee_lookup
+최근 작성된 8D 보고서 보여줘,document_search
+최근 작성된 8D 보고서 보여줘,document_search
+박 대리 연락처 알려줘,employee_lookup
+환경 규제 모니터링,regulation_query
+류 과장 부서가 어디야,employee_lookup
+윤에게 보낼 메일 작성?,document_compose
+자동화기술팀 조직도 보여줘,employee_lookup
+이 과장 연락처 알려줘,employee_lookup
+이메일 초안 써줘,document_compose
+이메일 초안 써줘,document_compose
+JOON INC가 뭐야,company_info
+신 사원 이메일 뭐야,employee_lookup
+품질 개선대책서 작성해줘,document_compose
+공문 관련문서,document_search
+환경 규제 모니터링,regulation_query
+환경 규제 대응 방안,regulation_query
+신입사원 교육 일정,company_info
+안전 인시던트 리포트 양식으로 문서 생성,document_compose
+8D 보고서 작성?,document_compose
+EU REACH 준수 사항,regulation_query
+ECN 양식 찾아줘,document_search
+권 과장 부서 어디야,employee_lookup
+납기 지연 사과 이메일 작성,document_compose
+생관팀 팀원들 누구야,employee_lookup
+IRA 설명해줘,company_info
+납입용기 규격설정서 양식으로 문서 생성,document_compose
+불량률 용어가 뭐야?,company_info
+사장님이 누구야,company_info
+회사 매출이 얼마야,company_info
+OSHA 대응 방안,regulation_query
+최근 작성된 품질문제 개선대책서 보여줘,document_search
+환경 규제 모니터링,regulation_query
+조직도 알려줘,employee_lookup
+회의록 양식으로 문서 생성,document_compose
+조직도 알려줘,employee_lookup
+안전보건팀 조직도 보여줘,employee_lookup
+보고서 초안작성해줘,document_compose
+CNC 절차서 어디 있어,document_search
+품질 개선대책서 작성해줘,document_compose
+회의록 만들어줘,document_compose
+서 차장 이메일 뭐야,employee_lookup
+OSHA관련 공장 영향,regulation_query
+품보팀 팀원들 누구야,employee_lookup
+품질 개선대책서 작성해줘,document_compose
+품질 개선대책서 작성해주세요,document_compose
+OSHA 절차서 어디 있어,document_search
+품질보증팀 소속 인원 보여줘,employee_lookup
+아진산업 설립연도,company_info
+아진산업 설립연도,company_info
+서 사원 연락처 알려줘,employee_lookup
+장 차장에게이메일 써줘,document_compose
+아진산업 설립연도,company_info
+한대리에게 이메일 써줘,document_compose
+아진산업 연혁알려줘,company_info
+환경 규제 모니터링,regulation_query
+품질문제 개선대책서 템플릿 어디 있어.,document_search
+구매팀 과장 찾아줘,employee_lookup
+IRA 관련 공장 영향,regulation_query
+품질문제 개선대책서 템플릿 어디 있어,document_search
+PPAP 서류 검색,document_search
+EU 규제 언제부터 적용이야,regulation_query
+환경 규제 모니터링,regulation_query
+EU REACH 준수 사항,regulation_query
+REACH 대응 방안,regulation_query
+품질문제 개선대책서 템플릿 어디 있어,document_search
+자동화기술팀 소속 인원 보여줘,employee_lookup
+환경 규제 언제부터 적용이야,regulation_query
+아진산업 설립연도,company_info
+이메일 초안 작성해줘,document_compose
+CBAM 탄소국경조정 현황,regulation_query
+품질문제 개선대책서 양식으로 문서 생성,document_compose
+신입사원 교육 일정,company_info
+임 사원 전화번호,employee_lookup
+회사 복지 제도 알려줘,company_info
+회사 복지 제도 알려줘,company_info
+안전 기준 관련 공장 영향,regulation_query
+CNC 뜻 알려줘.,company_info
+회사 매출이 얼마야,company_info
+HMGMA 관련 정보,company_info
+회사 복지 제도 알려줘,company_info
+IT전략팀 구성원 현황,employee_lookup
+신입사원 교육 일정,company_info
+ECN 문서 만들어줘,document_compose
+REACH 대응 방안,regulation_query
+회사 매출이 얼마야,company_info
+경산 본사 위치?,company_info
+규제 위반 시 과징금,regulation_query
+IRA 언제부터 적용이야,regulation_query
+이메일 템플릿 어디 있어,document_search
+ESG팀 팀원들 누구야?,employee_lookup
+재경 팀원들 누구야,employee_lookup
+최근 작성된 회의록 보여 줘,document_search
+안전인시던트 리포트 양식으로 문서 생성,document_compose
+IRA 세액공제 조건,regulation_query
+CBAM 탄소국경조정 현황,regulation_query
+회사복지 제도 알려줘.,company_info
+ECN 문서 만들어줘?,document_compose
+환경 규제 모니터링,regulation_query
+복지 혜택 뭐가 있어,company_info
+EU REACH 준수 사항,regulation_query
+생산관리팀 대리찾아주세요.,employee_lookup
+복지 혜택 뭐가 있어,company_info
+PPAP 서류 검색,document_search
+구매팀 차장 찾아줘,employee_lookup
+EU 규제 관련 공장 영향,regulation_query
+영업팀 팀장이 누구야,employee_lookup
+IRA 세액공제 조건,regulation_query
+JOON INC가 뭐야,company_info
+최근 작성된 공문 보여줘,document_search
+이메일 양식 찾아주세요,document_search
+품질보증팀 차장 찾아줘,employee_lookup
+ECN 문서 만들어줘,document_compose
+물류팀 차장 찾아줘요,employee_lookup
+품질 보고서 찾아줘,document_search
+미국 규제 현황,regulation_query
+조지아 공장 정보,company_info
+회사 매출이 얼마야,company_info
+김 사원 이메일 뭐야,employee_lookup
+품질 보고서 찾아줘,document_search
+아진산업 설립연도,company_info
+ECN 뜻 알려줘,company_info
+프리프레그 용어가 뭐야,company_info
+품질문제 개선대책서 템플릿 어디 있어,document_search
+품질 개선대책서 작성해주세요,document_compose
+규제 위반 시 과징금,regulation_query
+사출 용어가 뭐야,company_info
+최에게 보낼 메일 작성,document_compose
+해외법인 어디에 있어,company_info
+이메일 초안 써줘,document_compose
+FMEA 뜻 알려줘,company_info
+금형절차서 어디 있어,document_search
+보고서 초안 작성해줘,document_compose
+JOON INC가 뭐야,company_info
+신입사원 교육 일정,company_info
+PPAP 서류 검색,document_search
+장 부장에게 이메일 써줘,document_compose
+DASH COMPL 용어가 뭐야,company_info
+해외법인 어디에 있어,company_info
+품질 보고서 찾아줘,document_search
+보고서 초안 작성해줘,document_compose
+8D 보고서 작성해줘,document_compose
+보고서 초안 작성해줘,document_compose
+서보 관련 문서 검색해줘,document_search
+ECN 양식 찾아줘,document_search
+CBAM 탄소국경조정 현황,regulation_query
+환경 규제 모니터링,regulation_query
+안전 인시던트 리포트 템플릿 어디 있어,document_search
+안전보건팀 조직도 보여줘,employee_lookup
+회의록 만들어줘,document_compose
+해외법인 어디에 있어,company_info
+규제 위반 시 과징금,regulation_query
+공문 양식 찾아줘?,document_search
+PPAP 서류 검색,document_search
+관세 25% 영향 분석,regulation_query
+품질 보고서 찾아줘,document_search
+아진산업 설립연도,company_info
+류 사원 내선번호,employee_lookup
+JOON INC가 뭐야,company_info
+내선번호 2059번이 누구야,employee_lookup
+아진산업 연혁 알려줘,company_info
+8D 보고서 관련 문서,document_search
+EU REACH준수 사항?,regulation_query
+규제 위반시 과징금,regulation_query
+안전 인시던트 리포트 작성해줘,document_compose
+품질 개선대책서 작성해줘,document_compose
+PPAP 템플릿 어디 있어,document_search
+환경 규제 모니터링,regulation_query
+관세 25% 영향 분석,regulation_query
+구매 팀원들 누구야,employee_lookup
+CBAM 탄소국경조정 현황,regulation_query
+이메일 초안 써줘,document_compose
+서에게 보낼 메일 작성,document_compose
+최근 작성된 품질문제 개선대책서 보여줘,document_search
+사장님이 누구야,company_info
+EU REACH 준수 사항,regulation_query
+IRA 세액공제 조건,regulation_query
+내선번호 4940번이 누구야,employee_lookup
+회의록 양식 찾아줘,document_search
+IT전략팀 관련 문서 보여줘,document_search
+조지아 공장 정보,company_info
+조지아 공장 정보,company_info
+품질 보고서 찾아줘,document_search
+물류팀 팀장 찾아줘,employee_lookup
+구매팀 부장 찾아줘,employee_lookup
+영업팀 팀장이 누구야,employee_lookup
+관세25% 영향 분석,regulation_query
+오 차장 전화번호?,employee_lookup
+복지 혜택 뭐 있어,company_info
+신입사원 교육일정,company_info
+JOON INC가 뭐야,company_info
+황에게 보낼 메일 작성,document_compose
+서 과장 이메일 뭐야,employee_lookup
+홍에게 보낼 메일 작성,document_compose
+아진산업 설립연도,company_info
+PPAP 서류 검색,document_search
+류에게 보낼 메일 작성,document_compose
+품질보증팀 구성원 현황,employee_lookup
+관세 25% 영향 분석,regulation_query
+한 차장에게 이메일 써줘,document_compose
+ECN 템플릿 어디있어,document_search
+박 차장에게 이메일 써줘,document_compose
+8D 보고서 작성,document_compose
+IT전략팀 구성원 현황,employee_lookup
+조직도 알려줘,employee_lookup
+아진산업 설립연도,company_info
+8D 보고서 작성,document_compose
+ECN 문서 만들어줘,document_compose
+신입사원 교육 일정,company_info
+장에게 보낼 메일 작성,document_compose
+최 차장 이메일 뭔가요,employee_lookup
+이 대리에게 이메일 써줘?,document_compose
+품질 개선대책서 작성해줘,document_compose
+HMGMA 관련 정보.,company_info
+Cpk 용어가 뭐야,company_info
+품질 개선대책서 작성해주세요.,document_compose
+인사팀 조직도 보여줘,employee_lookup
+인사팀 관련 문서보여 줘,document_search
+회사 복지 제도 알려줘,company_info
+8D 보고서 작성,document_compose
+최근 작성된 이메일 보여줘,document_search
+아진산업 연혁 알려줘,company_info
+CBAM 탄소국경조정 현황.,regulation_query
+이메일 초안 써줘,document_compose
+개발팀에 보낼 공문 써줘,document_compose
+서 부장 내선번호,employee_lookup
+사장님이 누구야,company_info
+해외법인 어디에 있어,company_info
+납기 지연 사과 이메일 작성,document_compose
+8D 보고서 템플릿 어디 있어,document_search
+복지 혜택 뭐가 있어,company_info
+PPAP 서류 검색,document_search
+납입용기 규격 설정서 양식찾아주세요,document_search
+최근 작성된 안전 인시던트 리포트 보여줘,document_search
+IRA 대응 방안,regulation_query
+최사원 내선번호,employee_lookup
+EUREACH 준수 사항,regulation_query
+REACH 언제부터 적용이야,regulation_query
+품질문제 개선대책서 템플릿 어디 있어,document_search
+물류팀에 보낼 공문 써줘,document_compose
+관세 25% 영향 분석,regulation_query
+조지아 공장 정보,company_info
+안에게 보낼 메일 작성?,document_compose
+JOON INC가 뭐임,company_info
+IRA 세액공제 조건,regulation_query
+품질문제 개선대책서 만들어줘,document_compose
+EU REACH 준수 사항,regulation_query
+ECN 양식 찾아줘,document_search
+품질문제 개선대책서 작성해줘,document_compose
+아진산업 설립연도,company_info
+품질 보고서 찾아줘,document_search
+아진산업 연혁 알려줘,company_info
+HMGMA 관련 정보,company_info
+홍에게 보낼 메일 작성,document_compose
+CBAM 관련 공장 영향?,regulation_query
+IRA 관련 공장 영향,regulation_query
+최근 작성된 납입용기 규격 설정서 보여주세요,document_search
+조지아 공장 정보,company_info
+사장님이 누구야,company_info
+보고서 초안 작성해줘,document_compose
+금형 절차서 어디 있어,document_search
+8D 보고서 양식,document_search
+8D 보고서 양식,document_search
+이메일 양식으로 문서 생성,document_compose
+해외법인 어디 있어?,company_info
+미국 규제 현황,regulation_query
+이 차장 연락처 알려줘,employee_lookup
+최근 작성된 안전 인시던트리포트 보여주세요.,document_search
+ECN 양식 찾아줘,document_search
+EWP 뜻 알려줘,company_info
+아진산업 설립연도,company_info
+IRA 언제부터 적용이야,regulation_query
+관세 25% 영향 분석,regulation_query
+8D 보고서 작성,document_compose
+전 사원 부서가 어디야,employee_lookup
+사장님이 누구야,company_info
+IRA 세액공제 조건,regulation_query
+REACH 뜻 알려줘,company_info
+조지아 공장 정보,company_info
+ECN 문서 만들어줘,document_compose
+환경 규제 모니터링,regulation_query
+류 과장 내선번호,employee_lookup
+IRA 세액공제 조건,regulation_query
+구매팀 팀장이 누구야,employee_lookup
+IRA 세액공제 조건?,regulation_query
+JOON INC 뭐야,company_info
+해외법인 어디에 있어.,company_info
+CBAM 탄소국경조정 현황,regulation_query
+이메일 템플릿 어디 있어,document_search
+회사 복지 제도 알려줘,company_info
+아진산업 설립연도,company_info
+납입용기 규격 설정서 양식으로 문서 생성,document_compose
+임 사원 연락처 알려줘,employee_lookup
+자동화기술팀 팀장이누구야,employee_lookup
+품질 개선대책서 작성해줘,document_compose
+IT전략팀 구성원 현황,employee_lookup
+윤 팀장 이메일 뭐야,employee_lookup
+EU 규제 규제 현황 알려줘,regulation_query
+물류 팀원들 누구야,employee_lookup
+8D 보고서 양식,document_search
+황 부장 이메일 뭐야,employee_lookup
+회사 복지 제도 알려줘,company_info
+JOON INC가 뭐야,company_info
+환경 규제 언제부터 적용이야,regulation_query
+신입사원 교육 일정,company_info
+환경 규제 모니터링,regulation_query
+최근 작성된 안전 인시던트 리포트 보여줘,document_search
+EU REACH 준수 사항,regulation_query
+회의록 만들어줘,document_compose
+설비보전팀 사람들 목록,employee_lookup
+JOON INC가 뭐야,company_info
+보고서 초안 작성해 줘?,document_compose
+재경 팀원들 누구야,employee_lookup
+이 과장 이메일 뭐야,employee_lookup
+조직도 알려조,employee_lookup
+8D 보고서양식,document_search
+프리프레그 절차서 어디 있어,document_search
+IRA 세액공제 조건,regulation_query
+CBAM 탄소국경조정 현황,regulation_query
+품질 보고서 찾아줘,document_search
+관세 25% 영향 분석,regulation_query
+REACH 관련 문서 검색해줘,document_search
+회사 매출이 얼마야,company_info
+영업팀 관련 문서 보여줘,document_search
+최근 작성된 PPAP 보여줘.,document_search
+신 과장 이메일 뭐야,employee_lookup
+8D 보고서양식,document_search
+HMGMA 관련 정보?,company_info
+재경 멤버.,employee_lookup
+생관팀 팀원들 누구야,employee_lookup
+ECN 문서만들어줘,document_compose
+불량률 절차서어디 있어,document_search
+규제 위반 시 과징금.,regulation_query
+최 대리 이메일 뭐야,employee_lookup
+IT전략팀 팀장이 누구야,employee_lookup
+8D 보고서 작성,document_compose
+한 사원 내선번호,employee_lookup
+안전 기준 대응 방안,regulation_query
+품질 보고서 찾아줘,document_search
+규제 위반 시 과징금,regulation_query
+ECN 문서 만들어줘,document_compose
+한 사원 부서가 어디야,employee_lookup
+ECN 문서 만들어줘?,document_compose
+품질 개선대책서 작성해줘,document_compose
+8D 보고서 작성,document_compose
+영업팀 사람들 목록,employee_lookup
+IRA 세액공제조건,regulation_query
+산안법 최근 변경사항,regulation_query
+IRA 뜻 알려줘,company_info
+구매팀 관련 문서 보여줘,document_search
+아진산업 설립연도,company_info
+산안법 최근 변경사항,regulation_query
+ISO 절차서 어디 있어,document_search
+환경 규제 언제부터 적용이야,regulation_query
+관세 25% 영향 분석,regulation_query
+정 부장 연락처 알려줘,employee_lookup
+ESG경영팀 과장 찾아줘,employee_lookup
+EPA 규제 현황 알려줘,regulation_query
+환경 규제 모니터링,regulation_query
+관세 25% 영향 분석,regulation_query
+납기 지연 사과 이메일 작성,document_compose
+공문 양식 찾아줘,document_search
+해외법인 어디에 있어,company_info
+품질보증팀 소속 인원 보여줘,employee_lookup
+8D 보고서 작성,document_compose
+재경 멤버,employee_lookup
+8D 용어가 뭐야,company_info
+PPAP 서류 검색,document_search
+8D 보고서 작성,document_compose
+품질 개선대책서 작성해줘,document_compose
+납기 지연 사과 이메일 작성,document_compose
+품질 개선대책서 작성해줘,document_compose
+내선번호6183번이 누구야,employee_lookup
+해외법인 어디에 있어,company_info
+한 과장부서가 어디야?,employee_lookup
+산안법 관련 공장 영향,regulation_query
+JOON INC가 뭐야,company_info
+유압 관련 문서 검색해줘?,document_search
+8D 보고서 관련 문서?,document_search
+관세 25% 영향 분석,regulation_query
+납입용기 규격 설정서 관련 문서,document_search
+APQP 절차서 어디 있어,document_search
+REACH 절차서 어디 있어,document_search
+영업팀 부장 찾아줘,employee_lookup
+공문 양식 찾아줘,document_search
+회의록 관련 문서,document_search
+납입용기 규격 설정서 작성해줘,document_compose
+너겟 절차서 어디 있어,document_search
+CFRP 관련 문서 검색해줘,document_search
+규제 위반 시 과징금,regulation_query
+조직도 알려줘,employee_lookup
+REACH 대응 방안,regulation_query
+IT팀 팀원들 누구야,employee_lookup
+조직도 알려줘요,employee_lookup
+미국규제 현황.,regulation_query
+회사 매출이 얼마야,company_info
+HR 멤버,employee_lookup
+전 사원에게 이메일 써줘,document_compose
+구매팀 관련 문서 보여줘,document_search
+품질 보고서 찾아줘,document_search
+산안법 규제 현황 알려줘,regulation_query
+IRA 세액공제 조건,regulation_query
+ECN 양식으로 문서 생성,document_compose
+회사 매출이 얼마야.,company_info
+황 차장 연락처 알려줘,employee_lookup
+내선번호 2000번이 누구야,employee_lookup
+ESG경영팀 조직도 보여줘.,employee_lookup
+JOON INC가 뭐야,company_info
+공문 만들어줘,document_compose
+PPAP 서류 검색,document_search
+최근 작성된 PPAP 보여줘요,document_search
+품질 개선대책서 작성해줘,document_compose
+관세25% 영향 분석,regulation_query
+품질 보고서 찾아줘,document_search
+관세 25% 영향 분석,regulation_query
+금형생산팀 팀장 찾아줘,employee_lookup
+규제 위반 시 과징금,regulation_query
+환경 규제 모니터링,regulation_query
+조지아 공장 정보,company_info
+해외법인 어디에 있어,company_info
+EU REACH 준수 사항,regulation_query
+조지아 공장 정보,company_info
+IRA 세액공제 조건,regulation_query
+품질 개선대책서 작성해줘,document_compose
+IT팀 멤버,employee_lookup
+IATF 절차서 어디 있어,document_search
+인사팀 관련 문서 보여줘,document_search
+ECN 절차서 어디 있어,document_search
+사장님이 누구야,company_info
+아진산업 설립연도,company_info
+송에게 보낼 메일작성,document_compose
+JOON INC가 뭐야,company_info
+회사 복지 제도 알려줘,company_info
+품질 보고서 찾아줘,document_search
+이메일 양식으로 문서 생성,document_compose
+서 대리 전화번호,employee_lookup
+회사복지 제도 알려줘,company_info
+이메일 초안 써줘,document_compose
+신입사원 교육 일정,company_info
+생산관리팀에 보낼 공문 써줘,document_compose
+ECN 문서 만들어줘?,document_compose
+금형팀 멤버,employee_lookup
+조직도 알려주세요?,employee_lookup
+ECN 문서 만들어줘,document_compose
+PPAP양식 찾아줘,document_search
+REACH 대응 방안,regulation_query
+설비보전팀 팀장이 누구야,employee_lookup
+생관팀 멤버,employee_lookup
+8D 절차서 어디 있어,document_search
+아진산업 설립연도,company_info
+납입용기 규격 설정서 작성해줘,document_compose
+납기 지연 사과 이메일 작성,document_compose
+품질 개선대책서 작성해줘,document_compose
+회의록 양식 찾아주세요,document_search
+임 팀장 부서가 어디야,employee_lookup
+PPAP서류 검색,document_search
+관세 25% 영향 분석,regulation_query
+8D 보고서 작성,document_compose
+홍대리 내선번호,employee_lookup
+미국 규제 현황,regulation_query
+EU 규제 규제 현황 알려줘,regulation_query
+생관팀 멤버,employee_lookup
+설비보전팀에 보낼 공문 써줘,document_compose
+HMGMA 관련 정보,company_info
+물류 멤버,employee_lookup
+미국 규제 현황,regulation_query
+관세 관련 공장 영향,regulation_query
+설비보전팀 사람들 목록,employee_lookup
+공문 템플릿 어디 있어,document_search
+조직도 알려줘.,employee_lookup
+미국 규제 현황,regulation_query
+생관팀 멤버,employee_lookup
+IRA 설명해줘,company_info
+PPAP 템플릿 어디 있어,document_search
+PPAP 용어가 뭐야,company_info
+금형생산팀 팀장이 누구야,employee_lookup
+윤팀장 부서가 어디야,employee_lookup
+이에게 보낼 메일 작성,document_compose
+오 차장 부서가 어디야,employee_lookup
+정과장 내선번호,employee_lookup
+회사 복지 제도 알려줘,company_info
+물류 멤버,employee_lookup
+미국 규제 현황,regulation_query
+재경팀 관련 문서 보여줘,document_search
+안전보건팀 관련 문서 보여줘,document_search
+아진산업연혁 알려줘,company_info
+설비보전팀 관련 문서 보여줘,document_search
+품질문제 개선대책서 양식으로 문서 생성,document_compose
+ECN 작성해주세요,document_compose
+해외법인 어디에 있어,company_info
+HMGMA 관련 정보,company_info
+해외법인 어디에 있어,company_info
+8D 보고서 양식,document_search
+안전 인시던트 리포트 템플릿 어디 있어,document_search
+영업 팀원들 누구야,employee_lookup
+조지아 공장 정보,company_info
+8D 보고서 작성,document_compose
+ECN 관련 문서,document_search
+영업 멤버,employee_lookup
+영업팀 과장찾아줘,employee_lookup
+8D 보고서 양식,document_search
+보고서 초안 작성해줘,document_compose
+정 차장 내선번호,employee_lookup
+납기 지연 사과 이메일 작성,document_compose
+아진산업 설립연도,company_info
+ECN 양식으로 문서 생성,document_compose
+오 과장 연락처 알려줘,employee_lookup
+환경 규제 모니터링,regulation_query
+사출 용어가 뭐야,company_info
+안 대리에게 이메일 써 줘,document_compose
+규제 위반 시 과징금,regulation_query
+산안법 최근 변경사항,regulation_query
+김 팀장 내선번호,employee_lookup
+PPAP 서류 검색,document_search
+ECN 양식으로문서 생성?,document_compose
+임 사원 전화번호,employee_lookup
+아진산업 설립연도,company_info
+설비보전팀 조직도 보여줘요,employee_lookup
+인사팀 소속 인원 보여줘,employee_lookup
+품질 개선대책서 작성해줘,document_compose
+해외법인 어디에 있어,company_info
+회의록 만들어줘,document_compose
+물류팀 조직도 보여줘,employee_lookup
+Cpk 뜻 알려주세요,company_info
+금형 용어가 뭐야,company_info
+회사 매출이 얼마야,company_info
+CBAM 대응 방안,regulation_query
+8D 보고서 작성,document_compose
+영업팀 조직도 보여줘,employee_lookup
+내선번호 8206번이 누구야,employee_lookup
+관세 25%영향 분석,regulation_query
+Cpk 관련 문서 검색해줘,document_search
+산안법 규제 현황 알려줘,regulation_query
+아진산업 설립연도,company_info
+사장님이 누구야,company_info
+영업팀 조직도 보여줘,employee_lookup
+최근 작성된 품질문제 개선대책서 보여줘,document_search
+신입사원 교육일정,company_info
+IRA 세액공제 조건,regulation_query
+미국 규제 현황,regulation_query
+환경 규제 모니터링,regulation_query
+ECN 절차서 어디 있어,document_search
+조직도 알려줘,employee_lookup
+회의록 만들어줘,document_compose
+아진산업 연혁 알려줘,company_info
+신입사원 교육 일정,company_info
+규제 위반 시 과징금,regulation_query
+조지아 공장 정보,company_info
+CNC 뜻 알려줘요,company_info
+8D 보고서 작성,document_compose
+권 과장 내선번호,employee_lookup
+JOON INC가 뭐야,company_info
+프레스 용어가 뭐야.,company_info
+납입용기 규격 설정서 관련 문서,document_search
+회사 복지 제도 알려줘,company_info
+Cpk 관련 문서검색해줘,document_search
+8D 보고서 템플릿 어디 있어?,document_search
+사장님이 누구야,company_info
+ECN 문서만들어줘,document_compose
+신입사원 교육 일정,company_info
+공문 작성해줘,document_compose
+해외법인 어디에 있어,company_info
+납기 지연 사과 이메일 작성,document_compose
+구매팀 팀장 누구야,employee_lookup
+REACH 언제부터 적용이야,regulation_query
+QA 멤버,employee_lookup
+산안법 최근 변경사항,regulation_query
+불량률 용어가 뭐야,company_info
+품질 보고서 찾아줘,document_search
+조직도알려 줘,employee_lookup
+복지 혜택 뭐가 있어,company_info
+신에게 보낼메일 작성,document_compose
+사장님이 누구야,company_info
+조지아 공장 정보,company_info
+납입용기 규격 설정서 관련문서,document_search
+정 사원 내선번호,employee_lookup
+관세 규제 현황 알려줘,regulation_query
+이메일 초안 써줘,document_compose
+JOONINC가 뭐야?,company_info
+미국 규제 현황,regulation_query
+자동화기술팀 관련 문서보여줘요,document_search
+송 과장 전화번호,employee_lookup
+조지아 공장 정보,company_info
+회의록 양식 찾아줘,document_search
+복지 혜택 뭐가 있어,company_info
+류에게 보낼 메일 작성,document_compose
+내선번호 3437번이 누구야,employee_lookup
+관세 언제부터 적용이야,regulation_query
+박 대리 연락처 알려줘,employee_lookup
+안 사원 이메일 뭔가요,employee_lookup
+EU REACH 준수 사항,regulation_query
+금형팀 멤버,employee_lookup
+납기 지연 사과 이메일 작성,document_compose
+회의록 양식 찾아줘,document_search
+납입용기 규격 설정서 양식으로 문서 생성,document_compose
+품질 보고서 찾아줘,document_search
+CBAM 탄소국경조정 현황,regulation_query
+전 대리 내선번호,employee_lookup
+보고서 초안 작성해줘,document_compose
+내선번호 5070번이 누구야,employee_lookup
+산안법 대응 방안,regulation_query
+구매팀 관련 문서 보여줘,document_search
+ECN 문서 만들어줘.,document_compose
+REACH 용어가 뭐야,company_info
+ECN 템플릿 어디있어,document_search
+ISO 설명해줘,company_info
+PPAP 서류 검색,document_search
+IRA 절차서 어디 있어,document_search
+USMCA 언제부터 적용이야,regulation_query
+IRA 언제부터 적용이야,regulation_query
+안전보건팀 사람들 목록,employee_lookup
+산안법 최근 변경사항,regulation_query
+아진산업 설립연도?,company_info
+이메일 관련 문서,document_search
+EU REACH 준수 사항,regulation_query
+불량률 관련 문서 검색해줘,document_search
+PPAP 양식 찾아줘,document_search
+납입용기 규격 설정서 관련 문서,document_search
+규제 위반 시 과징금,regulation_query
+보고서 초안 작성해줘,document_compose
+보고서 초안 작성해주세요,document_compose
+아진산업 연혁 알려줘.,company_info
+ECN 문서 만들어줘,document_compose
+프레스 설명해줘?,company_info
+인사팀 소속 인원 보여줘,employee_lookup
+8D 보고서 작성,document_compose
+보고서 초안 작성해줘,document_compose
+관세 25% 영향 분석,regulation_query
+IT전략팀 소속 인원 보여줘,employee_lookup
+회의록 템플릿 어디 있어,document_search
+EU REACH 준수 사항,regulation_query
+회의록 템플릿 어디 있어,document_search
+PPAP 양식 찾아주세요,document_search
+EU REACH 준수 사항,regulation_query
+조지아 공장 정보,company_info
+납기 지연 사과 이메일 작성,document_compose
+이메일 양식으로 문서 생성,document_compose
+신입사원 교육 일정,company_info
+IT전략팀 구성원 현황,employee_lookup
+보고서 초안 작성해줘,document_compose
+CBAM 관련 공장 영향,regulation_query
+8D 보고서 양식,document_search
+DASH COMPL 설명해줘,company_info
+한 대리 전화번호,employee_lookup
+서에게 보낼 메일 작성,document_compose
+이메일 초안 써줘,document_compose
+품질문제 개선대책서 양식 찾아줘,document_search
+안전기준 관련 공장 영향,regulation_query
+EU REACH 준수 사항,regulation_query
+안 팀장 내선번호.,employee_lookup
+황 사원 내선번호,employee_lookup
+환경 규제 대응 방안,regulation_query
+미국 규제 현황,regulation_query
+신입사원 교육 일정,company_info
+이메일 초안 써 줘,document_compose
+서보 설명해줘,company_info
+생산관리팀 소속 인원 보여줘,employee_lookup
+자동화기술팀 팀장이 누구야,employee_lookup
+설비보전팀에 보낼 공문 써줘,document_compose
+회의록 만들어줘,document_compose
+임 팀장에게 이메일 써줘,document_compose
+ECN 문서 만들어줘,document_compose
+환경 규제 모니터링,regulation_query
+윤 과장 부서가 어디야,employee_lookup
+품질 개선대책서 작성해줘,document_compose
+자동화기술팀 조직도 보여주세요,employee_lookup
+IATF 절차서 어디 있어,document_search
+개발팀에 보낼 공문 써줘,document_compose
+CBAM 탄소국경조정 현황,regulation_query
+회사 복지 제도 알려줘,company_info
+8D 절차서 어디 있어,document_search
+Cpk 절차서 어디 있어,document_search
+설비보전팀 조직도 보여줘,employee_lookup
+미국 규제 현황,regulation_query
+재경팀에 보낼 공문 써줘,document_compose
+8D 보고서 작성,document_compose
+최 부장 연락처 알려줘,employee_lookup
+품질 보고서 찾아줘,document_search
+품질보증팀 소속 인원 보여줘,employee_lookup
+CFRP 뜻 알려줘,company_info
+CBAM 탄소국경조정 현황,regulation_query
+내선번호 3234번이 누구야,employee_lookup
+미국 규제 현황,regulation_query
+조지아 공장 정보,company_info
+품질 보고서 찾아줘,document_search
+류에게 보낼 메일 작성,document_compose
+회의록템플릿 어디 있어.,document_search
+해외법인 어디에 있어,company_info
+품질 개선대책서 작성해줘,document_compose
+자동화팀 멤버,employee_lookup
+EU REACH 준수 사항,regulation_query
+경산 본사 위치,company_info
+서 팀장 전화번호,employee_lookup
+회사 매출이얼마야?,company_info
+해외지원팀에 보낼 공문 써줘,document_compose
+Cpk 관련 문서검색해줘,document_search
+PPAP 서류 검색,document_search
+8D 보고서 작성해줘?,document_compose
+회의록 작성해줘,document_compose
+PPAP 서류 검색,document_search
+자동화기술팀 사람들 목록?,employee_lookup
+품질 개선대책서 만들어줘,document_compose
+CBAM 탄소국경조정 현황,regulation_query
+8D 보고서 작성?,document_compose
+USMCA 관련 공장 영향,regulation_query
+조직도 알려줘,employee_lookup
+해외법인 어디에 있어,company_info
+8D 보고서 양식,document_search
+안전보건팀 팀장이 누구야,employee_lookup
+USMCA 관련 공장 영향,regulation_query
+PPAP 서류 검색,document_search
+개발팀에 보낼 공문 써 줘,document_compose
+아진산업 연혁 알려줘,company_info
+미국 규제 현황,regulation_query
+안전 인시던트 리포트 양식 찾아줘,document_search
+신입사원 교육 일정,company_info
+8D 보고서 양식,document_search
+USMCA 관련 공장 영향.,regulation_query
+IT전략팀에 보낼 공문 써줘,document_compose
+ECN 문서 만들어줘,document_compose
+ESG경영팀 사람들 목록,employee_lookup
+내선번호 2425번이 누구야,employee_lookup
+ECN 문서 만들어줘,document_compose
+조지아 공장 정보,company_info
+조지아 공장 정보,company_info
+회의록 만들어줘,document_compose
+납기 지연 사과 이메일 작성,document_compose
+환경 규제 모니터링,regulation_query
+품질 개선대책서 작성해줘,document_compose
+임에게 보낼 메일 작성,document_compose
+ESG경영팀 사람들 목록,employee_lookup
+안전보건팀 관련 문서 보여줘,document_search
+8D 보고서 양식,document_search
+CFRP 용어가 뭐야,company_info
+납입용기 규격 설정서 템플릿 어디 있어,document_search
+내선번호 6698번이 누구야,employee_lookup
+PPAP 템플릿 어디 있어,document_search
+이메일 초안 써줘,document_compose
+김 팀장 연락처 알려줘,employee_lookup
+CBAM 탄소국경조정 현황,regulation_query
+개발팀 대리 찾아줘,employee_lookup
+이메일 관련 문서.,document_search
+ECN 양식 찾아줘,document_search
+CBAM 관련 공장 영향,regulation_query
+아진산업 설립연도,company_info
+강 부장 부서가 어디야,employee_lookup
+조지아 공장 정보,company_info
+납기 지연 사과 이메일 작성,document_compose
+정 대리 연락처 알려줘,employee_lookup
+EPA 대응 방안,regulation_query
+8D 보고서 작성,document_compose
+회의록 만들어줘,document_compose
+IRA 세액공제조건,regulation_query
+품질개선대책서 작성해줘,document_compose
+안전 인시던트 리포트 양식 찾아줘,document_search
+IRA 세액공제 조건,regulation_query
+관세 대응 방안,regulation_query
+김에게 보낼 메일 작성,document_compose
+OSHA 언제부터 적용이야,regulation_query
+규제 위반 시 과징금,regulation_query
+산안법 최근 변경사항,regulation_query
+품질 보고서 찾아줘?,document_search
+SPC 관련문서 검색해줘,document_search
+산안법 최근 변경사항,regulation_query
+안전보건팀 관련 문서 보여줘,document_search
+최근 작성된 회의록 보여 줘?,document_search
+최근 작성된 회의록 보여줘요,document_search
+8D 보고서 작성,document_compose
+규제 위반 시 과징금,regulation_query
+8D 보고서 양식으로 문서 생성,document_compose
+8D 보고서 작성,document_compose
+금형생산팀 조직도 보여줘,employee_lookup
+사장님이 누구야.,company_info
+아진산업 설립연도,company_info
+JOON INC가 뭐야,company_info
+CBAM 탄소국경조정 현황,regulation_query
+회사 매출이 얼마야,company_info
+EU REACH 준수 사항?,regulation_query
+관세 25% 영향 분석,regulation_query
+물류팀 소속 인원 보여줘,employee_lookup
+CBAM 탄소국경조정 현황,regulation_query
+조직도 알려주세요,employee_lookup
+산안법 최근 변경사항,regulation_query
+8D 보고서 작성,document_compose
+규제 위반 시 과징금,regulation_query
+품질 개선대책서 만들어줘,document_compose
+회사 매출이 얼마야,company_info
+JOON INC가 뭐야,company_info
+보고서 초안 작성해줘?,document_compose
+8D 보고서작성,document_compose
+USMCA 언제부터 적용야,regulation_query
+미국 규제 현황,regulation_query
+전게 보낼 메일 작성,document_compose
+신입사원 교육 일정,company_info
+PPAP 서류 검색,document_search
+규제 위반 시 과징금,regulation_query
+품질 개선대책서 작성해줘,document_compose
+품질문제 개선대책서 양식 찾아줘,document_search
+생산관리팀 사람들 목록,employee_lookup
+한에게 보낼 메일 작성,document_compose
+CBAM 탄소국경조정 현황,regulation_query
+해외법인 어디에 있어.,company_info
+IRA 세액공제 조건,regulation_query
+8D 보고서 작성,document_compose
+ISO 용어가 뭐야,company_info
+회의록 양식 찾아줘,document_search
+최근 작성된 PPAP 보여줘,document_search
+물류 팀원들 누구야,employee_lookup
+CCH 관련 문서검색해줘.,document_search
+환경규제 모니터링.,regulation_query
+미국 규제 현황,regulation_query
+장 대리 이메일 뭐야,employee_lookup
+김에게 보낼 메일 작성,document_compose
+회사 복지 제도 알려줘,company_info
+생관팀 멤버,employee_lookup
+8D 보고서 작성해주세요,document_compose
+규제 위반 시 과징금,regulation_query
+재경팀 소속 인원 보여줘,employee_lookup
+안보팀 팀원들 누구야,employee_lookup
+납입용기 규격 설정서 작성해 줘,document_compose
+회의록 만들어줘,document_compose
+품질 보고서 찾아주세요,document_search
+CBAM 관련 공장 영향,regulation_query
+PPAP 템플릿 어디 있어,document_search
+안전 인시던트 리포트 양식으로 문서 생성,document_compose
+IRA 관련 공장 영향,regulation_query
+회사 복지 제도 알려줘요.,company_info
+이메일 초안 써줘,document_compose
+영업팀 관련 문서 보여줘,document_search
+회의록 양식 찾아줘,document_search
+복지 혜택 뭐가 있어,company_info
+안 차장 내선번호,employee_lookup
+조직도 알려줘?,employee_lookup
+물류팀 소속 인원 보여줘,employee_lookup
+Cpk 절차서 어디 있어,document_search
+납입용기 규격 설정서 작성해줘,document_compose
+인사팀에 보낼 공문 써줘,document_compose
+조직도 알려줘,employee_lookup
+공문 관련 문서,document_search
+아진산업 연혁 알려줘,company_info
+영업팀에 보낼 공문 써줘,document_compose
+HMGMA 관련 정보,company_info
+금형 관련 문서 검색해줘,document_search
+보고서 초안 작성해줘,document_compose
+구매팀 부장 찾아줘,employee_lookup
+EU REACH 준수 사항,regulation_query
+납기 지연 사과 이메일 작성,document_compose
+품질 보고서 찾아줘,document_search
+영업팀에 보낼 공문 써줘,document_compose
+품질 보고서 찾아줘,document_search
+EU REACH 준수 사항,regulation_query
+유압 관련 문서 검색해줘,document_search
+금형 관련 문서 검색해줘,document_search
+ESG팀 멤버.,employee_lookup
+CBAM 탄소국경조정 현황,regulation_query
+8D 보고서 양식,document_search
+규제 위반 시 과징금,regulation_query
+ECN 문서 만들어줘,document_compose
+신입사원 교육 일정,company_info
+최근 작성된 이메일 보여줘?,document_search
+이메일 양식으로 문서 생성,document_compose
+납기 지연 사과 이메일 작성,document_compose
+회사 매출이 얼마야,company_info
+USMCA 관련 공장 영향,regulation_query
+ECN 문서 만들어줘,document_compose
+재경팀에보낼 공문 써줘.,document_compose
+관세 규제 현황 알려줘,regulation_query
+ECN 설명해줘?,company_info
+DASH COMPL 용어가 뭐야,company_info
+복지 혜택 뭐가 있어,company_info
+CBAM 탄소국경조정 현황,regulation_query
+사장님이 누구야,company_info
+PPAP 서류 검색,document_search
+해외법인 어디에 있어,company_info
+품질보증팀에 보낼 공문 써줘,document_compose
+영업 팀원들 누구야,employee_lookup
+ECN 관련 문서,document_search
+경산 본사 위치,company_info
+불량률 절차서 어디 있어,document_search
+안전 인시던트 리포트 양식으로 문서 생성,document_compose
+Cpk 설명해줘,company_info
+회사 복지 제도 알려줘,company_info
+HMGMA 관련 정보,company_info
+산안법 최근 변경사항,regulation_query
+규제 위반 시 과징금,regulation_query
+OSHA 관련 공장 영향,regulation_query
+환경 규제모니터링,regulation_query
+품질 보고서 찾아줘,document_search
+최근 작성된 납입용기 규격 설정서 보여줘,document_search
+환경 규제 모니터링,regulation_query
+IT전략팀 구성원 현황,employee_lookup
+생산관리팀 조직도 보여줘,employee_lookup
+윤 사원 부서가 어디야,employee_lookup
+ECN 작성해줘,document_compose
+HMGMA 관련 정보,company_info
+아진산업연혁 알려 줘,company_info
+EU 규제 언제부터 적용이야,regulation_query
+품질 개선대책서작성해줘,document_compose
+환경 규제 관련 공장 영향?,regulation_query
+IRA 세액공제 조건,regulation_query
+이메일초안 써줘.,document_compose
+서 팀장에게 이메일 써줘,document_compose
+조직도 알려줘,employee_lookup
+EU REACH 준수 사항,regulation_query
+IRA 세액공제 조건,regulation_query
+IRA 세액공제 조건,regulation_query
+아진산업 연혁 알려줘,company_info
+전 차장 이메일 뭐야?,employee_lookup

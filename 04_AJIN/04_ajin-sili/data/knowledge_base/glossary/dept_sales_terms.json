@@ -1,0 +1,29 @@
+{
+  "citation_id": "GLOSSARY-dept_sales_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "status": "published",
+  "category": "영업팀 현장 용어",
+  "department": ["영업팀", "해외영업팀", "기술영업팀"],
+  "version": "1.0",
+  "description": "완성차 업체(현대·기아) 및 해외 고객과의 수주·납품 업무에서 사용하는 영업·수주·납기 관련 용어 모음.",
+  "terms": [
+    {"term": "RFQ", "full_name": "Request for Quotation (견적 요청서)", "definition": "완성차 업체(OEM)가 부품사에 보내는 견적 요청 문서. 부품 사양, 수량, 납기 조건 등이 포함되며, 이에 대한 견적서(Quotation)를 제출하여 수주 경쟁에 참여한다.", "usage_example": "\"RFQ 들어왔다\" = 완성차에서 견적 요청이 왔다", "aliases": ["알에프큐", "견적요청"]},
+    {"term": "수주", "full_name": "Order Won / Award", "definition": "완성차 업체로부터 부품 공급 발주를 받아낸 것. '수주 따냈다'는 경쟁 입찰에서 선정되었다는 뜻이다.", "usage_example": "\"신차 프로젝트 수주 따냈다\"", "aliases": ["어워드", "낙찰"]},
+    {"term": "물량", "full_name": "Order Volume (발주 수량)", "definition": "완성차 업체가 부품사에 발주하는 수량. 완성차 생산 일정에 따라 수시로 변동된다.", "usage_example": "\"물량 떨어졌다\" = 발주 수량 줄었다, \"물량 올렸다\" = 증가", "aliases": ["발주량", "오더량"]},
+    {"term": "SOP", "full_name": "Start of Production (양산 시작)", "definition": "신차 또는 신규 부품의 양산이 시작되는 시점. 영업에서 말하는 SOP는 생산기술의 SOP(표준작업절차서)와 다른 의미이므로 맥락에 따라 구분해야 한다.", "usage_example": "\"SOP 언제야?\" = 양산 언제 시작해?", "aliases": ["양산시작", "라인업"]},
+    {"term": "EOP", "full_name": "End of Production (양산 종료)", "definition": "해당 차종 또는 부품의 양산이 종료되는 시점. EOP 이후에는 서비스(A/S) 부품만 공급한다.", "usage_example": "\"이 차종 EOP 내년이야\"", "aliases": ["양산종료", "단종"]},
+    {"term": "NPI", "full_name": "New Product Introduction (신규 제품 투입)", "definition": "새로운 부품이나 차종의 개발부터 양산까지의 전체 과정.", "usage_example": "\"NPI 일정 잡자\" = 신규 제품 개발 일정 수립하자", "aliases": ["신규개발"]},
+    {"term": "OEM", "full_name": "Original Equipment Manufacturer (완성차 업체)", "definition": "최종 제품(자동차)을 생산하는 업체. 현대차, 기아, GM, 도요타 등. 부품사 입장에서 고객사를 통칭할 때 사용.", "usage_example": "\"OEM에서 연락 왔다\" = 완성차 업체에서 연락 왔다", "aliases": ["완성차", "고객사"]},
+    {"term": "Tier 1 / Tier 2", "full_name": "1차 협력사 / 2차 협력사", "definition": "Tier 1은 완성차에 직접 납품하는 1차 협력사, Tier 2는 Tier 1에 납품하는 2차 협력사. 아진산업은 현대차그룹 Tier 1이다.", "usage_example": "\"우리는 Tier 1이야\", \"Tier 2 품질 잡아야 해\"", "aliases": ["1차사", "2차사"]},
+    {"term": "포캐스트", "full_name": "Forecast (수요 예측)", "definition": "완성차 업체가 향후 일정 기간 동안의 부품 수요를 예측하여 알려주는 것. 확정 발주는 아니지만 생산 계획의 기반이 된다.", "usage_example": "\"포캐스트 나왔다\" = 수요 예측 물량이 전달됐다", "aliases": ["수요예측", "F/C"]},
+    {"term": "납기", "full_name": "Delivery Date (납품 기한)", "definition": "약속된 부품 납품 일자. 자동차 산업에서 납기 미준수는 라인 정지로 이어질 수 있어 매우 엄격하게 관리된다.", "usage_example": "\"납기 맞춰\", \"납기 밀렸다\"", "aliases": ["D/D", "딜리버리"]},
+    {"term": "라인 태웠다", "full_name": "Line Feeding (라인 투입)", "definition": "완성차 조립라인에 부품을 투입(납품)했다는 뜻의 현장 은어.", "usage_example": "\"오늘 울산 라인에 태웠다\" = 울산공장에 부품 납품 완료", "aliases": ["라인 투입", "납품 완료"]},
+    {"term": "컨테이너 태웠다", "full_name": "Container Shipment (선적 완료)", "definition": "해외 수출 물량을 컨테이너에 적재하여 선적했다는 뜻.", "usage_example": "\"조지아행 컨테이너 태웠다\" = JOON INC향 수출 선적 완료", "aliases": ["선적", "시핑"]},
+    {"term": "클레임", "full_name": "Claim (품질 불만/반품)", "definition": "고객(완성차)으로부터 접수되는 품질 불만, 불량 신고, 반품 요구. 영업팀이 접수하여 품질팀에 전달한다.", "usage_example": "\"클레임 들어왔다\" = 고객에서 품질 불만 접수됐다", "aliases": ["컴플레인", "고객불만"]},
+    {"term": "협판", "full_name": "협력사 판정 (Supplier Assessment)", "definition": "완성차 업체가 협력사의 품질·납기·가격 등을 종합 평가하여 등급(A/B/C/D)을 매기는 것. 등급에 따라 신규 수주 기회가 달라진다.", "usage_example": "\"이번 협판 결과 A등급 받았다\"", "aliases": ["벤더 평가", "공급사 평가"]},
+    {"term": "킥오프", "full_name": "Kick-off Meeting (착수 회의)", "definition": "새로운 프로젝트나 신차 개발이 시작될 때 관련 부서가 모여 일정, 역할, 목표를 공유하는 첫 회의.", "usage_example": "\"신차 킥오프 다음 주야\"", "aliases": ["착수회의", "K/O"]},
+    {"term": "마일스톤", "full_name": "Milestone (주요 일정 체크포인트)", "definition": "프로젝트 진행 과정에서 반드시 달성해야 하는 주요 일정 기점. 예: 금형 발주, T/O, PPAP 제출, SOP 등.", "usage_example": "\"마일스톤 찍었어?\" = 주요 일정 달성했어?", "aliases": ["이정표", "M/S"]}
+  ]
+}

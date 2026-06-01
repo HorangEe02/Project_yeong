@@ -1,0 +1,445 @@
+/* ═══════════════════════════════════════════════════════════════
+ * AJIN Mobile · Liquid Glass v3 — REFINED LENSING LAYER
+ * Loaded AFTER mobile-theme.css. Overrides the v2 glass with a more
+ * Apple-accurate "lens + refraction + specular edge" recipe, plus a
+ * coordinated App Store pattern pass.
+ *
+ * Knobs (CSS custom props on .aj-mobile — set by Tweaks):
+ *   --lg-blur      blur radius for primary glass (default 36px)
+ *   --lg-sat       backdrop saturation (default 1.8)
+ *   --lg-bright    backdrop brightness (default 1.06)
+ *   --lg-edge      specular edge intensity 0..1 (default 1)
+ *   --lg-tint-a    primary tint amount 0..0.3 (default 0.08)
+ *   --aj-gold-h    gold accent hue intensity, 0..1 (default 1)
+ *   --aj-radius    base card radius (default 22px)
+ * ═══════════════════════════════════════════════════════════════ */
+
+.aj-mobile {
+  --lg-blur: 36px;
+  --lg-sat: 1.8;
+  --lg-bright: 1.06;
+  --lg-edge: 1;
+  --lg-tint-a: 0.08;
+  --aj-gold-h: 1;
+  --aj-radius: 22px;
+  --aj-radius-sm: 14px;
+  --lg-tint: 252, 177, 50;
+}
+
+/* ────────────── Core glass: layered base + specular edge + lens ────────────── */
+.aj-mobile .aj-glass,
+.aj-mobile .aj-toast,
+.aj-mobile .aj-divlist {
+  position: relative;
+  border-radius: var(--aj-radius);
+  background:
+    /* lens tint (very subtle) */
+    var(--lg-tint),
+    /* substrate */
+    rgba(255,255,255,0.085);
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat)) brightness(var(--lg-bright));
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat)) brightness(var(--lg-bright));
+  border: 0.5px solid transparent;
+  background-clip: padding-box;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,calc(0.20 * var(--lg-edge))) inset,
+    0 -1px 0 rgba(255,255,255,calc(0.04 * var(--lg-edge))) inset,
+    0 14px 40px -16px rgba(0,0,0,0.55),
+    0 4px 12px -6px rgba(0,0,0,0.35);
+  isolation: isolate;
+}
+
+/* Top specular edge — the "wet glass" highlight */
+.aj-mobile .aj-glass::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background:
+    var(--lg-edge) top/100% 1.5px no-repeat,
+    var(--lg-edge) bottom/100% 1.2px no-repeat;
+  mix-blend-mode: screen;
+  opacity: 0.95;
+  z-index: 2;
+}
+
+/* Diagonal lens flare across the surface */
+.aj-mobile .aj-glass::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background:
+    var(--lg-tint);
+  mix-blend-mode: screen;
+  opacity: 0.85;
+  z-index: 1;
+}
+.aj-mobile .aj-glass > * { position: relative; z-index: 3; }
+
+/* ────────────── Light mode — invert to cream substrate ────────────── */
+.aj-mobile .aj-screen.light .aj-glass {
+  background:
+    rgba(255,255,255,0.95);
+  backdrop-filter: blur(calc(var(--lg-blur) - 6px)) saturate(var(--lg-sat));
+  -webkit-backdrop-filter: blur(calc(var(--lg-blur) - 6px)) saturate(var(--lg-sat));
+  box-shadow:
+    0 1px 0 rgba(255,255,255, calc(0.95 * var(--lg-edge))) inset,
+    0 -0.5px 0 rgba(30,20,10,0.06) inset,
+    0 10px 28px -14px rgba(60,40,10,0.18),
+    0 2px 8px -4px rgba(60,40,10,0.10);
+  border: 0.5px solid rgba(30,20,10,0.06);
+}
+.aj-mobile .aj-screen.light .aj-glass::before {
+  background:
+    var(--lg-edge) top/100% 1px no-repeat;
+  mix-blend-mode: normal;
+  opacity: 0.7;
+}
+.aj-mobile .aj-screen.light .aj-glass::after {
+  background:
+    var(--lg-tint);
+  mix-blend-mode: normal;
+  opacity: 0.6;
+}
+
+/* ────────────── Backdrops — improved color science ────────────── */
+.aj-bg-grad.dark {
+  background:
+    #0E1218;
+}
+.aj-bg-grad.light {
+  background:
+    #FBF7EE;
+}
+
+/* ────────────── Tab bar + composer — refractive pill ────────────── */
+.aj-mobile .aj-tabbar,
+.aj-mobile .aj-composer {
+  backdrop-filter: blur(calc(var(--lg-blur) + 4px)) saturate(2.0);
+  -webkit-backdrop-filter: blur(calc(var(--lg-blur) + 4px)) saturate(2.0);
+  background:
+    var(--lg-tint) !important;
+  border: 0.5px solid rgba(255,255,255, calc(0.18 * var(--lg-edge))) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255, calc(0.22 * var(--lg-edge))) inset,
+    0 18px 48px -18px rgba(0,0,0,0.55) !important;
+}
+.aj-mobile .aj-screen.light .aj-tabbar,
+.aj-mobile .aj-screen.light .aj-composer {
+  background:
+    var(--lg-tint) !important;
+  border: 0.5px solid rgba(30,20,10,0.08) !important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.95) inset,
+    0 14px 36px -16px rgba(20,15,5,0.18) !important;
+}
+
+/* Active tab — gold pill */
+.aj-mobile .aj-tabbar button.on {
+  color: var(--aj-gold);
+  background:
+    var(--lg-tint),
+    rgba(var(--lg-tint), calc(0.16 * var(--aj-gold-h)));
+  box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.2);
+}
+
+/* ────────────── Buttons — refractive ────────────── */
+.aj-mobile .aj-btn.primary {
+  background:
+    rgba(255,255,255,0.5);
+  border: 0.5px solid rgba(255,255,255,0.4);
+  color: #1a1206;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.7) inset,
+    0 -1px 0 rgba(120,75,10,0.25) inset,
+    0 12px 28px -10px rgba(252,177,50, calc(0.55 * var(--aj-gold-h)));
+}
+
+/* ────────────── App Store pattern — UNIFIED ────────────── */
+/* Section header — every page uses the same heading rhythm */
+.aj-mobile .aj-as-sect {
+  padding: 22px 20px 10px;
+}
+.aj-mobile .aj-as-sect .label {
+  color: var(--aj-gold);
+  font: 600 10.5px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  opacity: calc(0.55 + 0.45 * var(--aj-gold-h));
+}
+.aj-mobile .aj-as-sect h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.024em;
+  line-height: 1.08;
+}
+.aj-mobile .aj-as-sect .more {
+  color: var(--aj-gold);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  opacity: calc(0.55 + 0.45 * var(--aj-gold-h));
+}
+
+/* Large-title area */
+.aj-mobile .aj-as-title h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.06;
+}
+
+/* App rows — consistent 60×60 tile, 14px gap */
+.aj-mobile .aj-as-approw .tile {
+  width: 60px; height: 60px; border-radius: 14px;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.16),
+    inset 0 0 0 0.5px rgba(255,255,255,0.06),
+    0 6px 14px -6px rgba(0,0,0,0.5);
+}
+.aj-mobile .aj-as-approw .tile.gold {
+  background:
+    #FCB132;
+  color: #1A1004;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.55),
+    0 6px 14px -4px rgba(252,177,50, calc(0.5 * var(--aj-gold-h)));
+}
+
+/* Category tiles — unify shadow */
+.aj-mobile .aj-as-cat {
+  height: 88px;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.22),
+    inset 0 -0.5px 0 rgba(0,0,0,0.18),
+    0 10px 22px -10px rgba(0,0,0,0.55);
+}
+.aj-mobile .aj-as-cat .lbl {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+}
+
+/* Hero — refined */
+.aj-mobile .aj-as-hero {
+  height: 380px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.2) inset,
+    0 28px 64px -22px rgba(0,0,0,0.65),
+    0 8px 18px -10px rgba(0,0,0,0.4);
+}
+.aj-mobile .aj-as-hero::after {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  border-radius: inherit;
+  background:
+    rgba(255,255,255,0.08);
+  mix-blend-mode: screen;
+}
+
+/* Story card */
+.aj-mobile .aj-as-story {
+  border-radius: 22px;
+  min-height: 320px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.18) inset,
+    0 24px 60px -22px rgba(0,0,0,0.6),
+    0 6px 16px -8px rgba(0,0,0,0.4);
+}
+
+/* Chat bubbles — refined user bubble (gold capsule) */
+.aj-mobile .aj-msg.user {
+  background:
+    #FFD78A;
+  color: #1A1004;
+  border: 0.5px solid rgba(255,255,255,0.3);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.6),
+    inset 0 -0.5px 0 rgba(140,90,10,0.2),
+    0 8px 20px -10px rgba(252,177,50, calc(0.4 * var(--aj-gold-h)));
+}
+.aj-mobile .aj-msg.ai {
+  background:
+    rgba(255,255,255,0.10);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+}
+
+/* Brand mark — refined gold orb */
+.aj-mobile .aj-brand .mark {
+  background:
+    #FFD78A;
+  box-shadow:
+    inset 0 0.5px 0 rgba(255,255,255,0.65),
+    inset 0 -1px 1px rgba(60,30,0,0.30),
+    0 6px 18px -6px rgba(252,177,50, calc(0.6 * var(--aj-gold-h)));
+}
+
+/* Light mode hero variant — softer gold */
+.aj-mobile .aj-screen.light .aj-as-hero .bg {
+  background:
+    #FFE9B8;
+}
+
+/* Status-bar safe area override — pad content for taller bezels */
+.aj-mobile .aj-scroll { scrollbar-width: none; }
+
+/* Tab bar / Composer rounded radii */
+.aj-mobile .aj-tabbar { border-radius: 28px; }
+.aj-mobile .aj-composer { border-radius: 26px; }
+
+/* Chat bubble corners — softer rhythm */
+.aj-mobile .aj-msg { border-radius: 20px; }
+.aj-mobile .aj-msg.user { border-bottom-right-radius: 7px; }
+.aj-mobile .aj-msg.ai { border-bottom-left-radius: 7px; }
+
+/* Status pill — slightly more refined */
+.aj-mobile .aj-status {
+  font: 600 9px/1 "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 4px 8px; border-radius: 5px;
+}
+
+/* Quality bars — gold gradient track */
+.aj-mobile .aj-q-bar .track i {
+  background: #FCB132;
+  box-shadow: 0 0 8px rgba(252,177,50, calc(0.35 * var(--aj-gold-h)));
+}
+
+/* Mobile-only — make sure App Store tabs read clearly on light */
+.aj-mobile .aj-screen.light .aj-as-tabs { border-bottom-color: rgba(0,0,0,0.10); }
+.aj-mobile .aj-screen.light .aj-as-tabs .tab.on::after { background: #B57600; }
+
+/* iPad rail polish */
+.aj-mobile .aj-pad .rail {
+  background:
+    rgba(0,0,0,0.18);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+.aj-mobile .aj-pad.light .rail {
+  background:
+    rgba(255,255,255,0.7);
+}
+.aj-mobile .aj-pad .rail-row.on {
+  background:
+    var(--lg-tint),
+    rgba(var(--lg-tint), calc(0.14 * var(--aj-gold-h)));
+  color: var(--aj-gold);
+  box-shadow: inset 0 0.5px 0 rgba(255,255,255,0.18);
+}
+
+/* Streaming cursor refinement */
+.aj-mobile .streaming-cursor::after {
+  content: '';
+  display: inline-block;
+  width: 6px; height: 14px;
+  background: var(--aj-gold);
+  margin-left: 4px;
+  vertical-align: -2px;
+  animation: aj-pulse 1.4s ease-in-out infinite;
+}
+@keyframes aj-pulse {
+  0%, 100% { opacity: 0.2; }
+  50%      { opacity: 1; }
+}
+
+/* App-row consistency — equal padding both light and dark */
+.aj-mobile .aj-screen.light .aj-as-approw + .aj-as-approw::before {
+  background: rgba(20,15,5,0.10);
+}
+
+/* Spacer between glass blocks (App Store standard) */
+.aj-mobile .aj-glass + .aj-glass { margin-top: 10px; }
+
+/* Final: gold-soft variable derived from gold-h knob */
+.aj-mobile { --aj-gold-soft: rgba(252,177,50, calc(0.18 * var(--aj-gold-h))); }
+
+/* ═══════════════════════════════════════════════════════════════
+ * iPad · Light-mode contrast pass
+ * In light mode the iPad surfaces showed too much gray on captions
+ * and meta text — inline JSX styles with opacity:0.5–0.7 were
+ * dimming text colors. Force opacity to 1 and lock the color to
+ * near-black with !important so inline styles can't override.
+ * Scoped to .aj-pad.light only — dark iPad and iPhone unaffected.
+ * ═══════════════════════════════════════════════════════════════ */
+.aj-mobile .aj-pad.light,
+.aj-mobile .aj-pad.light .work,
+.aj-mobile .aj-pad.light .rail { color: #111; }
+
+/* Force all .aj-mono captions to dark + opaque. Skip elements that
+   already carry an explicit color (gold, semantic) — they have inline
+   `color:` which we leave alone. The * selector below targets the
+   default-colored ones. */
+.aj-mobile .aj-pad.light .aj-mono { color: #2B2B2B !important; opacity: 1 !important; }
+
+/* Re-allow inline colors for monos that have an explicit color set:
+   gold #FCB132, amber #E8A317, brown #6B3F00, red #FF7565, green #4FB774.
+   Using attribute selectors so the !important above is undone for these. */
+.aj-mobile .aj-pad.light .aj-mono[style*="#FCB132"],
+.aj-mobile .aj-pad.light .aj-mono[style*="#E8A317"],
+.aj-mobile .aj-pad.light .aj-mono[style*="#6B3F00"],
+.aj-mobile .aj-pad.light .aj-mono[style*="#FF7565"],
+.aj-mobile .aj-pad.light .aj-mono[style*="#4FB774"],
+.aj-mobile .aj-pad.light .aj-mono[style*="#B57600"] { color: revert !important; }
+
+/* Section headers + row captions */
+.aj-mobile .aj-pad.light .aj-sect-h h3 { color: #2B2B2B !important; opacity: 1 !important; }
+.aj-mobile .aj-pad.light .aj-row .en,
+.aj-mobile .aj-pad.light .aj-row .meta { color: #444 !important; opacity: 1 !important; }
+.aj-mobile .aj-pad.light .aj-kpi .k { color: #2B2B2B !important; opacity: 1 !important; }
+.aj-mobile .aj-pad.light .aj-kpi .v i { color: #555 !important; opacity: 1 !important; }
+
+/* Sidebar rail subtitles (.ko + .aj-mono inside rail rows) */
+.aj-mobile .aj-pad.light .rail .ko,
+.aj-mobile .aj-pad.light .rail .rail-row > div:nth-child(2) { color: #111 !important; opacity: 1 !important; }
+
+/* Chat bubble meta */
+.aj-mobile .aj-pad.light .aj-msg .meta { color: #444 !important; opacity: 1 !important; }
+.aj-mobile .aj-pad.light .aj-msg.user .meta { color: #2B1A04 !important; opacity: 1 !important; }
+
+/* Search bar */
+.aj-mobile .aj-pad.light .aj-search input { color: #111 !important; }
+.aj-mobile .aj-pad.light .aj-search input::placeholder { color: #555 !important; opacity: 1 !important; }
+.aj-mobile .aj-pad.light .aj-search .icn { opacity: 0.85 !important; color: #444 !important; }
+
+/* App-Store-style sub texts inside iPad showcase variant */
+.aj-mobile .aj-pad.light .aj-as-approw .meta .sub,
+.aj-mobile .aj-pad.light .aj-as-approw .meta .iap,
+.aj-mobile .aj-pad.light .aj-as-rating .out,
+.aj-mobile .aj-pad.light .aj-as-tabs .tab,
+.aj-mobile .aj-pad.light .aj-as-review .head .ts,
+.aj-mobile .aj-pad.light .aj-as-shots .shot .head,
+.aj-mobile .aj-pad.light .aj-as-shots .shot .body { color: #2B2B2B !important; opacity: 1 !important; }
+.aj-mobile .aj-pad.light .aj-as-tabs .tab.on { color: #1a1a1a !important; }
+
+/* Tab bar inactive items */
+.aj-mobile .aj-pad.light .aj-tabbar button { color: #333 !important; opacity: 1 !important; }
+.aj-mobile .aj-pad.light .aj-tabbar button.on { color: var(--aj-gold) !important; }
+
+/* Final safety net: any direct child of .work with inline opacity that
+   carries text should still be readable. Don't blanket-* this; target
+   only the typical aj-glass content blocks where JSX inlines opacity. */
+.aj-mobile .aj-pad.light .work [style*="opacity:0.4"],
+.aj-mobile .aj-pad.light .work [style*="opacity:0.45"],
+.aj-mobile .aj-pad.light .work [style*="opacity:0.5"],
+.aj-mobile .aj-pad.light .work [style*="opacity:0.55"],
+.aj-mobile .aj-pad.light .work [style*="opacity:0.6"],
+.aj-mobile .aj-pad.light .work [style*="opacity:0.65"],
+.aj-mobile .aj-pad.light .work [style*="opacity:0.7"],
+.aj-mobile .aj-pad.light .work [style*="opacity:0.75"],
+.aj-mobile .aj-pad.light .work [style*="opacity:0.85"] { opacity: 1 !important; }
+.aj-mobile .aj-pad.light .rail [style*="opacity:0.5"],
+.aj-mobile .aj-pad.light .rail [style*="opacity:0.55"],
+.aj-mobile .aj-pad.light .rail [style*="opacity:0.6"],
+.aj-mobile .aj-pad.light .rail [style*="opacity:0.7"] { opacity: 1 !important; }
+
+/* Once opacity is restored to 1, plain (non-gold) muted text needs an
+   explicit dark color — otherwise it's pure white-on-light. Target text
+   nodes that don't carry their own explicit fill color. */
+.aj-mobile .aj-pad.light .work [style*="opacity:0.5"]:not([style*="color:#"]):not([style*="color:rgb"]),
+.aj-mobile .aj-pad.light .work [style*="opacity:0.55"]:not([style*="color:#"]):not([style*="color:rgb"]),
+.aj-mobile .aj-pad.light .work [style*="opacity:0.6"]:not([style*="color:#"]):not([style*="color:rgb"]),
+.aj-mobile .aj-pad.light .work [style*="opacity:0.65"]:not([style*="color:#"]):not([style*="color:rgb"]),
+.aj-mobile .aj-pad.light .work [style*="opacity:0.7"]:not([style*="color:#"]):not([style*="color:rgb"]) { color: #2B2B2B !important; }

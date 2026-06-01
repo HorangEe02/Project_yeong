@@ -1,0 +1,41 @@
+{# 완성차 업체(현대·기아) 수신 공식 이메일 양식 #}
+
+수신: {{ customer_name }} {{ department }} {{ recipient_name }} {{ recipient_title }}
+발신: 아진산업(주) {{ sender_department }} {{ sender_name }} {{ sender_title }}
+일자: {{ date }}
+제목: [아진산업] {{ subject }}
+
+{{ recipient_name }} {{ recipient_title }}께,
+
+안녕하십니까, 아진산업 {{ sender_department }} {{ sender_name }}입니다.
+
+{{ opening_paragraph }}
+
+{% if structured_items %}
+{% for item in structured_items %}
+■ {{ item.label }}: {{ item.value }}
+{% endfor %}
+{% endif %}
+
+{{ main_body }}
+
+{% if action_items %}
+■ 향후 조치 계획
+{% for action in action_items %}
+  {{ loop.index }}. {{ action }}
+{% endfor %}
+{% endif %}
+
+{{ closing_paragraph }}
+
+불편을 끼쳐드려 죄송하며, 추가 문의사항이 있으시면
+아래 연락처로 연락 주시기 바랍니다.
+
+감사합니다.
+
+─────────────────────────────
+아진산업(주) {{ sender_department }}
+{{ sender_name }} {{ sender_title }}
+Tel: {{ sender_phone | default("054-XXX-XXXX") }}
+Email: {{ sender_email | default("") }}
+─────────────────────────────

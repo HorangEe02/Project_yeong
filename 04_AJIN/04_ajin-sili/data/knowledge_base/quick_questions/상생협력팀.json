@@ -1,0 +1,61 @@
+{
+  "department": "상생협력팀",
+  "division": "구매본부",
+  "description": "협력사 품질·납품·경영 다방면 지원·동반성장 프로그램·지속 가능한 파트너십",
+  "questions": [
+    {
+      "id": "win-supplier-issue",
+      "label": "협력사 이슈",
+      "promptText": "현재 지원 요청 중인 협력사 이슈 모음",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["협력사", "이슈"]
+    },
+    {
+      "id": "win-growth-program",
+      "label": "동반성장 프로그램",
+      "promptText": "올해 운영 중인 동반성장 프로그램 라인업",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["동반성장"]
+    },
+    {
+      "id": "win-fund-support",
+      "label": "자금 지원",
+      "promptText": "협력사 자금 지원 신청 절차와 한도",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["자금"]
+    },
+    {
+      "id": "win-tech-transfer",
+      "label": "기술 이전",
+      "promptText": "협력사 대상 기술 이전·교육 프로그램",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["기술이전"]
+    },
+    {
+      "id": "win-evaluation-meeting",
+      "label": "평가 미팅",
+      "promptText": "협력사 정기 평가 미팅 일정과 안건",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["평가", "미팅"]
+    },
+    {
+      "id": "win-fair-trade",
+      "label": "공정거래",
+      "promptText": "공정거래위원회 제출 자료 작성 가이드",
+      "category": "sop",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["공정거래"]
+    }
+  ]
+}

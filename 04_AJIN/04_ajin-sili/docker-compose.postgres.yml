@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ajin-postgres-dev
+    environment:
+      POSTGRES_USER: ajin
+      POSTGRES_PASSWORD: ajin
+      POSTGRES_DB: ajin
+    ports:
+      - "5432:5432"
+    volumes:
+      - ajin-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ajin -d ajin"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  ajin-postgres-data:

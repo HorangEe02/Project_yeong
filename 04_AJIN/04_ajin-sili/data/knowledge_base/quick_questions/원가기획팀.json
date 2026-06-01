@@ -1,0 +1,61 @@
+{
+  "department": "원가기획팀",
+  "division": "재경본부",
+  "description": "제품 개발~양산 수익성 검토·원가요소 분석·투자비 목표·수익 극대화 기획",
+  "questions": [
+    {
+      "id": "cost-product-margin",
+      "label": "제품 수익성",
+      "promptText": "주요 제품군 수익성(매출 총이익률) 현황",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["수익성", "마진"]
+    },
+    {
+      "id": "cost-rfq-review",
+      "label": "RFQ 원가 검토",
+      "promptText": "신규 RFQ 원가 분석 표준 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["RFQ", "원가"]
+    },
+    {
+      "id": "cost-investment-roi",
+      "label": "투자 ROI",
+      "promptText": "진행 중인 투자건 ROI 분석 현황",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["투자", "ROI"]
+    },
+    {
+      "id": "cost-material-trend",
+      "label": "원재료 동향",
+      "promptText": "주요 원재료(스틸·알루미늄) 가격 추이와 영향",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["원재료", "가격"]
+    },
+    {
+      "id": "cost-vehicle-program",
+      "label": "차종 수익성",
+      "promptText": "차종별 수익성 시뮬레이션 결과",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["차종", "수익성"]
+    },
+    {
+      "id": "cost-target-setting",
+      "label": "목표 원가",
+      "promptText": "신차종 목표 원가 설정 가이드",
+      "category": "scenario",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["목표원가"]
+    }
+  ]
+}

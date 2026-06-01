@@ -1,0 +1,82 @@
+{# usage_hint: "설계·공정·소재 변경 사항을 고객사·내부 부서에 공식 통지할 때 (ECN: Engineering Change Notice)" #}
+{# dept_recommend: ["부품개발팀", "생산기술팀", "품질보증팀"] #}
+{# required_vars: ["title", "change_reason", "ecn_number", "effective_date", "affected_parts"] #}
+{# optional_vars: ["recipient", "originator", "approval_chain", "impact_analysis", "attachments"] #}
+{# example_output: "ECN-2026-A-014 / 부품번호 EWP-001 회로 보호 다이오드 변경 / 발효일 2026-06-01" #}
+{# var_metadata:
+  - {name: "title", label_ko: "제목", required: true, group: "기본", placeholder: "예: EWP 회로 보호 다이오드 변경"}
+  - {name: "ecn_number", label_ko: "ECN 번호", required: true, group: "기본", placeholder: "예: ECN-2026-A-014"}
+  - {name: "change_reason", label_ko: "변경 사유", required: true, group: "내용", placeholder: "예: 양산 라인 부적합 다발에 따른 회로 보호 다이오드 변경 (DI-204 → DI-208)"}
+  - {name: "effective_date", label_ko: "발효일", required: true, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "affected_parts", label_ko: "영향 부품", required: true, group: "내용", placeholder: "예: EWP-001, EWP-001A (LH/RH 공통)"}
+  - {name: "recipient", label_ko: "수신처", required: false, group: "수신/발신", placeholder: "예: 현대자동차 부품개발팀"}
+  - {name: "originator", label_ko: "기안자", required: false, group: "수신/발신", placeholder: "예: 아진산업 부품개발팀 김기안"}
+  - {name: "impact_analysis", label_ko: "영향 분석", required: false, group: "내용", placeholder: "기능/성능/내구성/원가 영향 요약"}
+#}
+
+# 설계 변경 통지서 (Engineering Change Notice)
+
+**ECN 번호**: {{ ecn_number | default("ECN-YYYY-A-XXX") }}
+**제목**: {{ title }}
+**발효일**: {{ effective_date }}
+**기안자**: {{ originator | default("기안자 미지정") }}
+{% if recipient %}**수신처**: {{ recipient }}{% endif %}
+
+---
+
+## 1. 변경 개요
+
+### 1.1 변경 사유
+{{ change_reason }}
+
+### 1.2 영향 부품
+{{ affected_parts }}
+
+{% if impact_analysis %}
+### 1.3 영향 분석
+{{ impact_analysis }}
+{% endif %}
+
+## 2. 변경 전후 비교
+
+| 구분 | 변경 전 (Before) | 변경 후 (After) |
+|---|---|---|
+| 사양 | (변경 전 사양 기재) | (변경 후 사양 기재) |
+| 도면 번호 | — | — |
+| 공급사 | — | — |
+
+## 3. 적용 일정
+
+- **양산 적용일**: {{ effective_date }}
+- **검증 완료일**: (PPAP 재제출 일정 기재)
+- **이전 자재 소진 정책**: (FIFO / 즉시 폐기 / 별도 협의)
+
+## 4. 검증 계획
+
+- [ ] 도면 / 사양서 개정 (Rev. 차수 명시)
+- [ ] PPAP 재제출 (Level 3 기준)
+- [ ] FMEA 업데이트
+- [ ] Control Plan 개정
+- [ ] 초도품 검사 통과 확인
+
+## 5. 결재 라인
+
+{% if approval_chain %}
+{{ approval_chain }}
+{% else %}
+| 단계 | 부서 / 직급 | 성명 | 결재일 |
+|---|---|---|---|
+| 기안 | 기안자 | — | — |
+| 검토 | 부서장 | — | — |
+| 승인 | 본부장 | — | — |
+{% endif %}
+
+{% if attachments %}
+## 6. 첨부
+
+{{ attachments }}
+{% endif %}
+
+---
+
+본 ECN 은 발효일 이후 모든 양산·검사·납품에 즉시 적용되며, 이전 사양으로 생산된 자재의 처리 방침은 별도 통보합니다.

@@ -1,0 +1,57 @@
+{# usage_hint: "회의 결과를 결정 사항·액션 아이템·차주 일정으로 정리하는 회의록" #}
+{# dept_recommend: ["전 부서"] #}
+{# required_vars: ["date", "attendees"] #}
+{# optional_vars: ["title", "agenda", "decisions", "action_items", "next_meeting", "location"] #}
+{# example_output: "2026-04-15 / 품질혁신 TF 정례회 / 12명 참석 / 결정 3건 / 액션 5건" #}
+{# var_metadata:
+  - {name: "title", label_ko: "회의명", required: false, group: "기본", placeholder: "예: 품질혁신 TF 정례회의"}
+  - {name: "date", label_ko: "회의일시", required: true, group: "일정", placeholder: "예: 2026-04-15 14:00 ~ 15:30"}
+  - {name: "location", label_ko: "장소", required: false, group: "일정", placeholder: "예: 본관 5F 회의실"}
+  - {name: "attendees", label_ko: "참석자", required: true, group: "수신/발신", placeholder: "예: 김QA부장, 박PE과장, 이QC대리 등 12명"}
+  - {name: "agenda", label_ko: "안건", required: false, group: "내용", placeholder: "1. 4월 불량률 리뷰 / 2. SPC 도입 일정 / 3. CAPA 진행 현황"}
+  - {name: "decisions", label_ko: "결정 사항", required: false, group: "내용", placeholder: "회의에서 합의된 결정 3-5건"}
+  - {name: "action_items", label_ko: "액션 아이템", required: false, group: "내용", placeholder: "담당자 / 기한 / 산출물"}
+  - {name: "next_meeting", label_ko: "차회 일정", required: false, group: "일정", placeholder: "예: 2026-04-29 (목) 14:00"}
+#}
+
+# 회의록
+
+**회의명**: {{ title | default("(회의명)") }}
+**일시**: {{ date }}
+**장소**: {{ location | default("(장소)") }}
+**참석자**: {{ attendees }}
+
+---
+
+## 1. 안건
+
+{{ agenda | default("1. (안건 1)\n2. (안건 2)\n3. (안건 3)") }}
+
+## 2. 논의 요약
+
+(주요 발언 / 쟁점 / 데이터 요약)
+
+## 3. 결정 사항
+
+{{ decisions | default("- 결정 1\n- 결정 2\n- 결정 3") }}
+
+## 4. 액션 아이템
+
+| 번호 | 내용 | 담당 | 기한 | 산출물 |
+|---:|---|---|---|---|
+| 1 | (예: SPC 차트 시범 운영 결과 정리) | 김QA부장 | 2026-04-22 | 분석 보고서 |
+| 2 | (예: CAPA 진행률 업데이트) | 박PE과장 | 2026-04-19 | 진행 표 |
+
+{% if action_items %}
+{{ action_items }}
+{% endif %}
+
+## 5. 차회 일정
+
+- **일시**: {{ next_meeting | default("(차회 일정)") }}
+- **주제**: (예: 액션 아이템 진행 점검 + 5월 품질 KPI)
+
+---
+
+**작성**: 회의 서기
+**배포**: 참석자 전원 + 본부장

@@ -1,0 +1,50 @@
+{# usage_hint: "퇴직 의사를 회사에 공식 통지 — 마지막 근무일·인수 인계·사유" #}
+{# dept_recommend: ["전 부서"] #}
+{# required_vars: ["last_work_date", "reason"] #}
+{# optional_vars: ["applicant", "team", "join_date", "handover_plan", "contact"] #}
+{# example_output: "사직서 / 박준영 / 마지막 근무일 2026-06-30 / 사유: 가정 상황" #}
+{# var_metadata:
+  - {name: "applicant", label_ko: "신청자", required: false, group: "수신/발신", placeholder: "예: 박준영 (사번 12345)"}
+  - {name: "team", label_ko: "부서 / 직급", required: false, group: "수신/발신", placeholder: "예: 생산기술팀 대리"}
+  - {name: "join_date", label_ko: "입사일", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "last_work_date", label_ko: "마지막 근무일", required: true, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "reason", label_ko: "사유", required: true, group: "내용", placeholder: "예: 가정 상황 / 진학 / 이직 / 건강 등"}
+  - {name: "handover_plan", label_ko: "인수인계 계획", required: false, group: "내용", placeholder: "주요 업무 / 인수자 / 기간"}
+  - {name: "contact", label_ko: "퇴직 후 연락처", required: false, group: "참조", placeholder: "(선택) 인수인계 후속 연락 가능 시"}
+#}
+
+# 사직서
+
+**신청자**: {{ applicant | default("[성명 / 사번]") }}
+**부서 / 직급**: {{ team | default("[부서 / 직급]") }}
+{% if join_date %}**입사일**: {{ join_date }}{% endif %}
+**마지막 근무 희망일**: {{ last_work_date }}
+
+---
+
+## 사직 사유
+
+{{ reason }}
+
+## 인수인계 계획
+
+{{ handover_plan | default("- 진행 중 업무 인수자: (인수자 이름)\n- 인수 기간: 사직일 전 2주\n- 산출물: 업무 매뉴얼 / 진행 상태 표 / 외부 연락처") }}
+
+## 회사에 드리는 말씀
+
+(재직 기간 동안의 감사 인사 / 회사에 대한 건의 사항 등 — 자유 작성)
+
+{% if contact %}
+## 퇴직 후 연락처
+
+{{ contact }}
+{% endif %}
+
+---
+
+본 사직서는 사내 퇴직 절차에 따라 인사관리팀에 제출되며, 결재 완료 후 효력이 발생합니다. 사직 처리 진행 중 인수인계에 최선을 다하겠습니다.
+
+| 결재 | 신청자 | 팀장 | 부서장 | 인사팀 |
+|:-:|:-:|:-:|:-:|:-:|
+| 서명 |  |  |  |  |
+| 일자 |  |  |  |  |

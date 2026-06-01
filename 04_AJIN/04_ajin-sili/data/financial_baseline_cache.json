@@ -1,0 +1,18 @@
+{
+  "_industry_avg_": {
+    "revenue_krw_mn": 8426718,
+    "cogs_krw_mn": 36089798,
+    "labor_share": 0.25,
+    "emissions": {
+      "scope_1": 0,
+      "scope_2": 0,
+      "scope_3": null,
+      "source": "industry_avg_3peers"
+    },
+    "data_source": "industry_avg",
+    "confidence": 0.5,
+    "as_of": "2026-05-09",
+    "corp_code": "",
+    "__fetched_at": "2026-05-09T21:52:13.106881"
+  }
+}

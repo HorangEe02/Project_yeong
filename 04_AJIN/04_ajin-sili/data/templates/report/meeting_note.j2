@@ -1,0 +1,42 @@
+{# 회의록 양식 #}
+
+# 회의록
+
+| 항목 | 내용 |
+|---|---|
+| 회의번호 | {{ doc_number | default("MTG-YYYY-NNN") }} |
+| 회의명 | {{ meeting_title }} |
+| 일시 | {{ meeting_date }} {{ meeting_time | default("") }} |
+| 장소 | {{ meeting_place | default("본사 회의실") }} |
+| 작성자 | {{ author | default("OOO") }} |
+
+---
+
+## 참석자
+
+| 부서 | 이름 | 직급 |
+|---|---|---|
+{% for member in attendees %}
+| {{ member.department }} | {{ member.name }} | {{ member.title | default("") }} |
+{% endfor %}
+
+## 안건
+
+{% for agenda in agenda_items %}
+### {{ loop.index }}. {{ agenda.title }}
+
+{{ agenda.content }}
+
+{% endfor %}
+
+## 결정 사항
+
+| 결정 내용 | 담당자 | 기한 |
+|---|---|---|
+{% for decision in decisions %}
+| {{ decision.content }} | {{ decision.owner }} | {{ decision.deadline | default("") }} |
+{% endfor %}
+
+## 향후 일정
+
+{{ next_steps | default("차기 회의 일정은 추후 공지 예정입니다.") }}

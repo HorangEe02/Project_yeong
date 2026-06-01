@@ -1,0 +1,61 @@
+{
+  "department": "기술교육원",
+  "division": "관리본부",
+  "description": "직무능력 향상 교육·전문기술인 양성·고용노동부 지원·안전보건교육 운영",
+  "questions": [
+    {
+      "id": "edu-curriculum",
+      "label": "교육 커리큘럼",
+      "promptText": "이번 분기 운영 중인 교육 커리큘럼과 신청 가능 과정",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["커리큘럼", "교육"]
+    },
+    {
+      "id": "edu-mandatory-status",
+      "label": "법정 교육 이수",
+      "promptText": "법정 의무 교육(안전·성희롱·개인정보) 미이수자",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["법정교육", "이수"]
+    },
+    {
+      "id": "edu-apply-course",
+      "label": "교육 신청",
+      "promptText": "사내 직무 교육 신청 방법과 일정 보기",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["신청", "LMS"]
+    },
+    {
+      "id": "edu-content-update",
+      "label": "교육 자료 갱신",
+      "promptText": "안전보건교육 콘텐츠 최신 갱신본 위치",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["자료", "콘텐츠"]
+    },
+    {
+      "id": "edu-government-grant",
+      "label": "정부 지원금",
+      "promptText": "고용노동부/HRD 정부 지원 교육 신청 가이드",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["정부", "지원"]
+    },
+    {
+      "id": "edu-training-stats",
+      "label": "교육 통계",
+      "promptText": "이번 분기 부서별·직급별 교육 이수 통계",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["통계"]
+    }
+  ]
+}

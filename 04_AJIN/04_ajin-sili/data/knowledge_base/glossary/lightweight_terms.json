@@ -1,0 +1,20 @@
+{
+  "citation_id": "GLOSSARY-lightweight_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "category": "press_mold_lightweight",
+  "description": "프레스·금형 생산팀 및 경량화(CFRP 등) 관련 현장 은어",
+  "terms": {
+    "블랭킹": "Blanking - 철판을 원하는 모양으로 찍어내는 작업",
+    "피어싱": "Piercing - 구멍을 뚫는 작업",
+    "버링": "Burr 제거 작업 (가장자리 날카로운 버 제거)",
+    "헤밍": "Hemming - 판재 끝을 접어 붙이는 작업 (도어 가장자리)",
+    "하프블랭킹": "Half Blanking - 반만 찍어내는 반타발",
+    "전착": "Electro Deposition - 하도 방청 도장",
+    "프라이머": "Primer - 중도 도장 (접착력 담당)",
+    "실러": "Sealer - 방청·방음 실란트"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "citation_id": "GLOSSARY-dept_purchasing_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "status": "published",
+  "category": "구매팀 현장 용어",
+  "department": ["구매팀", "자재팀", "SCM팀"],
+  "version": "1.0",
+  "description": "자재 조달, 협력사 관리, 원가 관리 업무에서 사용하는 구매·무역·물류 약어 및 현장 용어 모음.",
+  "terms": [
+    {"term": "MOQ", "full_name": "Minimum Order Quantity (최소발주수량)", "definition": "공급업체가 설정한 최소 구매 가능 수량. 이 수량 이상으로 주문해야 발주가 가능하다. 금형 제작비, 셋업 비용 등을 고려하여 결정된다.", "usage_example": "\"MOQ가 5,000개야\" = 최소 5,000개 이상 주문해야 한다", "aliases": ["최소발주", "엠오큐"]},
+    {"term": "PO", "full_name": "Purchase Order (발주서)", "definition": "공급업체에 자재·부품을 주문하는 공식 문서. ERP 시스템에서 발행한다.", "usage_example": "\"PO 끊었다\" = 발주서 발행했다, \"PO 넘버 뭐야?\"", "aliases": ["발주서", "피오"]},
+    {"term": "L/T", "full_name": "Lead Time (소요 기간)", "definition": "발주부터 자재 입고까지 걸리는 시간. 장납기(Long Lead Time) 자재는 선행 발주가 필요하다.", "usage_example": "\"L/T 3주야\" = 발주 후 입고까지 3주 소요", "aliases": ["리드타임", "납기"]},
+    {"term": "단납기", "full_name": "Short Lead Time (긴급 단축 납기)", "definition": "정상 L/T보다 훨씬 짧은 기한 내에 납품을 요구하는 것. 완성차 증산, 클레임 대응 등으로 빈번하게 발생한다.", "usage_example": "\"단납기 걸렸다\" = 매우 급하게 납품해야 한다", "aliases": ["긴급납기", "숏리드"]},
+    {"term": "긴급오더", "full_name": "Urgent Order / Rush Order", "definition": "예정에 없던 갑작스러운 발주. 완성차 일정 변동이나 품질 이슈로 발생한다.", "usage_example": "\"긴급오더 떨어졌다\" = 예상 외의 급한 주문이 들어왔다", "aliases": ["러시오더", "특급오더"]},
+    {"term": "벤더", "full_name": "Vendor (공급업체)", "definition": "자재나 부품을 공급하는 업체. 1차 벤더는 완성차에 직납하는 업체, 2차 벤더는 1차에 납품하는 업체.", "usage_example": "\"벤더 바꿔야 해\", \"2차 벤더 품질이 문제야\"", "aliases": ["공급사", "협력사", "서플라이어"]},
+    {"term": "소싱", "full_name": "Sourcing (공급처 발굴)", "definition": "새로운 자재·부품 공급처를 찾고 평가하는 활동.", "usage_example": "\"신규 소싱 진행 중\", \"대체 소싱 찾아\"", "aliases": ["공급처개발"]},
+    {"term": "견적", "full_name": "Quotation / 견적서", "definition": "공급업체가 제시하는 가격, 납기, 조건 등이 담긴 문서.", "usage_example": "\"견적 넣어\" = 가격 견적 제출해, \"견적 비교해봐\"", "aliases": ["견적서", "쿼테이션", "Q/T"]},
+    {"term": "네고", "full_name": "Negotiation (가격 협상)", "definition": "공급업체와 단가, 납기, 결제 조건 등을 협상하는 것.", "usage_example": "\"네고 들어가\" = 가격 협상 시작해", "aliases": ["협상", "단가협상"]},
+    {"term": "단가", "full_name": "Unit Price (개당 가격)", "definition": "부품 1개당 구매 가격. 원가의 핵심 구성 요소이며, 매년 단가 인하(Cost Down) 압박을 받는다.", "usage_example": "\"단가 깎아야 해\", \"단가 동결해달라고 해\"", "aliases": ["유닛 프라이스", "개당 가격"]},
+    {"term": "VA/VE", "full_name": "Value Analysis / Value Engineering", "definition": "VA는 기존 제품의 원가를 절감하는 활동, VE는 개발 단계에서 원가를 최적화하는 활동. 기능을 유지하면서 비용을 줄이는 것이 핵심.", "usage_example": "\"VA/VE 아이템 발굴해\" = 원가 절감 항목 찾아", "aliases": ["원가절감", "가치공학"]},
+    {"term": "BOM", "full_name": "Bill of Materials (부품 목록표)", "definition": "제품 1개를 만드는 데 필요한 모든 부품·자재의 목록. 품번, 수량, 규격 등이 포함된다.", "usage_example": "\"BOM 변경됐다\" = 부품 구성이 바뀌었다", "aliases": ["부품표", "자재명세서"]},
+    {"term": "MRO", "full_name": "Maintenance, Repair, Operations", "definition": "생산에 직접 사용되지 않지만 공장 운영에 필요한 소모품·공구·설비 부품 등의 간접 자재.", "usage_example": "\"MRO 발주해\" = 소모품/공구 주문해", "aliases": ["간접자재", "소모품"]},
+    {"term": "안전재고", "full_name": "Safety Stock", "definition": "수요 변동이나 납기 지연에 대비하여 최소한으로 보유하는 재고량.", "usage_example": "\"안전재고 며칠 분이야?\", \"안전재고 확보해\"", "aliases": ["버퍼재고", "최소재고"]},
+    {"term": "입고", "full_name": "Incoming / Goods Receipt", "definition": "발주한 자재가 창고에 도착하여 접수되는 것.", "usage_example": "\"입고 확인해\" = 자재 들어왔는지 확인해", "aliases": ["GR", "자재입고"]},
+    {"term": "미납", "full_name": "Back Order / Outstanding", "definition": "발주했으나 아직 납품되지 않은 수량. 미납이 쌓이면 라인 정지 위험이 있다.", "usage_example": "\"미납 얼마야?\", \"미납 처리해\"", "aliases": ["미입고", "백오더"]},
+    {"term": "코스트 다운", "full_name": "Cost Down (원가 절감)", "definition": "완성차 업체가 매년 협력사에 요구하는 단가 인하. 구매팀의 가장 큰 압박 중 하나.", "usage_example": "\"올해 코스트다운 3% 목표야\"", "aliases": ["C/D", "단가인하", "원가저감"]}
+  ]
+}

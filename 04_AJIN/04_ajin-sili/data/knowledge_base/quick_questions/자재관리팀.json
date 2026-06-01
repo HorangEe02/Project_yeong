@@ -1,0 +1,61 @@
+{
+  "department": "자재관리팀",
+  "division": "생산본부",
+  "description": "자재 입출고·재고·BOM·창고운영 — 생산 자재 흐름 관리",
+  "questions": [
+    {
+      "id": "mat-stock-status",
+      "label": "재고 현황",
+      "promptText": "주요 자재 재고 현황과 안전재고 미달 품목 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["재고", "ERP"]
+    },
+    {
+      "id": "mat-bom-search",
+      "label": "BOM 조회",
+      "promptText": "특정 부품의 BOM 구조 조회",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["BOM", "부품"]
+    },
+    {
+      "id": "mat-receiving-sop",
+      "label": "입고 검수 절차",
+      "promptText": "자재 입고 검수 표준 절차 알려줘",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["입고", "검수"]
+    },
+    {
+      "id": "mat-shortage-alert",
+      "label": "결품 알림",
+      "promptText": "오늘 생산 결품 우려 자재와 발주 상태",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["결품", "발주"]
+    },
+    {
+      "id": "mat-fifo-cycle-count",
+      "label": "재고 실사",
+      "promptText": "재고 실사(Cycle Count) 일정과 차이 분석",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["실사", "FIFO"]
+    },
+    {
+      "id": "mat-warehouse-layout",
+      "label": "창고 적재",
+      "promptText": "창고 적재 표준과 위험물 보관 규정",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["창고", "위험물"]
+    }
+  ]
+}

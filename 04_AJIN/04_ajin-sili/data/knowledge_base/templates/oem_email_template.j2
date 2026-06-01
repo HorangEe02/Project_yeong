@@ -1,0 +1,49 @@
+{# usage_hint: "현대·기아 등 OEM 고객사로 보내는 격식 영문 이메일. PPAP 제출, 클레임 응대, 일정 협의 등" #}
+{# dept_recommend: ["영업팀", "품질보증팀", "부품개발팀"] #}
+{# required_vars: ["recipient", "subject"] #}
+{# optional_vars: ["sender_name", "sender_title", "main_content", "action_required", "due_date", "attachments"] #}
+{# example_output: "Subject: PPAP Level 3 Submission for Part EWP-001 / Hyundai Motor Quality" #}
+{# var_metadata:
+  - {name: "recipient", label_ko: "수신자", required: true, group: "수신/발신", placeholder: "예: Hyundai Motor Quality Team / Mr. John Smith"}
+  - {name: "subject", label_ko: "Subject (영문)", required: true, group: "기본", placeholder: "예: PPAP Level 3 Submission for Part EWP-001"}
+  - {name: "sender_name", label_ko: "발신자 성명", required: false, group: "수신/발신", placeholder: "예: Junyoung Park"}
+  - {name: "sender_title", label_ko: "발신자 직급/부서", required: false, group: "수신/발신", placeholder: "예: Quality Assurance Manager, AJIN Industry"}
+  - {name: "main_content", label_ko: "본문 핵심 내용", required: false, group: "내용", placeholder: "1-2 문장으로 요점 기재"}
+  - {name: "action_required", label_ko: "요청 사항", required: false, group: "내용", placeholder: "예: Please review and approve by..."}
+  - {name: "due_date", label_ko: "기한", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "attachments", label_ko: "첨부", required: false, group: "참조", placeholder: "예: PSW.pdf, FMEA.xlsx"}
+#}
+
+To: {{ recipient }}
+From: {{ sender_name | default("[Your Name]") }} <{{ sender_email | default("name@ajin.co.kr") }}>
+Subject: {{ subject }}
+
+Dear {{ recipient }},
+
+I hope this message finds you well. I am writing on behalf of AJIN Industry Co., Ltd.
+
+{{ main_content | default("(Please describe the main purpose of this communication in 1-2 sentences.)") }}
+
+{% if action_required %}
+**Action Required**
+{{ action_required }}
+{% if due_date %}**Due Date**: {{ due_date }}{% endif %}
+{% endif %}
+
+{% if attachments %}
+**Attachments**
+{{ attachments }}
+{% endif %}
+
+Please feel free to contact me if you have any questions or require additional information.
+
+Best regards,
+
+{{ sender_name | default("[Your Name]") }}
+{{ sender_title | default("[Your Title]") }}
+AJIN Industry Co., Ltd.
+{{ sender_phone | default("+82-53-XXX-XXXX") }}
+
+---
+
+*This email and any attachments are confidential and intended solely for the use of the addressee. If you are not the intended recipient, please notify the sender and delete this email immediately.*

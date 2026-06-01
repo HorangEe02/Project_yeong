@@ -1,0 +1,61 @@
+{
+  "department": "공법계획팀",
+  "division": "생산기술본부",
+  "description": "프레스 공법 최적화·AUTOFORM 성형해석·공법 표준화",
+  "questions": [
+    {
+      "id": "method-autoform-run",
+      "label": "AUTOFORM 해석",
+      "promptText": "AUTOFORM 성형해석 표준 셋업 방법",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["AUTOFORM", "성형해석"]
+    },
+    {
+      "id": "method-springback",
+      "label": "스프링백 보정",
+      "promptText": "스프링백 보정 절차와 적용 사례",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["스프링백", "보정"]
+    },
+    {
+      "id": "method-press-condition",
+      "label": "프레스 조건 설정",
+      "promptText": "신규 부품 프레스 공법 조건(톤수·속도·BHF) 설정 가이드",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["프레스", "조건"]
+    },
+    {
+      "id": "method-defect-analysis",
+      "label": "성형 불량 원인",
+      "promptText": "주름·크랙·치수이상 성형 불량 원인 분석",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["불량", "성형"]
+    },
+    {
+      "id": "method-standardize",
+      "label": "공법 표준화",
+      "promptText": "신규 공법을 사내 표준으로 등록하는 절차",
+      "category": "sop",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["표준화"]
+    },
+    {
+      "id": "method-cae-vs-real",
+      "label": "해석 vs 실측",
+      "promptText": "CAE 해석 결과와 시작품 실측 차이 분석",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["CAE", "검증"]
+    }
+  ]
+}

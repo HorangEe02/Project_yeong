@@ -1,0 +1,52 @@
+[
+  {
+    "name": "EWP 하우징 내경",
+    "filename": "spc_ewp_housing_bore.csv",
+    "target": 25.0,
+    "usl": 25.05,
+    "lsl": 24.95,
+    "unit": "mm",
+    "part_number": "AJ-EWP-H100",
+    "n_samples": 200
+  },
+  {
+    "name": "CCH 냉각플레이트 두께",
+    "filename": "spc_cch_plate_thickness.csv",
+    "target": 1.2,
+    "usl": 1.25,
+    "lsl": 1.15,
+    "unit": "mm",
+    "part_number": "AJ-CCH-P100",
+    "n_samples": 50
+  },
+  {
+    "name": "OBC 케이스 평탄도",
+    "filename": "spc_obc_case_flatness.csv",
+    "target": 0.1,
+    "usl": 0.2,
+    "lsl": 0.0,
+    "unit": "mm",
+    "part_number": "AJ-OBC-C100",
+    "n_samples": 50
+  },
+  {
+    "name": "범퍼빔 용접 너겟 직경",
+    "filename": "spc_bumper_nugget_dia.csv",
+    "target": 6.5,
+    "usl": 8.0,
+    "lsl": 5.0,
+    "unit": "mm",
+    "part_number": "AJ-BMP-F100",
+    "n_samples": 50
+  },
+  {
+    "name": "시트레일 홀 위치도",
+    "filename": "spc_seat_rail_hole_position.csv",
+    "target": 0.0,
+    "usl": 0.3,
+    "lsl": -0.3,
+    "unit": "mm",
+    "part_number": "AJ-SIT-R100",
+    "n_samples": 50
+  }
+]

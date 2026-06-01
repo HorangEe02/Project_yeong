@@ -1,0 +1,17 @@
+{
+  "regulation_type": "eu_reach",
+  "title": "EU REACH SVHC 후보 목록 (갱신)",
+  "items": [
+    {
+      "id": "ECHA-SVHC-LIST",
+      "subject": "SVHC 후보 물질 목록",
+      "total_substances": 237,
+      "new_additions": [
+        "크롬산 (CAS: 7738-94-5)",
+        "크롬산 나트륨 (CAS: 7775-11-3)"
+      ],
+      "effective_date": "2027-01-01"
+    }
+  ],
+  "crawled_at": "2026-04-01T09:00:00"
+}

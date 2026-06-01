@@ -1,0 +1,44 @@
+{
+  "scope": "by_level",
+  "level": "4-5",
+  "level_name": "임원/시스템 (EXECUTIVE L4 / SYS-HR_ADMIN L5)",
+  "description": "본부장 이상 — 전사 / 본부 단위 의사결정",
+  "questions": [
+    {
+      "id": "lv45-dashboard",
+      "label": "전사 대시보드",
+      "promptText": "전사 KPI 대시보드 핵심 지표 알려줘",
+      "category": "action",
+      "min_level": 4,
+      "max_level": 5,
+      "tags": ["대시보드", "전사"]
+    },
+    {
+      "id": "lv45-incident-summary",
+      "label": "이슈/사고 요약",
+      "promptText": "최근 1주일 사내 이슈/사고/품질이상 모두 요약해줘",
+      "category": "action",
+      "min_level": 4,
+      "max_level": 5,
+      "tags": ["이슈", "사고"]
+    },
+    {
+      "id": "lv45-cross-division",
+      "label": "본부 간 협업",
+      "promptText": "본부 간 진행 중인 협업 프로젝트 현황 알려줘",
+      "category": "action",
+      "min_level": 4,
+      "max_level": 5,
+      "tags": ["협업", "프로젝트"]
+    },
+    {
+      "id": "lv45-bulk-export",
+      "label": "보고서 일괄",
+      "promptText": "이번 달 부서별 보고서 일괄 다운로드",
+      "category": "action",
+      "min_level": 4,
+      "max_level": 5,
+      "tags": ["보고서", "다운로드"]
+    }
+  ]
+}

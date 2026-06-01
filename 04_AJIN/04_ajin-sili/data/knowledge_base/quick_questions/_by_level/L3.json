@@ -1,0 +1,44 @@
+{
+  "scope": "by_level",
+  "level": 3,
+  "level_name": "관리자 (MANAGER L3)",
+  "description": "팀장/과장급 — 팀 관리·성과·보고 위주",
+  "questions": [
+    {
+      "id": "lv3-team-kpi",
+      "label": "팀 KPI",
+      "promptText": "우리 팀 이번 분기 KPI 진행률 보여줘",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["KPI", "성과"]
+    },
+    {
+      "id": "lv3-pending-approvals",
+      "label": "결재 대기",
+      "promptText": "내 결재 대기 건 모두 보여줘",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["결재", "워크플로"]
+    },
+    {
+      "id": "lv3-meeting-summary",
+      "label": "회의 요약",
+      "promptText": "지난주 팀 회의록 요약해줘",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["회의", "요약"]
+    },
+    {
+      "id": "lv3-report-draft",
+      "label": "보고서 초안",
+      "promptText": "이번 주 팀 보고서 초안 작성해줘",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["보고서", "초안"]
+    }
+  ]
+}

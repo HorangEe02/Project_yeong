@@ -1,0 +1,61 @@
+{
+  "department": "품질경영팀",
+  "division": "관리본부",
+  "description": "전사 품질경영 전략·5스타 PM·내부심사·SQ 평가·IATF 16949 인증 관리",
+  "questions": [
+    {
+      "id": "qm-iatf-status",
+      "label": "IATF 인증 현황",
+      "promptText": "IATF 16949 인증 갱신 일정과 사내 준비 현황",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["IATF", "인증"]
+    },
+    {
+      "id": "qm-internal-audit",
+      "label": "내부심사 일정",
+      "promptText": "이번 분기 내부심사 일정과 대상 부서",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["내부심사"]
+    },
+    {
+      "id": "qm-sq-rating",
+      "label": "SQ 등급 현황",
+      "promptText": "현재 협력사 SQ 등급 분포와 저등급 협력사 개선",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["SQ", "협력사"]
+    },
+    {
+      "id": "qm-five-star-pm",
+      "label": "5스타 PM",
+      "promptText": "품질 5스타 PM 평가 기준과 진행 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["5스타", "PM"]
+    },
+    {
+      "id": "qm-group-quality",
+      "label": "그룹사 품질",
+      "promptText": "그룹사 품질경영 회의 자료 검색",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["그룹사"]
+    },
+    {
+      "id": "qm-improvement-project",
+      "label": "혁신 프로젝트",
+      "promptText": "현재 진행 중인 품질혁신 프로젝트 현황",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["혁신", "프로젝트"]
+    }
+  ]
+}

@@ -1,0 +1,482 @@
+[
+  {
+    "id": "EMP-A-20260301-001",
+    "name": "김민준",
+    "department": "생산기술팀",
+    "position": "사원",
+    "profile_text": "김민준 사원. 생산기술팀 소속. 24세, 입사 2개월 신입사원. 기계공학 학사. 이전 인턴 6개월 (자동차 부품사). 프레스·금형 기초 학습 중. 주요 업무: 생산 라인 점검 보조, 작업 표준서 숙지, SOP 교육 이수. 신입 온보딩 과정에서 사내 용어(ECN, PPAP, 8D) 학습 중. OJT 진행 중이며 사수 지도 하에 현장 실습 중. RBAC L1 권한.",
+    "metadata": {
+      "hire_date": "2026-03-01",
+      "tenure_months": 2,
+      "age": 24,
+      "education": "기계공학 학사",
+      "certifications": [],
+      "email": "kim.minjun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20150412-014",
+    "name": "박성훈",
+    "department": "안전환경팀",
+    "position": "책임",
+    "profile_text": "박성훈 책임. 안전환경팀 안전관리자. 38세, 근속 11년 (AJIN 7년 + 동종업계 4년). 산업안전기사·환경기사 보유. 산업안전보건법·화관법·EU REACH·IATF 16949·ISO 14001 등 9개 법규 영역 담당. 공장 안전 점검, 화학물질 관리, 환경 보고서 작성 전문. 현장 태블릿으로 실시간 설비 안전 점검 수행. 법규 변경 추적 및 영향 분석 담당. 안전관리자로서 전사 안전 교육 기획 및 집행. RBAC L3 권한.",
+    "metadata": {
+      "hire_date": "2015-04-12",
+      "tenure_months": 133,
+      "age": 38,
+      "education": "환경공학 학사",
+      "certifications": ["산업안전기사", "환경기사"],
+      "email": "park.sunghun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20220305-008",
+    "name": "이현아",
+    "department": "품질보증팀",
+    "position": "선임",
+    "profile_text": "이현아 선임. 품질보증팀 소속. 29세, 근속 4년. 품질경영기사 보유. 8D Report 작성 전문가로 불량 원인 분석 및 재발 방지 보고서 담당. ECN(엔지니어링 변경 통지) 및 PPAP(양산 부품 승인 절차) 작성 업무 수행. 현대·기아 SQ 평가 대응 경험. 품질 감사 대응 및 내부 감사 수행. IATF 16949 관련 품질 관리 시스템 운영. 유사 8D Report 사례 데이터베이스 관리. RBAC L2 권한.",
+    "metadata": {
+      "hire_date": "2022-03-05",
+      "tenure_months": 50,
+      "age": 29,
+      "education": "산업공학 학사",
+      "certifications": ["품질경영기사"],
+      "email": "lee.hyuna@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20200615-002",
+    "name": "최준호",
+    "department": "품질보증팀",
+    "position": "선임",
+    "profile_text": "최준호 선임. 품질보증팀 소속. 32세, 근속 6년. 불량 분석 및 SPC(통계적 공정 관리) 담당. 측정 시스템 분석(MSA) 및 공정 능력 지수 관리. 협력업체 품질 감사 및 개선 지도. 품질 이상 발생 시 생산팀과 협업하여 즉각 대응.",
+    "metadata": {
+      "hire_date": "2020-06-15",
+      "tenure_months": 71,
+      "age": 32,
+      "education": "기계공학 학사",
+      "certifications": ["품질경영기사"],
+      "email": "choi.junho@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20180320-003",
+    "name": "정수민",
+    "department": "품질보증팀",
+    "position": "책임",
+    "profile_text": "정수민 책임. 품질보증팀 소속. 36세, 근속 8년. IATF 16949 내부 심사원 자격 보유. 고객 클레임 처리 및 8D Report 검토 담당. 신규 부품 품질 승인 절차(PPAP) 총괄. 품질 지표(PPM, Cpk) 관리 및 월간 품질 보고서 작성.",
+    "metadata": {
+      "hire_date": "2018-03-20",
+      "tenure_months": 98,
+      "age": 36,
+      "education": "산업공학 석사",
+      "certifications": ["품질경영기사", "IATF 16949 내부심사원"],
+      "email": "jung.sumin@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20231005-004",
+    "name": "한지원",
+    "department": "품질보증팀",
+    "position": "사원",
+    "profile_text": "한지원 사원. 품질보증팀 소속. 26세, 근속 1년 6개월. 일상 품질 검사 및 불량품 판정 업무 담당. 검사 성적서 작성 및 데이터 입력. 불량 시료 보관 및 관리. OJT 완료 후 독립적 품질 검사 수행 중.",
+    "metadata": {
+      "hire_date": "2023-10-05",
+      "tenure_months": 19,
+      "age": 26,
+      "education": "기계공학 학사",
+      "certifications": [],
+      "email": "han.jiwon@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20190801-005",
+    "name": "윤성재",
+    "department": "생산기술팀",
+    "position": "책임",
+    "profile_text": "윤성재 책임. 생산기술팀 소속. 35세, 근속 7년. 프레스 금형 설계 및 개선 담당. 생산 공정 최적화 및 사이클 타임 단축 프로젝트 리드. 신규 설비 도입 시 공정 검증(PV) 수행. 생산기술 표준서(SOP) 작성 및 관리 책임.",
+    "metadata": {
+      "hire_date": "2019-08-01",
+      "tenure_months": 81,
+      "age": 35,
+      "education": "기계공학 학사",
+      "certifications": ["일반기계기사"],
+      "email": "yoon.sungjae@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20210310-006",
+    "name": "임도현",
+    "department": "생산기술팀",
+    "position": "선임",
+    "profile_text": "임도현 선임. 생산기술팀 소속. 30세, 근속 5년. 사출 공정 기술 지원 및 금형 유지보수 담당. 공정 불량 원인 분석 및 개선 대책 수립. 작업자 기술 교육 및 OJT 지도. 설비 이상 시 긴급 기술 지원 수행.",
+    "metadata": {
+      "hire_date": "2021-03-10",
+      "tenure_months": 62,
+      "age": 30,
+      "education": "기계공학 학사",
+      "certifications": ["금형기능사"],
+      "email": "lim.dohyun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20240101-007",
+    "name": "서민기",
+    "department": "생산기술팀",
+    "position": "사원",
+    "profile_text": "서민기 사원. 생산기술팀 소속. 25세, 근속 1년 4개월. 생산 라인 표준 작업 보조 및 현장 데이터 수집 담당. 작업 시간 측정 및 공수 분석 보조. 현장 개선 제안 활동(카이젠) 참여. 신입 교육 과정 이수 중.",
+    "metadata": {
+      "hire_date": "2024-01-01",
+      "tenure_months": 16,
+      "age": 25,
+      "education": "산업공학 학사",
+      "certifications": [],
+      "email": "seo.minki@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20170520-009",
+    "name": "강태훈",
+    "department": "생산기술팀",
+    "position": "부장",
+    "profile_text": "강태훈 부장. 생산기술팀 팀장. 42세, 근속 9년. 생산기술 전략 기획 및 팀 운영 총괄. 원가 절감 프로젝트 PMO. 신규 차종 양산 준비(APQP) 총괄. 경영진 보고 및 설비 투자 계획 수립. 기계공학 석사.",
+    "metadata": {
+      "hire_date": "2017-05-20",
+      "tenure_months": 108,
+      "age": 42,
+      "education": "기계공학 석사",
+      "certifications": ["기계기술사"],
+      "email": "kang.taehun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20160901-010",
+    "name": "조민서",
+    "department": "안전환경팀",
+    "position": "선임",
+    "profile_text": "조민서 선임. 안전환경팀 소속. 33세, 근속 10년. 화학물질 관리 및 MSDS(물질안전보건자료) 관리 담당. 환경 법규 준수 모니터링 및 보고서 작성. 소방 안전 점검 및 화재 예방 활동 담당. 직업성 질환 예방 교육 기획.",
+    "metadata": {
+      "hire_date": "2016-09-01",
+      "tenure_months": 116,
+      "age": 33,
+      "education": "환경공학 학사",
+      "certifications": ["환경기사", "위험물산업기사"],
+      "email": "jo.minseo@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20230601-011",
+    "name": "배지수",
+    "department": "안전환경팀",
+    "position": "사원",
+    "profile_text": "배지수 사원. 안전환경팀 소속. 27세, 근속 2년. 안전 점검 보조 및 체크리스트 관리 담당. 작업장 위험성 평가 보조. 안전 교육 자료 준비 및 이수 관리. 산업안전보건법 학습 중.",
+    "metadata": {
+      "hire_date": "2023-06-01",
+      "tenure_months": 23,
+      "age": 27,
+      "education": "안전공학 학사",
+      "certifications": ["산업안전산업기사"],
+      "email": "bae.jisu@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20200101-012",
+    "name": "오준석",
+    "department": "안전환경팀",
+    "position": "선임",
+    "profile_text": "오준석 선임. 안전환경팀 소속. 31세, 근속 6년. 작업장 소음·진동 측정 및 작업환경 측정 담당. 근로자 건강 관리 프로그램 운영. 화관법(화학물질관리법) 준수 현황 점검. 비상사태 대응 훈련 기획 및 진행.",
+    "metadata": {
+      "hire_date": "2020-01-01",
+      "tenure_months": 76,
+      "age": 31,
+      "education": "산업위생학 학사",
+      "certifications": ["산업위생관리기사"],
+      "email": "oh.junseok@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20130301-013",
+    "name": "유정현",
+    "department": "인사팀",
+    "position": "책임",
+    "profile_text": "유정현 책임. 인사팀 소속. 40세, 근속 13년. 채용·배치·평가·보상 전 인사 프로세스 담당. 인사 정보 시스템(HIS) 운영 및 관리. 조직 문화 개선 프로젝트 리드. 노무 관리 및 근로기준법 준수 감독. 임원 인사 보고 작성.",
+    "metadata": {
+      "hire_date": "2013-03-01",
+      "tenure_months": 158,
+      "age": 40,
+      "education": "경영학 학사",
+      "certifications": ["공인노무사"],
+      "email": "yoo.junghyun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20250601-015",
+    "name": "신예진",
+    "department": "인사팀",
+    "position": "사원",
+    "profile_text": "신예진 사원. 인사팀 소속. 24세, 근속 11개월. 신입사원 채용 보조 및 입사 서류 관리 담당. 사원증 발급 및 사무용품 지급 관리. 급여 명세서 발송 보조. 사내 교육 일정 관리 및 이수 현황 정리.",
+    "metadata": {
+      "hire_date": "2025-06-01",
+      "tenure_months": 11,
+      "age": 24,
+      "education": "경영학 학사",
+      "certifications": [],
+      "email": "shin.yejin@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20120601-016",
+    "name": "문성호",
+    "department": "설비기술팀",
+    "position": "부장",
+    "profile_text": "문성호 부장. 설비기술팀 팀장. 44세, 근속 14년. 전사 설비 유지보수 전략 수립 및 PM(예방보전) 계획 총괄. 설비 투자 ROI 분석 및 경영진 보고. 노후 설비 교체 계획 수립. 협력 업체 관리 및 설비 도입 협상.",
+    "metadata": {
+      "hire_date": "2012-06-01",
+      "tenure_months": 167,
+      "age": 44,
+      "education": "전기공학 학사",
+      "certifications": ["전기기술사"],
+      "email": "moon.sungho@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20180910-017",
+    "name": "구광민",
+    "department": "설비기술팀",
+    "position": "책임",
+    "profile_text": "구광민 책임. 설비기술팀 소속. 37세, 근속 8년. CNC 머시닝센터 및 프레스 설비 정비 전문. 설비 이상 진단 및 고장 예측 분석. 예방보전(PM) 체크리스트 작성 및 실행. PLC 프로그램 유지보수 담당.",
+    "metadata": {
+      "hire_date": "2018-09-10",
+      "tenure_months": 92,
+      "age": 37,
+      "education": "메카트로닉스 학사",
+      "certifications": ["전기기사", "설비보전기사"],
+      "email": "gu.gwangmin@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20210701-018",
+    "name": "탁승민",
+    "department": "설비기술팀",
+    "position": "선임",
+    "profile_text": "탁승민 선임. 설비기술팀 소속. 31세, 근속 5년. 전기·계장 설비 유지보수 담당. 설비 고장 긴급 대응 및 원인 분석 보고서 작성. 작업안전허가서(PTW) 발행 및 관리. 설비 데이터 수집 시스템(SCADA) 운영 보조.",
+    "metadata": {
+      "hire_date": "2021-07-01",
+      "tenure_months": 58,
+      "age": 31,
+      "education": "전기전자공학 학사",
+      "certifications": ["전기기사"],
+      "email": "tak.seungmin@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20240701-019",
+    "name": "남다은",
+    "department": "설비기술팀",
+    "position": "사원",
+    "profile_text": "남다은 사원. 설비기술팀 소속. 24세, 근속 10개월. 설비 일상 점검 보조 및 점검 이력 기록 담당. 소모품 재고 관리 및 발주 보조. 설비 도면·매뉴얼 파일 관리. OJT 교육 이수 중.",
+    "metadata": {
+      "hire_date": "2024-07-01",
+      "tenure_months": 10,
+      "age": 24,
+      "education": "기계공학 학사",
+      "certifications": [],
+      "email": "nam.daeun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20190401-020",
+    "name": "허재원",
+    "department": "자재팀",
+    "position": "선임",
+    "profile_text": "허재원 선임. 자재팀 소속. 33세, 근속 7년. 원자재 구매 발주 및 납기 관리 담당. 협력업체 단가 협상 및 거래처 관리. 재고 수준 최적화 및 안전 재고 설정. ERP 시스템을 활용한 자재 수급 계획 수립.",
+    "metadata": {
+      "hire_date": "2019-04-01",
+      "tenure_months": 85,
+      "age": 33,
+      "education": "경영학 학사",
+      "certifications": ["구매조달관리사"],
+      "email": "heo.jaewon@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20221101-021",
+    "name": "채민지",
+    "department": "자재팀",
+    "position": "사원",
+    "profile_text": "채민지 사원. 자재팀 소속. 26세, 근속 3년 6개월. 자재 입출고 관리 및 재고 실사 담당. 거래처 발주서 발행 및 수령 확인. 불량 자재 반품 처리 보조. ERP 자재 관리 모듈 운영 중.",
+    "metadata": {
+      "hire_date": "2022-11-01",
+      "tenure_months": 42,
+      "age": 26,
+      "education": "물류학 학사",
+      "certifications": [],
+      "email": "chae.minji@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20200801-022",
+    "name": "진현수",
+    "department": "해외영업팀",
+    "position": "선임",
+    "profile_text": "진현수 선임. 해외영업팀 소속. 32세, 근속 6년. 동남아시아 완성차 OEM 거래처 관리 담당. 영문 수출 계약서 작성 및 협상 보조. 제품 샘플 발송 및 인증 서류 관리. 해외 전시회 참가 기획 및 실행.",
+    "metadata": {
+      "hire_date": "2020-08-01",
+      "tenure_months": 69,
+      "age": 32,
+      "education": "국제통상학 학사",
+      "certifications": ["무역영어 1급"],
+      "email": "jin.hyunsu@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20230301-023",
+    "name": "류지현",
+    "department": "해외영업팀",
+    "position": "사원",
+    "profile_text": "류지현 사원. 해외영업팀 소속. 26세, 근속 2년 2개월. 해외 고객 이메일 대응 보조 및 견적서 작성 지원. 수출 서류(인보이스, 팩킹리스트) 준비. 해외 거래처 데이터베이스 관리. 영어·일어 비즈니스 커뮤니케이션 업무 수행.",
+    "metadata": {
+      "hire_date": "2023-03-01",
+      "tenure_months": 26,
+      "age": 26,
+      "education": "일어일문학 학사",
+      "certifications": ["JLPT N1"],
+      "email": "ryu.jihyun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20160301-024",
+    "name": "피성준",
+    "department": "해외영업팀",
+    "position": "책임",
+    "profile_text": "피성준 책임. 해외영업팀 소속. 37세, 근속 10년. 유럽 OEM(폭스바겐·BMW 1차 협력사) 거래처 담당. 글로벌 품질 인증(IATF 16949) 대응 지원. 연간 수출 매출 목표 관리 및 실적 보고. 해외 고객사 공장 실사 대응 총괄.",
+    "metadata": {
+      "hire_date": "2016-03-01",
+      "tenure_months": 122,
+      "age": 37,
+      "education": "경영학 석사 (MBA)",
+      "certifications": ["무역관리사"],
+      "email": "pi.sungjun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20210901-025",
+    "name": "안소연",
+    "department": "연구개발팀",
+    "position": "선임",
+    "profile_text": "안소연 선임. 연구개발팀 소속. 30세, 근속 5년. 경량화 소재 적용 연구 및 시제품 개발 담당. FEM(유한요소해석) 시뮬레이션 수행. 특허 출원 보조 및 기술 문서 작성. 국책 과제 참여 및 연구 결과 보고서 작성.",
+    "metadata": {
+      "hire_date": "2021-09-01",
+      "tenure_months": 56,
+      "age": 30,
+      "education": "재료공학 석사",
+      "certifications": [],
+      "email": "an.soyeon@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20240301-026",
+    "name": "마현준",
+    "department": "연구개발팀",
+    "position": "사원",
+    "profile_text": "마현준 사원. 연구개발팀 소속. 27세, 근속 1년 2개월. 시험 시편 제작 보조 및 재료 물성 시험 담당. 시험 데이터 측정·기록·정리. CAD 도면 수정 보조. 연구 보고서 초안 작성 지원.",
+    "metadata": {
+      "hire_date": "2024-03-01",
+      "tenure_months": 14,
+      "age": 27,
+      "education": "재료공학 학사",
+      "certifications": [],
+      "email": "ma.hyunjun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20170101-027",
+    "name": "표상현",
+    "department": "연구개발팀",
+    "position": "사원",
+    "profile_text": "표상현 사원. 연구개발팀 소속. 40세, 근속 9년. 신규 부품 설계 지원 및 프로토타입 개발 보조. 고객사(현대·기아) DR(설계 검토) 자료 준비. DFMEA(설계 FMEA) 작성 보조. 특허 출원 서류 지원. 설계 표준화 작업 참여.",
+    "metadata": {
+      "hire_date": "2017-01-01",
+      "tenure_months": 112,
+      "age": 40,
+      "education": "기계공학 석사",
+      "certifications": ["일반기계기사"],
+      "email": "pyo.sanghyun@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20211201-028",
+    "name": "엄가영",
+    "department": "재무팀",
+    "position": "사원",
+    "profile_text": "엄가영 사원. 재무팀 소속. 31세, 근속 4년 5개월. 원가 분석 및 예산 편성 보조 담당. 월간 손익 결산 자료 작성. 원재료 단가 변동 분석 및 보고. 세금계산서 발행 관리 및 매입매출 정리.",
+    "metadata": {
+      "hire_date": "2021-12-01",
+      "tenure_months": 53,
+      "age": 31,
+      "education": "회계학 학사",
+      "certifications": ["전산회계 1급"],
+      "email": "eum.gayoung@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20141101-029",
+    "name": "봉찬수",
+    "department": "총무팀",
+    "position": "사원",
+    "profile_text": "봉찬수 사원. 총무팀 소속. 39세, 근속 12년. 사무용품·소모품 구매 및 재고 관리 담당. 사내 시설 유지보수 관리(청소, 주차, 식당). 법인 차량 관리 및 임직원 출장 지원. 행사·회의 준비 및 보안 관리 담당.",
+    "metadata": {
+      "hire_date": "2014-11-01",
+      "tenure_months": 138,
+      "age": 39,
+      "education": "행정학 학사",
+      "certifications": ["시설관리사"],
+      "email": "bong.chansu@ajin-demo.local",
+      "data_class": "demo"
+    }
+  },
+  {
+    "id": "EMP-A-20250101-030",
+    "name": "황규리",
+    "department": "생산기술팀",
+    "position": "사원",
+    "profile_text": "황규리 사원. 생산기술팀 소속. 23세, 근속 4개월. 생산 현장 실습 중이며 신입 OJT 과정 이수 중. 공정 흐름도 및 작업 표준서 학습 담당. 생산 일보 집계 보조. 기계 조작 기초 교육 수료. 신입사원으로 현장 감각 습득 중.",
+    "metadata": {
+      "hire_date": "2026-01-01",
+      "tenure_months": 4,
+      "age": 23,
+      "education": "기계공학 학사",
+      "certifications": [],
+      "email": "hwang.gyuri@ajin-demo.local",
+      "data_class": "demo"
+    }
+  }
+]

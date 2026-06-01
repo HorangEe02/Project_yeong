@@ -1,0 +1,61 @@
+{
+  "department": "영업팀",
+  "division": "생산본부",
+  "description": "납품관리·외주자재 조달·물류·납기조율 — 생산본부 산하 영업 (개발본부 기술영업팀과 별개)",
+  "questions": [
+    {
+      "id": "sales-delivery-status",
+      "label": "납품 현황",
+      "promptText": "오늘·이번주 납품 현황과 잔량 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["납품", "EDI"]
+    },
+    {
+      "id": "sales-edi-issue",
+      "label": "EDI 이슈",
+      "promptText": "현대·기아 EDI 송수신 이슈 발생 시 조치 절차",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["EDI", "고객사"]
+    },
+    {
+      "id": "sales-deadline-risk",
+      "label": "납기 리스크",
+      "promptText": "납기 위험 라인/품목과 대응 방안",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["납기", "리스크"]
+    },
+    {
+      "id": "sales-outsourcing",
+      "label": "외주 자재",
+      "promptText": "외주 자재 입고 일정과 협력사 현황",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["외주", "협력사"]
+    },
+    {
+      "id": "sales-logistics-cost",
+      "label": "물류비",
+      "promptText": "이번 분기 물류비 현황과 절감 가능 항목",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["물류", "비용"]
+    },
+    {
+      "id": "sales-monthly-report",
+      "label": "월간 영업 보고",
+      "promptText": "월간 영업 실적 보고서 초안 작성해줘",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["보고서", "실적"]
+    }
+  ]
+}

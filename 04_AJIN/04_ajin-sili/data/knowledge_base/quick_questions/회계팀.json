@@ -1,0 +1,61 @@
+{
+  "department": "회계팀",
+  "division": "재경본부",
+  "description": "결산·재무제표·세무·원가회계·경영 의사결정 지원",
+  "questions": [
+    {
+      "id": "acc-month-close",
+      "label": "월결산 일정",
+      "promptText": "이번 달 결산 일정과 마감 체크리스트",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["결산"]
+    },
+    {
+      "id": "acc-tax-filing",
+      "label": "세무 신고",
+      "promptText": "이번 달 세무 신고 일정 (부가세·법인세·원천세)",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["세무"]
+    },
+    {
+      "id": "acc-voucher-process",
+      "label": "전표 처리",
+      "promptText": "전표 등록·승인 표준 절차",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["전표"]
+    },
+    {
+      "id": "acc-cost-allocation",
+      "label": "원가 배분",
+      "promptText": "공통원가 배분 기준과 부서별 배부 결과",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["원가배분"]
+    },
+    {
+      "id": "acc-audit-prep",
+      "label": "외부감사 대비",
+      "promptText": "외부 회계감사 대비 자료 준비 가이드",
+      "category": "scenario",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["감사"]
+    },
+    {
+      "id": "acc-financial-statements",
+      "label": "재무제표 조회",
+      "promptText": "최근 분기 재무제표(BS·IS·CF) 핵심 지표",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["재무제표"]
+    }
+  ]
+}

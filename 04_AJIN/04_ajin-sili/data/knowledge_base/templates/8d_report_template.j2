@@ -1,0 +1,65 @@
+{# usage_hint: "고객 클레임 또는 중대 품질 이슈를 D0-D8 단계로 정리해 고객사와 내부 품질조직에 보고할 때" #}
+{# dept_recommend: ["품질보증팀", "품질관리팀", "생산기술팀"] #}
+{# required_vars: ["title", "report_id", "date", "plant", "customer", "part_name", "part_no", "d2_problem_description"] #}
+{# optional_vars: ["severity", "status", "team_members", "d3_containment_actions", "d4_root_cause", "d5_corrective_actions", "d6_validation", "d7_prevention"] #}
+{# example_output: "8D-2026-001 / EWP Housing 누수 클레임 / D3 긴급 봉쇄 조치 진행" #}
+{# var_metadata:
+  - {name: "title", label_ko: "제목", required: true, group: "기본", placeholder: "예: EWP Housing 누수 클레임 8D"}
+  - {name: "report_id", label_ko: "8D 번호", required: true, group: "기본", placeholder: "예: 8D-2026-001"}
+  - {name: "date", label_ko: "작성일", required: true, group: "기본", placeholder: "YYYY-MM-DD"}
+  - {name: "plant", label_ko: "공장", required: true, group: "기본", placeholder: "예: 경산 제1공장"}
+  - {name: "customer", label_ko: "고객사", required: true, group: "수신/발신", placeholder: "예: 현대자동차 품질팀"}
+  - {name: "part_name", label_ko: "부품명", required: true, group: "부품", placeholder: "예: EWP Housing"}
+  - {name: "part_no", label_ko: "품번", required: true, group: "부품", placeholder: "예: 26410-XXXXX"}
+  - {name: "d2_problem_description", label_ko: "문제 정의", required: true, group: "내용", placeholder: "5W1H 기준으로 불량 현상을 요약"}
+#}
+
+# 8D Report — {{ title }}
+
+| Field | Value |
+|---|---|
+| 8D No. | {{ report_id }} |
+| Date | {{ date }} |
+| Plant | {{ plant }} |
+| Customer | {{ customer }} |
+| Part Name | {{ part_name }} |
+| Part No. | {{ part_no }} |
+| Severity | {{ severity }} |
+| Status | {{ status | default('D1') }} |
+
+## D0 — Awareness / Emergency Response
+{{ d0_description }}
+
+## D1 — Team Formation
+| Role | Name | Department |
+|---|---|---|
+{% for member in team_members %}
+| {{ member.role }} | {{ member.name }} | {{ member.department }} |
+{% endfor %}
+
+## D2 — Problem Description
+{{ d2_problem_description }}
+
+## D3 — Interim Containment Action (ICA)
+{% for action in d3_containment_actions %}
+- {{ action }}
+{% endfor %}
+
+## D4 — Root Cause Analysis
+{{ d4_root_cause }}
+
+## D5 — Permanent Corrective Action (PCA)
+{% for action in d5_corrective_actions %}
+{{ loop.index }}. {{ action }}
+{% endfor %}
+
+## D6 — Implementation & Validation
+{{ d6_validation }}
+
+## D7 — Prevention
+{% for item in d7_prevention %}
+- {{ item }}
+{% endfor %}
+
+## D8 — Team Recognition
+{{ d8_recognition | default('Team acknowledged.') }}

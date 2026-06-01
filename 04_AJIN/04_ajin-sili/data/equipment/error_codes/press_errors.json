@@ -1,0 +1,90 @@
+[
+  {
+    "equipment_type": "프레스",
+    "equipment_model": "AIDA 2000T",
+    "error_code": "E-001",
+    "error_name": "과부하 경보",
+    "severity": "critical",
+    "cause": "금형 셋팅 불량, 소재 두께 초과, 윤활유 부족",
+    "action": "1. 즉시 비상정지 2. 금형 간격 확인 3. 소재 규격 확인 4. 윤활 상태 점검 5. 과부하 릴레이 리셋",
+    "prevention": "정기 금형 점검, 소재 입고 검사, 일일 윤활 체크",
+    "reference_page": "매뉴얼 p.45-48"
+  },
+  {
+    "equipment_type": "프레스",
+    "equipment_model": "AIDA 2000T",
+    "error_code": "E-002",
+    "error_name": "슬라이드 하사점 이상",
+    "severity": "critical",
+    "cause": "커넥팅로드 베어링 마모, 플런저 길이 변화, BDC 센서 불량",
+    "action": "1. 즉시 운전 정지 2. BDC 수치 확인 (허용 ±0.05mm) 3. 커넥팅로드 점검 4. 센서 교정",
+    "prevention": "월 1회 BDC 측정, 분기 1회 커넥팅로드 점검",
+    "reference_page": "매뉴얼 p.52-55"
+  },
+  {
+    "equipment_type": "프레스",
+    "equipment_model": "",
+    "error_code": "E-010",
+    "error_name": "유압 압력 저하",
+    "severity": "warning",
+    "cause": "유압 펌프 마모, 오일 누유, 필터 막힘, 오일 부족",
+    "action": "1. 유압 게이지 확인 (정상 150~180 bar) 2. 오일 레벨 점검 3. 누유 부위 확인 4. 필터 교체 여부 확인",
+    "prevention": "일일 오일 레벨 점검, 3개월마다 필터 교체, 연 1회 펌프 오버홀",
+    "reference_page": "매뉴얼 p.78-82"
+  },
+  {
+    "equipment_type": "프레스",
+    "equipment_model": "",
+    "error_code": "E-015",
+    "error_name": "안전장치 작동",
+    "severity": "critical",
+    "cause": "라이트커튼 감지, 양수조작 미완료, 안전문 미닫힘",
+    "action": "1. 작업자 안전 확인 2. 라이트커튼 장애물 제거 3. 안전문 닫힘 확인 4. 양수조작 버튼 동시 누름 확인",
+    "prevention": "시업 전 안전장치 작동 테스트, 라이트커튼 청소",
+    "reference_page": "매뉴얼 p.30-33"
+  },
+  {
+    "equipment_type": "용접기",
+    "equipment_model": "FANUC R-2000iC",
+    "error_code": "ALM-012",
+    "error_name": "용접전류 이상",
+    "severity": "warning",
+    "cause": "팁(Tip) 마모, 가압력 부족, 전극 오정렬, 트랜스포머 불량",
+    "action": "1. 팁 상태 확인 (드레싱/교체) 2. 가압 실린더 압력 확인 3. 전극 정렬 확인 4. 용접 파라미터 재설정",
+    "prevention": "타수별 팁 드레싱 주기 준수, 일일 가압력 점검",
+    "reference_page": "매뉴얼 p.120-125"
+  },
+  {
+    "equipment_type": "용접기",
+    "equipment_model": "",
+    "error_code": "ALM-020",
+    "error_name": "냉각수 온도 경고",
+    "severity": "warning",
+    "cause": "냉각수 유량 부족, 칠러 고장, 냉각수 오염, 배관 막힘",
+    "action": "1. 냉각수 온도 확인 (정상 15~25°C) 2. 유량 확인 3. 칠러 작동 상태 점검 4. 배관 에어빼기",
+    "prevention": "주 1회 냉각수 온도/유량 점검, 6개월마다 냉각수 교환",
+    "reference_page": "매뉴얼 p.130-132"
+  },
+  {
+    "equipment_type": "로봇",
+    "equipment_model": "FANUC M-20iA",
+    "error_code": "SRVO-023",
+    "error_name": "서보 과열 경보",
+    "severity": "warning",
+    "cause": "연속 고부하 운전, 냉각팬 고장, 주변 온도 과열, 감속기 마모",
+    "action": "1. 10분간 냉각 대기 2. 냉각팬 작동 확인 3. 주변 환기 확인 4. 동작 프로그램 부하율 확인 (80% 이하 권장)",
+    "prevention": "주기적 부하율 모니터링, 냉각팬 필터 청소",
+    "reference_page": "FANUC 매뉴얼 B-83284EN/07 p.312"
+  },
+  {
+    "equipment_type": "로봇",
+    "equipment_model": "",
+    "error_code": "SRVO-050",
+    "error_name": "충돌 감지",
+    "severity": "critical",
+    "cause": "치공구 간섭, 워크 위치 틀어짐, 티칭 포인트 오류, 외력 충격",
+    "action": "1. 즉시 정지 유지 2. 로봇 주변 장애물 확인 3. 조인트별 위치 확인 4. 복구 모드로 원점 이동 5. 티칭 포인트 재확인",
+    "prevention": "충돌 감지 감도 설정 최적화, 워크 위치 센서 점검",
+    "reference_page": "FANUC 매뉴얼 p.340-345"
+  }
+]

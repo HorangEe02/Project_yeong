@@ -1,0 +1,61 @@
+{
+  "department": "금형생산팀",
+  "division": "개발본부",
+  "description": "프레스 금형 제작·신공법 금형·전 계열사 금형 데이터 관리·금형 유지보수",
+  "questions": [
+    {
+      "id": "tooling-progress",
+      "label": "금형 제작 진척",
+      "promptText": "현재 제작 중인 금형 진척 현황과 납기",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["금형", "진척"]
+    },
+    {
+      "id": "tooling-cnc-schedule",
+      "label": "CNC 일정",
+      "promptText": "CNC 가공기 작업 일정과 가용 캐파",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["CNC", "일정"]
+    },
+    {
+      "id": "tooling-data-mgmt",
+      "label": "금형 데이터 관리",
+      "promptText": "전 계열사 금형 데이터 검색 및 등록 절차",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["데이터", "관리"]
+    },
+    {
+      "id": "tooling-repair-request",
+      "label": "금형 보수",
+      "promptText": "양산 금형 보수 요청 접수~완료 절차",
+      "category": "scenario",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["보수", "유지보수"]
+    },
+    {
+      "id": "tooling-new-method",
+      "label": "신공법 금형",
+      "promptText": "신공법 적용 금형 제작 사례와 노하우",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["신공법"]
+    },
+    {
+      "id": "tooling-3d-scan-vs-design",
+      "label": "스캔 vs 설계",
+      "promptText": "금형 3D 스캔 결과와 설계 데이터 차이 분석",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["3D스캔", "검증"]
+    }
+  ]
+}

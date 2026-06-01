@@ -1,0 +1,61 @@
+{
+  "department": "ESG경영팀",
+  "division": "관리본부",
+  "description": "ESG 전략·지속가능성·탄소중립·사회공헌 — ESG 경영 실행",
+  "questions": [
+    {
+      "id": "esg-carbon-status",
+      "label": "탄소배출 현황",
+      "promptText": "사내 탄소배출량 현황과 감축 목표 진행률",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["탄소", "배출"]
+    },
+    {
+      "id": "esg-report-publish",
+      "label": "ESG 보고서",
+      "promptText": "올해 ESG 지속가능경영보고서 발간 일정과 자료 수집",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["보고서", "ESG"]
+    },
+    {
+      "id": "esg-rating-trend",
+      "label": "ESG 등급",
+      "promptText": "외부 ESG 평가기관 등급 추이와 개선 항목",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["등급", "평가"]
+    },
+    {
+      "id": "esg-supplier",
+      "label": "협력사 ESG",
+      "promptText": "협력사 ESG 평가·실사 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["협력사", "실사"]
+    },
+    {
+      "id": "esg-community",
+      "label": "사회공헌",
+      "promptText": "이번 분기 사회공헌 활동 계획과 참여 방법",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["사회공헌"]
+    },
+    {
+      "id": "esg-disclosure",
+      "label": "ESG 공시",
+      "promptText": "ESG 의무 공시 항목과 작성 가이드",
+      "category": "sop",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["공시"]
+    }
+  ]
+}

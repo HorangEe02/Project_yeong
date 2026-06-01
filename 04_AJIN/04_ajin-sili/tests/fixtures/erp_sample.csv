@@ -1,0 +1,6 @@
+canonical_id,name,email,phone,department,division,position,position_level,plant,hire_date,is_active
+ERP-0001,홍길동,hong.gd@ajin.co.kr,010-1111-2222,품질보증팀,품질본부,과장,4,경산 본사,2018-03-01,1
+ERP-0002,김영희,kim.yh@ajin.co.kr,010-2222-3333,자동화기술팀,생산본부,대리,3,경산 본사,2020-06-15,1
+ERP-0003,박철수,park.cs@ajin.co.kr,010-3333-4444,정비팀,생산본부,사원,1,경주 외동공장,2024-01-08,1
+ERP-0004,이순신,lee.ss@ajin.co.kr,010-4444-5555,금형생산팀,생산본부,차장,5,경산 본사,2010-09-20,1
+ERP-0005,장보고,jang.bg@ajin.co.kr,010-5555-6666,영업본부,영업본부,부장,6,경산 본사,2005-04-11,0

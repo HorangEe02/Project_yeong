@@ -1,0 +1,23 @@
+{# 사내 이메일 양식 #}
+
+수신: {{ recipient_department }} {{ recipient_name }} {{ recipient_title }}
+{% if cc_list %}참조: {{ cc_list | join(", ") }}{% endif %}
+발신: {{ sender_department }} {{ sender_name }}
+일자: {{ date }}
+제목: {{ subject }}
+
+{{ recipient_name }} {{ recipient_title }},
+
+{{ main_body }}
+
+{% if todo_items %}
+[조치 필요 사항]
+{% for todo in todo_items %}
+- {{ todo }}
+{% endfor %}
+{% endif %}
+
+{% if deadline %}회신 기한: {{ deadline }}{% endif %}
+
+감사합니다.
+{{ sender_name }} 드림

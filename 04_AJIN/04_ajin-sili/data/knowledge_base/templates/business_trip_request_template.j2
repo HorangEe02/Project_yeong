@@ -1,0 +1,68 @@
+{# usage_hint: "국내·해외 출장 신청서 — 목적·일정·예산·동행자를 결재 라인에 제출" #}
+{# dept_recommend: ["전 부서"] #}
+{# required_vars: ["destination", "purpose"] #}
+{# optional_vars: ["applicant", "team", "start_date", "end_date", "companions", "budget", "transport", "accommodation"] #}
+{# example_output: "조지아 (HMGMA) 출장 / EWP 라인 시운전 입회 / 2026-06-10 ~ 06-17 / 1명" #}
+{# var_metadata:
+  - {name: "applicant", label_ko: "신청자", required: false, group: "수신/발신", placeholder: "예: 박준영 (사번 12345)"}
+  - {name: "team", label_ko: "부서", required: false, group: "수신/발신", placeholder: "예: 생산기술팀"}
+  - {name: "destination", label_ko: "출장지", required: true, group: "기본", placeholder: "예: 조지아주 HMGMA / 경주 외동공장"}
+  - {name: "purpose", label_ko: "출장 목적", required: true, group: "내용", placeholder: "예: EWP 라인 시운전 입회 + SQ 인증 사전 점검"}
+  - {name: "start_date", label_ko: "출발일", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "end_date", label_ko: "복귀일", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "companions", label_ko: "동행자", required: false, group: "수신/발신", placeholder: "예: 김QA과장, 이PE대리"}
+  - {name: "budget", label_ko: "예산 (KRW)", required: false, group: "내용", placeholder: "예: 4,820,000"}
+  - {name: "transport", label_ko: "교통 수단", required: false, group: "내용", placeholder: "예: 항공 (인천→애틀랜타) + 렌터카"}
+  - {name: "accommodation", label_ko: "숙소", required: false, group: "내용", placeholder: "예: 사반나 시 호텔 7박"}
+#}
+
+# 출장 신청서
+
+**신청자**: {{ applicant | default("[성명 / 사번]") }}
+**부서**: {{ team | default("[부서]") }}
+
+---
+
+## 1. 출장 개요
+
+| 항목 | 내용 |
+|---|---|
+| 출장지 | {{ destination }} |
+| 출발일 | {{ start_date | default("YYYY-MM-DD") }} |
+| 복귀일 | {{ end_date | default("YYYY-MM-DD") }} |
+| 동행자 | {{ companions | default("(없음 / 동행자 명단)") }} |
+
+## 2. 출장 목적
+
+{{ purpose }}
+
+## 3. 일정 (Day-by-Day)
+
+| 일차 | 일자 | 일정 | 비고 |
+|---:|---|---|---|
+| 1 | {{ start_date | default("D1") }} | (출발 / 도착 / 첫 미팅) | — |
+| 2 | — | (현장 점검 / 회의) | — |
+| 3 | — | (마지막 회의 / 출국) | — |
+
+## 4. 예산
+
+| 항목 | 금액 (KRW) | 비고 |
+|---|---:|---|
+| 항공 / 교통 | — | {{ transport | default("(교통 수단)") }} |
+| 숙박 | — | {{ accommodation | default("(숙소)") }} |
+| 식비 | — | (일비 기준) |
+| 출장비 | — | — |
+| **합계** | **{{ budget | default("(예산)") }}** | — |
+
+## 5. 산출물
+
+- [ ] 출장 보고서 제출 (복귀 후 5일 이내)
+- [ ] 회의록 / 사진 / 측정 데이터
+- [ ] 후속 액션 아이템
+
+---
+
+| 결재 | 신청자 | 팀장 | 부서장 | 본부장 |
+|:-:|:-:|:-:|:-:|:-:|
+| 서명 |  |  |  |  |
+| 일자 |  |  |  |  |

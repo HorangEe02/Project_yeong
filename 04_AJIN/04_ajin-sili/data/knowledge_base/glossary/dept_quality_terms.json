@@ -1,0 +1,188 @@
+{
+  "citation_id": "GLOSSARY-dept_quality_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "status": "published",
+  "category": "품질관리·품질보증팀 현장 용어",
+  "department": ["품질관리팀", "품질보증팀", "품질경영팀"],
+  "version": "1.0",
+  "description": "자동차 부품 제조 품질 부서에서 일상적으로 사용하는 약어, 은어, 현장 용어 모음. 신입사원 온보딩 및 부서 간 커뮤니케이션 이해를 위한 참고 자료.",
+  "terms": [
+    {
+      "term": "QC",
+      "full_name": "Quality Control (품질관리)",
+      "definition": "제품의 치수 측정, 검사성적서 작성 등 현장에서 직접 제품을 검사하는 업무. 보통 사원~대리급이 수행하며, 수입검사·공정검사·출하검사를 담당한다.",
+      "usage_example": "\"QC에서 치수 데이터 올려줘\"",
+      "aliases": ["큐씨", "품관"]
+    },
+    {
+      "term": "QA",
+      "full_name": "Quality Assurance (품질보증)",
+      "definition": "고객사 클레임 대응, IATF 16949·SQ 인증 서류 관리, 품질 시스템 운영 등 품질을 보증하는 업무. QC 경력 후 승진하여 담당하는 경우가 많다.",
+      "usage_example": "\"QA에서 8D 올려야 해\"",
+      "aliases": ["큐에이", "품보"]
+    },
+    {
+      "term": "SQ 심사",
+      "full_name": "Supplier Quality 심사",
+      "definition": "현대·기아자동차에서 협력사(2차 벤더 포함)를 대상으로 품질 향상을 위해 실시하는 평가·심사 제도. 생산조건 관리, 검사 시험, 설비관리, 금형 관리, 자재관리, 품질경영체제 등을 평가한다.",
+      "usage_example": "\"SQ 심사 다음 주야, 서류 준비해\", \"SQ에서 왔다\" = 현대차 품질 담당자가 실사 나왔다",
+      "aliases": ["에스큐", "SQ 인증", "SQ-MARK"]
+    },
+    {
+      "term": "8D",
+      "full_name": "8D Report (8 Disciplines Report)",
+      "definition": "고객 클레임 발생 시 작성하는 8단계 원인분석 및 시정조치 보고서. D1(팀 구성)부터 D8(최종 검증)까지 체계적으로 문제를 해결한다. 현대차 SQ 기준 클레임 접수 후 통상 5영업일 이내 회신 필요.",
+      "usage_example": "\"8D 올려\" = 8D Report 작성해서 제출하라",
+      "aliases": ["팔디", "8디"]
+    },
+    {
+      "term": "PPM",
+      "full_name": "Parts Per Million",
+      "definition": "백만 개당 불량 수를 나타내는 품질 지표. 협력사 품질 평가의 핵심 기준이며, 숫자가 낮을수록 품질이 좋다. 완성차 업체는 보통 50PPM 이하를 요구한다.",
+      "usage_example": "\"이번 달 PPM 몇이야?\", \"PPM 터졌다\" = 불량률이 목표를 크게 초과했다",
+      "aliases": ["피피엠"]
+    },
+    {
+      "term": "초물",
+      "full_name": "初物 (하츠모노, First Article)",
+      "definition": "금형 수정, 공정 변경, 자재 변경 등 4M 변경 후 처음 생산된 제품. 반드시 초물검사(치수·외관·기능)를 거쳐 합격 판정 후 양산에 투입한다.",
+      "usage_example": "\"초물 검사해\", \"초물 나왔다\"",
+      "aliases": ["초도품", "First Article"]
+    },
+    {
+      "term": "초·중·종",
+      "full_name": "初·中·終 (초도·중간·종료 검사)",
+      "definition": "생산 시작(초), 중간(중), 종료(종) 시점에 각각 실시하는 3회 품질 검사. 공정 중 품질 변동을 조기에 감지하기 위한 관리 방법이다.",
+      "usage_example": "\"초중종 찍었어?\" = 3회 검사 데이터 기록했어?",
+      "aliases": ["초중종검사", "3회 검사"]
+    },
+    {
+      "term": "전검",
+      "full_name": "전수검사 (100% Inspection)",
+      "definition": "샘플이 아닌 납품 부품 전체를 검사하는 것. 심할 경우 200%(2번), 300%(3번) 전수검사를 하기도 한다. 기능성 부품이나 클레임 발생 후 주로 적용된다.",
+      "usage_example": "\"전검 돌려\" = 전수검사 실시하라",
+      "aliases": ["전수", "풀 인스펙션"]
+    },
+    {
+      "term": "선별",
+      "full_name": "Sorting (선별 작업)",
+      "definition": "불량 의심 로트에서 양품만 골라내는 작업. 클레임 발생 시 출하된 로트를 현장에서 선별하는 경우가 많다.",
+      "usage_example": "\"선별 들어가\" = 불량 로트에서 양품/불량 분리 작업 시작하라",
+      "aliases": ["소팅"]
+    },
+    {
+      "term": "리워크",
+      "full_name": "Rework (재작업)",
+      "definition": "불량품을 수정하여 다시 양품으로 만드는 작업. 스크랩(폐기)과 구분된다.",
+      "usage_example": "\"리워크 가능한 건 리워크하고, 나머지는 스크랩 처리해\"",
+      "aliases": ["재작업", "수정작업"]
+    },
+    {
+      "term": "스크랩",
+      "full_name": "Scrap (폐기)",
+      "definition": "수정 불가능하여 폐기 처분하는 불량품 또는 자재 잔재. 스크랩률은 원가에 직접 영향을 미친다.",
+      "usage_example": "\"스크랩 몇 개 나왔어?\", \"스크랩률 줄여야 해\"",
+      "aliases": ["폐기", "폐각"]
+    },
+    {
+      "term": "CP",
+      "full_name": "Control Plan (관리계획서)",
+      "definition": "양산 공정별 품질 관리 항목, 관리 방법, 검사 주기, 이상 시 조치 방법 등을 정리한 문서. IATF 16949의 핵심 문서 중 하나이다.",
+      "usage_example": "\"CP 업데이트했어?\", \"CP대로 관리해\"",
+      "aliases": ["관리계획서", "컨트롤 플랜"]
+    },
+    {
+      "term": "RPN",
+      "full_name": "Risk Priority Number (위험 우선순위 수)",
+      "definition": "FMEA에서 심각도(S) × 발생도(O) × 검출도(D)로 산출하는 위험 우선순위 숫자. 일반적으로 RPN 100 이상이면 개선 조치를 취해야 한다.",
+      "usage_example": "\"RPN 100 넘는 항목 개선 계획 잡아\"",
+      "aliases": ["알피엔"]
+    },
+    {
+      "term": "Cpk",
+      "full_name": "Process Capability Index (공정능력지수)",
+      "definition": "공정이 규격 한계 내에서 얼마나 안정적으로 생산하는지를 나타내는 지수. 1.33 이상이면 합격, 1.67 이상이면 우수. 완성차 업체는 보통 Cpk ≥ 1.33을 요구한다.",
+      "usage_example": "\"Cpk 1.33 이상 유지해\", \"Cpk 떨어졌다\"",
+      "aliases": ["씨피케이", "공정능력"]
+    },
+    {
+      "term": "MSA",
+      "full_name": "Measurement System Analysis (측정 시스템 분석)",
+      "definition": "측정 장비와 측정자의 정확성·반복성·재현성을 분석하는 것. 대표적으로 게이지 R&R(반복성·재현성) 연구가 있다. PPAP 18항목 중 하나.",
+      "usage_example": "\"게이지 R&R 해봤어?\", \"MSA 결과 올려\"",
+      "aliases": ["엠에스에이", "게이지 R&R"]
+    },
+    {
+      "term": "PSW",
+      "full_name": "Part Submission Warrant (부품제출보증서)",
+      "definition": "PPAP 제출 시 최종 승인을 위한 요약 서류. 고객(완성차)이 이 서류에 사인하면 양산 승인이 완료된다.",
+      "usage_example": "\"PSW 사인 받았어?\" = PPAP 승인 완료됐어?",
+      "aliases": ["피에스더블유"]
+    },
+    {
+      "term": "양불 판정",
+      "full_name": "양품/불량 판정",
+      "definition": "제품이 규격에 적합(양품)한지 부적합(불량)한지를 판정하는 것.",
+      "usage_example": "\"양불 판정 내려\" = 합격/불합격 결정해",
+      "aliases": ["양불", "합불 판정"]
+    },
+    {
+      "term": "직행률",
+      "full_name": "First Pass Yield / 직행률",
+      "definition": "생산된 제품이 재작업(리워크) 없이 한 번에 합격하는 비율. 높을수록 공정 품질이 좋다.",
+      "usage_example": "\"직행률 98% 달성해야 해\"",
+      "aliases": ["FPY", "일발 합격률"]
+    },
+    {
+      "term": "로트 잡았다 / 풀었다",
+      "full_name": "Lot Hold / Lot Release",
+      "definition": "특정 생산 로트의 출하를 보류(Hold)하거나 해제(Release)하는 것. 품질 이슈 발생 시 해당 로트를 잡고, 원인 분석 후 문제없으면 풀어준다.",
+      "usage_example": "\"이 로트 잡아\" = 출하 보류, \"풀었다\" = 출하 해제",
+      "aliases": ["로트 홀드", "출하 보류"]
+    },
+    {
+      "term": "특채",
+      "full_name": "특별채용 / 특별 허용 (Concession)",
+      "definition": "규격에서 벗어났지만 기능에 문제가 없다고 판단되어 특별히 사용을 허가하는 것. 고객 승인이 필요한 경우가 많다.",
+      "usage_example": "\"특채 올려\" = 규격 미달 제품의 특별 사용 허가를 요청하라",
+      "aliases": ["특별채용", "컨세션"]
+    },
+    {
+      "term": "수입검사",
+      "full_name": "Incoming Inspection (수입검사)",
+      "definition": "협력사(2차 벤더)로부터 입고된 원자재·부품을 검사하는 것. 품질 신입사원이 가장 먼저 배우는 업무.",
+      "usage_example": "\"수검에서 불량 나왔다\" = 수입검사에서 입고 부품 불량 발견",
+      "aliases": ["수검", "입고검사", "IQC"]
+    },
+    {
+      "term": "출하검사",
+      "full_name": "Outgoing Inspection / Final Inspection",
+      "definition": "완성품을 고객(완성차)에게 출하하기 전 실시하는 최종 검사.",
+      "usage_example": "\"출검 걸렸다\" = 출하검사에서 불합격됐다",
+      "aliases": ["출검", "OQC", "최종검사"]
+    },
+    {
+      "term": "검성",
+      "full_name": "검사성적서 (Inspection Report)",
+      "definition": "검사 결과를 기록한 공식 성적서. 제품 납품 시 함께 제출하는 경우가 많다.",
+      "usage_example": "\"검성 뽑아\" = 검사성적서 발행해",
+      "aliases": ["성적서", "IR"]
+    },
+    {
+      "term": "부적합",
+      "full_name": "Nonconformity / NC",
+      "definition": "규격, 절차, 요구사항에 맞지 않는 상태. 부적합 발생 시 시정조치(CA)를 수립해야 한다.",
+      "usage_example": "\"부적합 처리해\", \"부적합 보고서 올려\"",
+      "aliases": ["NC", "불일치"]
+    },
+    {
+      "term": "노기스",
+      "full_name": "버니어 캘리퍼스 (Vernier Calipers)",
+      "definition": "치수 측정용 정밀 공구. 독일어 '노니우스(Nonius)'가 일본식으로 변형된 현장 은어이다. 정식 명칭은 '버니어 캘리퍼스'.",
+      "usage_example": "\"노기스로 재봐\" = 버니어 캘리퍼스로 치수 측정해",
+      "aliases": ["캘리퍼스", "버니어"]
+    }
+  ]
+}

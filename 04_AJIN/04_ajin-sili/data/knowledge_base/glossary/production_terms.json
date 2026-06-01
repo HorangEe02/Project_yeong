@@ -1,0 +1,24 @@
+{
+  "citation_id": "GLOSSARY-production_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "category": "production_technology",
+  "description": "아진산업 생산기술팀 및 전체 생산 현장에서 사용하는 주요 은어 및 전문 용어",
+  "terms": {
+    "올툴": "All Tool - 양산 전체 조건 세팅 (PP → MP 전환 신호)",
+    "택트타임": "Tact Time - 한 대당 생산 시간 간격 (라인 속도 결정)",
+    "사이클타임": "Cycle Time - 한 공정당 실제 소요 시간",
+    "병목": "Bottle Neck - 생산 라인에서 가장 느린 공정",
+    "PP": "Pilot Production - 초도 양산 / 시험생산",
+    "MP": "Mass Production - 본양산",
+    "SOP": "Start of Production - 양산 개시일",
+    "라인 밸런싱": "Line Balancing - 각 스테이션 작업 시간 균형 맞추기",
+    "가용접": "Tack Welding - 임시 용접 (위치 고정용)",
+    "데스라": "작업자 수 / 출력 인원",
+    "작업표준서": "Work Standard / SOP - 표준작업절차서",
+    "JIT": "Just In Time - 적시 납품"
+  }
+}

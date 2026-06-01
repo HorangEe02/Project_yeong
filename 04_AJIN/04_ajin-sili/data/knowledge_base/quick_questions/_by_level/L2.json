@@ -1,0 +1,44 @@
+{
+  "scope": "by_level",
+  "level": 2,
+  "level_name": "일반 (EMPLOYEE L2)",
+  "description": "1년 이상 실무자 — 일상 업무 가속 위주",
+  "questions": [
+    {
+      "id": "lv2-my-tasks",
+      "label": "이번 주 마감",
+      "promptText": "이번 주 내가 마감해야 할 보고서/업무 알려줘",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 3,
+      "tags": ["업무", "마감"]
+    },
+    {
+      "id": "lv2-team-schedule",
+      "label": "팀 일정",
+      "promptText": "우리 팀 이번 주 회의·일정 알려줘",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 3,
+      "tags": ["팀", "캘린더"]
+    },
+    {
+      "id": "lv2-sop-search",
+      "label": "SOP 검색",
+      "promptText": "내 담당 업무 SOP 절차 찾아줘",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["SOP", "절차"]
+    },
+    {
+      "id": "lv2-doc-search",
+      "label": "양식 검색",
+      "promptText": "사내 문서 양식 검색하고 다운로드 받고 싶어",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["문서", "다운로드"]
+    }
+  ]
+}

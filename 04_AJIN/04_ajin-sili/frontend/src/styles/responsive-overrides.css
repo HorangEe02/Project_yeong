@@ -1,0 +1,293 @@
+/* ==========================================================================
+   AJIN AI Assistant — 라우트별 반응형 보강 (v4.4 Design System v2)
+
+   사용자 결정 (P0): CSS·미디어쿼리만 추가, 컴포넌트 구조 보존.
+   적용 라우트: Dashboard / Search / Draft / Chat / Compliance / HR / Equipment / Login
+   ========================================================================== */
+
+/* ─── 공통 — 모바일 (≤640px) ────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* page 컨테이너 좌우 safe padding */
+  .page {
+    padding-left: var(--safe-x, 16px) !important;
+    padding-right: var(--safe-x, 16px) !important;
+  }
+  /* hero / 큰 제목 폰트 축소 */
+  .lg-display {
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+  }
+  .lg-hero-eyebrow {
+    font-size: 10px !important;
+  }
+  /* 카드 모서리 모바일 22px */
+  .lg-card, .metric-card {
+    border-radius: var(--r-card-mobile, 14px) !important;
+  }
+  /* 폼 input 최소 높이 44px (Apple HIG 터치 타깃) */
+  input[type="text"], input[type="search"], input[type="email"], input[type="password"], input[type="number"], select, textarea, .lg-input {
+    min-height: 44px;
+    font-size: 16px; /* iOS 줌 방지 */
+  }
+  /* 버튼 터치 타깃 */
+  .lg-btn, button.btn, .lg-tab, .lg-subtab {
+    min-height: 44px;
+  }
+}
+
+/* ─── Dashboard ────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .modules-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+@media (max-width: 640px) {
+  .modules-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .module-card .label-en {
+    font-size: 15px !important;
+  }
+}
+
+/* ─── Search (A — 조직도 + 검색 결과) ───────────────────────────────── */
+@media (max-width: 1024px) {
+  /* 조직도 SVG 영역 자동 축소 */
+  .org-svg, .org-hq-row, .org-chart {
+    max-width: 100% !important;
+    overflow-x: auto;
+  }
+}
+@media (max-width: 640px) {
+  /* 조직도는 모바일에서 접고 토글로 (점진) — 임시: 자동 가로 스크롤 */
+  .org-chart {
+    font-size: 11px;
+  }
+}
+
+/* ─── Draft (B — 문서 작성) ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  /* 편집기 + 미리보기 2-col → 단일 컬럼 stack */
+  .draft-grid, .draft-split {
+    grid-template-columns: 1fr !important;
+  }
+}
+@media (max-width: 640px) {
+  /* 다운로드 버튼 그룹 — 가로 스크롤 허용 */
+  .draft-actions {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* 다운로드 액션 sticky bottom (BottomTabBar 위) */
+  .draft-actions.sticky {
+    position: sticky;
+    bottom: calc(var(--bottom-nav-h, 60px) + env(safe-area-inset-bottom, 0px) + 4px);
+    z-index: 10;
+    background: var(--hud-bg);
+    padding: 8px 0;
+    border-top: 1px solid var(--hud-border);
+  }
+}
+
+/* ─── Chat (C — AI 도우미) ────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  /* 분석 패널 숨김 — 모바일/태블릿에서 채팅 영역 최대화 */
+  .chat-analytics-panel {
+    display: none !important;
+  }
+}
+@media (max-width: 640px) {
+  /* 입력창 sticky bottom + safe area */
+  .chat-composer, .chat-input-area {
+    position: sticky;
+    bottom: calc(var(--bottom-nav-h, 60px) + env(safe-area-inset-bottom, 0px));
+    z-index: 10;
+    background: var(--hud-bg);
+    padding-bottom: 8px;
+  }
+  /* 메시지 카드 폭 제한 — 90vw */
+  .chat-msg, .chat-bubble {
+    max-width: 90vw !important;
+  }
+}
+
+/* ─── Compliance (D — 법규) ─────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  /* 4탭 가로 스크롤 허용 */
+  .lg-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  .lg-tabs::-webkit-scrollbar { height: 4px; }
+  .lg-tabs .lg-tab {
+    flex-shrink: 0;
+  }
+}
+@media (max-width: 640px) {
+  /* Scenario Modal 풀스크린 */
+  .scenario-modal, .compliance-modal {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+  }
+  /* ChangeFeed 카드 폭 */
+  .change-card {
+    padding: 12px !important;
+  }
+}
+
+/* ─── HR (E — 인사) ─────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* 본부/부서 selectbox 폭 풀 */
+  .hr-select-row {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  /* 6 탭 → 가로 스크롤 (compliance와 동일) */
+}
+
+/* ─── Equipment (F — 설비) ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  /* SPC 차트 / Plotly 컨테이너 폭 자동 */
+  .plotly, .plotly-graph-div, .js-plotly-plot {
+    width: 100% !important;
+  }
+  /* 5공정 카드 그리드 분기 */
+  .lg-equip-grid, .processes-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+}
+@media (max-width: 640px) {
+  .lg-equip-grid, .processes-grid {
+    grid-template-columns: 1fr !important;
+  }
+  /* "현장 모드 PWA" 링크 강조 (CSS only) */
+  a[href="/equipment/field"] {
+    width: 100%;
+    margin-top: 8px;
+    text-align: center;
+  }
+}
+
+/* ─── Login ───────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .login-shell, .login-split {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+  }
+  .login-aside, .login-bg {
+    display: none !important; /* 모바일은 폼만 노출 */
+  }
+  .login-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ─── ErrorState / EmptyState 컴포넌트 — 모바일 패딩 축소 ──────────── */
+@media (max-width: 640px) {
+  .error-state {
+    min-height: 160px !important;
+    padding: 20px 14px !important;
+  }
+}
+
+/* ─── 햄버거 버튼 — 데스크탑 숨김 (theme.css 와 정합) ────────────── */
+@media (min-width: 1025px) {
+  .tb-hamburger {
+    display: none !important;
+  }
+}
+
+/* ─── BottomTabBar — 데스크탑 숨김 ─────────────────────────────────── */
+@media (min-width: 641px) {
+  .app-shell[data-mobile="true"] nav[role="tablist"][aria-label="모바일 핵심 메뉴"] {
+    /* 동적으로만 mount 되지만 안전망 */
+    display: none;
+  }
+}
+
+/* ===========================================================================
+   v3.5 UI_REDESIGN_PLAN §3 Phase 3 — 태블릿 (641-1024px) Slim Sidebar
+   ===========================================================================
+   - LeftSidebar.sidebar → width 64px (icon-only).
+   - 텍스트 라벨 (name/sub/ver/role/sb-user 본문 등) 숨김. 아이콘만 노출.
+   - hover 시 일시 확장 (240px) — UX 시도. 모바일 Drawer 와 다른 통로.
+   - breakpoints.css v4.4 가 이미 --left-panel-width: 64px 설정 — CSS 만 정렬.
+   ========================================================================== */
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* sidebar 자체 width — tokens.css 의 --left-panel-width 가 64px 로 설정됨 */
+  .sidebar {
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    overflow: hidden;
+    transition: width 200ms ease-out, max-width 200ms ease-out;
+  }
+
+  /* 텍스트 라벨 — 64px 모드에서 숨김 */
+  .sidebar .sb-brand .name,
+  .sidebar .sb-brand .sub,
+  .sidebar .sb-brand .ver,
+  .sidebar .sb-user .who,
+  .sidebar .sb-user .actions .btn span:not(.icon),
+  .sidebar .sb-modules a span:not(.icon),
+  .sidebar .sb-modules a .ko,
+  .sidebar .sb-modules a .label-en,
+  .sidebar .sb-section-label {
+    display: none !important;
+  }
+
+  /* sb-brand row 의 logo 만 노출 */
+  .sidebar .sb-brand .row {
+    justify-content: center;
+  }
+
+  /* sb-modules 항목 — 아이콘 center align */
+  .sidebar .sb-modules a {
+    justify-content: center;
+    padding: 10px 0 !important;
+  }
+
+  /* hover 시 일시 확장 — UX 옵션 */
+  .sidebar:hover {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.20);
+    z-index: 30;
+  }
+  .sidebar:hover .sb-brand .name,
+  .sidebar:hover .sb-brand .sub,
+  .sidebar:hover .sb-brand .ver,
+  .sidebar:hover .sb-user .who,
+  .sidebar:hover .sb-modules a span:not(.icon),
+  .sidebar:hover .sb-modules a .ko,
+  .sidebar:hover .sb-modules a .label-en,
+  .sidebar:hover .sb-section-label {
+    display: revert !important;
+  }
+  .sidebar:hover .sb-modules a {
+    justify-content: flex-start;
+    padding: 10px 14px !important;
+  }
+
+  /* dashboard 의 12-col grid → 6-col 태블릿 분기 (디자인 시스템 Phase 3 §3.4) */
+  .ne-brief-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+  .ne-brief.col-12 { grid-column: span 6 !important; }
+  .ne-brief.col-8  { grid-column: span 6 !important; }
+  .ne-brief.col-6  { grid-column: span 6 !important; }
+  .ne-brief.col-4  { grid-column: span 3 !important; }
+  .ne-brief.col-3  { grid-column: span 3 !important; }
+}

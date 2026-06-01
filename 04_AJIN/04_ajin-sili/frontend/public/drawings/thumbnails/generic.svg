@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect x="6" y="10" width="52" height="44" rx="3" fill="none" stroke="currentColor" stroke-width="2" opacity="0.55"/>
+  <path d="M14 22 H50 M14 32 H50 M14 42 H38" stroke="currentColor" stroke-width="1.5" opacity="0.45" stroke-linecap="round"/>
+  <circle cx="48" cy="46" r="3" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.55"/>
+  <text x="32" y="62" text-anchor="middle" font-family="ui-monospace, monospace" font-size="6" fill="currentColor" opacity="0.55">DRAWING</text>
+</svg>

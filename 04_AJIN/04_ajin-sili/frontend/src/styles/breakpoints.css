@@ -1,0 +1,65 @@
+/* ==========================================================================
+   AJIN AI Assistant — 반응형 Breakpoint 토큰 (v4.4)
+
+   Design System v2 모바일/태블릿 spec 기반.
+   기존 tokens.css 의 데스크탑 기본값 + 본 파일의 모바일/태블릿 분기.
+   ========================================================================== */
+
+:root {
+  /* 4단계 breakpoint — 점진적 통일 목표 (기존 1280/1100/900 는 점진 마이그레이션) */
+  --bp-sm:  480px;
+  --bp-md:  640px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+
+  /* 모바일 전용 (Design System v2 mobile-theme.css 미러링) */
+  --r-card-mobile: 22px;
+  --r-row-mobile:  16px;
+  --r-pill:       999px;
+  --safe-x:        16px;
+  --bottom-nav-h:  60px;
+  --aj-gold-soft:  color-mix(in oklab, var(--hud-primary) 18%, transparent);
+
+  /* 반응형 타이포 bump (모바일에서 +1px) */
+  --fs-mobile-bump: 1px;
+}
+
+/* ── 모바일 (≤640px) — 레이아웃 토큰 분기 ─────────────────────────── */
+@media (max-width: 640px) {
+  :root {
+    --top-bar-height:    56px;     /* iOS safe-area 고려 */
+    --left-panel-width:  0px;       /* Drawer 모드로 전환 (off-canvas) */
+    --right-panel-width: 0px;       /* 모바일에선 강제 숨김 */
+    --section-gap:       14px;
+    --card-padding:      14px;
+    --main-col-ratio:    1fr;
+  }
+}
+
+/* ── 태블릿 (641-1024px) — slim sidebar 모드 ───────────────────────── */
+@media (min-width: 641px) and (max-width: 1024px) {
+  :root {
+    --left-panel-width:  64px;      /* icon-only slim */
+    --right-panel-width: 0px;       /* 풀폭 메인 */
+    --main-col-ratio:    1fr;
+  }
+}
+
+/* ── 데스크탑 (≥1025px) — 기존 토큰 사용 ──────────────────────────── */
+/* tokens.css 기본값 그대로: 240 + main + 280 */
+
+/* ── 와이드 (≥1280px) — 옵션 ─────────────────────────────────────── */
+@media (min-width: 1280px) {
+  :root {
+    --left-panel-max: 280px;
+  }
+}
+
+/* ── prefers-reduced-motion — 모든 transition 60ms 미만 ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

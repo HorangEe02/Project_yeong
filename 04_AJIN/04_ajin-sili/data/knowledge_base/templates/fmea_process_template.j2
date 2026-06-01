@@ -1,0 +1,30 @@
+# Process FMEA — {{ title }}
+
+| Field | Value |
+|---|---|
+| Part Name | {{ part_name }} |
+| Part No. | {{ part_no }} |
+| Plant | {{ plant }} |
+| FMEA Date | {{ date }} |
+| Prepared By | {{ prepared_by }} |
+| Revision | {{ revision | default('Rev. A') }} |
+
+## Process FMEA Analysis
+
+| No. | Process Step | Potential Failure Mode | Potential Effect | S | Potential Cause | O | Current Controls | D | RPN | Recommended Action |
+|-----|-------------|----------------------|-----------------|---|----------------|---|-----------------|---|-----|-------------------|
+{% for row in fmea_rows %}
+| {{ loop.index }} | {{ row.process_step }} | {{ row.failure_mode }} | {{ row.effect }} | {{ row.severity }} | {{ row.cause }} | {{ row.occurrence }} | {{ row.controls }} | {{ row.detection }} | {{ row.rpn }} | {{ row.action }} |
+{% endfor %}
+
+## RPN Summary
+- Total items analyzed: {{ fmea_rows | length }}
+- Items with RPN > 100: {{ high_rpn_count | default(0) }}
+- Maximum RPN: {{ max_rpn | default('N/A') }}
+
+## Approval
+| Role | Name | Signature | Date |
+|---|---|---|---|
+| Prepared By | {{ prepared_by }} | | {{ date }} |
+| Reviewed By | {{ reviewed_by | default('') }} | | |
+| Approved By | {{ approved_by | default('') }} | | |

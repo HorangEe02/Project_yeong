@@ -1,0 +1,61 @@
+{
+  "department": "FA사업팀",
+  "division": "생산기술본부",
+  "description": "스마트팩토리·무인자동화 구축 사업 — FA 시스템 설계·납품",
+  "questions": [
+    {
+      "id": "fa-project-status",
+      "label": "FA 프로젝트 현황",
+      "promptText": "현재 진행 중인 FA(공장자동화) 프로젝트 현황 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["FA", "프로젝트"]
+    },
+    {
+      "id": "fa-customer-spec",
+      "label": "고객 사양서",
+      "promptText": "FA 사업 고객 사양서 검토 표준 절차",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["사양", "고객"]
+    },
+    {
+      "id": "fa-delivery-schedule",
+      "label": "납품 일정",
+      "promptText": "FA 시스템 납품 일정과 시운전 계획",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["납품", "시운전"]
+    },
+    {
+      "id": "fa-iot-sensor",
+      "label": "IoT 센서 사양",
+      "promptText": "스마트팩토리 IoT 센서 표준 사양과 배치",
+      "category": "general",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["IoT", "센서"]
+    },
+    {
+      "id": "fa-maintenance-call",
+      "label": "AS/유지보수",
+      "promptText": "납품 FA 시스템 AS 요청 처리 절차",
+      "category": "scenario",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["AS", "유지보수"]
+    },
+    {
+      "id": "fa-roi-report",
+      "label": "ROI 보고",
+      "promptText": "FA 도입 ROI 분석 보고서 초안 작성해줘",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["ROI", "보고서"]
+    }
+  ]
+}

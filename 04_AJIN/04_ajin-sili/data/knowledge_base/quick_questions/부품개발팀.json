@@ -1,0 +1,61 @@
+{
+  "department": "부품개발팀",
+  "division": "개발본부",
+  "description": "신차종 단품 양산 진척·금형 발주~승인·ECR/ECN·PPAP 설계 서류·시작품·도면 관리",
+  "questions": [
+    {
+      "id": "part-dev-mass-prod",
+      "label": "양산 진척",
+      "promptText": "현재 개발 중인 신차종 부품 양산 진척률",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["양산", "진척"]
+    },
+    {
+      "id": "part-dev-mold-order",
+      "label": "금형 발주",
+      "promptText": "신규 부품 금형 발주~최종 승인 절차",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["금형", "발주"]
+    },
+    {
+      "id": "part-dev-ecr-ecn",
+      "label": "ECR/ECN 발의",
+      "promptText": "설계 변경 요청(ECR) 또는 변경 통지(ECN) 발의 절차",
+      "category": "scenario",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["ECR", "ECN"]
+    },
+    {
+      "id": "part-dev-ppap-doc",
+      "label": "PPAP 설계 서류",
+      "promptText": "PPAP 설계측 서류 패키지 작성 가이드",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["PPAP", "설계"]
+    },
+    {
+      "id": "part-dev-prototype",
+      "label": "시작품 검증",
+      "promptText": "시작품 제작 후 검증 체크리스트",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["시작품", "검증"]
+    },
+    {
+      "id": "part-dev-drawing-rev",
+      "label": "도면 리비전",
+      "promptText": "도면 리비전 관리와 최신본 확인 방법",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["도면", "리비전"]
+    }
+  ]
+}

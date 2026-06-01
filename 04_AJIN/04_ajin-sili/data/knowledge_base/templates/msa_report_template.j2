@@ -1,0 +1,73 @@
+{# usage_hint: "측정 시스템 분석(MSA) 결과를 고객사·내부 검토자에게 공식 보고할 때 (Gage R&R, Bias, Linearity)" #}
+{# dept_recommend: ["품질보증팀", "검사팀", "품질관리팀"] #}
+{# required_vars: ["instrument", "study_type"] #}
+{# optional_vars: ["recipient", "originator", "study_date", "appraisers", "samples", "result_summary", "ndc"] #}
+{# example_output: "Gage R&R Study / 마이크로미터 MM-204 / 3 측정자 × 10 샘플 × 3 회 / GRR 8.4% (수용)" #}
+{# var_metadata:
+  - {name: "instrument", label_ko: "측정 장비", required: true, group: "기본", placeholder: "예: 마이크로미터 MM-204"}
+  - {name: "study_type", label_ko: "Study 유형", required: true, group: "기본", placeholder: "Gage R&R / Bias / Linearity / Stability"}
+  - {name: "study_date", label_ko: "측정일", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "appraisers", label_ko: "측정자 수", required: false, group: "내용", placeholder: "예: 3명 (A/B/C)"}
+  - {name: "samples", label_ko: "샘플 수", required: false, group: "내용", placeholder: "예: 10개"}
+  - {name: "result_summary", label_ko: "결과 요약", required: false, group: "내용", placeholder: "예: GRR 8.4% (수용 기준 10% 이내)"}
+  - {name: "ndc", label_ko: "NDC", required: false, group: "내용", placeholder: "예: 8 이상 (수용)"}
+#}
+
+# 측정 시스템 분석 보고서 (MSA Report)
+
+**Study 유형**: {{ study_type }}
+**측정 장비**: {{ instrument }}
+**측정일**: {{ study_date | default("YYYY-MM-DD") }}
+**기안자**: {{ originator | default("품질보증팀") }}
+
+---
+
+## 1. 분석 개요
+
+| 항목 | 내용 |
+|---|---|
+| 측정 장비 / 자산번호 | {{ instrument }} |
+| Study 유형 | {{ study_type }} |
+| 측정자 | {{ appraisers | default("3명 (A / B / C)") }} |
+| 샘플 수 | {{ samples | default("10개") }} |
+| 반복 측정 | 3회 |
+
+## 2. 측정 결과
+
+### 2.1 Repeatability (반복성)
+- EV (Equipment Variation): __값__
+- 평가: 수용 / 보완 / 거부
+
+### 2.2 Reproducibility (재현성)
+- AV (Appraiser Variation): __값__
+- 평가: 수용 / 보완 / 거부
+
+### 2.3 종합 GRR (Gage R&R)
+- GRR %TV: {{ result_summary | default("__%__ (수용 기준: 10% 이내)") }}
+- NDC (Number of Distinct Categories): {{ ndc | default("__값__ (수용 기준: 5 이상)") }}
+
+## 3. 판정 기준
+
+| GRR (%TV) | 판정 |
+|---|---|
+| ≤ 10% | 수용 (Acceptable) |
+| 10% ~ 30% | 조건부 수용 |
+| > 30% | 거부 — 측정 시스템 개선 필요 |
+
+## 4. 결론 및 조치
+
+- 본 측정 시스템은 **수용/조건부 수용/거부** 판정.
+- 후속 조치:
+  - [ ] 장비 교정 주기 검토
+  - [ ] 측정자 재훈련
+  - [ ] 측정 절차 표준화 (SOP 갱신)
+
+## 5. 첨부
+
+- 원시 데이터 시트 (Excel)
+- ANOVA 표
+- 분산 분석 차트
+
+---
+
+본 보고서는 IATF 16949 Clause 7.1.5.1.1 측정 시스템 분석 요건을 따릅니다.

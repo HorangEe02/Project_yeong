@@ -1,0 +1,5 @@
+{
+  "format_version": 1,
+  "sklearn_version": "1.8.0",
+  "model_type": "regulation_risk_classifier"
+}

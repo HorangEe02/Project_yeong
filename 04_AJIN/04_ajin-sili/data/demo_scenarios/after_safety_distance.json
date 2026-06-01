@@ -1,0 +1,15 @@
+{
+  "regulation_type": "domestic_safety",
+  "title": "산업안전보건법 시행규칙 (개정)",
+  "items": [
+    {
+      "id": "KOSHA-PRESS-001",
+      "subject": "프레스 작업 안전거리",
+      "current_standard": "400mm",
+      "penalty": "과태료 1,000만 원 이하 (상향)",
+      "effective_date": "2026-10-01",
+      "change_reason": "프레스 작업 중 사고 증가에 따른 안전 기준 강화"
+    }
+  ],
+  "crawled_at": "2026-04-01T09:00:00"
+}

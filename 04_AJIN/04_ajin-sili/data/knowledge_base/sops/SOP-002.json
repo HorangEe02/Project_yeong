@@ -1,0 +1,103 @@
+{
+  "sop_id": "SOP-002",
+  "title": "용접 너겟 품질 검사 절차",
+  "department": "품질보증팀",
+  "category": "품질",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "검사 대상 선정",
+      "description": "생산 로트별 샘플링 기준에 따라 검사 대상 선정 -> 검사 기준서 확인",
+      "checklist": [
+        "샘플링 기준 확인",
+        "검사 기준서 준비"
+      ],
+      "caution": "",
+      "related_terms": [
+        "샘플링",
+        "검사기준서"
+      ],
+      "estimated_time": "3분",
+      "responsible": "",
+      "title_en": ""
+    },
+    {
+      "step_number": 2,
+      "title": "외관 검사",
+      "description": "용접 비드/너겟 외관 육안 확인 -> 스패터/기공/언더컷 유무 -> 판정 기록",
+      "checklist": [
+        "스패터 확인",
+        "기공 유무",
+        "언더컷 유무",
+        "외관 판정 기록"
+      ],
+      "caution": "",
+      "related_terms": [
+        "스패터",
+        "기공",
+        "언더컷",
+        "너겟"
+      ],
+      "estimated_time": "5분",
+      "responsible": "",
+      "title_en": ""
+    },
+    {
+      "step_number": 3,
+      "title": "너겟 직경 측정",
+      "description": "피일 테스트 또는 초음파 검사 -> 너겟 직경 측정 -> 기준 대비 합부 판정",
+      "checklist": [
+        "너겟 직경 측정",
+        "기준값 대비 판정",
+        "데이터 기록"
+      ],
+      "caution": "최소 너겟 직경 미달 시 전수 검사 전환",
+      "related_terms": [
+        "피일테스트",
+        "초음파검사",
+        "너겟직경"
+      ],
+      "estimated_time": "10분",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 4,
+      "title": "결과 기록 및 보고",
+      "description": "검사 데이터 SPC 입력 -> Cpk 자동 계산 -> 이상 시 8D 보고서 개시",
+      "checklist": [
+        "SPC 데이터 입력",
+        "Cpk 확인",
+        "이상 시 8D 개시"
+      ],
+      "caution": "",
+      "related_terms": [
+        "SPC",
+        "Cpk",
+        "8D"
+      ],
+      "estimated_time": "5분",
+      "responsible": "",
+      "title_en": ""
+    }
+  ],
+  "prerequisites": [
+    "AWIS 시스템 가동 확인",
+    "검사 기준서 확인"
+  ],
+  "safety_warnings": [
+    "용접 직후 고온 주의",
+    "초음파 검사 장비 취급 주의"
+  ],
+  "related_sops": [],
+  "citation_id": "SOP-002",
+  "owner_department": "품질보증팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "title_en": "Welding Nugget Inspection Procedure",
+  "department_en": "QA Team",
+  "category_en": "Quality"
+}

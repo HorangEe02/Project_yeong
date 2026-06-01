@@ -1,0 +1,31 @@
+To: {{ recipient_name }}, {{ recipient_title }}, {{ recipient_company }}
+CC: {{ cc_list | default('') }}
+Subject: [JOON INC] Delivery Schedule Adjustment Notice — {{ part_name }}
+
+Dear {{ recipient_name }},
+
+I am writing to inform you of a delivery schedule adjustment for the following part(s):
+
+| Part Name | Part No. | Original Date | Revised Date | Reason |
+|-----------|----------|---------------|--------------|--------|
+{% for item in items %}
+| {{ item.part_name }} | {{ item.part_no }} | {{ item.original_date }} | {{ item.revised_date }} | {{ item.reason }} |
+{% endfor %}
+
+We sincerely apologize for any inconvenience this may cause. Our team is taking the following actions to minimize the impact:
+
+{% for action in corrective_actions %}
+{{ loop.index }}. {{ action }}
+{% endfor %}
+
+We are committed to meeting the revised schedule and will provide daily updates until delivery is completed.
+
+Please do not hesitate to contact me if you have any questions or concerns.
+
+Best regards,
+
+{{ sender_name }}
+{{ sender_title }}, {{ sender_department }}
+AJIN Industrial (JOON INC)
+Tel: {{ sender_phone }}
+Email: {{ sender_email }}

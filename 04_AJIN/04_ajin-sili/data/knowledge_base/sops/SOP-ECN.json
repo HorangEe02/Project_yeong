@@ -1,0 +1,86 @@
+{
+  "sop_id": "SOP-ECN",
+  "title": "ECN(설계변경통보) 접수 및 대응",
+  "department": "부품개발팀",
+  "category": "품질",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "ECN 접수 및 영향 범위 파악",
+      "description": "ECN 문서 접수 후 변경 내용(치수/소재/공법)과 적용 시점 파악.",
+      "checklist": [
+        "ECN 번호, 적용 차종/부품 확인",
+        "변경 내용(도면 변경점) 파악",
+        "적용 시점(즉시/재고 소진 후) 확인",
+        "영향 부서 목록 정리"
+      ],
+      "caution": "적용 시점 놓치면 불일치 부품 납품 → 클레임 직결",
+      "related_terms": [
+        "ECN",
+        "리비전",
+        "적용 시점"
+      ],
+      "estimated_time": "1일",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 2,
+      "title": "금형/설비 변경 검토",
+      "description": "금형 수정/신규 제작 필요 여부, 설비 조건 변경 필요 여부 검토.",
+      "checklist": [
+        "금형 수정 필요 여부·소요 기간 확인",
+        "설비 파라미터 변경 필요 여부",
+        "시작품 제작 일정 수립",
+        "비용 발생 시 견적·청구 절차 확인"
+      ],
+      "caution": "",
+      "related_terms": [
+        "금형 수정",
+        "설비 조건"
+      ],
+      "estimated_time": "2~3일",
+      "responsible": "생산기술팀",
+      "title_en": ""
+    },
+    {
+      "step_number": 3,
+      "title": "변경 후 품질 검증 및 승인",
+      "description": "변경 부품 치수/외관/기능 검증 후 PPAP 재제출 여부 결정.",
+      "checklist": [
+        "변경 부위 치수 측정·도면 대비 확인",
+        "PPAP 레벨 확인(전체/부분)",
+        "CP/FMEA 업데이트",
+        "SQ 승인 후 양산 전환"
+      ],
+      "caution": "Level 3 이상 변경은 반드시 PPAP 전체 재제출",
+      "related_terms": [
+        "PPAP",
+        "Control Plan"
+      ],
+      "estimated_time": "3~5일",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    }
+  ],
+  "prerequisites": [
+    "ECN 문서 접수 완료"
+  ],
+  "safety_warnings": [
+    "적용 시점 놓치면 불일치 부품 납품 → 클레임 직결"
+  ],
+  "related_sops": [
+    "SOP-PPAP"
+  ],
+  "citation_id": "SOP-ECN",
+  "owner_department": "연구개발팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "title_en": "ECN (Engineering Change Notice) Procedure",
+  "department_en": "R&D / Engineering",
+  "category_en": "Engineering"
+}

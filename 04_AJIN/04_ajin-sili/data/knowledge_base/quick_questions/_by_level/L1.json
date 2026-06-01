@@ -1,0 +1,44 @@
+{
+  "scope": "by_level",
+  "level": 1,
+  "level_name": "신입 (EMPLOYEE L1)",
+  "description": "입사 1년 미만 신입 사원 대상 — 학습 + 사내 적응 위주",
+  "questions": [
+    {
+      "id": "lv1-first-week",
+      "label": "첫 주 가이드",
+      "promptText": "우리 부서 신입이 첫 주에 꼭 알아야 할 것 알려줘",
+      "category": "scenario",
+      "min_level": 1,
+      "max_level": 1,
+      "tags": ["온보딩", "커리큘럼"]
+    },
+    {
+      "id": "lv1-glossary",
+      "label": "용어 사전",
+      "promptText": "사내에서 자주 쓰는 용어 알려줘 (예: PPAP, 8D, ECN)",
+      "category": "general",
+      "min_level": 1,
+      "max_level": 1,
+      "tags": ["용어", "학습"]
+    },
+    {
+      "id": "lv1-org-chart",
+      "label": "조직도",
+      "promptText": "우리 부서 조직도와 본부 구조 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 2,
+      "tags": ["조직", "사람"]
+    },
+    {
+      "id": "lv1-hr-system",
+      "label": "출퇴근/연차",
+      "promptText": "출퇴근 등록과 연차 신청 방법 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 2,
+      "tags": ["인사", "근태"]
+    }
+  ]
+}

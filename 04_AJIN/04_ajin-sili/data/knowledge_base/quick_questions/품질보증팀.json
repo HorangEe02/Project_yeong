@@ -1,0 +1,61 @@
+{
+  "department": "품질보증팀",
+  "division": "생산본부",
+  "description": "PPAP·8D·SPC·검사·IATF — 고객사(현대·기아) 품질 대응 핵심",
+  "questions": [
+    {
+      "id": "qa-ppap-form",
+      "label": "PPAP 양식",
+      "promptText": "PPAP 양식 다운로드 위치 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["PPAP", "문서", "다운로드"]
+    },
+    {
+      "id": "qa-8d-scenario",
+      "label": "8D 클레임 대응",
+      "promptText": "고객 클레임 접수 — 8D Report 작성 절차 알려줘",
+      "category": "scenario",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["8D", "클레임", "고객"]
+    },
+    {
+      "id": "qa-spc-status",
+      "label": "SPC 상태",
+      "promptText": "SPC 관리도 현재 상태와 Cpk 알려줘",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["SPC", "Cpk", "관리도"]
+    },
+    {
+      "id": "qa-iatf-audit",
+      "label": "IATF 심사",
+      "promptText": "IATF 16949 심사 대비 체크리스트 보여줘",
+      "category": "sop",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["IATF", "심사", "인증"]
+    },
+    {
+      "id": "qa-incoming-inspection",
+      "label": "수입검사 절차",
+      "promptText": "IQC(수입검사) 표준 절차와 샘플링 기준",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["IQC", "검사", "샘플링"]
+    },
+    {
+      "id": "qa-claim-history",
+      "label": "클레임 이력",
+      "promptText": "최근 1개월 클레임 이력과 재발 방지 현황",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["클레임", "이력"]
+    }
+  ]
+}

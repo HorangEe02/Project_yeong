@@ -1,0 +1,49 @@
+{# 납입용기 규격 설정서 양식 (v2.6) #}
+
+# 납입용기 표준 및 용기 설정서
+
+| 항목 | 내용 |
+|---|---|
+| 문서번호 | {{ doc_number | default("CS-2026-XXX") }} |
+| 작성일 | {{ created_date }} |
+| 작성부서 | {{ department | default("생산관리팀") }} |
+| 작성자 | {{ author | default("OOO") }} |
+
+---
+
+## 1. 부품 정보
+
+| 항목 | 내용 |
+|---|---|
+| 부품명 | {{ part_name }} |
+| 품번 | {{ part_number }} |
+| 납품처 | {{ customer | default("현대자동차") }} |
+| 납품 공장 | {{ delivery_plant | default("울산공장") }} |
+
+## 2. 용기 규격
+
+| 항목 | 규격 |
+|---|---|
+| 용기 종류 | {{ container_type | default("플라스틱 박스") }} |
+| 외형 치수 (L x W x H) | {{ container_dimensions }} |
+| 용기 중량 (공용기) | {{ container_weight | default("확인 중") }} |
+| 수납 수량 (EA/용기) | {{ quantity_per_container }} |
+| 적재 단수 | {{ stacking_layers | default("3단") }} |
+
+## 3. 포장 사양
+
+{{ packaging_spec }}
+
+## 4. 비고
+
+{{ remarks | default("") }}
+
+---
+
+**승인:**
+
+| 작성 | 검토 | 승인 |
+|---|---|---|
+| {{ author | default("OOO") }} | | |
+
+*아진산업(주) {{ department | default("생산관리팀") }}*

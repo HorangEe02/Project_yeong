@@ -1,0 +1,26 @@
+{
+  "citation_id": "GLOSSARY-safety_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "category": "safety_health",
+  "description": "아진산업 안전보건팀 현장 은어 및 산업안전보건법 관련 용어",
+  "terms": {
+    "아다리": "용접 불꽃으로 인한 각막·피부 화상 (또는 부품이 딱 맞는 상태)",
+    "스패터": "Spatter - 용접 시 튀는 불꽃·금속 입자 (화상·화재 위험)",
+    "LOTO": "Lockout/Tagout - 잠금·표지 조치 (기계 작동 중 사고 방지)",
+    "MSDS": "Material Safety Data Sheet - 물질안전보건자료 (유해화학물질 정보)",
+    "버": "Burr - 용접·프레스 후 날카로운 금속 찌꺼기 (절단·찔림 사고 원인)",
+    "실드 가스": "Shield Gas - 용접 보호 가스 (부족 시 아다리 발생)",
+    "PPE": "Personal Protective Equipment - 개인보호구 (안전모·보호안경·장갑 등)",
+    "위험성 평가": "Risk Assessment - 작업별 위험성 평가 (중대재해처벌법 핵심)",
+    "안전교육": "Safety Training - 안전교육 (입사 시·정기 의무)",
+    "비상정지": "Emergency Stop - 비상 정지 버튼 (EMO)",
+    "밀폐공간": "Confined Space - 밀폐 공간 작업 (산소 부족·유독가스 위험)",
+    "추락방지": "Fall Protection - 추락 방지 설비 (안전대·추락방지망)",
+    "소음 노출": "Noise Exposure - 소음 노출 관리 (청력 보호)",
+    "화학물질 취급": "Chemical Handling - 유해화학물질 취급 (MSDS 확인 의무)"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "department": "재무팀",
+  "division": "재경본부",
+  "description": "재무 건전성·자금 운용·주주총회/이사회·IR·자금 계획",
+  "questions": [
+    {
+      "id": "fin-cash-status",
+      "label": "자금 현황",
+      "promptText": "현재 사내 가용 자금과 단기 자금 계획",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["자금", "현금"]
+    },
+    {
+      "id": "fin-loan-portfolio",
+      "label": "차입 포트폴리오",
+      "promptText": "현재 차입금 만기 분포와 금리 구조",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["차입", "금리"]
+    },
+    {
+      "id": "fin-ir-schedule",
+      "label": "IR 일정",
+      "promptText": "이번 분기 IR 일정과 주요 KPI 자료",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["IR", "투자자"]
+    },
+    {
+      "id": "fin-board-meeting",
+      "label": "이사회 자료",
+      "promptText": "다음 이사회 자료 작성 표준 절차",
+      "category": "sop",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["이사회"]
+    },
+    {
+      "id": "fin-fx-hedge",
+      "label": "환 헤지",
+      "promptText": "환율 변동 헤지 전략 현황",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["환율", "헤지"]
+    },
+    {
+      "id": "fin-financial-report",
+      "label": "재무 보고",
+      "promptText": "월간 재무 현황 보고서 초안",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["보고서"]
+    }
+  ]
+}

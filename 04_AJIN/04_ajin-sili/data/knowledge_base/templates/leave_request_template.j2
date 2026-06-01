@@ -1,0 +1,59 @@
+{# usage_hint: "연차/병가/경조사 등 휴가 신청 — 사유와 일정을 명확히 결재 라인에 제출" #}
+{# dept_recommend: ["전 부서"] #}
+{# required_vars: ["start_date", "reason"] #}
+{# optional_vars: ["applicant", "team", "end_date", "leave_type", "days", "delegate", "contact"] #}
+{# example_output: "연차 휴가 신청 / 2026-05-15 ~ 05-17 (3일) / 가족 여행" #}
+{# var_metadata:
+  - {name: "applicant", label_ko: "신청자", required: false, group: "수신/발신", placeholder: "예: 박준영 (사번 12345)"}
+  - {name: "team", label_ko: "부서", required: false, group: "수신/발신", placeholder: "예: 생산기술팀"}
+  - {name: "leave_type", label_ko: "휴가 종류", required: false, group: "기본", placeholder: "연차 / 반차 / 병가 / 경조사 / 출산 / 기타"}
+  - {name: "start_date", label_ko: "시작일", required: true, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "end_date", label_ko: "종료일", required: false, group: "일정", placeholder: "YYYY-MM-DD"}
+  - {name: "days", label_ko: "사용 일수", required: false, group: "일정", placeholder: "예: 3일"}
+  - {name: "reason", label_ko: "사유", required: true, group: "내용", placeholder: "예: 가족 여행 / 본인 결혼 / 부친 별세"}
+  - {name: "delegate", label_ko: "업무 인수자", required: false, group: "참조", placeholder: "예: 김대리 (010-XXXX-XXXX)"}
+  - {name: "contact", label_ko: "비상 연락처", required: false, group: "참조", placeholder: "예: 010-1234-5678"}
+#}
+
+# 휴가 신청서
+
+**신청자**: {{ applicant | default("[성명 / 사번]") }}
+**부서**: {{ team | default("[부서]") }}
+**신청일**: 작성일
+
+---
+
+## 1. 휴가 신청 내역
+
+| 항목 | 내용 |
+|---|---|
+| 휴가 종류 | {{ leave_type | default("연차 / 반차 / 병가 / 경조사 / 출산 / 기타") }} |
+| 시작일 | {{ start_date }} |
+| 종료일 | {{ end_date | default("(시작일과 동일)") }} |
+| 사용 일수 | {{ days | default("(자동 계산)") }} |
+
+## 2. 사유
+
+{{ reason }}
+
+## 3. 업무 인수
+
+| 인수 항목 | 인수자 | 비고 |
+|---|---|---|
+| 진행 중 업무 | {{ delegate | default("(인수자)") }} | (인수 일자 / 진행 상태) |
+| 결재 권한 위임 | (대결자) | (적용 기간) |
+| 외부 일정 / 회의 | (대체 참석자) | — |
+
+## 4. 비상 연락
+
+- **휴가 중 연락처**: {{ contact | default("(연락처)") }}
+- **긴급 호출 가능 시간**: (예: 평일 09:00~18:00)
+
+---
+
+| 결재 | 신청자 | 팀장 | 부서장 | 본부장 |
+|:-:|:-:|:-:|:-:|:-:|
+| 서명 |  |  |  |  |
+| 일자 |  |  |  |  |
+
+본 신청서는 사내 휴가 운영 규정에 따라 제출되며, 결재 완료 후 효력이 발생합니다.

@@ -1,0 +1,87 @@
+# ── Security: 민감 파일 ──
+data/.jwt_secret
+data/.sessions/
+data/**/*.db
+data/**/*.db-shm
+data/**/*.db-journal
+data/**/*.db-wal
+*.db-journal
+*.db-wal
+
+# 사용자 계정·자격 정보가 담긴 문서 (절대 commit 금지)
+로그인 가능한 계정.pdf
+*계정*.pdf
+*credentials*.pdf
+*password*.pdf
+
+# ── Secrets / API keys ──
+.env
+.env.local
+.env.*.local
+.env.production
+.env.docker
+*.pem
+*.key
+secrets/
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── Streamlit ──
+.streamlit/secrets.toml
+
+# ── ChromaDB (regenerable) ──
+data/vectorstore/
+
+# ── Crawled history (large) ──
+data/crawled/history/
+
+# ── Logs ──
+*.log
+logs/
+
+# ── Test/Build outputs ──
+output/
+.mypy_cache/
+.ruff_cache/
+
+# ── Node / frontend ──
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.cache/
+
+# ── OMC (oh-my-claudecode) workspace ──
+.omc/
+
+# ── Firebase CLI 로컬 캐시 ──
+.firebase/
+
+# ── Vectorstore (regenerable) ──
+vectorstore/
+
+# Celery runtime artifacts (시연 시 생성됨)
+data/celery_beat.pid
+data/captures/mock_*
+data/real_documents/
+.vercel

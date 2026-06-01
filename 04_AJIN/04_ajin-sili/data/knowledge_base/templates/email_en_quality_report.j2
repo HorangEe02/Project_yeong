@@ -1,0 +1,40 @@
+To: {{ recipient_name }}, {{ recipient_title }}, {{ recipient_company }}
+CC: {{ cc_list | default('') }}
+Subject: [JOON INC] Quality Notification — {{ issue_title }}
+
+Dear {{ recipient_name }},
+
+This is to notify you of a quality issue identified in the following product:
+
+**Issue Summary:**
+- Part Name: {{ part_name }}
+- Part No.: {{ part_no }}
+- Affected Lot(s): {{ lot_numbers }}
+- Defect Rate: {{ defect_rate }}
+- Severity: {{ severity }}
+
+**Issue Description:**
+{{ issue_description }}
+
+**Containment Actions Taken:**
+{% for action in containment_actions %}
+{{ loop.index }}. {{ action }}
+{% endfor %}
+
+**Root Cause (Preliminary):**
+{{ root_cause }}
+
+**Corrective Action Plan:**
+{% for action in corrective_actions %}
+{{ loop.index }}. {{ action.description }} — Target: {{ action.target_date }}
+{% endfor %}
+
+A formal 8D report ({{ report_id }}) will be submitted by {{ report_due_date }}.
+
+Best regards,
+
+{{ sender_name }}
+{{ sender_title }}, {{ sender_department }}
+AJIN Industrial (JOON INC)
+Tel: {{ sender_phone }}
+Email: {{ sender_email }}

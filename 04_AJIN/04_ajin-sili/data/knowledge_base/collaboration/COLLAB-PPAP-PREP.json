@@ -1,0 +1,30 @@
+{
+  "id": "COLLAB-PPAP-PREP",
+  "trigger_keywords": [
+    "PPAP",
+    "승인 서류",
+    "초도품",
+    "양산 승인"
+  ],
+  "situation": "신차 부품 양산을 위해 PPAP 서류 패키지 구성, 각 부서별 산출물 취합 필요",
+  "requesting_dept": "부품개발팀",
+  "my_actions": [
+    "내 부서 담당 산출물 확인 (PPAP 18항목 중 해당 항목)",
+    "산출물 작성 또는 최신화",
+    "제출 기한 확인 및 일정 조율"
+  ],
+  "hand_off_to": "부품개발팀 PPAP 총괄",
+  "hand_off_items": [
+    "생산기술팀: 공정 FMEA, Process Flow",
+    "품질보증팀: Control Plan, MSA, SPC 초기 데이터",
+    "구매팀: 원자재 성적서, 하청 업체 인증서",
+    "금형생산팀: 금형 이력카드, 금형 검수 성적서"
+  ],
+  "deadline_info": "PPAP 전체 패키지 제출: 양산 전 최소 4주 전",
+  "related_sop_id": "SOP-PPAP",
+  "tips": [
+    "PPAP는 부서 간 협업이 핵심 — 자기 부서 산출물만 잘 내도 큰 기여",
+    "항목 간 불일치(FMEA vs Control Plan)가 가장 흔한 반려 사유입니다"
+  ],
+  "citation_id": "COLLAB-PPAP-PREP"
+}

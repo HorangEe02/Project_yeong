@@ -1,0 +1,75 @@
+{# 품질문제 개선대책서 양식 (v2.6) #}
+
+# 품질문제 개선대책서
+
+| 항목 | 내용 |
+|---|---|
+| 문서번호 | {{ doc_number | default("QI-2026-XXX") }} |
+| 작성일 | {{ created_date }} |
+| 작성부서 | {{ department | default("품질보증팀") }} |
+| 작성자 | {{ author | default("OOO") }} |
+
+---
+
+## 1. 문제 개요
+
+| 항목 | 내용 |
+|---|---|
+| 부품명 | {{ part_name }} |
+| 품번 | {{ part_number | default("확인 중") }} |
+| 발생 공장/라인 | {{ plant_line | default("경산 본사") }} |
+| 발생일 | {{ occurrence_date }} |
+| 불량 현상 | {{ defect_description }} |
+| 불량 수량 / 발생률 | {{ defect_quantity | default("확인 중") }} |
+| 발견 단계 | {{ detection_stage | default("공정 검사") }} |
+
+---
+
+## 2. 현상 분석
+
+{{ phenomenon_analysis }}
+
+## 3. 원인 분석
+
+{{ root_cause_analysis }}
+
+## 4. 개선 대책
+
+### 4-1. 긴급 조치 (즉시 시행)
+
+{{ immediate_action }}
+
+### 4-2. 영구 대책 (항구 대책)
+
+{{ permanent_action }}
+
+### 4-3. 수평 전개 (유사 공정/부품)
+
+{{ horizontal_deployment | default("해당 없음") }}
+
+## 5. 효과 검증
+
+| 항목 | 내용 |
+|---|---|
+| 검증 방법 | {{ verification_method | default("공정능력 재평가 (Cpk)") }} |
+| 검증 기간 | {{ verification_period | default("대책 시행 후 1개월") }} |
+| 목표 수치 | {{ target_value | default("불량률 0% (재발 방지)") }} |
+
+## 6. 일정 계획
+
+| 단계 | 담당 | 기한 | 비고 |
+|---|---|---|---|
+| 긴급 조치 | {{ department }} | {{ immediate_deadline | default("당일") }} | |
+| 원인 분석 완료 | {{ department }} | {{ analysis_deadline | default("3일 이내") }} | |
+| 영구 대책 시행 | {{ department }} | {{ permanent_deadline | default("14일 이내") }} | |
+| 효과 검증 | {{ department }} | {{ verification_deadline | default("30일 이내") }} | |
+
+---
+
+**승인:**
+
+| 작성 | 검토 | 승인 |
+|---|---|---|
+| {{ author | default("OOO") }} | | |
+
+*아진산업(주) 품질보증팀*

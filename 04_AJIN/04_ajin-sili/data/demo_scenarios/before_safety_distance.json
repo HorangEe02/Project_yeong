@@ -1,0 +1,14 @@
+{
+  "regulation_type": "domestic_safety",
+  "title": "산업안전보건법 시행규칙",
+  "items": [
+    {
+      "id": "KOSHA-PRESS-001",
+      "subject": "프레스 작업 안전거리",
+      "current_standard": "300mm",
+      "penalty": "과태료 500만 원 이하",
+      "last_updated": "2024-01-01"
+    }
+  ],
+  "crawled_at": "2026-03-01T09:00:00"
+}

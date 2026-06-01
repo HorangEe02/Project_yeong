@@ -1,0 +1,61 @@
+{
+  "department": "생산관리팀",
+  "division": "생산본부",
+  "description": "생산진도·설비유지보수·원가절감·MES — 공장 운영 컨트롤타워",
+  "questions": [
+    {
+      "id": "prod-progress",
+      "label": "생산 진도",
+      "promptText": "오늘 라인별 생산 진도와 계획 대비 달성률 알려줘",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["MES", "생산", "진도"]
+    },
+    {
+      "id": "prod-error-code",
+      "label": "에러코드 조회",
+      "promptText": "설비 에러코드 E-101 원인과 조치 방법",
+      "category": "action",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["에러코드", "설비", "정비"]
+    },
+    {
+      "id": "prod-pm-schedule",
+      "label": "PM 일정",
+      "promptText": "이번 주 설비 예방정비(PM) 일정 보여줘",
+      "category": "action",
+      "min_level": 2,
+      "max_level": 5,
+      "tags": ["PM", "정비", "설비"]
+    },
+    {
+      "id": "prod-cost-saving",
+      "label": "원가 절감 현황",
+      "promptText": "이번 분기 원가절감 활동 현황과 효과",
+      "category": "action",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["원가", "절감"]
+    },
+    {
+      "id": "prod-line-balance",
+      "label": "라인 밸런스",
+      "promptText": "라인별 가동률·작업자 배치 최적화 검토",
+      "category": "scenario",
+      "min_level": 3,
+      "max_level": 5,
+      "tags": ["가동률", "배치"]
+    },
+    {
+      "id": "prod-shutdown-plan",
+      "label": "정전/단수 대응",
+      "promptText": "공장 정전 또는 단수 시 비상 대응 절차",
+      "category": "sop",
+      "min_level": 1,
+      "max_level": 5,
+      "tags": ["비상", "정전"]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+# AJIN remote Supabase override.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.supabase.yml up -d --build
+#
+# Supabase is enabled only when this override is selected, so the default local
+# Docker flow does not accidentally connect to the remote production-like DB.
+
+services:
+  backend:
+    env_file:
+      - path: .env
+        required: false
+      - path: .env.docker
+        required: false
+      - path: .env.supabase.local
+        required: true
+    environment:
+      APP_DB_BACKEND: postgres
+      FIREBASE_WRITE_ENABLED: "false"
+      FIREBASE_READ_FALLBACK_ENABLED: "false"
+      ENABLE_SUPABASE_REALTIME: "false"
+
+  frontend:
+    build:
+      args:
+        VITE_API_BASE_URL: /api

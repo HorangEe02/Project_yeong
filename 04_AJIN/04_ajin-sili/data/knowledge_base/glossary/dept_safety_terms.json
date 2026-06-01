@@ -1,0 +1,30 @@
+{
+  "citation_id": "GLOSSARY-dept_safety_terms",
+  "owner_department": "총무인사팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "status": "published",
+  "category": "안전보건팀 현장 용어",
+  "department": ["안전보건팀", "환경안전팀", "안전관리팀"],
+  "version": "1.0",
+  "description": "산업안전보건법 준수, 현장 안전관리, 환경 관리 업무에서 사용하는 법규·안전·환경 관련 용어 모음.",
+  "terms": [
+    {"term": "산안법", "full_name": "산업안전보건법", "definition": "근로자의 안전과 건강을 보호하기 위한 대한민국의 기본 법률. 사업장의 안전·보건 조치 의무, 안전교육, 작업 중지권 등을 규정한다. 위반 시 과태료·형사처벌 대상.", "usage_example": "\"산안법 개정됐다\", \"산안법 위반이야\"", "aliases": ["산업안전보건법", "산안"]},
+    {"term": "TBM", "full_name": "Tool Box Meeting (작업 전 안전 미팅)", "definition": "매일 작업 시작 전 현장에서 5~10분간 실시하는 안전 회의. 당일 작업 내용, 위험 요소, 안전 수칙을 공유한다.", "usage_example": "\"TBM 하자\" = 작업 전 안전 미팅 하자", "aliases": ["티비엠", "작업 전 미팅", "안전조회"]},
+    {"term": "아차사고", "full_name": "Near Miss (아차사고)", "definition": "사고로 이어질 뻔했으나 다행히 피해가 발생하지 않은 사건. 하인리히 법칙(1:29:300)에 따라 아차사고 관리가 중대재해 예방의 핵심이다.", "usage_example": "\"아차사고 보고해\", \"아차사고 카드 작성해\"", "aliases": ["니어미스", "아차"]},
+    {"term": "재해율", "full_name": "Accident Rate (산업재해 발생률)", "definition": "근로자 수 대비 산업재해 발생 비율. 재해율이 높으면 안전관리 등급이 하락하고 산재보험료가 인상된다.", "usage_example": "\"재해율 줄여야 해\", \"무재해 1000일 달성\"", "aliases": ["재해 발생률"]},
+    {"term": "MSDS", "full_name": "Material Safety Data Sheet (물질안전보건자료)", "definition": "화학물질의 유해·위험성, 취급 방법, 응급조치 요령 등을 기록한 문서. 화학물질을 사용하는 모든 작업장에 비치 의무가 있다.", "usage_example": "\"MSDS 비치해\", \"MSDS 확인했어?\"", "aliases": ["엠에스디에스", "물질안전보건자료"]},
+    {"term": "보호구 / PPE", "full_name": "Personal Protective Equipment (개인보호장구)", "definition": "안전화, 안전모, 보안경, 귀마개, 안전장갑, 방진마스크 등 작업자를 보호하는 개인 장비.", "usage_example": "\"보호구 착용해\", \"PPE 착용 상태 확인\"", "aliases": ["개인보호구", "안전장구"]},
+    {"term": "위험성평가", "full_name": "Risk Assessment", "definition": "사업장의 유해·위험 요인을 파악하고, 위험 수준을 평가하여 개선 대책을 수립하는 법정 의무 활동.", "usage_example": "\"위험성평가 했어?\", \"위험성평가 결과 보고해\"", "aliases": ["리스크 평가", "RA"]},
+    {"term": "LOTO", "full_name": "Lock Out Tag Out (잠금·표시 장치)", "definition": "설비 정비·수리 시 에너지원(전기, 유압, 공압 등)을 차단하고 자물쇠(Lock)와 경고표지(Tag)를 부착하여 재가동을 방지하는 안전 절차.", "usage_example": "\"LOTO 걸어\" = 잠금장치 설치해", "aliases": ["잠금장치", "락아웃"]},
+    {"term": "안전거리", "full_name": "Safety Distance", "definition": "프레스, 로봇 등 위험 설비와 작업자 사이에 유지해야 하는 최소 이격 거리. 산안법에서 구체적 수치를 규정한다.", "usage_example": "\"안전거리 확인해\", \"안전거리 기준 400mm로 강화됐다\"", "aliases": ["이격거리"]},
+    {"term": "끼임 / 협착", "full_name": "Pinch Point / Caught-in", "definition": "설비 구동부(프레스 슬라이드, 컨베이어 롤러 등)에 신체 일부가 끼이는 위험. 프레스 작업에서 가장 빈번한 중대재해 유형이다.", "usage_example": "\"끼임 방지 장치 확인해\", \"협착 위험 구역 표시해\"", "aliases": ["핀치포인트"]},
+    {"term": "비상정지", "full_name": "Emergency Stop (E-Stop)", "definition": "위험 상황 발생 시 설비를 즉시 정지시키는 긴급 버튼. 모든 위험 설비에 설치 의무가 있다.", "usage_example": "\"비상정지 걸어\" = E-Stop 눌러 설비 멈춰", "aliases": ["이스톱", "E-Stop", "긴급정지"]},
+    {"term": "PSM", "full_name": "Process Safety Management (공정안전관리)", "definition": "유해·위험물질을 규정량 이상 취급하는 사업장에서 중대산업사고를 예방하기 위한 관리 체계.", "usage_example": "\"PSM 대상 사업장이야\"", "aliases": ["공정안전관리"]},
+    {"term": "밀폐공간", "full_name": "Confined Space", "definition": "환기가 불충분하고 출입이 제한된 공간. 산소 결핍, 유해가스 중독 위험이 있어 특별한 안전 절차가 필요하다.", "usage_example": "\"밀폐공간 작업 허가 받았어?\"", "aliases": ["협소공간"]},
+    {"term": "중대재해", "full_name": "Serious Accident", "definition": "사망, 3개월 이상 요양이 필요한 부상, 직업성 질병 등 중대한 산업재해. 중대재해처벌법에 따라 경영 책임자 처벌 대상.", "usage_example": "\"중대재해 발생하면 경영자 처벌 대상이야\"", "aliases": ["중대산업재해"]},
+    {"term": "특수건강검진", "full_name": "Special Health Examination", "definition": "소음, 분진, 유해화학물질 등 유해인자에 노출되는 근로자를 대상으로 실시하는 법정 건강검진.", "usage_example": "\"특수건강검진 대상자 명단 올려\"", "aliases": ["특수건진", "특검"]},
+    {"term": "안전순찰", "full_name": "Safety Patrol", "definition": "안전관리자가 현장을 순회하며 불안전 행동·불안전 상태를 점검하는 활동.", "usage_example": "\"안전순찰 돌아\" = 현장 안전 점검 순회해", "aliases": ["순찰", "현장점검"]},
+    {"term": "SDS", "full_name": "Safety Data Sheet (안전보건자료)", "definition": "MSDS의 국제 표준 명칭(GHS 체계). 화학물질의 위험성, 취급 주의사항, 응급처치 방법 등을 16개 항목으로 기술한다.", "usage_example": "\"SDS 최신 버전으로 업데이트해\"", "aliases": ["안전보건자료", "GHS-SDS"]}
+  ]
+}

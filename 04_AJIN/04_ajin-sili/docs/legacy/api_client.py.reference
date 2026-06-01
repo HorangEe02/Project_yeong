@@ -1,0 +1,231 @@
+"""AJIN AI Assistant - 프론트엔드 API 클라이언트.
+
+Streamlit 페이지에서 FastAPI 백엔드를 호출하는 httpx 기반 클라이언트.
+백엔드 연결 실패 시 직접 import 폴백을 지원한다.
+"""
+
+import json
+from typing import Generator
+
+import httpx
+
+BACKEND_URL = "http://localhost:8000"
+_TIMEOUT = httpx.Timeout(180.0, connect=5.0)
+
+
+class AjinAPIClient:
+    """동기 API 클라이언트 (Streamlit은 동기 실행 환경)."""
+
+    def __init__(self, base_url: str = BACKEND_URL):
+        self._base_url = base_url
+        self._client = httpx.Client(base_url=base_url, timeout=_TIMEOUT)
+
+    # ── 헬스체크 ──
+
+    def health_check(self) -> dict:
+        """백엔드 헬스체크."""
+        try:
+            resp = self._client.get("/api/health")
+            return resp.json()
+        except httpx.ConnectError:
+            return {"status": "backend_offline", "llm_connected": False, "chroma_connected": False, "chroma_doc_count": 0}
+
+    def is_backend_available(self) -> bool:
+        """백엔드 서버가 실행 중인지 확인한다."""
+        try:
+            resp = self._client.get("/", timeout=2.0)
+            return resp.status_code == 200
+        except Exception:
+            return False
+
+    # ── 모델 ──
+
+    def get_installed_models(self) -> list[str]:
+        try:
+            return self._client.get("/api/models/installed").json().get("models", [])
+        except httpx.ConnectError:
+            from core.llm_client import get_installed_models
+            return get_installed_models()
+
+    def get_available_models(self) -> list[dict]:
+        try:
+            return self._client.get("/api/models/available").json().get("models", [])
+        except httpx.ConnectError:
+            from core.llm_client import get_available_chat_models
+            return get_available_chat_models()
+
+    def auto_select_model(self, feature: str = "onboarding") -> str:
+        try:
+            return self._client.get(f"/api/models/auto-select?feature={feature}").json().get("model", "qwen3.5:9b")
+        except httpx.ConnectError:
+            from core.llm_client import auto_select_model
+            return auto_select_model(feature)
+
+    # ── 검색 ──
+
+    def search_documents(self, query: str, k: int = 5, **filters) -> dict:
+        """하이브리드 문서 검색."""
+        try:
+            payload = {"query": query, "k": k, **filters}
+            return self._client.post("/api/search/documents", json=payload).json()
+        except httpx.ConnectError:
+            return self._fallback_search(query, k, **filters)
+
+    def _fallback_search(self, query: str, k: int, **filters) -> dict:
+        """백엔드 미연결 시 직접 검색 폴백."""
+        try:
+            from features.search.searcher import HybridSearcher
+            searcher = HybridSearcher()
+            results = searcher.search(query, k=k, **filters)
+            return {
+                "results": [
+                    {
+                        "title": getattr(r, "title", ""),
+                        "doc_type": getattr(r, "doc_type", ""),
+                        "content": getattr(r, "content", ""),
+                        "score": getattr(r, "score", 0.0),
+                    }
+                    for r in results
+                ],
+                "total": len(results),
+                "query": query,
+            }
+        except Exception:
+            return {"results": [], "total": 0, "query": query}
+
+    # ── 직원 검색 ──
+
+    def search_employee(self, query: str) -> dict:
+        try:
+            return self._client.post("/api/employee/search", json={"query": query}).json()
+        except httpx.ConnectError:
+            return {"mode": "", "results": [], "message": "백엔드 연결 실패", "formatted_markdown": "", "total": 0}
+
+    # ── 온보딩 채팅 (SSE 스트리밍) ──
+
+    def stream_chat(
+        self,
+        query: str,
+        department: str = "품질보증팀",
+        model: str | None = None,
+        history: list[dict] | None = None,
+        file_context: str | None = None,
+    ) -> Generator[str, None, None]:
+        """온보딩 채팅 SSE 스트리밍."""
+        payload = {
+            "query": query,
+            "department": department,
+            "model": model,
+            "history": history or [],
+            "file_context": file_context,
+        }
+        try:
+            with self._client.stream("POST", "/api/onboarding/chat", json=payload) as resp:
+                for line in resp.iter_lines():
+                    if line.startswith("data: "):
+                        try:
+                            data = json.loads(line[6:])
+                            if "token" in data:
+                                yield data["token"]
+                            if data.get("done"):
+                                return
+                            if "error" in data:
+                                yield f"\n[오류] {data['error']}"
+                                return
+                        except json.JSONDecodeError:
+                            continue
+        except httpx.ConnectError:
+            # 폴백: 직접 스트리밍
+            yield from self._fallback_stream_chat(query, department, model)
+
+    def _fallback_stream_chat(self, query: str, department: str, model: str | None) -> Generator[str, None, None]:
+        """백엔드 미연결 시 직접 LLM 스트리밍 폴백."""
+        try:
+            from core.llm_client import auto_select_model, stream_generate
+            m = model or auto_select_model("onboarding")
+            prompt = f"아진산업 {department} 신입사원 도우미로서 답변해주세요.\n질문: {query}"
+            yield from stream_generate(prompt, model=m, feature="onboarding")
+        except Exception as e:
+            yield f"[오류] {e}"
+
+    def chat_vision(self, query: str, image_bytes: bytes, filename: str, department: str = "품질보증팀") -> str:
+        """비전 모델로 이미지 분석."""
+        try:
+            files = {"file": (filename, image_bytes)}
+            data = {"query": query, "department": department}
+            resp = self._client.post("/api/onboarding/chat/vision", files=files, data=data)
+            return resp.json().get("response", "")
+        except httpx.ConnectError:
+            from core.llm_client import invoke_vision
+            return invoke_vision(query, image_bytes)
+
+    def upload_file(self, file_bytes: bytes, filename: str) -> dict:
+        """파일 업로드 후 텍스트 추출."""
+        try:
+            files = {"file": (filename, file_bytes)}
+            return self._client.post("/api/onboarding/upload", files=files).json()
+        except httpx.ConnectError:
+            from core.llm_client import extract_text_from_file
+            text = extract_text_from_file(file_bytes, filename)
+            is_image = filename.lower().endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"))
+            return {"filename": filename, "is_image": is_image, "text": text}
+
+    # ── 초안 생성 (SSE 스트리밍) ──
+
+    def stream_draft(
+        self,
+        user_input: str,
+        tone: str = "공식적",
+        model: str | None = None,
+    ) -> Generator[str, None, None]:
+        """초안 SSE 스트리밍 생성."""
+        payload = {"user_input": user_input, "tone": tone, "model": model}
+        try:
+            with self._client.stream("POST", "/api/draft/generate", json=payload) as resp:
+                for line in resp.iter_lines():
+                    if line.startswith("data: "):
+                        try:
+                            data = json.loads(line[6:])
+                            if "token" in data:
+                                yield data["token"]
+                            if data.get("done"):
+                                return
+                        except json.JSONDecodeError:
+                            continue
+        except httpx.ConnectError:
+            from core.llm_client import auto_select_model, stream_generate
+            m = model or auto_select_model("draft")
+            prompt = f"문서 초안을 작성하세요: {user_input}"
+            yield from stream_generate(prompt, model=m, feature="draft")
+
+    def export_draft(self, content: str, doc_type: str = "email_oem", fmt: str = "docx") -> bytes:
+        """초안을 파일로 내보낸다."""
+        try:
+            resp = self._client.post("/api/draft/export", json={"content": content, "doc_type": doc_type, "format": fmt})
+            return resp.content
+        except httpx.ConnectError:
+            return content.encode("utf-8")
+
+    # ── 규정 준수 ──
+
+    def get_scenarios(self) -> list[dict]:
+        try:
+            return self._client.get("/api/compliance/scenarios").json().get("scenarios", [])
+        except httpx.ConnectError:
+            return []
+
+    def get_facilities(self) -> list[dict]:
+        try:
+            return self._client.get("/api/compliance/facilities").json().get("facilities", [])
+        except httpx.ConnectError:
+            return []
+
+    def check_compliance(self, query: str) -> dict:
+        try:
+            return self._client.post("/api/compliance/check", json={"query": query}).json()
+        except httpx.ConnectError:
+            return {"answer": "", "relevant_standards": [], "compliance_status": "offline"}
+
+
+# 싱글톤 인스턴스
+api = AjinAPIClient()

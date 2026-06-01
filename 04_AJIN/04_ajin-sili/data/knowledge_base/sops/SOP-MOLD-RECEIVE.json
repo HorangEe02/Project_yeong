@@ -1,0 +1,89 @@
+{
+  "sop_id": "SOP-MOLD-RECEIVE",
+  "title": "신규 금형 입고 및 검수",
+  "department": "금형생산팀",
+  "category": "설비",
+  "steps": [
+    {
+      "step_number": 1,
+      "title": "외관 검수 및 서류 확인",
+      "description": "금형 도착 시 외관 손상 확인, 납품 서류(금형 이력카드, 검수 성적서) 대조.",
+      "checklist": [
+        "운송 중 손상(찍힘, 크랙) 유무 확인",
+        "금형 번호(각인)와 납품서 대조",
+        "금형 이력카드 수령",
+        "가이드 핀/스프링/센서 등 부속품 확인"
+      ],
+      "caution": "손상 발견 시 사진 촬영 후 즉시 구매팀 통보 — 클레임 기한 준수",
+      "related_terms": [
+        "금형 이력카드",
+        "검수 성적서"
+      ],
+      "estimated_time": "30분",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 2,
+      "title": "프레스 장착 및 초도 트라이",
+      "description": "금형을 프레스에 장착하고 저속 트라이 실시.",
+      "checklist": [
+        "프레스 톤수 적합성 확인",
+        "금형 높이(Shut Height) 세팅",
+        "안전장치(인터록, 비상정지) 동작 확인",
+        "저속(5~10 SPM)으로 초도 트라이",
+        "성형 제품 외관·치수 확인"
+      ],
+      "caution": "초도 트라이는 반드시 저속으로 시작 — 고속 투입 시 금형 파손 위험",
+      "related_terms": [
+        "Shut Height",
+        "인터록",
+        "SPM"
+      ],
+      "estimated_time": "1~2시간",
+      "responsible": "",
+      "title_en": "",
+      "caution_en": ""
+    },
+    {
+      "step_number": 3,
+      "title": "검수 판정 및 등록",
+      "description": "검수 결과 기록, 금형 관리 시스템에 등록.",
+      "checklist": [
+        "검수 판정(합격/조건부 합격/불합격) 기록",
+        "금형 관리 대장에 등록",
+        "예방 보전 스케줄 초기 설정",
+        "불합격 시 수정 요청서 작성"
+      ],
+      "caution": "",
+      "related_terms": [
+        "금형 관리 대장",
+        "예방 보전"
+      ],
+      "estimated_time": "30분",
+      "responsible": "",
+      "title_en": ""
+    }
+  ],
+  "prerequisites": [
+    "금형 발주서 확인",
+    "프레스 톤수 적합성 사전 확인"
+  ],
+  "safety_warnings": [
+    "손상 발견 시 사진 촬영 후 즉시 구매팀 통보",
+    "초도 트라이는 반드시 저속으로 시작 — 고속 투입 시 금형 파손 위험"
+  ],
+  "related_sops": [
+    "SOP-001"
+  ],
+  "citation_id": "SOP-MOLD-RECEIVE",
+  "owner_department": "금형생산팀",
+  "reviewed_at": "2026-05-21",
+  "effective_date": "2026-05-21",
+  "version": "1.0",
+  "status": "published",
+  "title_en": "New Mold Inbound Inspection Procedure",
+  "department_en": "Mold Production Team",
+  "category_en": "Equipment"
+}

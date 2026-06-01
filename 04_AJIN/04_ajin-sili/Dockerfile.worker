@@ -1,0 +1,21 @@
+# D3 — Celery worker / beat / flower 공통 이미지.
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc libssl-dev curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt /app/requirements.txt
+# --default-timeout=300 + --retries 5: PyPI 대형 패키지 다운로드 일시 끊김 복구
+RUN pip install --no-cache-dir --default-timeout=300 --retries 5 -r requirements.txt
+
+COPY backend /app/backend
+COPY features /app/features
+COPY config.py /app/config.py
+COPY core /app/core
+
+ENV PYTHONPATH=/app
+
+CMD ["celery", "-A", "backend.celery_app", "worker", "-l", "info"]
