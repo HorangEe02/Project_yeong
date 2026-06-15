@@ -12,7 +12,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from features.compliance.facility_db import FacilityDB
 from features.compliance.crawler import ScenarioLoader, RegulationChange
-from features.compliance.change_detector import ChangeDetector
+from features.compliance.text_change_detector import ChangeDetector
 from features.compliance.impact_analyzer import ImpactAnalyzer
 from features.compliance.alert_generator import AlertGenerator
 from features.compliance.compliance_checker import ComplianceChecker
@@ -60,7 +60,6 @@ def test_facility_db():
 
     print("  ✅ 교차 참조 정합성 확인")
     print("\n  ✅ 시설 DB 로드 테스트 통과")
-    return True
 
 
 # ===== 2. 시나리오 로더 테스트 =====
@@ -92,7 +91,6 @@ def test_scenario_loader():
     print(f"  ✅ SCN-001 조회 정상: {scn001.title}")
 
     print("\n  ✅ 시나리오 로더 테스트 통과")
-    return True
 
 
 # ===== 3. 변경 감지 테스트 =====
@@ -138,7 +136,6 @@ def test_change_detector():
     print("  ✅ 동일 텍스트: 변경 없음 정상")
 
     print("\n  ✅ 변경 감지 테스트 통과")
-    return True
 
 
 # ===== 4. 영향 분석 테스트 =====
@@ -174,7 +171,6 @@ def test_impact_analyzer():
             all_ok = False
 
     print(f"\n  {'✅' if all_ok else '⚠️'} 영향 분석 테스트 {'통과' if all_ok else '일부 경고'}")
-    return True  # 경고는 허용
 
 
 # ===== 5. 알림 생성 테스트 =====
@@ -197,7 +193,7 @@ def test_alert_generator():
         assert alert.alert_id.startswith("ALT-")
         assert alert.severity == scenario.severity
         assert alert.title == scenario.title
-        assert alert.icon in ("🔴", "🟡", "🟢")
+        assert alert.icon in ("[HIGH]", "[MEDIUM]", "[LOW]")
 
         alert_text = alert_gen.format_alert_text(alert)
         assert len(alert_text) > 100
@@ -206,7 +202,6 @@ def test_alert_generator():
         print(f"     알림 길이: {len(alert_text)}자")
 
     print("\n  ✅ 알림 생성 테스트 통과")
-    return True
 
 
 # ===== 6. 규정 준수 확인 테스트 =====
@@ -242,7 +237,7 @@ def test_compliance_checker():
         print(f"  {status} '{query}' → {info}")
 
     print(f"\n  결과: {passed}/{len(test_queries)} 통과")
-    return passed >= len(test_queries) - 1
+    assert passed >= len(test_queries) - 1
 
 
 # ===== 7. 통합 파이프라인 테스트 =====
@@ -288,7 +283,6 @@ def test_pipeline():
     print(result["alert_text"][:300])
 
     print("\n  ✅ 통합 파이프라인 테스트 통과")
-    return True
 
 
 # ===== 메인 =====
@@ -297,13 +291,13 @@ def main():
     print("\n🏭 AJIN AI Assistant — 기능 D 법규/규정 모니터링 테스트\n")
 
     all_passed = True
-    all_passed &= test_facility_db()
-    all_passed &= test_scenario_loader()
-    all_passed &= test_change_detector()
-    all_passed &= test_impact_analyzer()
-    all_passed &= test_alert_generator()
-    all_passed &= test_compliance_checker()
-    all_passed &= test_pipeline()
+    test_facility_db()
+    test_scenario_loader()
+    test_change_detector()
+    test_impact_analyzer()
+    test_alert_generator()
+    test_compliance_checker()
+    test_pipeline()
 
     print("\n" + "=" * 60)
     if all_passed:

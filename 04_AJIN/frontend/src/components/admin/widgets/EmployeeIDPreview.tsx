@@ -81,7 +81,7 @@ export function EmployeeIDPreview({ department, onResolved }: Props) {
           <b className="mono" style={{ fontSize: 12 }}>{preview.suggested_email}</b>
         </div>
         <div className="lg-stat-row">
-          <span>초기 비밀번호</span>
+          <span>초기 인증</span>
           <b className="mono">{preview.suggested_initial_password}</b>
         </div>
       </div>

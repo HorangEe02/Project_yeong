@@ -4,7 +4,6 @@ langchain-ollama>=0.2.0
 langchain-chroma>=0.2.0
 langchain-text-splitters>=0.3.0
 langchain-community>=0.3.0
-chromadb>=0.5.0
 
 # 검색
 rank-bm25>=0.2.2
@@ -15,6 +14,7 @@ kiwipiepy>=0.18.0
 # 문서 내보내기
 python-docx>=1.1.0
 fpdf2>=2.8.0
+openpyxl>=3.1.0
 
 # 파일 파싱 (업로드 기능)
 pypdf>=3.0.0
@@ -24,6 +24,7 @@ ezdxf>=1.1.0          # DXF 파싱 + matplotlib 렌더링
 olefile>=0.46         # HWP 5.0 OLE Compound Document
 matplotlib>=3.7.0     # ezdxf.addons.drawing.matplotlib 백엔드
 pyhwp>=0.1b15; sys_platform != 'win32'  # HWP 본문 추출 폴백 (Windows pip 호환성 이슈로 옵션)
+python-hwpx>=2.9.1   # HWPX 생성 — HwpxDocument.new()/add_paragraph()/add_table() (Module B 다운로드)
 
 # 시각화 (조직도)
 plotly>=5.18.0
@@ -38,13 +39,29 @@ scipy>=1.11.0
 # 웹 프레임워크 / HTTP
 fastapi>=0.100.0
 uvicorn>=0.20.0
+python-multipart>=0.0.9
+email-validator>=2.0.0
 httpx>=0.24.0
 requests>=2.28.0
+
+# Phase 1 크롤러 (compliance — 진짜 HTTP 전환)
+tenacity>=8.2.0          # 재시도 백오프
+beautifulsoup4>=4.12.0   # HTML 파싱 (UNECE 인덱스, USTR)
+lxml>=4.9.0              # bs4 파서 백엔드
+pdfplumber>=0.10.0       # UN R100 PDF 텍스트 추출
 
 # 유틸리티
 pydantic>=2.0.0
 python-dotenv>=1.0.0
 rich>=13.0.0
+psutil>=5.9.0
+PyYAML>=6.0.0
+
+# Firebase → Supabase/PostgreSQL 전환 기반
+SQLAlchemy>=2.0.0
+psycopg[binary]>=3.2.0
+alembic>=1.13.0
+supabase>=2.0.0
 
 # LLM Router (Day 4 — Gemini + SSE)
 google-genai>=0.5.0
@@ -53,4 +70,32 @@ sse-starlette>=2.0.0
 # 테스트
 pytest>=8.0
 pytest-asyncio>=0.23
+fakeredis>=2.0.0
 
+# D3 — Celery + Redis 스케줄러 + 다이제스트
+celery>=5.3
+redis>=5.0
+flower>=2.0
+aiosmtplib>=3.0
+jinja2>=3.1
+
+# v4.7 Feature E — 외부 IdP (OIDC/SAML/LDAP) + 2FA (TOTP)
+PyJWT>=2.8.0
+bcrypt>=4.0.0
+authlib>=1.3
+cryptography>=42.0
+ldap3>=2.9
+pyotp>=2.9
+python3-saml>=1.16
+qrcode>=7.4
+
+# v4.8 Feature F 트랙 A — Firebase RTDB Admin SDK (실시간 알람 push)
+firebase-admin>=6.4.0
+
+# Cloud audit archive 조회 (lazy import, 테스트 라우터 import 정합성)
+google-cloud-bigquery>=3.18.0
+
+# v4.x RAG 강화 — Phase 1 (Reranker, Cross-Encoder) + Phase 2 (LongLLMLingua 압축)
+# 출처: docs/RAG_ENHANCEMENT_PLAN.md §2.1, §2.3
+FlagEmbedding>=1.2.10        # BAAI bge-reranker-v2-m3 cross-encoder (FP16, ~600MB)
+llmlingua>=0.2.2             # Microsoft LLMLingua/LongLLMLingua/LLMLingua-2 통합 (Phase 2 활성)

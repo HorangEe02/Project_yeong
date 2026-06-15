@@ -18,6 +18,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+from core.data_lineage import ensure_lineage_columns, lineage_values
+
 INSPECTION_DB_PATH = Path("data/equipment/inspection.db")
 
 
@@ -32,7 +34,11 @@ def init_inspection_db(db_path: Path = INSPECTION_DB_PATH) -> None:
             equipment_type TEXT NOT NULL,
             checklist_type TEXT NOT NULL DEFAULT 'daily',
             items_json TEXT NOT NULL DEFAULT '[]',
-            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+            created_at TEXT DEFAULT (datetime('now', 'localtime')),
+            data_class TEXT NOT NULL DEFAULT 'unknown',
+            source_system TEXT NOT NULL DEFAULT 'unknown',
+            source_label TEXT DEFAULT '',
+            source_updated_at TEXT DEFAULT ''
         );
 
         CREATE TABLE IF NOT EXISTS inspection_logs (
@@ -45,7 +51,12 @@ def init_inspection_db(db_path: Path = INSPECTION_DB_PATH) -> None:
             results_json TEXT DEFAULT '[]',
             overall_status TEXT DEFAULT 'PASS',
             note TEXT DEFAULT '',
+            source TEXT DEFAULT 'unknown',
             created_at TEXT DEFAULT (datetime('now', 'localtime')),
+            data_class TEXT NOT NULL DEFAULT 'unknown',
+            source_system TEXT NOT NULL DEFAULT 'unknown',
+            source_label TEXT DEFAULT '',
+            source_updated_at TEXT DEFAULT '',
             FOREIGN KEY (template_id) REFERENCES checklist_templates(id)
         );
 
@@ -55,11 +66,49 @@ def init_inspection_db(db_path: Path = INSPECTION_DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_inspection_date
         ON inspection_logs(inspection_date DESC);
     """)
+    for table in ("checklist_templates", "inspection_logs"):
+        ensure_lineage_columns(conn, table)
+    try:
+        conn.execute("ALTER TABLE inspection_logs ADD COLUMN source TEXT DEFAULT 'unknown'")
+    except sqlite3.OperationalError:
+        pass
 
     # 템플릿이 없으면 시딩
     count = conn.execute("SELECT COUNT(*) FROM checklist_templates").fetchone()[0]
     if count == 0:
         _seed_templates(conn)
+    else:
+        lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
+        conn.execute(
+            """UPDATE checklist_templates
+                  SET data_class = ?,
+                      source_system = ?,
+                      source_label = ?,
+                      source_updated_at = ?
+                WHERE data_class IS NULL OR data_class = '' OR data_class = 'unknown'""",
+            (
+                lineage["data_class"],
+                lineage["source_system"],
+                lineage["source_label"],
+                lineage["source_updated_at"],
+            ),
+        )
+    seed_lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
+    conn.execute(
+        """UPDATE inspection_logs
+              SET data_class = ?,
+                  source_system = ?,
+                  source_label = ?,
+                  source_updated_at = ?
+            WHERE source IN ('synthetic', 'seed_equipment', 'unknown', '')
+              AND (data_class IS NULL OR data_class = '' OR data_class = 'unknown')""",
+        (
+            seed_lineage["data_class"],
+            seed_lineage["source_system"],
+            seed_lineage["source_label"],
+            seed_lineage["source_updated_at"],
+        ),
+    )
 
     conn.commit()
     conn.close()
@@ -67,6 +116,7 @@ def init_inspection_db(db_path: Path = INSPECTION_DB_PATH) -> None:
 
 def _seed_templates(conn: sqlite3.Connection) -> None:
     """장비별 점검 템플릿 시딩"""
+    lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
     templates = [
         # 프레스 일상점검
         ("프레스 일상점검", "프레스", "daily", json.dumps([
@@ -135,9 +185,11 @@ def _seed_templates(conn: sqlite3.Connection) -> None:
 
     conn.executemany(
         """INSERT INTO checklist_templates
-           (template_name, equipment_type, checklist_type, items_json)
-           VALUES (?, ?, ?, ?)""",
-        templates,
+           (template_name, equipment_type, checklist_type, items_json,
+            data_class, source_system, source_label, source_updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+        [(*tpl, lineage["data_class"], lineage["source_system"], lineage["source_label"],
+          lineage["source_updated_at"]) for tpl in templates],
     )
 
 
@@ -214,6 +266,9 @@ def save_inspection(
     note: str = "",
     inspection_date: str = "",
     db_path: Path = INSPECTION_DB_PATH,
+    data_class: str = "real",
+    source_system: str = "tablet_pwa",
+    source_label: str = "tablet_pwa",
 ) -> int:
     """점검 결과 저장
 
@@ -229,14 +284,18 @@ def save_inspection(
         results_json = json.dumps(results, ensure_ascii=False)
         if not inspection_date:
             inspection_date = datetime.now().strftime("%Y-%m-%d")
+        lineage = lineage_values(data_class, source_system, source_label)
 
         cur = conn.execute(
             """INSERT INTO inspection_logs
                (equipment_id, equipment_name, template_id, inspector,
-                inspection_date, results_json, overall_status, note)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                inspection_date, results_json, overall_status, note, source,
+                data_class, source_system, source_label, source_updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (equipment_id, equipment_name, template_id, inspector,
-             inspection_date, results_json, overall_status, note),
+             inspection_date, results_json, overall_status, note, source_system,
+             lineage["data_class"], lineage["source_system"], lineage["source_label"],
+             lineage["source_updated_at"]),
         )
         conn.commit()
         return cur.lastrowid

@@ -64,6 +64,51 @@ def handle_document_search(query: str, searcher=None) -> dict:
 # ──────────────────────────────────────────────
 
 
+def _extract_department_from_query(query: str, engine) -> str | None:
+    """query 에 등장하는 부서명/별칭을 정확한 부서명으로 매핑.
+
+    Module A 의 EmployeeSearchEngine 이 사용하는 DEPARTMENT_ALIASES 를 그대로
+    재활용해 Module C 도 같은 검색 결과를 보장한다 (예: "인사팀과 협업..." 처럼
+    긴 자연어 query 에서도 "인사" → "총무인사팀" 으로 정확히 좁힘).
+
+    매칭 규칙 (긴 부서명·별칭 우선):
+      1) employees DB 의 distinct(department) 와 직접 일치
+      2) DEPARTMENT_ALIASES 의 키 (alias) 가 query 에 포함
+
+    매칭 없으면 None 반환 → 호출자가 fallback regex 정제 사용.
+    """
+    if not query:
+        return None
+
+    # 1) DB 의 실제 부서명 직접 매칭 (가장 정확, 긴 이름 우선)
+    db_depts: list[str] = []
+    db = getattr(engine, "db", None) if engine is not None else None
+    conn = getattr(db, "conn", None) if db is not None else None
+    if conn is not None:
+        try:
+            rows = conn.execute(
+                "SELECT DISTINCT department FROM employees WHERE department IS NOT NULL"
+            ).fetchall()
+            db_depts = [r[0] for r in rows if r[0]]
+        except Exception:
+            db_depts = []
+
+    for dept in sorted(db_depts, key=len, reverse=True):
+        if dept and dept in query:
+            return dept
+
+    # 2) DEPARTMENT_ALIASES 별칭 매칭 (긴 별칭 우선)
+    try:
+        from features.search.employee.search import DEPARTMENT_ALIASES
+    except Exception:
+        DEPARTMENT_ALIASES = {}
+    for alias in sorted(DEPARTMENT_ALIASES.keys(), key=len, reverse=True):
+        if alias and alias in query:
+            return DEPARTMENT_ALIASES[alias]
+
+    return None
+
+
 def handle_employee_search(query: str, user, engine=None) -> dict:
     """인사 검색 결과 — 가시성 매트릭스 적용. 비인증 시 auth_required=True 폴백.
 
@@ -87,13 +132,6 @@ def handle_employee_search(query: str, user, engine=None) -> dict:
         payload["auth_required"] = True
         return payload
 
-    # 검색어 정제 — 흔한 prefix/suffix 제거
-    search_term = re.sub(
-        r"(연락처|전화번호|내선|이메일|누구|찾아|검색|알려줘)", "", query
-    ).strip()
-    if not search_term:
-        return payload
-
     try:
         from core.auth.visibility import (
             VisibilityLevel,
@@ -111,6 +149,25 @@ def handle_employee_search(query: str, user, engine=None) -> dict:
             db = EmployeeDatabase()
             engine = EmployeeSearchEngine(db)
             owns_db = True
+
+        # v3.8: 부서명 우선 추출 — Feature A 와 동일 결과 보장.
+        # 사용자가 "인사팀과 협업..." 같은 긴 자연어로 부서원 정보를 요청할 때,
+        # 단순 prefix 정제로는 EmployeeSearchEngine 이 노이즈에 막혀 0건 반환.
+        # DEPARTMENT_ALIASES + DB distinct(department) 매칭으로 정확한 부서명만 추출.
+        dept_match = _extract_department_from_query(query, engine)
+        if dept_match:
+            search_term = dept_match
+        else:
+            # fallback: 흔한 prefix/suffix 제거 (이름 검색·연락처 등)
+            search_term = re.sub(
+                r"(연락처|전화번호|내선|이메일|누구|찾아|검색|알려줘|어느\s*분|부서원|인원|담당자|팀원|직원)",
+                "", query
+            ).strip()
+
+        if not search_term:
+            if owns_db and db is not None:
+                db.close()
+            return payload
 
         result = engine.search(search_term)
         if owns_db and db is not None:
@@ -348,6 +405,42 @@ def handle_error_lookup(query: str, params: dict | None = None) -> dict:
 # ──────────────────────────────────────────────
 
 
+# ──────────────────────────────────────────────
+# P1 D4 — RAG 자연어 Q&A 핸들러
+# ──────────────────────────────────────────────
+
+
+def handle_regulation_qa(query: str, user=None) -> dict:
+    """규제·법규 자연어 Q&A — RAG 검색 + LLM 답변 + 인용 강제.
+
+    신입사원(hire_date 6개월 이내) 자동 풀이 모드 활성.
+    """
+    payload: dict[str, Any] = {
+        "title": "규제 Q&A",
+        "answer": "",
+        "citations": [],
+        "novice_mode": False,
+        "rag_hit": False,
+        "full_view_url": "/compliance",
+    }
+    try:
+        from features.compliance.regulation_qa import answer_question
+        out = answer_question(query, user=user, top_k=5)
+        payload["answer"] = out.get("answer", "")
+        payload["citations"] = out.get("citations", [])
+        payload["novice_mode"] = bool(out.get("novice_mode"))
+        payload["rag_hit"] = bool(out.get("rag_hit"))
+        # 카드 헤드라인 — 신입 모드면 라벨링
+        payload["title"] = "🌱 신입 모드 · 규제 Q&A" if payload["novice_mode"] else "규제 Q&A"
+    except Exception as e:
+        logger.exception("handle_regulation_qa 실패: %s", e)
+        payload["answer"] = (
+            "Q&A 모듈 미가용 — 변경 피드 페이지에서 직접 검색하세요.\n"
+            "※ AI 자문은 참고용 — 최종 판단은 담당자."
+        )
+    return payload
+
+
 def dispatch_action(
     action: DetectedAction,
     query: str,
@@ -376,6 +469,9 @@ def dispatch_action(
     if kind == "employee":
         return handle_employee_search(query, user, engine=employee_engine)
     if kind == "compliance":
+        # P1 D4 — regulation_qa 는 RAG 답변 생성, 그 외 (regulation_status) 는 기존 룰
+        if action.action_type == "regulation_qa":
+            return handle_regulation_qa(query, user)
         return handle_compliance_lookup(query)
     if kind == "draft":
         return handle_draft_compose(query, department=department)
@@ -439,6 +535,15 @@ def summarize_payload_for_llm(kind: str, payload: dict) -> str:
         )
         return "\n".join(lines)
     if kind == "compliance":
+        # P1 D4 — regulation_qa payload 는 answer/citations 필드 보유
+        if payload.get("answer") is not None or payload.get("rag_hit") is not None:
+            ans = payload.get("answer", "")[:300]
+            n_cites = len(payload.get("citations", []))
+            mode = "신입 모드" if payload.get("novice_mode") else "표준 모드"
+            return (
+                f"[액션:규제 Q&A · {mode}] {n_cites}건 인용 출처 결합. "
+                f"답변 (요약): {ans} ... 위 답변을 그대로 사용하고, **출처에 없는 내용 추가 금지**."
+            )
         title = payload.get("title", "")
         sev = payload.get("severity", "")
         return f"[방금 실행된 액션 — 규제 조회] {title} (심각도: {sev or '미지정'})."

@@ -126,8 +126,13 @@ class DocxExporter:
 
         self._parse_markdown(doc, markdown_text)
 
-        # 하단 회사 정보
-        self._add_company_footer(doc)
+        # 하단 회사 정보 + AI 워터마크 (컨텐츠 SHA1 기반).
+        from features.draft.watermark import compute_watermark_id
+        self._add_company_footer(
+            doc,
+            watermark_id=compute_watermark_id(markdown_text),
+            reviewer=author,
+        )
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
         doc.save(str(output_path))
@@ -158,7 +163,12 @@ class DocxExporter:
             self._add_meta_block(doc, layout["meta_block"], markdown_text)
         doc.add_paragraph()
         self._parse_markdown(doc, markdown_text)
-        self._add_company_footer(doc)
+        from features.draft.watermark import compute_watermark_id
+        self._add_company_footer(
+            doc,
+            watermark_id=compute_watermark_id(markdown_text),
+            reviewer=author,
+        )
 
         buf = BytesIO()
         doc.save(buf)
@@ -341,8 +351,13 @@ class DocxExporter:
     # 하단 회사 정보
     # ──────────────────────────────────────────
 
-    def _add_company_footer(self, doc: Document):
-        """문서 하단 회사 정보 블록"""
+    def _add_company_footer(
+        self,
+        doc: Document,
+        watermark_id: str = "",
+        reviewer: str = "",
+    ):
+        """문서 하단 회사 정보 블록 + AI 워터마크 (Feature B Sprint 1 P0)."""
         doc.add_paragraph()  # 간격
 
         p_line = doc.add_paragraph()
@@ -359,6 +374,16 @@ class DocxExporter:
         run = p_info.add_run(info_text)
         run.font.size = Pt(7)
         run.font.color.rgb = _GRAY
+
+        # AI 워터마크 라인 (회색 8pt) — OEM 평가자 오인 방지 + 감사 추적용.
+        # watermark_id 미지정 시 빈 footer (export 진입점에서 자동 계산하도록 권장).
+        if watermark_id:
+            from features.draft.watermark import watermark_text
+            p_wm = doc.add_paragraph()
+            p_wm.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            wm_run = p_wm.add_run(watermark_text(watermark_id, reviewer))
+            wm_run.font.size = Pt(8)
+            wm_run.font.color.rgb = _GRAY
 
     # ──────────────────────────────────────────
     # 문서 유형별 메타 블록

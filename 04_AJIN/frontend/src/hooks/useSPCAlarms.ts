@@ -1,9 +1,11 @@
 // Day 6 Phase 3 — SPC 알람 폴링 (옵션 B).
-// 5초 간격 백엔드 폴링 → 새 위반 감지 시 RTDB push + Toast + 사이드바 점멸.
+// 5초 간격 백엔드 폴링 → 새 위반 감지 시 Toast + 사이드바 점멸.
+// Firebase RTDB push 경로는 제거되었고, backend/Postgres live_alarms API가 표준 경로다.
+// v4.7 Sprint 2 P0 (축 ③) — 토스트에 "메일 초안" 액션 버튼 추가.
+//   클릭 시 /draft?template=spc_violation&violation_id=<id> 로 이동.
 
 import { useEffect, useRef } from 'react';
-import { ref as rtdbRef, push as rtdbPush, serverTimestamp } from 'firebase/database';
-import { auth, rtdb } from '@lib/firebase';
+import { useNavigate } from 'react-router-dom';
 import { fetchSPCViolationsRecent } from '@api/equipment';
 import { useToastStore, type ToastType } from '@store/toast';
 import { useUIStore } from '@store/ui';
@@ -24,6 +26,7 @@ interface Options {
 
 export function useSPCAlarms(options: Options = {}) {
   const { enabled = true } = options;
+  const navigate = useNavigate();
   const lastSeenRef = useRef<number>(0);
   const seenIdsRef = useRef<Set<string>>(new Set());
   const addToast = useToastStore((s) => s.addToast);
@@ -57,23 +60,26 @@ export function useSPCAlarms(options: Options = {}) {
         if (fresh.length === 0) return;
 
         for (const v of fresh) {
-          // RTDB push (인증 + RTDB 사용 가능 시에만)
-          if (auth?.currentUser && rtdb) {
-            try {
-              await rtdbPush(rtdbRef(rtdb, 'live_alarms'), {
-                ...v,
-                pushed_at: serverTimestamp(),
-              });
-            } catch {
-              // RTDB 권한 부재 — 조용히 skip (로컬 toast 만)
-            }
-          }
           appendViolation(v);
           incActiveAlarms();
+          // v4.7 Sprint 2 P0 (축 ③) — critical/warning 위반에 "메일 초안" 액션 부착.
+          const isActionable = v.severity === 'critical' || v.severity === 'warning';
           addToast({
             type: SEVERITY_TOAST[v.severity],
             message: v.message,
-            duration: 6000,
+            duration: 8000,
+            ...(isActionable
+              ? {
+                  action: {
+                    label: '메일 초안',
+                    onClick: () => {
+                      navigate(
+                        `/draft?template=spc_violation&violation_id=${encodeURIComponent(v.id)}`,
+                      );
+                    },
+                  },
+                }
+              : {}),
           });
         }
 
@@ -93,5 +99,5 @@ export function useSPCAlarms(options: Options = {}) {
       cancelled = true;
       if (timer) clearInterval(timer);
     };
-  }, [enabled, addToast, incActiveAlarms, appendViolation, setLastSeenViolationsTs]);
+  }, [enabled, addToast, incActiveAlarms, appendViolation, setLastSeenViolationsTs, navigate]);
 }

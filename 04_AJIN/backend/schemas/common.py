@@ -6,8 +6,9 @@ from pydantic import BaseModel
 class HealthResponse(BaseModel):
     status: str  # "ok" | "degraded" | "error"
     llm_connected: bool
-    chroma_connected: bool
-    chroma_doc_count: int
+    # ADR-0008: ChromaDB 제거, Supabase pgvector 일원화
+    pgvector_connected: bool
+    pgvector_doc_count: int
     models_loaded: list[str] = []
 
 

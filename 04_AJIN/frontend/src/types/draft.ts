@@ -12,9 +12,18 @@ export type DraftToneId =
   | '공식적'
   | '친근함'
   | '중립';
-export type CCTier = 'required' | 'recommended' | 'optional';
+export type CCTier = 'required' | 'recommended' | 'frequent' | 'optional';
 
 // ── 1. Doc Types (GET /draft/doc-types) ─────────────────────
+
+/** B2 — 변수 입력 폼 메타. 필수★ + 그룹 + placeholder 예시. */
+export interface VarMetadata {
+  name: string;
+  label_ko: string;
+  required: boolean;
+  group: string; // "수신/발신" | "기본" | "내용" | "일정" | "참조"
+  placeholder: string;
+}
 
 export interface DocTypeMeta {
   id: string;
@@ -22,6 +31,11 @@ export interface DocTypeMeta {
   name_ko: string;
   name_en: string;
   required_fields: string[];
+  // B1 — 카드 hover 미리보기 + 가이드 + 부서 추천 배지 (v4.0+)
+  usage_hint?: string;
+  dept_recommend?: string[];
+  example_output?: string;
+  var_metadata?: VarMetadata[];
 }
 
 export interface DocTypeListResponse {

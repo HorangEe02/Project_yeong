@@ -12,6 +12,9 @@ export interface BackendEmployee {
   phone: string;
   extension: string;
   plant: string;
+  // Sprint 1 P0 — 1=시연 합성 / 0=ERP·LDAP 실데이터 / null=미정.
+  // UI 는 1 일 때 DEMO 배지 렌더 (lib/syntheticBadge).
+  is_synthetic?: number | null;
 }
 
 // ─────────────────────────────────────────────────────────────

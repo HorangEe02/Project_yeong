@@ -2,9 +2,9 @@
 
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@store/auth';
+import { logout } from '@api/auth';
 import { useThemeStore, type ThemePreference } from '@store/theme';
 import { useUIStore } from '@store/ui';
-import { signOutFirebase } from '@lib/firebaseAuth';
 import { clearChatSession } from '@lib/chatSession';
 import { isMenuVisible } from '@lib/rbac';
 import { Icons, type IconName } from '@components/Icons';
@@ -18,13 +18,15 @@ interface ModuleItem {
 }
 
 // minRoleLevel + allowedDepartments 는 lib/rbac.ts MODULE_PERMISSIONS 에서 단일 진실 출처로 관리.
+// v4.8 — 기능 G(HR) 완전 삭제. 모듈 6개 (A·B·C·C2·D·E·F).
 const MODULES: ModuleItem[] = [
   { code: 'A', slug: 'search', path: '/search', ko: '인원 검색', iconName: 'Employee' },
   { code: 'B', slug: 'draft', path: '/draft', ko: '문서 작성', iconName: 'Documents' },
   { code: 'C', slug: 'chat', path: '/chat', ko: 'AI 도우미', iconName: 'Onboarding' },
+  { code: 'C2', slug: 'onboarding', path: '/onboarding', ko: '신입 가이드', iconName: 'Onboarding' },
   { code: 'D', slug: 'compliance', path: '/compliance', ko: '법규 모니터', iconName: 'Compliance' },
-  { code: 'E', slug: 'admin', path: '/admin', ko: '인사 관리', iconName: 'Admin' },
-  { code: 'F', slug: 'equipment', path: '/equipment', ko: '설비 AI', iconName: 'Equipment' },
+  { code: 'E', slug: 'equipment', path: '/equipment', ko: '설비 AI', iconName: 'Equipment' },
+  { code: 'F', slug: 'admin', path: '/admin', ko: '시스템 관리', iconName: 'Admin' },
 ];
 
 const THEMES: ThemePreference[] = ['light', 'dark', 'auto'];
@@ -32,7 +34,6 @@ const THEMES: ThemePreference[] = ['light', 'dark', 'auto'];
 export function LeftSidebar() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
-  const clearAuth = useAuthStore((s) => s.clear);
   const themePref = useThemeStore((s) => s.preference);
   const setThemePref = useThemeStore((s) => s.setPreference);
   const isStreaming = useUIStore((s) => s.isStreaming);
@@ -41,13 +42,17 @@ export function LeftSidebar() {
   // F-2-14: 부서 + role_level 기반 화이트리스트 (lib/rbac.ts isMenuVisible)
   const allowed = MODULES.filter((m) => isMenuVisible(m.slug, user));
 
+  // v4.4 — 모바일·태블릿 Drawer 모드
+  const mobileNavOpen = useUIStore((s) => s.mobileNavOpen);
+  const setMobileNavOpen = useUIStore((s) => s.setMobileNavOpen);
+
   const onLogout = () => {
-    clearAuth();
-    // v3.6.1 — 다음 사용자가 로그인했을 때 이전 사용자의 환영 메시지/대화가 그대로 남는
-    // 버그 차단. 채팅 세션은 employee_id 단위로 격리한다.
-    clearChatSession();
-    void signOutFirebase();
-    navigate('/login');
+    void logout().finally(() => {
+      // v3.6.1 — 다음 사용자가 로그인했을 때 이전 사용자의 환영 메시지/대화가 그대로 남는
+      // 버그 차단. 채팅 세션은 employee_id 단위로 격리한다.
+      clearChatSession();
+      navigate('/login');
+    });
   };
 
   const userName = user?.username ?? '게스트';
@@ -56,7 +61,35 @@ export function LeftSidebar() {
     : 'GUEST · L0';
 
   return (
-    <aside className="sidebar">
+    <>
+    {mobileNavOpen && (
+      <div
+        className="sidebar-scrim"
+        onClick={() => setMobileNavOpen(false)}
+        aria-hidden
+        style={{
+          position: 'fixed',
+          inset: 0,
+          top: 'var(--top-bar-height, 52px)',
+          zIndex: 38,
+          background: 'rgba(8, 12, 20, 0.55)',
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)',
+        }}
+      />
+    )}
+    <aside
+      id="left-sidebar"
+      className="sidebar"
+      data-mobile-open={mobileNavOpen ? 'true' : undefined}
+      onClickCapture={(e) => {
+        // 메뉴 클릭 시 자동 닫기 (모바일 Drawer UX)
+        const target = e.target as HTMLElement;
+        if (target.closest('a, button')) {
+          if (window.matchMedia('(max-width: 1024px)').matches) setMobileNavOpen(false);
+        }
+      }}
+    >
       {/* BRAND — 클릭 시 대시보드(/) 로 이동 */}
       <div
         className="sb-brand"
@@ -160,8 +193,25 @@ export function LeftSidebar() {
             >
               <span className="glyph">{Icon && <Icon size={14} />}</span>
               <span className="label">
-                {m.code}. {isStreaming ? '(응답 생성 중...)' : m.ko.toUpperCase()}
+                {m.code}. {m.ko.toUpperCase()}
               </span>
+              {/* C4 v4.0 — 스트리밍 표시는 사이드바 라벨 교체 대신 활성 모듈 옆 점멸 점만.
+                  추천 질문 클릭/일반 채팅 모두에서 사이드바 라벨이 안정적으로 유지됨. */}
+              {isStreaming && m.slug === 'chat' && (
+                <span
+                  aria-label="응답 생성 중"
+                  title="응답 생성 중"
+                  style={{
+                    marginLeft: 6,
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: 'var(--hud-primary)',
+                    animation: 'pulse 1.4s ease-in-out infinite',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
               {shouldPulse && (
                 <span className="module-btn-alarm-badge" aria-label="활성 알람 수">
                   {activeAlarmCount}
@@ -217,5 +267,6 @@ export function LeftSidebar() {
         FastAPI · React · Ollama
       </div>
     </aside>
+    </>
   );
 }

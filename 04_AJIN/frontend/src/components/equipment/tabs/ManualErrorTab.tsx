@@ -1,16 +1,16 @@
 // ManualErrorTab — F-manual_error 메인 탭 (3 sub-tabs: 에러코드 / 증상 / RAG).
 
 import { useState } from 'react';
-import { PlotlyChart } from '@components/chart/PlotlyChart';
 import type { Data } from 'plotly.js';
 import { DownloadActions } from '@components/common/DownloadActions';
+import { CascadeFailureSimulation } from '../CascadeFailureSimulation';
 import type {
   ErrorCategoriesResponse,
   ManualSearchResponse,
   MarkovResponse,
 } from '@/types/equipment';
 import type { ErrResultDisplay, MarkovBranchDisplay } from '../types';
-import { CAUSALITY_CATEGORIES } from '../mockData';
+import { CAUSALITY_CATEGORIES } from '../taxonomy';
 import { buildErrSearchMarkdown } from '../markdownBuilders';
 
 type ManualSubTab = 'codes' | 'symptoms' | 'rag';
@@ -178,72 +178,37 @@ export function ManualErrorTab({
             </div>
           </section>
 
-          <section className="lg-card">
-            <div className="lg-card-h">
-              <div>
-                <div className="lg-eyebrow">MARKOV CHAIN · DFS depth=3</div>
-                <h2 className="lg-h2">연쇄 고장 예측</h2>
-              </div>
-              {markov?.risk_level && (
-                <span className={'lg-pill ' + (markov.risk_level === 'critical' ? 'warn' : '')}>
-                  {markov.risk_level.toUpperCase()}
-                </span>
-              )}
+          {/* 2026-05-28 — 정적 markov 섹션을 인터랙티브 시뮬레이션 (3-col grid: network·toggle·time-series) 로 교체.
+              참조 패턴: EquipmentDetailDrawer 의 3-column grid + Cpk gaussian SVG 시각화. */}
+          <CascadeFailureSimulation
+            markov={markov}
+            markovChain={markovChain}
+            markovGraph={markovGraph}
+          />
+          {/* 텍스트 한 줄 요약 (스크린리더 / 기존 사용자 친숙도) — toggle 영향 안 받는 base markov 결과 */}
+          <div className="lg-markov" style={{ marginTop: 14 }}>
+            <span className="lg-m-node start">{markov?.current_code ?? 'E-101'} 베어링 마모</span>
+            <span className="lg-m-arrow">→</span>
+            <div className="lg-m-branches">
+              {markovChain.map((m) => (
+                <div key={m.code} className="lg-m-branch">
+                  <span className="lg-m-prob">{m.prob.toFixed(2)}</span>
+                  <span className="lg-m-node">
+                    {m.code} {m.name}
+                  </span>
+                </div>
+              ))}
             </div>
-            <div className="lg-markov">
-              <span className="lg-m-node start">{markov?.current_code ?? 'E-101'} 베어링 마모</span>
-              <span className="lg-m-arrow">→</span>
-              <div className="lg-m-branches">
-                {markovChain.map((m) => (
-                  <div key={m.code} className="lg-m-branch">
-                    <span className="lg-m-prob">{m.prob.toFixed(2)}</span>
-                    <span className="lg-m-node">
-                      {m.code} {m.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{ width: '100%', height: 320, marginTop: 18 }}>
-              <PlotlyChart
-                data={markovGraph}
-                layout={{
-                  margin: { l: 10, r: 10, t: 10, b: 10 },
-                  xaxis: {
-                    visible: false,
-                    showgrid: false,
-                    zeroline: false,
-                    showticklabels: false,
-                    range: [-0.5, 2.0],
-                  },
-                  yaxis: {
-                    visible: false,
-                    showgrid: false,
-                    zeroline: false,
-                    showticklabels: false,
-                    range: [-1.2, 1.2],
-                    scaleanchor: 'x',
-                    scaleratio: 1,
-                  },
-                  hovermode: 'closest',
-                }}
-                config={{ displayModeBar: false }}
-                style={{ width: '100%', height: '100%' }}
-              />
-            </div>
-            <div className="lg-markov-foot">
-              {markov?.prevention_message ?? '권장 사전 조치: 윤활 점검 → 베어링 교체 → 모터 온도 모니터링'}
-            </div>
-            <DownloadActions
-              content={() => buildErrSearchMarkdown(errQuery, equipFilter, symptom, errResults, markovChain)}
-              basename={`equipment_error_search_${equipFilter}_${new Date().toISOString().slice(0, 10)}`}
-              source="equipment"
-              metadata={{
-                title: `에러 검색 보고서 — ${equipFilter} (${symptom})`,
-                doc_type: 'equipment_error_search',
-              }}
-            />
-          </section>
+          </div>
+          <DownloadActions
+            content={() => buildErrSearchMarkdown(errQuery, equipFilter, symptom, errResults, markovChain)}
+            basename={`equipment_error_search_${equipFilter}_${new Date().toISOString().slice(0, 10)}`}
+            source="equipment"
+            metadata={{
+              title: `에러 검색 보고서 — ${equipFilter} (${symptom})`,
+              doc_type: 'equipment_error_search',
+            }}
+          />
         </>
       )}
 

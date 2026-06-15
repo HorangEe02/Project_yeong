@@ -62,6 +62,15 @@ class DraftRequest(BaseModel):
 # ---------------------------------------------------------------------------
 
 PART_INFO = {
+    # AI 문서 초안 기능의 대표 demo 부품
+    "EMP 워터펌프": ("EMP 워터펌프", "AJ-EMP-W100"),
+    "EMP워터펌프": ("EMP 워터펌프", "AJ-EMP-W100"),
+    "CCH 냉난방장치": ("CCH 냉난방장치", "AJ-CCH-H200"),
+    "CCH냉난방장치": ("CCH 냉난방장치", "AJ-CCH-H200"),
+    "OBC 충전장치": ("OBC 충전장치", "AJ-OBC-C300"),
+    "OBC충전장치": ("OBC 충전장치", "AJ-OBC-C300"),
+    "A-Panel": ("A-Panel", "AJ-AP-001"),
+    "A Panel": ("A-Panel", "AJ-AP-001"),
     # 차체 패널류 (경산 본사 주력 제품)
     "쿼터패널": ("쿼터 패널 (PNL ASS'Y QTR COMPL)", "AJ-QTR-001"),
     "쿼터 패널": ("쿼터 패널 (PNL ASS'Y QTR COMPL)", "AJ-QTR-001"),

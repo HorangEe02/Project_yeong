@@ -17,6 +17,8 @@ export interface MeProfile {
   updated_at: string | null;
   is_active: boolean;
   must_change_pw: boolean;
+  /** v3.9 — 디지털 사원증 사진 (data:image/jpeg;base64,...). 미설정 시 빈 문자열. */
+  photo_url?: string;
 }
 
 export interface MeUpdateRequest {
@@ -64,6 +66,16 @@ export async function updateMe(req: MeUpdateRequest): Promise<MeUpdateResponse> 
 export async function getMyLoginHistory(limit = 20): Promise<LoginHistoryResponse> {
   const { data } = await api.get<LoginHistoryResponse>('/auth/me/login-history', {
     params: { limit },
+  });
+  return data;
+}
+
+// v3.9 — 디지털 사원증 증명사진 변경.
+// backend `PATCH /api/auth/me/photo` → users.photo_url 인라인 저장 (base64 dataUrl).
+// 추후 Supabase Storage signed-upload 로 마이그레이션 시 같은 endpoint signature 유지.
+export async function updateMyPhoto(photoDataUrl: string): Promise<MeProfile> {
+  const { data } = await api.patch<MeProfile>('/auth/me/photo', {
+    photo_data_url: photoDataUrl,
   });
   return data;
 }

@@ -5,7 +5,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { fetchEventSource, type FetchEventSourceInit } from '@microsoft/fetch-event-source';
-import { useAuthStore } from '@store/auth';
+import { csrfHeaderFor } from '@api/csrf';
 import type { ActionCard } from '@/components/chat/cards/types';
 
 export type StreamEventType =
@@ -14,7 +14,8 @@ export type StreamEventType =
   | 'done'
   | 'error'
   | 'detection'
-  | 'action_card';
+  | 'action_card'
+  | 'sources';
 
 export interface StreamEvent {
   type: StreamEventType;
@@ -37,6 +38,13 @@ export interface SSEMeta {
   finalModel?: string;
   ttftMs?: number;
   latencyMs?: number;
+  citationStatus?: string;
+  sources?: unknown[];
+  // v4.x — CRAG retrieval evaluator (Phase 1 PR2). backend onboarding chat endpoint
+  // 가 'done' 이벤트 metadata 에 송출. citationStatus='crag_blocked' 면 incorrect
+  // 차단 (LLM 호출 우회됨). CRAGVerdictBanner.tsx 가 verdict 별 UI 분기.
+  cragVerdict?: 'correct' | 'ambiguous' | 'incorrect';
+  cragTopScore?: number;
 }
 
 interface UseSSEOptions {
@@ -125,18 +133,17 @@ export function useSSE(options: UseSSEOptions = {}): UseSSEReturn {
         ? AbortSignal.any?.([ctrl.signal, signal]) ?? ctrl.signal
         : ctrl.signal;
 
-      const token = useAuthStore.getState().accessToken;
-
       try {
         await fetchEventSource(url, {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
             // Plan v1.0 — 일부 프록시/SW 가 Content-Type 을 변경하는 환경에서도
             // SSE 응답을 받기 위해 Accept 명시 + onopen 에서 status 만 검증.
             Accept: 'text/event-stream',
             'Cache-Control': 'no-cache',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...csrfHeaderFor('POST'),
           },
           body: JSON.stringify(body),
           signal: linkedSignal,
@@ -228,6 +235,17 @@ export function useSSE(options: UseSSEOptions = {}): UseSSEReturn {
                 options.onMetadata?.(m);
                 break;
               }
+              case 'sources': {
+                const m = parsed.metadata ?? {};
+                setMeta((prev) => ({
+                  ...prev,
+                  citationStatus:
+                    pickString(m, 'citation_status') ?? prev.citationStatus,
+                  sources: Array.isArray(m.sources) ? m.sources : prev.sources,
+                }));
+                options.onMetadata?.(m);
+                break;
+              }
               case 'token':
                 if (parsed.content) {
                   const chunk = parsed.content;
@@ -239,6 +257,24 @@ export function useSSE(options: UseSSEOptions = {}): UseSSEReturn {
               case 'done':
                 doneSeen = true;
                 setIsStreaming(false);
+                if (parsed.metadata) {
+                  const rawVerdict = pickString(parsed.metadata!, 'crag_verdict');
+                  const verdict: SSEMeta['cragVerdict'] =
+                    rawVerdict === 'correct' || rawVerdict === 'ambiguous' || rawVerdict === 'incorrect'
+                      ? rawVerdict
+                      : undefined;
+                  setMeta((prev) => ({
+                    ...prev,
+                    citationStatus:
+                      pickString(parsed.metadata!, 'citation_status') ?? prev.citationStatus,
+                    sources: Array.isArray(parsed.metadata!.sources)
+                      ? parsed.metadata!.sources
+                      : prev.sources,
+                    cragVerdict: verdict ?? prev.cragVerdict,
+                    cragTopScore:
+                      pickNumber(parsed.metadata!, 'crag_top_score') ?? prev.cragTopScore,
+                  }));
+                }
                 options.onDone?.(parsed.metadata ?? {});
                 break;
               case 'error':

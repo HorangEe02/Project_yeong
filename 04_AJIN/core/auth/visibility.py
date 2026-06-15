@@ -28,15 +28,17 @@ class VisibilityLevel(Enum):
 
 
 # ── 필드별 가시성 매핑 ──
+# F5 정책 (2026-05-10): 사내 협업 자산(이메일/내선)은 PARTIAL에서도 공개.
+# 개인 휴대폰(phone)만 PARTIAL에서 마스킹. 인사관리팀이 별도 운영.
 FIELD_VISIBILITY = {
-    # FULL에서만 보이는 필드
+    # FULL에서만 보이는 필드 (휴대폰·입퇴사일 등 민감 정보)
     "full_only": [
-        "email", "phone", "hire_date", "resign_date",
+        "phone", "hire_date", "resign_date",
         "overseas_assignment", "language_skills",
     ],
-    # PARTIAL에서도 보이는 필드
+    # PARTIAL에서도 보이는 필드 (사내 협업 자산 포함)
     "partial": [
-        "name", "department", "position", "extension", "site",
+        "name", "department", "position", "extension", "site", "email",
     ],
     # 항상 보이는 필드
     "always": [
@@ -99,7 +101,8 @@ def filter_employee_fields(
     가시성 레벨에 따라 사원 정보 필드를 필터링합니다.
 
     FULL → 모든 필드
-    PARTIAL → 이름/부서/직급/내선만 + 마스킹된 이메일
+    PARTIAL → 사내 협업 자산(이름/부서/직급/내선/이메일/사업장) 공개,
+              휴대폰만 마스킹. (F5, 2026-05-10)
     HIDDEN → 빈 딕셔너리
     """
     if visibility == VisibilityLevel.HIDDEN:
@@ -108,20 +111,13 @@ def filter_employee_fields(
     if visibility == VisibilityLevel.FULL:
         return employee.copy()
 
-    # PARTIAL: 기본 필드만 + 민감 필드 마스킹
+    # PARTIAL: 협업 자산 공개 + 휴대폰만 마스킹
     filtered = {}
     partial_fields = set(FIELD_VISIBILITY["partial"])
 
     for key, val in employee.items():
         if key in partial_fields:
             filtered[key] = val
-        elif key == "email":
-            # 이메일 마스킹: hong@ajin.co.kr → h***@ajin.co.kr
-            if val and "@" in str(val):
-                local, domain = str(val).split("@", 1)
-                filtered[key] = f"{local[0]}***@{domain}"
-            else:
-                filtered[key] = "***"
         elif key == "phone":
             filtered[key] = "(내선번호로 연락)"
         elif key in ("hire_date", "resign_date"):
@@ -134,9 +130,9 @@ def filter_employee_fields(
 
 
 def get_visibility_notice(visibility: VisibilityLevel) -> str:
-    """사용자에게 표시할 가시성 안내 메시지"""
+    """사용자에게 표시할 가시성 안내 메시지 (F5 정책 반영)"""
     if visibility == VisibilityLevel.PARTIAL:
-        return "상세 연락처는 같은 부서 또는 팀장 이상만 열람 가능합니다."
+        return "타 본부·부서 인원은 휴대폰만 마스킹됩니다. 내선번호와 사내 이메일은 공개됩니다."
     return ""
 
 

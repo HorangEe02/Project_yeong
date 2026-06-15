@@ -9,6 +9,9 @@ from pathlib import Path
 # 템플릿 디렉토리 경로
 TEMPLATE_DIR = Path(__file__).parent.parent.parent / "data" / "templates"
 
+# v4.7 Sprint 2 P0 (축 ③) — features/draft/templates/ 의 YAML 기반 메타 템플릿.
+META_TEMPLATE_DIR = Path(__file__).parent / "templates"
+
 # ═══════════════════════════════════════════════════════
 # 내부용 양식 카탈로그
 # ═══════════════════════════════════════════════════════
@@ -236,10 +239,43 @@ def get_all_template_ids(context: str) -> list[str]:
 
 
 def find_template_by_id(template_id: str) -> dict | None:
-    """ID로 양식 메타데이터 검색 (내부/외부 모두 탐색)"""
+    """ID로 양식 메타데이터 검색 (내부/외부 catalog 우선, 없으면 YAML 메타)."""
     for catalog in [INTERNAL_TEMPLATES, EXTERNAL_TEMPLATES]:
         for templates in catalog.values():
             for t in templates:
                 if t["id"] == template_id:
                     return t
+    # v4.7 Sprint 2 P0 (축 ③) — YAML 메타 카탈로그 (spc_violation 등).
+    yaml_meta = load_yaml_template(template_id)
+    if yaml_meta:
+        return yaml_meta
     return None
+
+
+def load_yaml_template(template_id: str) -> dict | None:
+    """features/draft/templates/{template_id}_mail.yaml 또는 {template_id}.yaml 메타 로드.
+
+    Returns: { template_id, template_name, category, required_context,
+               subject_template, body_template } 또는 None.
+    """
+    if not META_TEMPLATE_DIR.exists():
+        return None
+
+    candidates = [
+        META_TEMPLATE_DIR / f"{template_id}_mail.yaml",
+        META_TEMPLATE_DIR / f"{template_id}.yaml",
+    ]
+    target = next((p for p in candidates if p.exists()), None)
+    if target is None:
+        return None
+
+    try:
+        import yaml  # PyYAML — requirements.txt 에 이미 포함됨.
+
+        with target.open("r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        if not isinstance(data, dict):
+            return None
+        return data
+    except Exception:
+        return None

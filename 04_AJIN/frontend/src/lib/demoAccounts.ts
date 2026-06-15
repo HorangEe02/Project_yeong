@@ -1,4 +1,4 @@
-// 데모 빠른 로그인 칩 — DEV 모드 또는 ?demo=1 URL 파라미터일 때 노출
+// 데모 빠른 로그인 칩 — DEV/TEST mock 모드에서만 노출
 
 export interface DemoChip {
   employee_id: string;
@@ -15,8 +15,18 @@ export const DEMO_CHIPS: DemoChip[] = [
   { employee_id: 'PE-0019', password: 'Demo!2026', username: '최유진', role_label: 'EMPLOYEE', role_level: 2 },
 ];
 
+/**
+ * Return true only when the hard-coded demo credentials are expected to work.
+ *
+ * `Demo!2026` belongs to the mock seed data. Supabase/Postgres release smoke
+ * must use the bootstrap secret or short-lived smoke JWT path instead.
+ */
 export function shouldShowDemoChips(): boolean {
-  if (import.meta.env.DEV) return true;
+  const mockMode = import.meta.env.VITE_USE_MOCK === 'true';
+  const explicitlyEnabled = import.meta.env.VITE_DEMO_CHIPS_ENABLED === 'true';
+  if (import.meta.env.PROD) return false;
+  if (import.meta.env.DEV && mockMode) return true;
+  if (!explicitlyEnabled) return false;
   if (typeof window !== 'undefined') {
     return new URLSearchParams(window.location.search).get('demo') === '1';
   }

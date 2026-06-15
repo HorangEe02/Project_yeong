@@ -19,6 +19,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
+from core.sklearn_cache import cache_matches_current_sklearn, write_cache_metadata
+
 
 ERROR_CODES_DB = "data/equipment/error_codes.db"
 MODEL_CACHE_DIR = "data/equipment/ml_cache"
@@ -244,7 +246,7 @@ class ErrorCodeMLSearchEngine:
         cache_file = self._cache_path / "tfidf_model.pkl"
 
         # 캐시 로드 시도
-        if not force and cache_file.exists():
+        if not force and cache_matches_current_sklearn(cache_file):
             try:
                 with open(cache_file, "rb") as f:
                     cached = pickle.load(f)
@@ -281,6 +283,7 @@ class ErrorCodeMLSearchEngine:
                     "vectorizer": self.vectorizer,
                     "tfidf_matrix": self.tfidf_matrix,
                 }, f)
+            write_cache_metadata(cache_file, model_type="equipment_tfidf_search")
         except Exception:
             pass
 

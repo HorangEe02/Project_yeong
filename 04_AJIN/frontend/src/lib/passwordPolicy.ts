@@ -1,25 +1,47 @@
-// 비밀번호 정책 6 조건 — v3.3 정책 그대로 React로
+// Frontend password policy preview. Backend remains the source of truth.
 
 export type PolicyKey =
   | 'min_length'
-  | 'uppercase'
-  | 'lowercase'
-  | 'number'
-  | 'special'
-  | 'no_repeat';
+  | 'max_bytes'
+  | 'not_common'
+  | 'not_context';
 
 export interface PolicyRule {
   key: PolicyKey;
   test: (s: string) => boolean;
 }
 
+const COMMON_PASSWORD_TOKENS = [
+  'admin',
+  'admin1234',
+  'ajin1234',
+  'password',
+  'password123',
+  'qwerty',
+  'welcome',
+];
+
+const CONTEXT_TOKENS = ['ajin', 'ajinindustry', 'assistant', 'admin', 'system'];
+
+function simplified(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9가-힣]/g, '');
+}
+
+function byteLength(value: string): number {
+  return new TextEncoder().encode(value).length;
+}
+
 export const POLICY_RULES: PolicyRule[] = [
-  { key: 'min_length', test: (s) => s.length >= 8 },
-  { key: 'uppercase', test: (s) => /[A-Z]/.test(s) },
-  { key: 'lowercase', test: (s) => /[a-z]/.test(s) },
-  { key: 'number', test: (s) => /[0-9]/.test(s) },
-  { key: 'special', test: (s) => /[^A-Za-z0-9]/.test(s) },
-  { key: 'no_repeat', test: (s) => !/(.)\1\1/.test(s) },
+  { key: 'min_length', test: (s) => s.length >= 12 },
+  { key: 'max_bytes', test: (s) => byteLength(s) <= 72 },
+  {
+    key: 'not_common',
+    test: (s) => !COMMON_PASSWORD_TOKENS.some((token) => simplified(s).includes(token)),
+  },
+  {
+    key: 'not_context',
+    test: (s) => !CONTEXT_TOKENS.some((token) => simplified(s).includes(token)),
+  },
 ];
 
 export interface PolicyResult {

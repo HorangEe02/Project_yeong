@@ -85,8 +85,34 @@ export function EmployeeCard({ payload, onLoginClick }: Props) {
     return (
       <div className="lg-action-card" data-kind="employee">
         <div className="lg-eyebrow">PEOPLE · 0건</div>
-        <div style={{ fontSize: 13, color: 'var(--hud-text-dim)' }}>
-          "{payload.query}" 검색 결과가 없습니다.
+        <div style={{ fontSize: 13, color: 'var(--hud-text-dim)', lineHeight: 1.6 }}>
+          <div style={{ marginBottom: 8 }}>
+            "{payload.query}" 검색 결과가 없습니다.
+          </div>
+          {/* C6-3 v4.0 — 친절한 안내 + 대안 액션 제안 */}
+          <div
+            style={{
+              fontSize: 12,
+              color: 'var(--hud-text-muted)',
+              padding: '8px 10px',
+              borderRadius: 8,
+              background: 'color-mix(in oklab, var(--hud-text) 4%, transparent)',
+              border: '1px dashed color-mix(in oklab, var(--hud-text) 12%, transparent)',
+            }}
+          >
+            <div style={{ fontWeight: 600, marginBottom: 4, color: 'var(--hud-text-dim)' }}>
+              검색 팁
+            </div>
+            <ul style={{ margin: 0, paddingLeft: 16 }}>
+              <li>이름·직급만 입력 (예: "김 대리")</li>
+              <li>부서명으로 검색 (예: "품질보증팀")</li>
+              <li>이메일 일부 (예: "kim@")</li>
+              <li>좌측 메뉴 <b>A. 인원검색</b> 페이지에서 조직도/필터로 탐색</li>
+            </ul>
+            <div style={{ marginTop: 6, fontSize: 11 }}>
+              퇴직자·휴직자 정보는 인사관리팀에 문의하세요.
+            </div>
+          </div>
         </div>
       </div>
     );

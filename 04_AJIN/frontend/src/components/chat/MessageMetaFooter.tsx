@@ -14,7 +14,7 @@ const TOKEN_BUDGET_MAP = {
   work: 2000,
 } as const;
 
-/** 모델명 라벨로 정규화 — `gemini-2.5-pro` → `GEMINI-2.5-PRO`, `qwen3.5:9b` → `QWEN-3.5-9B`. */
+/** 모델명 라벨로 정규화 — `gemini-3.5-flash` → `GEMINI-2.5-PRO`, `qwen3.5:9b` → `QWEN-3.5-9B`. */
 function formatModelLabel(model?: string, finalModel?: string): string {
   const m = finalModel || model;
   if (!m) return 'AUTO';

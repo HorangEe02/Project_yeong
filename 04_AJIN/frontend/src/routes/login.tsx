@@ -5,16 +5,27 @@ import { useLocation, useNavigate, type Location } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { useAuthStore } from '@store/auth';
-import { useToast } from '@store/toast';
-import { login as apiLogin, changePassword as apiChangePassword, extractError } from '@api/auth';
+import {
+  login as apiLogin,
+  changePassword as apiChangePassword,
+  extractError,
+  verify2FA,
+  type LoginResponse,
+} from '@api/auth';
+import { IdPLoginButtons } from '@components/auth/IdPLoginButtons';
 import { POLICY_RULES, evaluatePolicy, type PolicyKey } from '@lib/passwordPolicy';
 import { DEMO_CHIPS, shouldShowDemoChips } from '@lib/demoAccounts';
-import { ensureFirebaseUser, syncFirebasePassword } from '@lib/firebaseAuth';
 import { Button } from '@components/ui/Button';
 import { ErrorAlert } from '@components/ui/ErrorAlert';
 import { useThemeStore } from '@store/theme';
+import { useIsMobile, useIsTablet } from '@hooks/useBreakpoint';
+import {
+  AJINMobileLogin,
+  type AJINMobileLoginProps,
+} from '@components/uikit/AJINMobileLogin';
+import { AJINTabletLogin } from '@components/uikit/AJINTabletLogin';
 
-type ViewMode = 'sign_in' | 'change_pw';
+type ViewMode = 'sign_in' | 'change_pw' | 'two_factor';
 
 interface SignInValues {
   employee_id: string;
@@ -37,13 +48,15 @@ export function Login() {
   const location = useLocation();
   const setSession = useAuthStore((s) => s.setSession);
   const themeResolved = useThemeStore((s) => s.resolved());
-  const { addToast } = useToast();
 
   const [view, setView] = useState<ViewMode>('sign_in');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pendingEmpId, setPendingEmpId] = useState<string | null>(null);
   const [capsLockOn, setCapsLockOn] = useState(false);
+  // v4.7 Feature E Phase 2 — 2FA verify 단계
+  const [midToken, setMidToken] = useState<string | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
 
   const signInForm = useForm<SignInValues>({ defaultValues: { employee_id: '', password: '' } });
   const changeForm = useForm<ChangePwValues>({ defaultValues: { current_password: '', new_password: '', confirm_password: '' } });
@@ -67,6 +80,17 @@ export function Login() {
     }
   };
 
+  const applySession = (data: LoginResponse) => {
+    setSession({
+      employee_id: data.employee_id,
+      username: data.username,
+      role_name: data.role_name,
+      role_level: data.role_level,
+      department: data.department,
+      position: data.position,
+    });
+  };
+
   const handleCapsLock = (e: React.KeyboardEvent<HTMLInputElement>) => {
     setCapsLockOn(e.getModifierState('CapsLock'));
   };
@@ -76,39 +100,23 @@ export function Login() {
     setSubmitting(true);
     try {
       const data = await apiLogin(values);
+      // v4.7 Feature E Phase 2 — 2FA 필요 시 verify 단계로
+      if (data.require_2fa && data.mid_token) {
+        setMidToken(data.mid_token);
+        setPendingEmpId(data.employee_id);
+        setTwoFactorCode('');
+        signInForm.reset();
+        setView('two_factor');
+        return;
+      }
       if (data.must_change_pw) {
+        applySession(data);
         setPendingEmpId(data.employee_id);
         signInForm.reset();
         setView('change_pw');
         return;
       }
-      // Firebase Auth 자동 부트스트랩 — 실패해도 백엔드 JWT 만으로 진행 (graceful degrade)
-      let firebaseUid: string | undefined;
-      try {
-        const fb = await ensureFirebaseUser(data.employee_id, values.password);
-        firebaseUid = fb.uid;
-        if (fb.isNewlyCreated) {
-          addToast({ type: 'info', message: t('auth.firebase.bootstrap'), duration: 3000 });
-        }
-      } catch (fbErr) {
-        if (import.meta.env.DEV) {
-          console.warn('[Login] Firebase Auth 실패 — 백엔드 JWT 만으로 진행:', fbErr);
-        }
-        addToast({ type: 'warning', message: t('auth.firebase.warning'), duration: 5000 });
-      }
-      setSession(
-        data.access_token,
-        data.refresh_token,
-        {
-          employee_id: data.employee_id,
-          username: data.username,
-          role_name: data.role_name,
-          role_level: data.role_level,
-          department: data.department,
-          position: data.position,
-        },
-        firebaseUid,
-      );
+      applySession(data);
       redirectAfterAuth();
     } catch (e) {
       const { detail } = extractError(e);
@@ -129,36 +137,40 @@ export function Login() {
     setSubmitting(true);
     try {
       await apiChangePassword({
-        employee_id: pendingEmpId,
         current_password: values.current_password,
         new_password: values.new_password,
       });
       // 변경 후 자동 재로그인
       const data = await apiLogin({ employee_id: pendingEmpId, password: values.new_password });
-      // Firebase 비밀번호 동기화 — 실패해도 백엔드 JWT 만으로 진행
-      let firebaseUid: string | undefined;
-      try {
-        const fb = await syncFirebasePassword(data.employee_id, values.new_password);
-        firebaseUid = fb.uid;
-      } catch (fbErr) {
-        if (import.meta.env.DEV) {
-          console.warn('[Login] Firebase 비밀번호 동기화 실패 — 백엔드 JWT 만으로 진행:', fbErr);
-        }
-        addToast({ type: 'warning', message: t('auth.firebase.warning'), duration: 5000 });
+      applySession(data);
+      redirectAfterAuth();
+    } catch (e) {
+      const { detail } = extractError(e);
+      setError(detail);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const on2FAVerify = async () => {
+    if (!midToken) return;
+    const code = twoFactorCode.trim();
+    if (!/^\d{6}$/.test(code) && !/^[A-F0-9]{5}-[A-F0-9]{5}$/i.test(code)) {
+      setError('6자리 숫자 코드 또는 백업 코드 형식이 아닙니다.');
+      return;
+    }
+    setError(null);
+    setSubmitting(true);
+    try {
+      const data = await verify2FA(midToken, code);
+      applySession(data);
+      setMidToken(null);
+      setTwoFactorCode('');
+      if (data.must_change_pw) {
+        setPendingEmpId(data.employee_id);
+        setView('change_pw');
+        return;
       }
-      setSession(
-        data.access_token,
-        data.refresh_token,
-        {
-          employee_id: data.employee_id,
-          username: data.username,
-          role_name: data.role_name,
-          role_level: data.role_level,
-          department: data.department,
-          position: data.position,
-        },
-        firebaseUid,
-      );
       redirectAfterAuth();
     } catch (e) {
       const { detail } = extractError(e);
@@ -181,14 +193,58 @@ export function Login() {
 
   const showDemoChips = shouldShowDemoChips() && view === 'sign_in';
 
+  // v3.6 — 모바일/태블릿 viewport early return (Design System v3.5 reference 매칭)
+  // 모든 hook 호출 후·return 직전. 동작 로직(2FA / changePassword / apiLogin)은 그대로,
+  // visual layer 만 AJINMobileLogin / AJINTabletLogin 으로 교체.
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+
+  const goSignIn = () => {
+    setView('sign_in');
+    setMidToken(null);
+    setTwoFactorCode('');
+    setError(null);
+  };
+
+  const mobileTabletProps: AJINMobileLoginProps = {
+    view,
+    signInForm,
+    changeForm,
+    onSignIn,
+    onChangePassword,
+    on2FAVerify,
+    twoFactorCode,
+    setTwoFactorCode,
+    pendingEmpId,
+    submitting,
+    error,
+    capsLockOn,
+    handleCapsLock,
+    empIdRef,
+    policy,
+    passwordMismatch,
+    onDemoChip,
+    toggleLang,
+    goSignIn,
+  };
+
+  if (isMobile) return <AJINMobileLogin {...mobileTabletProps} />;
+  if (isTablet) return <AJINTabletLogin {...mobileTabletProps} />;
+
   return (
     <div className="login-wrap">
       <div className="login-card glass">
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          {/* v3.5 — Neural Expressive 브랜드 orb (data-neural=on 시 발광 애니메이션) */}
+          <div
+            className="ne-orb sm"
+            aria-hidden
+            style={{ margin: '0 auto 12px', display: 'inline-flex' }}
+          />
           <img
             src={`/logos/ajin_logo_${themeResolved === 'light' ? 'light' : 'dark'}.svg`}
             alt="AJIN"
-            style={{ width: 180 }}
+            style={{ width: 180, display: 'block', margin: '0 auto' }}
           />
           <div className="label-en" style={{ marginTop: 12 }}>AI ASSISTANT</div>
           <div className="dim" style={{ fontSize: 11, marginTop: 4, letterSpacing: 2 }}>
@@ -198,7 +254,9 @@ export function Login() {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
           <h1 className="h1">
-            {view === 'sign_in' ? t('login.title') : t('login.change_pw.title')}
+            {view === 'sign_in' && t('login.title')}
+            {view === 'change_pw' && t('login.change_pw.title')}
+            {view === 'two_factor' && '2단계 인증'}
           </h1>
           <button
             type="button"
@@ -211,7 +269,9 @@ export function Login() {
           </button>
         </div>
         <p className="dim" style={{ marginBottom: 20 }}>
-          {view === 'sign_in' ? t('login.subtitle') : t('login.change_pw.subtitle')}
+          {view === 'sign_in' && t('login.subtitle')}
+          {view === 'change_pw' && t('login.change_pw.subtitle')}
+          {view === 'two_factor' && '인증 앱의 6자리 코드 또는 백업 코드를 입력하세요.'}
         </p>
 
         {error && (
@@ -257,6 +317,53 @@ export function Login() {
 
             <Button type="submit" variant="primary" fullWidth loading={submitting} style={{ marginTop: 16 }}>
               {t('login.submit')}
+            </Button>
+            {/* v4.7 Feature E — 외부 IdP 로그인 (활성 IdP 없으면 null) */}
+            <IdPLoginButtons nextUrl={fromPath && fromPath !== '/login' ? fromPath : '/'} />
+          </form>
+        )}
+
+        {view === 'two_factor' && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void on2FAVerify();
+            }}
+          >
+            <div className="field">
+              <label className="label-en" htmlFor="totp_code">인증 코드</label>
+              <input
+                id="totp_code"
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={11}
+                value={twoFactorCode}
+                onChange={(e) => setTwoFactorCode(e.target.value)}
+                placeholder="123456 또는 ABCDE-12345"
+                autoFocus
+              />
+              <div className="dim" style={{ fontSize: 11, marginTop: 4 }}>
+                {pendingEmpId ? `사번 ${pendingEmpId} — ` : ''}
+                6자리 TOTP 코드 또는 11자 백업 코드 (XXXXX-XXXXX)
+              </div>
+            </div>
+            <Button type="submit" variant="primary" fullWidth loading={submitting} style={{ marginTop: 12 }}>
+              인증
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              fullWidth
+              onClick={() => {
+                setView('sign_in');
+                setMidToken(null);
+                setTwoFactorCode('');
+                setError(null);
+              }}
+              style={{ marginTop: 8 }}
+            >
+              취소
             </Button>
           </form>
         )}

@@ -13,6 +13,11 @@ import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
 import random
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from core.data_lineage import ensure_lineage_columns, lineage_values
 
 DB_PATH = Path(__file__).parent.parent / "data" / "equipment" / "molds.db"
 
@@ -29,7 +34,11 @@ CREATE TABLE IF NOT EXISTS molds (
     expected_lifecycle   INTEGER DEFAULT 1000000,
     current_shots        INTEGER DEFAULT 0,
     health_score         REAL DEFAULT 100.0,
-    created_at           TEXT DEFAULT (datetime('now'))
+    created_at           TEXT DEFAULT (datetime('now')),
+    data_class           TEXT NOT NULL DEFAULT 'unknown',
+    source_system        TEXT NOT NULL DEFAULT 'unknown',
+    source_label         TEXT DEFAULT '',
+    source_updated_at    TEXT DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_plant ON molds(plant_id);
 CREATE INDEX IF NOT EXISTS idx_status ON molds(status);
@@ -73,9 +82,11 @@ def seed():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(DB_PATH))
     conn.executescript(SCHEMA)
+    ensure_lineage_columns(conn, "molds")
 
     rng = random.Random(42)  # 결정적
     inserted = 0
+    lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
 
     for row in MOLDS:
         mold_id, name, model, plant, mtype, status, last_pm, next_pm = row
@@ -86,10 +97,13 @@ def seed():
         conn.execute(
             """INSERT OR REPLACE INTO molds
                (mold_id, name, model, plant_id, type, status,
-                last_pm_date, next_pm_date, expected_lifecycle, current_shots, health_score)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                last_pm_date, next_pm_date, expected_lifecycle, current_shots, health_score,
+                data_class, source_system, source_label, source_updated_at)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (mold_id, name, model, plant, mtype, status,
-             last_pm, next_pm, 1_000_000, shots, health),
+             last_pm, next_pm, 1_000_000, shots, health,
+             lineage["data_class"], lineage["source_system"], lineage["source_label"],
+             lineage["source_updated_at"]),
         )
         inserted += 1
 

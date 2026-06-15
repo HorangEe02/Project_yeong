@@ -15,17 +15,25 @@ import Plotly from 'plotly.js/dist/plotly.min';
 import factoryModule from 'react-plotly.js/factory';
 import { useThemeStore } from '@store/theme';
 
-// react-plotly.js Plot 컴포넌트는 다양한 prop 을 받기에 any 타입 prop 으로 안전하게 처리.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyComponent = React.ComponentType<any>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const createPlotlyComponent: (plotly: unknown) => AnyComponent =
-  typeof factoryModule === 'function'
-    ? (factoryModule as any)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    : ((factoryModule as any).default as any);
+interface PlotComponentProps {
+  data: Data[];
+  layout: Partial<Layout>;
+  config: Partial<Config>;
+  useResizeHandler?: boolean;
+  style?: React.CSSProperties;
+  className?: string;
+  onClick?: (event: Readonly<Plotly.PlotMouseEvent>) => void;
+}
 
-const Plot: AnyComponent = createPlotlyComponent(Plotly);
+type PlotComponent = React.ComponentType<PlotComponentProps>;
+type PlotlyFactory = (plotly: unknown) => PlotComponent;
+
+const createPlotlyComponent: PlotlyFactory =
+  typeof factoryModule === 'function'
+    ? (factoryModule as unknown as PlotlyFactory)
+    : (factoryModule as unknown as { default: PlotlyFactory }).default;
+
+const Plot: PlotComponent = createPlotlyComponent(Plotly);
 
 interface Props {
   data: Data[];

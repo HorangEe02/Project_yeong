@@ -18,6 +18,15 @@ from pydantic import BaseModel, Field
 Severity = Literal["critical", "warning", "info"]
 RiskLevel = Literal["critical", "warning", "normal"]
 ProcessStatus = Literal["good", "warning", "critical"]
+DataClass = Literal["real", "synthetic", "system", "unknown"]
+
+
+class LineageFields(BaseModel):
+    """Common Feature F data lineage fields."""
+
+    data_class: DataClass = "unknown"
+    source_system: str = "unknown"
+    source_label: str = ""
 
 
 # ═══════════════════════════════════════════════════════════
@@ -25,7 +34,7 @@ ProcessStatus = Literal["good", "warning", "critical"]
 # ═══════════════════════════════════════════════════════════
 
 
-class ProcessHealthCard(BaseModel):
+class ProcessHealthCard(LineageFields):
     """5공정 건강 카드 (CCH/OBC/범퍼빔/도어/볼시트)."""
 
     process_id: str
@@ -39,7 +48,7 @@ class ProcessHealthCard(BaseModel):
     anomaly_rate: float = 0.0
 
 
-class EquipmentTypeCard(BaseModel):
+class EquipmentTypeCard(LineageFields):
     """7장비 카드 (프레스/용접기/로봇/사출기/CNC/레이저/공통설비)."""
 
     type: str
@@ -62,7 +71,7 @@ class DashboardMetrics(BaseModel):
     inspections_recent: int = 0
 
 
-class MLAlert(BaseModel):
+class MLAlert(LineageFields):
     """ML 경고 카드."""
 
     level: str
@@ -84,7 +93,7 @@ class OverviewResponse(BaseModel):
 # ═══════════════════════════════════════════════════════════
 
 
-class NelsonViolationItem(BaseModel):
+class NelsonViolationItem(LineageFields):
     """Nelson 8 Rules 위반 항목."""
 
     rule_number: int
@@ -96,7 +105,7 @@ class NelsonViolationItem(BaseModel):
     chart_annotation: str = ""
 
 
-class SPCData(BaseModel):
+class SPCData(LineageFields):
     """SPC 관리도 데이터 (Plotly 시각화용)."""
 
     process_id: str
@@ -129,7 +138,7 @@ class SPCResponse(BaseModel):
 # ═══════════════════════════════════════════════════════════
 
 
-class RecentViolation(BaseModel):
+class RecentViolation(LineageFields):
     """최근 SPC 위반 — RTDB push 대상."""
 
     id: str
@@ -157,7 +166,7 @@ class ErrorSearchRequest(BaseModel):
     equipment_filter: Optional[str] = None
 
 
-class ErrorSearchResult(BaseModel):
+class ErrorSearchResult(LineageFields):
     code: str
     equipment_type: str
     category: str
@@ -174,7 +183,7 @@ class CausalityInfo(BaseModel):
     actions: list[str] = Field(default_factory=list)
 
 
-class ManualExcerpt(BaseModel):
+class ManualExcerpt(LineageFields):
     content: str
     source: str = ""
     page: str = ""
@@ -207,7 +216,7 @@ class ErrorCategoriesResponse(BaseModel):
 # ═══════════════════════════════════════════════════════════
 
 
-class MarkovPrediction(BaseModel):
+class MarkovPrediction(LineageFields):
     code: str
     category: str
     equipment_type: str
@@ -244,7 +253,7 @@ class MarkovResponse(BaseModel):
 # ═══════════════════════════════════════════════════════════
 
 
-class MoldItem(BaseModel):
+class MoldItem(LineageFields):
     mold_id: str
     mold_name: str
     mold_type: str = ""
@@ -275,7 +284,7 @@ class MoldsResponse(BaseModel):
 # ═══════════════════════════════════════════════════════════
 
 
-class MTBFItem(BaseModel):
+class MTBFItem(LineageFields):
     machine_id: str
     machine_name: str
     total_repairs: int
@@ -310,7 +319,7 @@ class MTBFResponse(BaseModel):
 EngineStatus = Literal["online", "offline", "warning"]
 
 
-class MLEngineStatus(BaseModel):
+class MLEngineStatus(LineageFields):
     """7종 ML 모델 개별 상태."""
 
     id: str
@@ -350,7 +359,7 @@ class ManualSearchResponse(BaseModel):
 # ═══════════════════════════════════════════════════════════
 
 
-class SPCUploadResponse(BaseModel):
+class SPCUploadResponse(LineageFields):
     process_id: str
     n_samples: int
     mean: float
@@ -371,7 +380,7 @@ class ChecklistItem(BaseModel):
     unit: str = ""
 
 
-class ChecklistTemplate(BaseModel):
+class ChecklistTemplate(LineageFields):
     id: int
     template_name: str
     equipment_type: str

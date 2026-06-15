@@ -1,17 +1,14 @@
-// Day 5 Phase 4-B — 파일 업로드 API
-// 옵션 B: Frontend 가 Firebase Storage 직접 업로드 + 백엔드 /upload 로 텍스트 추출.
-// Storage 업로드는 Firebase Auth 가 통합되어 있을 때만 시도한다 (rules: uid 검사).
-// 비통합 환경에서는 fileUrl=undefined 로 우아하게 진행 — 백엔드 텍스트 추출만 사용.
+// Day 5 Phase 4-B — 파일 업로드 API.
+// Firebase Storage 직접 업로드 대신 백엔드 signed URL을 통해 Supabase Storage에 저장한다.
 
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { auth, storage } from '@lib/firebase';
+import { api } from '@api/client';
 import { ONBOARDING_BASE, authHeaders } from '@api/onboarding';
 
 export interface UploadResult {
   fileName: string;
   isImage: boolean;
   text: string;
-  /** Storage public URL (Firebase Auth 비통합 시 undefined). */
+  /** 서버 저장소 URL (Firebase write 차단 또는 비통합 시 undefined). */
   fileUrl?: string;
   /** 백엔드가 base64 로 반환하는 이미지 (비전 첨부용 fallback). */
   imageBase64?: string;
@@ -20,22 +17,47 @@ export interface UploadResult {
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
 
-function safeBase(name: string): string {
-  return name.replace(/[^A-Za-z0-9._-]/g, '_').slice(-80);
+interface SignedUploadResponse {
+  attachment_id: string;
+  bucket: string;
+  object_path: string;
+  signed_url: string;
+  token: string;
+  method: 'PUT';
 }
 
-/** Firebase Storage 에 직접 업로드. 인증/Storage 미초기화면 undefined 반환. */
+interface CompleteUploadResponse {
+  ok: boolean;
+  attachment_id: string;
+  signed_download_url?: string | null;
+}
+
+/** Supabase Storage signed URL 업로드. 미구성 환경에서는 호출 측에서 fallback 처리한다. */
 export async function uploadToStorage(
   file: File,
   path: 'images' | 'uploads',
 ): Promise<string | undefined> {
-  if (!storage) return undefined;
-  const uid = auth?.currentUser?.uid;
-  if (!uid) return undefined;
-  const ts = Date.now();
-  const r = storageRef(storage, `${path}/${uid}/${ts}_${safeBase(file.name)}`);
-  const snap = await uploadBytes(r, file, { contentType: file.type || undefined });
-  return getDownloadURL(snap.ref);
+  const signedRes = await api.post<SignedUploadResponse>('/storage/signed-upload', {
+    bucket_type: 'attachments',
+    file_name: file.name,
+    content_type: file.type || '',
+    size_bytes: file.size,
+    prefix: path,
+  });
+  const signed = signedRes.data;
+  const uploadRes = await fetch(signed.signed_url, {
+    method: signed.method || 'PUT',
+    headers: file.type ? { 'Content-Type': file.type } : undefined,
+    body: file,
+  });
+  if (!uploadRes.ok) {
+    const detail = await uploadRes.text().catch(() => `${uploadRes.status}`);
+    throw new Error(`스토리지 업로드 실패: ${detail || uploadRes.status}`);
+  }
+  const completeRes = await api.post<CompleteUploadResponse>('/storage/complete-upload', {
+    attachment_id: signed.attachment_id,
+  });
+  return completeRes.data.signed_download_url || undefined;
 }
 
 /** 파일 첨부용 — 백엔드 /upload 로 텍스트 추출 + Storage 업로드 시도. */

@@ -5,13 +5,39 @@ Ollama 서버가 실행 중이고, 모델이 설치되어 있어야 한다.
 """
 
 import asyncio
+import os
 import sys
 from pathlib import Path
+
+import pytest
 
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from config import LLM_MODEL, EMBEDDING_MODEL, OLLAMA_BASE_URL
+
+
+# ──────────────────────────────────────────────
+# v4.7 test isolation — Ollama 서버 미가동 시 skip (Pattern 6)
+# ──────────────────────────────────────────────
+
+
+def _ollama_available() -> bool:
+    try:
+        import httpx
+        host = os.environ.get("OLLAMA_HOST", OLLAMA_BASE_URL)
+        if not host.startswith("http"):
+            host = f"http://{host}"
+        r = httpx.get(f"{host.rstrip('/')}/api/tags", timeout=2)
+        return r.status_code == 200
+    except Exception:
+        return False
+
+
+pytestmark = pytest.mark.skipif(
+    not _ollama_available(),
+    reason="Ollama 서버 미가동 — 통합 테스트 skip",
+)
 
 
 # ===== 0. Ollama 서버 연결 확인 =====

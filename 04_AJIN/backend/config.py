@@ -16,6 +16,9 @@ CORS_ORIGINS = [
     # Firebase Hosting (production)
     "https://ajin-cb.web.app",
     "https://ajin-cb.firebaseapp.com",
+    # Vercel frontend hosting. Normal browser traffic uses same-origin /api rewrites,
+    # but direct Cloud Run API testing from this origin should also pass CORS.
+    "https://ajin-ai-assistant-frontend.vercel.app",
 ]
 
 # API prefix

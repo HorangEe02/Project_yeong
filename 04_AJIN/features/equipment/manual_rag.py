@@ -46,7 +46,7 @@ class ManualRAG:
         """
         collection = self._get_collection()
         if not collection:
-            return []
+            return self._search_local_manuals(query, equipment_type, n_results)
 
         try:
             where_filter = None
@@ -76,7 +76,87 @@ class ManualRAG:
 
         except Exception as e:
             logger.warning(f"매뉴얼 검색 실패: {e}")
+            return self._search_local_manuals(query, equipment_type, n_results)
+
+    def _search_local_manuals(
+        self,
+        query: str,
+        equipment_type: str = None,
+        n_results: int = 5,
+    ) -> list[dict]:
+        """Search local manual text files when ChromaDB is unavailable.
+
+        Args:
+            query: Natural-language maintenance query.
+            equipment_type: Optional equipment type filter.
+            n_results: Maximum number of excerpts.
+
+        Returns:
+            List of excerpt dictionaries compatible with the vector search path.
+        """
+
+        if not MANUALS_DIR.exists():
             return []
+
+        tokens = [t for t in query.lower().split() if len(t) >= 2]
+        scored: list[tuple[int, Path, str]] = []
+        for file_path in sorted(MANUALS_DIR.iterdir()):
+            if file_path.suffix.lower() not in (".md", ".txt"):
+                continue
+            if equipment_type and equipment_type not in file_path.stem and equipment_type not in file_path.name:
+                # Do not over-filter; Korean manual content often carries the
+                # equipment type even when the filename is English.
+                pass
+            try:
+                text = file_path.read_text(encoding="utf-8")
+            except Exception:
+                continue
+            blob = text.lower()
+            score = sum(blob.count(token) for token in tokens) if tokens else 0
+            if equipment_type and equipment_type in text:
+                score += 2
+            if score > 0:
+                scored.append((score, file_path, text))
+
+        scored.sort(key=lambda item: item[0], reverse=True)
+        items: list[dict] = []
+        for score, file_path, text in scored[:n_results]:
+            excerpt = self._build_excerpt(text, tokens)
+            items.append({
+                "content": excerpt,
+                "metadata": {
+                    "source": file_path.name,
+                    "equipment_type": _infer_equipment_type(file_path.stem),
+                    "fallback": "local_text",
+                },
+                "relevance": round(min(0.99, score / max(score + 3, 1)), 3),
+            })
+        return items
+
+    @staticmethod
+    def _build_excerpt(text: str, tokens: list[str], window: int = 420) -> str:
+        """Build a compact excerpt around the first query-token match.
+
+        Args:
+            text: Source manual text.
+            tokens: Lowercase query tokens.
+            window: Maximum excerpt length.
+
+        Returns:
+            Trimmed text excerpt.
+        """
+
+        lower = text.lower()
+        first_idx = -1
+        for token in tokens:
+            idx = lower.find(token)
+            if idx >= 0 and (first_idx < 0 or idx < first_idx):
+                first_idx = idx
+        if first_idx < 0:
+            return text[:window].strip()
+        start = max(0, first_idx - window // 3)
+        end = min(len(text), start + window)
+        return text[start:end].strip()
 
     def answer_with_context(
         self,

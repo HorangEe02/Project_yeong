@@ -1,37 +1,154 @@
-"""기능 D: 법규/규정 업데이트 모니터링
+"""기능 D: 법규/규정 업데이트 모니터링.
+
+v4.7 D mv: 58 모듈을 6 서브패키지로 물리 이동.
+  - crawlers/   12 크롤러
+  - rag/        8 RAG·시뮬레이션
+  - alerts/     10 변경 감지·알림
+  - supply/     5 협력사
+  - learning/   4 학습·보고서
+  - infra/      19 인프라·공통
+
+v4.7 호환: 옛 경로 `features.compliance.<module>` 와 `from features.compliance import <module>`
+모두 동작. 새 코드는 `features.compliance.<sub>.<module>` 사용.
+v4.8 DeprecationWarning · v5.0 제거 예정.
 
 시나리오 모드(데모)와 실시간 모드(운영)를 지원하는
 법규 변경 감지 → 영향 분석 → 알림 생성 파이프라인.
-
-크롤러 목록:
-- ISO 국제규격 표준 크롤러
-- APQP 연구개발 프로세스 크롤러
-- MSDS 유해물질 크롤러
-- 국내법규 통합 크롤러 (산안법, 중대재해, 환경법 등)
-- EU 규제 통합 크롤러 (RoHS, ELV, 배터리규정, CBAM 등)
-- OEM 품질기준 크롤러 (SQ, CQI, BIQS, Formel-Q)
-- 탄소/ESG 크롤러 (CBAM, CSRD, 탄소중립)
-- EV 배터리 안전 크롤러 (UN GTR 20, R100, IEC)
-- 미국/중국 규제 크롤러 (IRA, TSCA, 중국REACH)
 """
 
+from __future__ import annotations
+
+import sys as _sys
 from pathlib import Path
 
-from features.compliance.crawler import ScenarioLoader, LawCrawler, RegulationChange
-from features.compliance.facility_db import FacilityDB
-from features.compliance.text_change_detector import ChangeDetector
-from features.compliance.impact_analyzer import ImpactAnalyzer, ImpactReport
-from features.compliance.alert_generator import AlertGenerator, Alert
-from features.compliance.compliance_checker import ComplianceChecker
-from features.compliance.iso_crawler import ISOCrawler
-from features.compliance.apqp_crawler import APQPCrawler
-from features.compliance.msds_crawler import MSDSCrawler
-from features.compliance.domestic_law_crawler import DomesticLawCrawler
-from features.compliance.eu_regulation_crawler import EURegulationCrawler
-from features.compliance.oem_quality_crawler import OEMQualityCrawler
-from features.compliance.carbon_esg_crawler import CarbonESGCrawler
-from features.compliance.ev_battery_crawler import EVBatteryCrawler
-from features.compliance.global_trade_crawler import GlobalTradeCrawler
+# ── 6 서브패키지 노출 ──
+from features.compliance import (
+    crawlers,
+    rag,
+    alerts,
+    supply,
+    learning,
+    infra,
+)
+
+# ── 신 경로에서 핵심 심볼 재노출 (CompliancePipeline 용 + 외부 호환) ──
+from features.compliance.crawlers.crawler import (
+    ScenarioLoader,
+    LawCrawler,
+    RegulationChange,
+)
+from features.compliance.crawlers.iso_crawler import ISOCrawler
+from features.compliance.crawlers.apqp_crawler import APQPCrawler
+from features.compliance.crawlers.msds_crawler import MSDSCrawler
+from features.compliance.crawlers.domestic_law_crawler import DomesticLawCrawler
+from features.compliance.crawlers.eu_regulation_crawler import EURegulationCrawler
+from features.compliance.crawlers.oem_quality_crawler import OEMQualityCrawler
+from features.compliance.crawlers.carbon_esg_crawler import CarbonESGCrawler
+from features.compliance.crawlers.ev_battery_crawler import EVBatteryCrawler
+from features.compliance.crawlers.global_trade_crawler import GlobalTradeCrawler
+
+from features.compliance.alerts.text_change_detector import ChangeDetector
+from features.compliance.alerts.alert_generator import AlertGenerator, Alert
+
+from features.compliance.infra.facility_db import FacilityDB
+from features.compliance.infra.impact_analyzer import ImpactAnalyzer, ImpactReport
+from features.compliance.infra.compliance_checker import ComplianceChecker
+
+
+# ──────────────────────────────────────────────────────────────────────
+# v4.7 백워드 호환: 옛 모듈 경로 별칭 등록
+# ----------------------------------------------------------------------
+# 외부 코드 444건이 `from features.compliance.<module> import X` 또는
+# `from features.compliance import <module>` 형태로 import 중.
+# 물리 위치는 sub 로 옮겼지만 sys.modules 에 옛 이름을 별칭으로 등록해
+# 두 import 형태 모두 동작하게 한다. v4.8 에서 DeprecationWarning, v5.0 제거.
+# ──────────────────────────────────────────────────────────────────────
+
+_LEGACY_MAP = {
+    # crawlers
+    "apqp_crawler": "crawlers.apqp_crawler",
+    "base_crawler": "crawlers.base_crawler",
+    "carbon_esg_crawler": "crawlers.carbon_esg_crawler",
+    "crawler": "crawlers.crawler",
+    "domestic_law_crawler": "crawlers.domestic_law_crawler",
+    "eu_regulation_crawler": "crawlers.eu_regulation_crawler",
+    "ev_battery_crawler": "crawlers.ev_battery_crawler",
+    "global_trade_crawler": "crawlers.global_trade_crawler",
+    "iso_crawler": "crawlers.iso_crawler",
+    "msds_crawler": "crawlers.msds_crawler",
+    "oem_quality_crawler": "crawlers.oem_quality_crawler",
+    "us_trade_crawler": "crawlers.us_trade_crawler",
+    # rag
+    "accounting_trace": "rag.accounting_trace",
+    "cost_simulator": "rag.cost_simulator",
+    "demo_scenario_engine": "rag.demo_scenario_engine",
+    "financial_baseline": "rag.financial_baseline",
+    "regulation_context": "rag.regulation_context",
+    "regulation_qa": "rag.regulation_qa",
+    "tariff_simulator": "rag.tariff_simulator",
+    "whatif_engine": "rag.whatif_engine",
+    # alerts
+    "alarm_aggregator": "alerts.alarm_aggregator",
+    "alert_generator": "alerts.alert_generator",
+    "change_classifier": "alerts.change_classifier",
+    "change_detector": "alerts.change_detector",
+    "legal_classifier": "alerts.legal_classifier",
+    "notify": "alerts.notify",
+    "notify_slack": "alerts.notify_slack",
+    "notify_sms": "alerts.notify_sms",
+    "regulation_classifier": "alerts.regulation_classifier",
+    "text_change_detector": "alerts.text_change_detector",
+    # supply
+    "industry_trend": "supply.industry_trend",
+    "supplier_compliance": "supply.supplier_compliance",
+    "supplier_discovery": "supply.supplier_discovery",
+    "supplier_graph": "supply.supplier_graph",
+    "supplier_recommender": "supply.supplier_recommender",
+    # learning
+    "exec_report": "learning.exec_report",
+    "learning_path": "learning.learning_path",
+    "lms_export": "learning.lms_export",
+    "regulation_exporter": "learning.regulation_exporter",
+    # infra
+    "_http": "infra._http",
+    "approval_workflow": "infra.approval_workflow",
+    "case_law_indexer": "infra.case_law_indexer",
+    "collab_ticket": "infra.collab_ticket",
+    "compliance_checker": "infra.compliance_checker",
+    "compliance_db": "infra.compliance_db",
+    "contract_indexer": "infra.contract_indexer",
+    "delegation_rules": "infra.delegation_rules",
+    "facility_db": "infra.facility_db",
+    "feedback_loop": "infra.feedback_loop",
+    "impact_analyzer": "infra.impact_analyzer",
+    "impact_network": "infra.impact_network",
+    "jira_sync": "infra.jira_sync",
+    "plant_regulation_mapper": "infra.plant_regulation_mapper",
+    "regulation_indexer": "infra.regulation_indexer",
+    "risk_scorer": "infra.risk_scorer",
+    "sop_diff": "infra.sop_diff",
+    "timeline_builder": "infra.timeline_builder",
+    "version_manager": "infra.version_manager",
+}
+
+
+def _register_legacy_aliases() -> None:
+    """옛 경로(features.compliance.<module>)를 신 경로 모듈에 alias."""
+    import importlib
+
+    for legacy_name, new_relative in _LEGACY_MAP.items():
+        full_new = f"features.compliance.{new_relative}"
+        full_legacy = f"features.compliance.{legacy_name}"
+        try:
+            mod = importlib.import_module(full_new)
+        except Exception:  # 모듈 자체에 import 에러가 있으면 별칭만 스킵
+            continue
+        _sys.modules[full_legacy] = mod
+        # 본 패키지 속성으로도 노출 → `from features.compliance import <module>` 지원
+        globals()[legacy_name] = mod
+
+
+_register_legacy_aliases()
 
 
 class CompliancePipeline:
@@ -74,15 +191,10 @@ class CompliancePipeline:
         if not change:
             return {"error": f"시나리오 {scenario_id}를 찾을 수 없습니다."}
 
-        # 변경 감지
         change_analysis = self.detector.detect(
             change.before_text, change.after_text
         )
-
-        # 영향 분석
         report = self.analyzer.analyze(change)
-
-        # 알림 생성
         alert = self.alert_gen.generate(report)
 
         return {
@@ -102,7 +214,6 @@ class CompliancePipeline:
         change_analysis = self.detector.detect(
             change.before_text, change.after_text
         )
-
         report = await self.analyzer.analyze_with_llm(change)
         alert = self.alert_gen.generate(report)
 
@@ -526,3 +637,19 @@ class CompliancePipeline:
             "ev_battery": self.crawl_ev_battery(),
             "global_trade": self.crawl_global_trade(),
         }
+
+
+__all__ = [
+    "crawlers", "rag", "alerts", "supply", "learning", "infra",
+    "CompliancePipeline",
+    "ScenarioLoader", "LawCrawler", "RegulationChange",
+    "ISOCrawler", "APQPCrawler", "MSDSCrawler",
+    "DomesticLawCrawler", "EURegulationCrawler",
+    "OEMQualityCrawler", "CarbonESGCrawler",
+    "EVBatteryCrawler", "GlobalTradeCrawler",
+    "ChangeDetector",
+    "AlertGenerator", "Alert",
+    "FacilityDB",
+    "ImpactAnalyzer", "ImpactReport",
+    "ComplianceChecker",
+] + list(_LEGACY_MAP.keys())

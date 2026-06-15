@@ -1,18 +1,11 @@
-// 진행 중 알람 시드 — Dashboard 빠른 액션 카드 + 우측 패널
+// MSW handlers 용 알람 mock 시드.
+// v4.2 M3 — 타입·SEVERITY_LABEL 은 `@/types/alarms` 로 이관. 본 파일은 mock 데이터만 보유.
 
-export type AlarmSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+import type { Alarm } from '@/types/alarms';
+export type { Alarm, AlarmSeverity } from '@/types/alarms';
+export { SEVERITY_LABEL } from '@/types/alarms';
 
-export interface MockAlarm {
-  id: string;
-  severity: AlarmSeverity;
-  title: string;
-  detail: string;
-  module: 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
-  timestamp: string;
-  acknowledged: boolean;
-}
-
-export const ALARMS: MockAlarm[] = [
+export const ALARMS: Alarm[] = [
   {
     id: 'A-001',
     severity: 'HIGH',
@@ -41,10 +34,3 @@ export const ALARMS: MockAlarm[] = [
     acknowledged: false,
   },
 ];
-
-export const SEVERITY_LABEL: Record<AlarmSeverity, { ko: string; en: string; color: string }> = {
-  CRITICAL: { ko: '위급', en: 'CRITICAL', color: 'var(--hud-red)' },
-  HIGH: { ko: '높음', en: 'HIGH', color: 'var(--hud-orange)' },
-  MEDIUM: { ko: '보통', en: 'MEDIUM', color: 'var(--hud-blue)' },
-  LOW: { ko: '낮음', en: 'LOW', color: 'var(--hud-green)' },
-};

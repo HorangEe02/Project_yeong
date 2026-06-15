@@ -14,6 +14,8 @@ from datetime import datetime, timedelta
 from typing import Optional
 from pathlib import Path
 
+from core.data_lineage import ensure_lineage_columns, lineage_values
+
 
 DB_PATH = Path("data/equipment/error_history.db")
 
@@ -50,23 +52,46 @@ class ErrorHistoryDB:
             """)
             conn.execute("CREATE INDEX IF NOT EXISTS idx_eh_code ON error_history(error_code)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_eh_occurred ON error_history(occurred_at)")
+            ensure_lineage_columns(conn, "error_history")
+            lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
+            conn.execute(
+                """UPDATE error_history
+                      SET data_class = ?,
+                          source_system = ?,
+                          source_label = ?,
+                          source_updated_at = ?
+                    WHERE data_class IS NULL OR data_class = '' OR data_class = 'unknown'""",
+                (
+                    lineage["data_class"],
+                    lineage["source_system"],
+                    lineage["source_label"],
+                    lineage["source_updated_at"],
+                ),
+            )
 
     def add_record(self, error_code: str, equipment_type: str,
                    equipment_id: str = "", occurred_at: str = "",
                    resolved_at: str = "", resolution_minutes: int = 0,
                    root_cause: str = "", action_taken: str = "",
                    operator_name: str = "", shift: str = "",
-                   plant: str = "경산본사", severity: str = "MEDIUM") -> int:
+                   plant: str = "경산본사", severity: str = "MEDIUM",
+                   data_class: str = "synthetic",
+                   source_system: str = "seed_equipment",
+                   source_label: str = "seed_equipment") -> int:
+        lineage = lineage_values(data_class, source_system, source_label)
         with sqlite3.connect(self.db_path) as conn:
             cur = conn.execute("""
                 INSERT INTO error_history
                 (error_code, equipment_type, equipment_id, occurred_at,
                  resolved_at, resolution_minutes, root_cause, action_taken,
-                 operator_name, shift, plant, severity)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 operator_name, shift, plant, severity,
+                 data_class, source_system, source_label, source_updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (error_code, equipment_type, equipment_id, occurred_at,
                   resolved_at, resolution_minutes, root_cause, action_taken,
-                  operator_name, shift, plant, severity))
+                  operator_name, shift, plant, severity, lineage["data_class"],
+                  lineage["source_system"], lineage["source_label"],
+                  lineage["source_updated_at"]))
             return cur.lastrowid
 
     def get_summary(self, error_code: str, months: int = 3) -> dict:

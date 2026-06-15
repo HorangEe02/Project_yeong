@@ -8,6 +8,8 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+from core.data_lineage import ensure_lineage_columns, lineage_values
+
 logger = logging.getLogger(__name__)
 
 ERROR_DB_PATH = Path("data/equipment/error_codes.db")
@@ -39,6 +41,22 @@ def init_error_db(db_path: Path = ERROR_DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_error_equip
         ON error_codes(equipment_type, error_code);
     """)
+    ensure_lineage_columns(conn, "error_codes")
+    seed_lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
+    conn.execute(
+        """UPDATE error_codes
+              SET data_class = ?,
+                  source_system = ?,
+                  source_label = ?,
+                  source_updated_at = ?
+            WHERE data_class IS NULL OR data_class = '' OR data_class = 'unknown'""",
+        (
+            seed_lineage["data_class"],
+            seed_lineage["source_system"],
+            seed_lineage["source_label"],
+            seed_lineage["source_updated_at"],
+        ),
+    )
     conn.commit()
     conn.close()
 
@@ -99,17 +117,24 @@ def add_error_code(
     reference_page: str = "",
     language: str = "ko",
     db_path: Path = ERROR_DB_PATH,
+    data_class: str = "synthetic",
+    source_system: str = "seed_equipment",
+    source_label: str = "seed_equipment",
 ) -> int:
     """에러코드 1건 등록. Returns: ID"""
     init_error_db(db_path)
     conn = sqlite3.connect(str(db_path))
+    lineage = lineage_values(data_class, source_system, source_label)
     cursor = conn.execute(
         """INSERT INTO error_codes
            (equipment_type, equipment_model, error_code, error_name,
-            severity, cause, action, prevention, reference_page, language)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            severity, cause, action, prevention, reference_page, language,
+            data_class, source_system, source_label, source_updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (equipment_type, equipment_model, error_code.upper(), error_name,
-         severity, cause, action, prevention, reference_page, language),
+         severity, cause, action, prevention, reference_page, language,
+         lineage["data_class"], lineage["source_system"], lineage["source_label"],
+         lineage["source_updated_at"]),
     )
     conn.commit()
     row_id = cursor.lastrowid

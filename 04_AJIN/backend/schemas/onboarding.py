@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 # ── 기존 채팅 ────────────────────────────────────────────────
@@ -15,7 +15,24 @@ class ChatMessage(BaseModel):
     content: str
 
 
+class ChatReference(BaseModel):
+    """v4.7 Sprint 2 P0 (축 ①) — InputComposer "/" 으로 인용된 검색 항목.
+
+    프론트엔드의 PaletteItem 과 1:1 매핑. system prompt 에 "사용자가 인용한 항목"
+    컨텍스트로 주입되어 RAG 응답이 인용 항목을 우선 반영하도록 유도한다.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    kind: str          # "person" | "doc" | "page" | "drawing" | "ocr"
+    id: str
+    title: str
+
+
 class OnboardingChatRequest(BaseModel):
+    # 추가 필드 무시 — 프론트엔드가 mode/language(UI 라우팅용) 등을 함께 보내도 OK
+    model_config = ConfigDict(extra="ignore")
+
     query: str
     department: str = "품질보증팀"
     model: str | None = None
@@ -24,12 +41,40 @@ class OnboardingChatRequest(BaseModel):
     # Day 5 Phase 5 — Frontend ModelSelect 가 강제하는 (provider, model) 튜플.
     # Pydantic 은 tuple 직접 지원이 미흡하므로 list[str] 로 받아 라우터에서 tuple 변환.
     force_provider: list[str] | None = None
+    # v4.7 C-2 — 응답 언어 ('auto' 는 query 의 한글/라틴 비율로 감지).
+    # 프론트엔드는 ChatRequestBody.chat_language 필드명으로 송신.
+    chat_language: Literal["ko", "en", "auto"] = Field(default="auto", alias="chat_language")
+    # v4.7 Sprint 2 P0 (축 ①) — InputComposer "/" 으로 인용된 검색 항목 배열.
+    references: list[ChatReference] = Field(default_factory=list)
+
+
+class SourceRef(BaseModel):
+    """Common source reference attached to onboarding answers and content.
+
+    Args:
+        citation_id: Stable citation id used as ``[출처:<id>]``.
+        source_path: Repository path, endpoint, or storage/object id.
+        source_type: Source family such as ``sop``, ``glossary``, or ``kb_markdown``.
+        reviewed_at: Business review date when available.
+        title: Human-readable source title.
+
+    Returns:
+        Pydantic model for response serialization.
+    """
+
+    citation_id: str
+    source_path: str = ""
+    source_type: str
+    reviewed_at: str = ""
+    title: str = ""
 
 
 class OnboardingChatResponse(BaseModel):
     response: str
     model_used: str
     source: str = "llm"  # "llm" | "employee_db" | "glossary"
+    sources: list[SourceRef] = Field(default_factory=list)
+    citation_status: Literal["verified", "corrected", "model_only", "failed"] = "model_only"
 
 
 # ── SOP ──────────────────────────────────────────────────────
@@ -43,6 +88,12 @@ class SopSummary(BaseModel):
     department: str
     category: str
     steps_count: int
+    citation_id: str = ""
+    owner_department: str = ""
+    reviewed_at: str = ""
+    effective_date: str = ""
+    version: str = ""
+    status: str = "published"
 
 
 class SopListResponse(BaseModel):
@@ -66,6 +117,13 @@ class SopDetailResponse(BaseModel):
     title: str
     department: str
     category: str
+    citation_id: str = ""
+    owner_department: str = ""
+    reviewed_at: str = ""
+    effective_date: str = ""
+    version: str = ""
+    status: str = "published"
+    sources: list[SourceRef] = Field(default_factory=list)
     prerequisites: list[str] = Field(default_factory=list)
     safety_warnings: list[str] = Field(default_factory=list)
     related_sops: list[str] = Field(default_factory=list)
@@ -250,4 +308,3 @@ class ActionCardEvent(BaseModel):
     type: Literal["action_card"] = "action_card"
     kind: ActionKind
     payload: dict  # DocumentCardPayload | DraftCardPayload | ... model_dump()
-

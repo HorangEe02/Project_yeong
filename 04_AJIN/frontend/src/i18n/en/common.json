@@ -36,8 +36,44 @@
     "draft": "Document Drafting",
     "onboarding": "AI Work Assistant",
     "compliance": "Compliance Monitor",
-    "admin": "HR Admin",
-    "equipment": "Equipment & Process AI"
+    "admin": "System Management",
+    "equipment": "Equipment & Process AI",
+    "management": "System Management"
+  },
+  "management": {
+    "title": "Management Console",
+    "subtitle": "Users · Audit Log · System · Stats",
+    "cat": {
+      "users": "Users",
+      "audit": "Audit",
+      "system": "System",
+      "stats": "Stats"
+    },
+    "actions": {
+      "bulk_upload": "CSV Upload",
+      "bulk_role": "Bulk Role Change",
+      "export_csv": "Download CSV"
+    }
+  },
+  "admin": {
+    "tabs": {
+      "account_delegation": "Account Delegation",
+      "security_alerts": "Security Alerts",
+      "system_health": "System Health"
+    },
+    "notice": {
+      "title": "Admin console has been simplified to 3 tabs",
+      "users": "User provisioning is handled by your corporate IdP",
+      "search": "Search analytics moved to /search/analytics",
+      "stats": "Usage analytics merged into Equipment → KPI dashboard",
+      "dismiss": "Don't show again"
+    },
+    "idp_managed": {
+      "title": "Users are managed by your corporate IdP",
+      "body": "Request additions/edits/removals via the IT Strategy team",
+      "console_link": "Open IdP Console",
+      "fallback": "Contact administrator"
+    }
   },
   "right_panel": {
     "system_analytics": "SYSTEM ANALYTICS",
@@ -74,12 +110,10 @@
     "submit": "Sign In",
     "policy_title": "Password Policy",
     "policy": {
-      "min_length": "Min 8 characters",
-      "uppercase": "1+ uppercase",
-      "lowercase": "1+ lowercase",
-      "number": "1+ digit",
-      "special": "1+ special char",
-      "no_repeat": "No 3 repeat chars"
+      "min_length": "Min 12 characters",
+      "max_bytes": "Max 72 UTF-8 bytes",
+      "not_common": "No common passwords",
+      "not_context": "No company/service terms"
     },
     "error": {
       "title": "Sign-in failed",
@@ -93,7 +127,7 @@
     },
     "demo": {
       "label": "Demo Account Quick Login",
-      "hint": "Demo only — visible in DEV mode or with ?demo=1"
+      "hint": "Mock demo only — not used for release smoke"
     },
     "change_pw": {
       "title": "Password Change Required",
@@ -223,7 +257,7 @@
       "error": "Response failed"
     },
     "provider": {
-      "gemini": "Gemini 2.5 Pro",
+      "gemini": "Gemini 3.5 Flash",
       "ollama": "Ollama (on-prem)",
       "lm_studio": "LM Studio"
     },
@@ -287,7 +321,7 @@
     "model": {
       "label": "Model",
       "auto": "Auto (fallback)",
-      "gemini": "Gemini 2.5 Pro",
+      "gemini": "Gemini 3.5 Flash",
       "qwen": "Ollama qwen3.5:9b",
       "gemma": "Ollama gemma4:e4b",
       "forced_indicator": "(forced)"
@@ -308,6 +342,24 @@
       "uploading": "Uploading image...",
       "analyzing": "Analyzing with vision model...",
       "failed": "Vision analysis failed: {{msg}}"
+    },
+    "voice": {
+      "start": "Voice input",
+      "stop": "Stop recording",
+      "listening": "Listening…",
+      "error": {
+        "notSupported": "This browser does not support voice input",
+        "permission": "Microphone permission required",
+        "noSpeech": "No speech detected",
+        "network": "Voice recognition network error"
+      }
+    },
+    "language": {
+      "label": "Response Language",
+      "auto": "Auto",
+      "korean": "한국어",
+      "english": "English",
+      "tooltip": "Choose AI response language — Auto detects from your question"
     },
     "session": {
       "live": "LIVE",
@@ -426,15 +478,15 @@
     },
     "history": {
       "eyebrow": "HISTORY · Document Log",
-      "title": "Firestore persisted: {{n}}",
+      "title": "Server storage persisted: {{n}}",
       "subtitle": "/ showing latest 30",
       "refresh": "↻ Refresh",
       "loading": "Loading…",
-      "empty": "No history yet. Drafts auto-save to Firestore on generation.",
+      "empty": "No history yet. Drafts auto-save to server storage on generation.",
       "reedit": "Re-edit",
       "delete": "Delete",
       "deleteConfirm": "Delete this draft?",
-      "fbWarn": "Firestore connection failed — {{err}}"
+      "fbWarn": "Server storage connection failed — {{err}}"
     },
     "diff": {
       "eyebrow": "DIFF · Original ↔ Edited",
@@ -562,15 +614,117 @@
       "crit": "CRIT"
     },
     "placeholder": {
-      "manual_error": "Day 7 Phase 4~5 — Error Search + Markov Chain Failure + Manual RAG. Coming soon.",
-      "inspection": "Day 12 — Inspection Checklist + History. Coming soon."
+      "manual_error": "Error search · Markov cascade · Manual RAG",
+      "inspection": "Inspection checklist · history · CSV upload"
     }
   },
-  "auth": {
-    "firebase": {
-      "warning": "Firebase auth failed — some features limited",
-      "bootstrap": "First login — Firebase account auto-created",
-      "failed": "Firebase login failed"
+  "gamification": {
+    "sidebar": {
+      "title": "My Badges",
+      "count": "{{n}} earned",
+      "next": "Next badge",
+      "progress": "{{cur}} / {{tgt}}",
+      "open": "View all",
+      "leaderboard": "Weekly Team Rank",
+      "rank": "#{{rank}} / {{total}}",
+      "percentile": "Top {{p}}%",
+      "too_small": "Team < 3 members — hidden"
+    },
+    "modal": {
+      "title": "Badge Collection",
+      "subtitle": "10 badges — earn via learning & contribution",
+      "earned": "Earned",
+      "locked": "Locked",
+      "close": "Close",
+      "condition": "Condition"
+    },
+    "badges": {
+      "quiz_starter": {
+        "name": "First Quiz",
+        "description": "Completed your first AJIN AI quiz",
+        "condition": "Attempt 1 quiz"
+      },
+      "quiz_master_basic": {
+        "name": "Basic Master",
+        "description": "10 basic-tier quiz answers correct",
+        "condition": "10 correct basic quizzes"
+      },
+      "quiz_master_advanced": {
+        "name": "Advanced Master",
+        "description": "5 advanced-tier quiz answers correct",
+        "condition": "5 correct advanced quizzes"
+      },
+      "sop_explorer": {
+        "name": "SOP Explorer",
+        "description": "Completed all steps of 3 SOPs",
+        "condition": "Finish 3 SOPs"
+      },
+      "sop_completer": {
+        "name": "SOP Finisher",
+        "description": "Completed all department-related SOPs",
+        "condition": "100% department SOPs"
+      },
+      "streak_7": {
+        "name": "7-day Streak",
+        "description": "Used the assistant 7 days in a row",
+        "condition": "7-day streak"
+      },
+      "streak_30": {
+        "name": "30-day Streak",
+        "description": "Used the assistant 30 days in a row",
+        "condition": "30-day streak"
+      },
+      "helpful_voice": {
+        "name": "Helpful Voice",
+        "description": "Submitted 50 feedback responses",
+        "condition": "50 feedback"
+      },
+      "glossary_native": {
+        "name": "Glossary Native",
+        "description": "Looked up 100 glossary terms",
+        "condition": "100 glossary lookups"
+      },
+      "department_pioneer": {
+        "name": "Team Pioneer",
+        "description": "Monthly team #1 overall score",
+        "condition": "Monthly team #1"
+      }
+    }
+  },
+  "permissions": {
+    "matrix": {
+      "title": "Permission Matrix",
+      "dept_col": "Department",
+      "role_col": "Role"
+    },
+    "request": {
+      "title": "Request Permission Change",
+      "reason": "Reason",
+      "dryrun": "Dry-run Preview",
+      "submit": "Submit for Approval"
+    },
+    "queue": {
+      "title": "Approval Queue",
+      "empty": "No pending requests",
+      "action": {
+        "security": "Security Approve",
+        "executive": "Executive Approve",
+        "reject": "Reject"
+      }
+    },
+    "history": {
+      "title": "Change History"
+    },
+    "status": {
+      "pending": "Pending",
+      "security_approved": "Security Approved",
+      "executive_approved": "Executive Approved",
+      "applied": "Applied",
+      "rejected": "Rejected"
+    },
+    "audit": {
+      "actor": "Actor",
+      "diff": "Diff"
     }
   },
   "common": {

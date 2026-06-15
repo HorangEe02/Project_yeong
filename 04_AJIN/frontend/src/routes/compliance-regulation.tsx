@@ -3,11 +3,14 @@
 //   - 검색 결과의 regulations hit 클릭 시 진입
 //   - Design System v2 정합 (--hud-* 토큰, bilingual eyebrow, 2px radius)
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
+  fetchChanges,
   fetchRegulationById,
+  type ChangeItem,
   type RegulationDoc,
+  type RegulationImpact,
 } from '@api/compliance';
 import { GlossaryAutoText } from '@components/compliance/GlossaryProvider';
 
@@ -17,6 +20,7 @@ export function ComplianceRegulationDetail() {
   const [doc, setDoc] = useState<RegulationDoc | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [changes, setChanges] = useState<ChangeItem[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -39,6 +43,34 @@ export function ComplianceRegulationDetail() {
       cancelled = true;
     };
   }, [id]);
+
+  // Issue 3 — 규제별 변경 이력 + 사내 영향 (regulation_changes 테이블 조회)
+  useEffect(() => {
+    if (!doc) return;
+    const regType = (doc.doc_type || '').toLowerCase();
+    if (!regType) return;
+    let cancelled = false;
+    fetchChanges(5, false, regType, id)
+      .then((r) => {
+        if (!cancelled) setChanges(r.changes ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setChanges([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [doc, id]);
+
+  const latestImpact = useMemo<RegulationImpact | null>(() => {
+    const c = changes.find((x) => x.impact_json && x.impact_json !== '{}');
+    if (!c?.impact_json) return null;
+    try {
+      return JSON.parse(c.impact_json) as RegulationImpact;
+    } catch {
+      return null;
+    }
+  }, [changes]);
 
   if (loading) {
     return (
@@ -136,16 +168,138 @@ export function ComplianceRegulationDetail() {
           <p className="dim">본문이 비어 있습니다 (도메인 메타 데이터만 보유).</p>
         )}
       </section>
+
+      {/* Issue 3 — 규제 변경 이력 (과거 vs 현재) */}
+      {changes.length > 0 && (
+        <section className="lg-card lg-reg-changes">
+          <h3>CHANGE HISTORY · 규제 변경 이력</h3>
+          <ul className="lg-change-list">
+            {changes.map((c) => (
+              <li key={c.id} className="lg-change-item">
+                <header>
+                  <span className="lg-chip">{changeTypeLabel(c.change_type)}</span>
+                  <time className="mono dim">{c.detected_at.slice(0, 10)}</time>
+                </header>
+                {c.before_text || c.after_text ? (
+                  <div className="lg-diff">
+                    {c.before_text && (
+                      <div className="lg-diff-before">
+                        <span className="label-en">BEFORE · 이전</span>
+                        <pre>{truncate(c.before_text, 800)}</pre>
+                      </div>
+                    )}
+                    {c.after_text && (
+                      <div className="lg-diff-after">
+                        <span className="label-en">AFTER · 현재</span>
+                        <pre>{truncate(c.after_text, 800)}</pre>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  c.summary && <p className="dim">{c.summary}</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Issue 3 — 아진산업 영향 분석 */}
+      {latestImpact && (
+        <section className="lg-card lg-reg-impact">
+          <h3>IMPACT · 아진산업 영향 분석</h3>
+          <dl className="lg-kv">
+            {latestImpact.affected_plants && latestImpact.affected_plants.length > 0 && (
+              <Field
+                label="영향 사업장"
+                en="AFFECTED PLANTS"
+                value={`${latestImpact.affected_plants.join(', ')} (${latestImpact.affected_plants.length}곳)`}
+              />
+            )}
+            {latestImpact.affected_processes && latestImpact.affected_processes.length > 0 && (
+              <Field
+                label="영향 공정"
+                en="AFFECTED PROCESSES"
+                value={`${latestImpact.affected_processes.join(', ')} (${latestImpact.affected_processes.length}개)`}
+              />
+            )}
+            {typeof latestImpact.affected_workers === 'number' && (
+              <Field
+                label="영향 작업자"
+                en="AFFECTED WORKERS"
+                value={`${latestImpact.affected_workers}명`}
+              />
+            )}
+            {latestImpact.affected_chemicals && latestImpact.affected_chemicals.length > 0 && (
+              <Field
+                label="관련 화학물질"
+                en="CHEMICALS"
+                value={latestImpact.affected_chemicals.join(', ')}
+              />
+            )}
+            {latestImpact.affected_standards && latestImpact.affected_standards.length > 0 && (
+              <Field
+                label="관련 안전기준"
+                en="STANDARDS"
+                value={latestImpact.affected_standards.join(', ')}
+              />
+            )}
+            {typeof latestImpact.risk_score === 'number' && (
+              <Field
+                label="위험 점수"
+                en="RISK SCORE"
+                value={`${latestImpact.risk_score.toFixed(0)} / 100 · ${riskGrade(latestImpact.risk_score)}`}
+                mono
+              />
+            )}
+            {latestImpact.deadline && (
+              <Field label="대응 마감" en="DEADLINE" value={latestImpact.deadline} mono />
+            )}
+            {latestImpact.estimated_cost && (
+              <Field label="예상 비용" en="EST. COST" value={latestImpact.estimated_cost} />
+            )}
+          </dl>
+
+          {latestImpact.required_actions && latestImpact.required_actions.length > 0 && (
+            <>
+              <h4 className="lg-section-h4">RECOMMENDED ACTIONS · 권장 조치</h4>
+              <ol className="lg-action-list">
+                {latestImpact.required_actions.slice(0, 5).map((a, i) => (
+                  <li key={i}>{a}</li>
+                ))}
+              </ol>
+            </>
+          )}
+        </section>
+      )}
     </div>
   );
+}
+
+function changeTypeLabel(t: string): string {
+  return (
+    { added: '신규 추가', removed: '삭제', modified: '변경' } as Record<string, string>
+  )[t] ?? t;
+}
+
+function riskGrade(score: number): string {
+  if (score >= 80) return 'CRITICAL';
+  if (score >= 60) return 'HIGH';
+  if (score >= 40) return 'MEDIUM';
+  return 'LOW';
+}
+
+function truncate(text: string, max: number): string {
+  if (!text) return '';
+  if (text.length <= max) return text;
+  return text.slice(0, max - 1) + '…';
 }
 
 function Field({
   label,
   en,
   value,
-  mono,
-}: {
+  mono }: {
   label: string;
   en: string;
   value?: string | null;

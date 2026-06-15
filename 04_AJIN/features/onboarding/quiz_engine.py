@@ -5,9 +5,12 @@
 - 커리큘럼 단계 완료 검증
 """
 
+import logging
 import random
 from typing import List, Dict, Optional
 from dataclasses import dataclass
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -149,3 +152,37 @@ def _generate_distractors_checklist(correct: str, sop) -> List[str]:
     if len(wrong) < 3:
         wrong.extend(["해당 사항 없음", "자동으로 처리됨", "생략 가능"])
     return random.sample(wrong, min(3, len(wrong)))
+
+
+def record_quiz_result(
+    user_id: str,
+    question: QuizQuestion,
+    is_correct: bool,
+    user_department: str = "",
+) -> None:
+    """v4.7 C-4 — 게이미피케이션: 퀴즈 정/오답 결과 영속화 + 즉시 배지 평가.
+
+    호출 지점: backend/routers/onboarding.py 의 quiz submit endpoint.
+    실패해도 사용자 응답에는 영향 없음 (graceful — 로그만).
+    """
+    try:
+        from features.onboarding import gamification_db as gdb
+        from features.onboarding.gamification import evaluate_badges
+
+        gdb.record_quiz_attempt(
+            user_id=user_id,
+            is_correct=is_correct,
+            category=question.category or "sop",
+            difficulty=question.difficulty or "basic",
+            sop_id=question.source_id or "",
+            source_id=question.source_id or "",
+            related_step=question.related_step or 0,
+            user_department=user_department,
+        )
+        gdb.upsert_daily(user_id, field="quiz_total", delta=1, user_department=user_department)
+        if is_correct:
+            gdb.upsert_daily(user_id, field="quiz_correct", delta=1, user_department=user_department)
+        # 즉시 평가 (트리거 — quiz_starter 등)
+        evaluate_badges(user_id, user_department=user_department, event_hint="quiz")
+    except Exception:  # noqa: BLE001
+        logger.exception("record_quiz_result failed (non-fatal)")

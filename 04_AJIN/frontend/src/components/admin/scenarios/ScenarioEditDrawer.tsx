@@ -12,6 +12,7 @@ import {
   resetScenario,
   updateScenario,
   type ScenarioItem,
+  type ScenarioUpdatePayload,
 } from '@api/admin_scenarios';
 import type { DepartmentTreeResponse } from '@api/admin';
 
@@ -180,7 +181,21 @@ export function ScenarioEditDrawer({ mode, initial, tree, onClose, onSaved, onSh
         }
         saved = await createScenario(draft);
       } else {
-        const { scenario_id: _id, ...patch } = draft;
+        const patch: ScenarioUpdatePayload = {
+          trigger_keywords: draft.trigger_keywords,
+          situation: draft.situation,
+          requesting_dept: draft.requesting_dept,
+          my_actions: draft.my_actions,
+          hand_off_to: draft.hand_off_to,
+          hand_off_items: draft.hand_off_items,
+          deadline_info: draft.deadline_info,
+          related_sop_id: draft.related_sop_id,
+          tips: draft.tips,
+          priority: draft.priority,
+          scope_division: draft.scope_division,
+          lang: draft.lang,
+          is_active: draft.is_active,
+        };
         saved = await updateScenario(draft.scenario_id, patch);
       }
       setMsg('저장 완료');

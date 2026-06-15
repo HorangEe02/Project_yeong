@@ -26,7 +26,12 @@ export function ComplianceCard({ payload, onOpen }: Props) {
     }
   };
 
-  const sevColor = severityColor(payload.severity);
+  // P1 D4 — regulation_qa 모드 (RAG 답변)
+  if (payload.answer !== undefined) {
+    return <RegulationQAView payload={payload} onOpen={handleOpen} />;
+  }
+
+  const sevColor = severityColor(payload.severity || '');
   const dday = payload.days_until_effective;
 
   return (
@@ -77,7 +82,7 @@ export function ComplianceCard({ payload, onOpen }: Props) {
           {payload.excerpt}
         </p>
       )}
-      {payload.affected_departments?.length > 0 && (
+      {payload.affected_departments && payload.affected_departments.length > 0 && (
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
           <span className="lg-meta">영향 부서:</span>
           {payload.affected_departments.map((d) => (
@@ -95,6 +100,81 @@ export function ComplianceCard({ payload, onOpen }: Props) {
           disabled={!payload.full_view_url}
         >
           Module D 에서 자세히 →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+// ─────────────────────────────────────────────────────────────
+// P1 D4 — Regulation Q&A (RAG) view
+// ─────────────────────────────────────────────────────────────
+
+function RegulationQAView({
+  payload,
+  onOpen,
+}: {
+  payload: ComplianceCardPayload;
+  onOpen: () => void;
+}) {
+  const novice = payload.novice_mode;
+  const ragHit = payload.rag_hit;
+  const citations = payload.citations || [];
+
+  return (
+    <div className="lg-action-card" data-kind="compliance">
+      <div className="lg-eyebrow">
+        REGULATION Q&A
+        {novice && (
+          <span className="lg-meta" style={{ color: 'var(--hud-green, #4caf50)' }}>
+            🌱 신입 모드
+          </span>
+        )}
+        {!ragHit && (
+          <span className="lg-meta" style={{ color: 'var(--hud-orange, #f57c00)' }}>
+            ⚠ 검색 미스
+          </span>
+        )}
+      </div>
+      <strong style={{ fontSize: 14, color: 'var(--hud-text)' }}>
+        {payload.title || '규제 Q&A'}
+      </strong>
+      {payload.answer && (
+        <p
+          style={{
+            margin: 0,
+            padding: '10px 12px',
+            borderRadius: 8,
+            background: 'color-mix(in oklab, var(--hud-text) 4%, transparent)',
+            border: '1px solid color-mix(in oklab, var(--hud-text) 8%, transparent)',
+            fontSize: 12,
+            lineHeight: 1.65,
+            color: 'var(--hud-text)',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {payload.answer}
+        </p>
+      )}
+      {citations.length > 0 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span className="lg-meta">출처:</span>
+          {citations.slice(0, 5).map((c, i) => (
+            <span
+              key={`${c.change_id}-${i}`}
+              className="lg-chip"
+              style={{ fontSize: 10, padding: '3px 8px' }}
+              title={`${c.regulation_type} / ${c.item_id}`}
+            >
+              {c.item_title || c.item_id || c.regulation_type}
+            </span>
+          ))}
+        </div>
+      )}
+      <div>
+        <button type="button" className="lg-btn sm" onClick={onOpen}>
+          변경 피드 열기 →
         </button>
       </div>
     </div>

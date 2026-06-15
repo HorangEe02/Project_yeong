@@ -11,7 +11,8 @@
 #
 #   2) Startup 로그 grep — 새 리비전의 lifespan 로그에 다음 키워드가 *모두* 보여야 함:
 #      - "Application startup complete"        (gunicorn worker boot)
-#      - "Firestore → SQLite 동기화 완료"      (auth DB sync — AUTH_BACKEND=firestore 시)
+#      - "Firestore → SQLite 동기화 완료"      (Firebase read fallback enabled)
+#        또는 "Firestore read fallback 비활성" (Supabase/Postgres runtime cutover)
 #      - "✓ 인증 DB 초기화 완료"               (init_auth_db)
 #
 #   3) 금지 키워드 — 다음이 보이면 fail:
@@ -90,10 +91,36 @@ probe_endpoint() {
     return 1
 }
 
+probe_post_endpoint() {
+    # POST 변형 — body 없이도 5xx 가 아닌 응답이면 OK (auth 401 / 422 등 허용).
+    local path="$1"
+    local label="$2"
+    local max_time="${3:-30}"
+    local last_code=0
+    for ((i=1; i<=PROBE_RETRIES; i++)); do
+        local code
+        code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time "$max_time" \
+            -X POST "${BASE_URL%/}${path}" 2>/dev/null || echo "000")
+        last_code=$code
+        if [[ "$code" =~ ^[2345]..$ ]] && [[ "$code" -lt 500 ]]; then
+            pass "[$label] POST HTTP $code (4xx/2xx OK — 5xx 아님)"
+            return 0
+        fi
+        warn "[$label] try=$i/$PROBE_RETRIES HTTP $code (cold start 가능 — 재시도)"
+        sleep "$PROBE_DELAY"
+    done
+    fail "[$label] $PROBE_RETRIES 회 모두 5xx/error/timeout (last=$last_code)"
+    return 1
+}
+
 echo "═══ HTTP Probe ($BASE_URL) ═══"
 probe_failed=0
 probe_endpoint "/api/auth/login"          "auth.login"          || probe_failed=1
 probe_endpoint "/api/admin/hr/summary"    "admin.hr.summary"    || probe_failed=1
+# 크롤러 일괄 실행 — axios ceiling(30s) 안에 응답하는지 + 5xx 아님 보증.
+# 인증 필요하므로 401 기대 (실 동작 검증은 production smoke 의 별도 인증 시나리오).
+probe_post_endpoint "/api/compliance/crawl/run-all" "compliance.crawl.run-all" 30 \
+    || probe_failed=1
 
 if [[ $probe_failed -ne 0 ]]; then
     echo "${RED}HTTP probe failed.${RESET}"
@@ -117,39 +144,70 @@ fi
 
 echo "═══ Startup 로그 검사 (revision=$REVISION) ═══"
 
-LOGS=$(gcloud logging read \
-    "resource.type=\"cloud_run_revision\" AND resource.labels.revision_name=\"$REVISION\"" \
-    --limit=200 --freshness="$LOG_FRESHNESS" \
-    --format='value(textPayload)' \
-    --project="$PROJECT" 2>/dev/null || true)
-
-if [[ -z "$LOGS" ]]; then
-    fail "$REVISION 의 로그가 없음 — 컨테이너가 아직 안 떴거나 로그 권한 문제"
-    exit 2
-fi
+# Cloud Logging 인덱싱 지연 회피 — 초기 freshness 로 한 번 시도 후, 누락 시 retry.
+# 일부 로그(Application startup complete) 가 deploy 직후 ~10초 indexing lag 가능.
+LOG_RETRIES="${LOG_RETRIES:-4}"
+LOG_RETRY_DELAY="${LOG_RETRY_DELAY:-15}"
 
 REQUIRED=(
     "Application startup complete"
     "✓ 인증 DB 초기화 완료"
 )
-# AUTH_BACKEND=firestore 시에만 sync 메시지 기대
-if echo "$LOGS" | grep -q "AUTH_BACKEND" 2>/dev/null \
-   || echo "$LOGS" | grep -q "Firestore" 2>/dev/null; then
-    REQUIRED+=("Firestore → SQLite 동기화 완료")
-fi
 
-required_ok=1
-for keyword in "${REQUIRED[@]}"; do
-    if echo "$LOGS" | grep -qF "$keyword"; then
-        pass "필수 로그: $keyword"
-    else
-        fail "필수 로그 누락: $keyword"
-        required_ok=0
+required_ok=0
+for ((retry=1; retry<=LOG_RETRIES; retry++)); do
+    # retry 마다 freshness window 를 점진 확대 (10m → 14m → 18m → 22m 등)
+    fresh_min=$(( 10 + (retry - 1) * 4 ))
+    LOGS=$(gcloud logging read \
+        "resource.type=\"cloud_run_revision\" AND resource.labels.revision_name=\"$REVISION\"" \
+        --limit=300 --freshness="${fresh_min}m" \
+        --format='value(textPayload)' \
+        --project="$PROJECT" 2>/dev/null || true)
+
+    if [[ -z "$LOGS" ]]; then
+        warn "[try=$retry/$LOG_RETRIES] 로그 비어있음 (freshness=${fresh_min}m) — ${LOG_RETRY_DELAY}s 후 재시도"
+        sleep "$LOG_RETRY_DELAY"
+        continue
     fi
+
+    # Firebase read fallback 이 꺼진 Supabase/Postgres runtime 에서는 sync 완료가 아니라
+    # 의도적인 mirror sync skip 로그가 정상 경로다. 넓은 "Firestore" grep 으로
+    # skip 로그까지 sync 필수 조건으로 오인하지 않도록 fallback 상태를 먼저 판별한다.
+    SYNC_REQ="Firestore → SQLite 동기화 완료"
+    SYNC_SKIP_REQ="Firestore read fallback 비활성"
+    THIS_REQUIRED=("${REQUIRED[@]}")
+    if echo "$LOGS" | grep -qF "$SYNC_SKIP_REQ"; then
+        THIS_REQUIRED+=("$SYNC_SKIP_REQ")
+    elif echo "$LOGS" | grep -q "AUTH_BACKEND=firestore" 2>/dev/null \
+       || echo "$LOGS" | grep -qF "$SYNC_REQ"; then
+        THIS_REQUIRED+=("$SYNC_REQ")
+    fi
+
+    all_found=1
+    missing=()
+    for keyword in "${THIS_REQUIRED[@]}"; do
+        if echo "$LOGS" | grep -qF "$keyword"; then
+            :
+        else
+            all_found=0
+            missing+=("$keyword")
+        fi
+    done
+
+    if [[ $all_found -eq 1 ]]; then
+        for keyword in "${THIS_REQUIRED[@]}"; do
+            pass "필수 로그: $keyword"
+        done
+        required_ok=1
+        break
+    fi
+
+    warn "[try=$retry/$LOG_RETRIES] 누락: ${missing[*]} (freshness=${fresh_min}m) — ${LOG_RETRY_DELAY}s 후 재시도"
+    sleep "$LOG_RETRY_DELAY"
 done
 
 if [[ $required_ok -ne 1 ]]; then
-    echo "${RED}Required startup log missing.${RESET}"
+    fail "필수 로그 ${LOG_RETRIES}회 retry 후에도 일부 누락 — 컨테이너 부팅 실패 또는 인덱싱 lag 비정상"
     exit 2
 fi
 echo

@@ -22,7 +22,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-from backend.dependencies import get_optional_user
+from backend.dependencies import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ class HwpExportRequest(BaseModel):
 
 
 @router.post("/hwp")
-async def export_hwp(req: HwpExportRequest, user=Depends(get_optional_user)):
+async def export_hwp(req: HwpExportRequest, user=Depends(get_current_user)):
     """Markdown → HWP 응답 (서버 측 fallback).
 
     프론트엔드 WASM(@rhwp/core) 실패 시 호출.
@@ -95,7 +95,7 @@ async def export_hwp(req: HwpExportRequest, user=Depends(get_optional_user)):
 
 
 @router.post("/hwpx")
-async def export_hwpx(req: HwpExportRequest, user=Depends(get_optional_user)):
+async def export_hwpx(req: HwpExportRequest, user=Depends(get_current_user)):
     """Markdown → HWPX 응답 (서버 측 fallback)."""
     if not req.content or not req.content.strip():
         raise HTTPException(status_code=400, detail="빈 콘텐츠")
@@ -135,21 +135,31 @@ async def export_hwpx(req: HwpExportRequest, user=Depends(get_optional_user)):
 
 @router.get("/health")
 async def export_health():
-    """Export 서비스 헬스 체크. HwpxExporter 가용성 확인."""
+    """Export 서비스 헬스 체크. HwpxExporter + python-hwpx 가용성 확인."""
     try:
         from features.draft.hwpx_exporter import HwpxExporter  # noqa: F401
+        try:
+            import hwpx  # python-hwpx (PyPI 2.9.1+)
+            hwpx_lib_ok = True
+            hwpx_version = getattr(hwpx, "__version__", "unknown")
+        except ImportError:
+            hwpx_lib_ok = False
+            hwpx_version = None
         return {
-            "status": "ok",
+            "status": "ok" if hwpx_lib_ok else "degraded",
             "engines": {
                 "hwpx_exporter": True,
-                "rhwp_rust_binary": False,  # 향후 subprocess 옵션 활성화 시 True
+                "python_hwpx": hwpx_lib_ok,
+                "python_hwpx_version": hwpx_version,
             },
             "supported": ["hwp", "hwpx"],
-            "note": "프론트엔드 WASM(@rhwp/core)이 1순위 — 본 엔드포인트는 fallback.",
+            "note": (
+                "HWPX = 백엔드 python-hwpx 1순위, HWP = 프론트엔드 rhwp WASM 1순위."
+            ),
         }
     except ImportError:
         return {
             "status": "degraded",
-            "engines": {"hwpx_exporter": False, "rhwp_rust_binary": False},
+            "engines": {"hwpx_exporter": False, "python_hwpx": False},
             "supported": [],
         }

@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
+from core.data_lineage import ensure_lineage_columns, lineage_values
+
 MOLD_DB_PATH = Path("data/equipment/mold_lifecycle.db")
 
 
@@ -59,6 +61,23 @@ def init_mold_db(db_path: Path = MOLD_DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_mold_shots ON mold_shot_logs(mold_id, logged_at);
         CREATE INDEX IF NOT EXISTS idx_mold_maint ON mold_maintenance_logs(mold_id);
     """)
+    for table in ("molds", "mold_shot_logs", "mold_maintenance_logs"):
+        ensure_lineage_columns(conn, table)
+        lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
+        conn.execute(
+            f"""UPDATE {table}
+                  SET data_class = ?,
+                      source_system = ?,
+                      source_label = ?,
+                      source_updated_at = ?
+                WHERE data_class IS NULL OR data_class = '' OR data_class = 'unknown'""",
+            (
+                lineage["data_class"],
+                lineage["source_system"],
+                lineage["source_label"],
+                lineage["source_updated_at"],
+            ),
+        )
     conn.commit()
     conn.close()
 
@@ -68,17 +87,24 @@ def register_mold(
     mold_type: str = "", part_name: str = "", part_number: str = "",
     material: str = "", location: str = "",
     db_path: Path = MOLD_DB_PATH,
+    data_class: str = "synthetic",
+    source_system: str = "seed_equipment",
+    source_label: str = "seed_equipment",
 ) -> None:
     """금형 등록"""
     init_mold_db(db_path)
     conn = sqlite3.connect(str(db_path))
+    lineage = lineage_values(data_class, source_system, source_label)
     conn.execute(
         """INSERT OR REPLACE INTO molds
            (mold_id, mold_name, mold_type, part_name, part_number,
-            material, max_shots, location)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            material, max_shots, location, data_class, source_system,
+            source_label, source_updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (mold_id, mold_name, mold_type, part_name, part_number,
-         material, max_shots, location),
+         material, max_shots, location, lineage["data_class"],
+         lineage["source_system"], lineage["source_label"],
+         lineage["source_updated_at"]),
     )
     conn.commit()
     conn.close()
@@ -88,18 +114,35 @@ def add_shot_log(
     mold_id: str, shots: int,
     defect_count: int = 0, operator: str = "", machine: str = "", note: str = "",
     db_path: Path = MOLD_DB_PATH,
+    data_class: str = "synthetic",
+    source_system: str = "seed_equipment",
+    source_label: str = "seed_equipment",
 ) -> dict:
     """타수 기록 추가. Returns: 업데이트된 금형 상태"""
     init_mold_db(db_path)
     conn = sqlite3.connect(str(db_path))
+    lineage = lineage_values(data_class, source_system, source_label)
 
     defect_rate = round(defect_count / shots * 100, 2) if shots > 0 else 0
 
     conn.execute(
         """INSERT INTO mold_shot_logs
-           (mold_id, shots_added, defect_count, defect_rate, operator, machine, note)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
-        (mold_id, shots, defect_count, defect_rate, operator, machine, note),
+           (mold_id, shots_added, defect_count, defect_rate, operator, machine, note,
+            data_class, source_system, source_label, source_updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            mold_id,
+            shots,
+            defect_count,
+            defect_rate,
+            operator,
+            machine,
+            note,
+            lineage["data_class"],
+            lineage["source_system"],
+            lineage["source_label"],
+            lineage["source_updated_at"],
+        ),
     )
 
     conn.execute(
@@ -181,15 +224,30 @@ def add_maintenance_log(
     mold_id: str, maintenance_type: str, description: str = "",
     cost: float = 0.0, performed_by: str = "",
     db_path: Path = MOLD_DB_PATH,
+    data_class: str = "synthetic",
+    source_system: str = "seed_equipment",
+    source_label: str = "seed_equipment",
 ) -> None:
     """정비 이력 추가"""
     init_mold_db(db_path)
     conn = sqlite3.connect(str(db_path))
+    lineage = lineage_values(data_class, source_system, source_label)
     conn.execute(
         """INSERT INTO mold_maintenance_logs
-           (mold_id, maintenance_type, description, cost, performed_by)
-           VALUES (?, ?, ?, ?, ?)""",
-        (mold_id, maintenance_type, description, cost, performed_by),
+           (mold_id, maintenance_type, description, cost, performed_by,
+            data_class, source_system, source_label, source_updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            mold_id,
+            maintenance_type,
+            description,
+            cost,
+            performed_by,
+            lineage["data_class"],
+            lineage["source_system"],
+            lineage["source_label"],
+            lineage["source_updated_at"],
+        ),
     )
     conn.execute(
         """UPDATE molds

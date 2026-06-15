@@ -24,7 +24,6 @@ PUBLIC_PATHS = frozenset({
     "/api/health",
     "/api/auth/login",
     "/api/auth/refresh",
-    "/api/auth/firebase-exchange",
 })
 
 
@@ -55,7 +54,15 @@ def extract_user_from_token(token: str):
 
     employee_id = payload.get("sub", "")
     role_name = payload.get("role", "EMPLOYEE")
-    role_level = payload.get("role_level", 1)
+    raw_role_level = payload.get("role_level")
+    try:
+        role_level = int(raw_role_level)
+    except (TypeError, ValueError):
+        try:
+            from core.auth.rbac import get_role_level
+            role_level = get_role_level(role_name)
+        except Exception:
+            role_level = 1
 
     # auth.db에서 추가 정보 조회
     department = ""
@@ -99,6 +106,7 @@ def extract_user_from_token(token: str):
         division=division,
         position=position,
         role=role_name,
+        role_level=role_level,
     )
 
 
@@ -141,8 +149,23 @@ def init_audit_db(db_path: Path = AUDIT_DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_audit_endpoint
         ON api_audit_log(endpoint, timestamp DESC);
     """)
+    for sql in (
+        "ALTER TABLE api_audit_log ADD COLUMN latency_ms INTEGER",
+        "ALTER TABLE api_audit_log ADD COLUMN intent TEXT",
+        "ALTER TABLE api_audit_log ADD COLUMN result_count INTEGER",
+        "CREATE INDEX IF NOT EXISTS idx_audit_latency ON api_audit_log(timestamp, latency_ms)",
+    ):
+        try:
+            conn.execute(sql)
+        except sqlite3.OperationalError:
+            pass
     conn.commit()
     conn.close()
+    # Sprint 1 P0 — KPI columns (latency_ms / intent / result_count).
+    # Applied once, idempotent. Existing rows have NULL — acceptable for K1
+    # baseline (P95 computed over non-NULL window).
+    from core.directory import migrations as _dir_migrations
+    _dir_migrations.apply_audit()
 
 
 def log_api_access(
@@ -152,16 +175,26 @@ def log_api_access(
     detail: str = "",
     ip_address: str = "",
     user=None,
+    latency_ms: Optional[int] = None,
+    intent: Optional[str] = None,
+    result_count: Optional[int] = None,
     db_path: Path = AUDIT_DB_PATH,
 ) -> None:
-    """API 호출을 감사 로그에 기록한다."""
+    """API 호출을 감사 로그에 기록한다.
+
+    Sprint 1 P0 — latency_ms/intent/result_count는 마이그레이션 0001 신규 컬럼.
+    """
     try:
+        from core.auth.audit_redaction import redact_audit_detail
+
+        safe_detail = redact_audit_detail(detail)
         init_audit_db(db_path)
         conn = sqlite3.connect(str(db_path))
         conn.execute(
             """INSERT INTO api_audit_log
-               (employee_id, name, department, role, endpoint, method, status_code, detail, ip_address)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               (employee_id, name, department, role, endpoint, method,
+                status_code, detail, ip_address, latency_ms, intent, result_count)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 getattr(user, 'employee_id', '') if user else '',
                 getattr(user, 'name', '') if user else '',
@@ -170,8 +203,11 @@ def log_api_access(
                 endpoint,
                 method,
                 status_code,
-                detail,
+                safe_detail,
                 ip_address,
+                latency_ms,
+                intent,
+                result_count,
             ),
         )
         conn.commit()

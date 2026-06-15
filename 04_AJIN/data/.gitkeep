@@ -1,9 +1,0 @@
-# 이 디렉토리는 git 으로 추적되지 않습니다.
-# scripts/setup-demo-data.py 실행 시 자동으로 생성됩니다.
-#
-# 포함될 파일:
-#   - auth.db, employees.db, compliance.db, scenarios.db (가짜 데모 데이터)
-#   - .jwt_secret (자동 생성, 32-byte hex)
-#   - knowledge_base/, templates/, scenarios/ 등
-#
-# 실 사내 데이터는 절대 commit 금지 (.gitignore 처리 완료).

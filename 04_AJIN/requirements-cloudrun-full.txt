@@ -48,10 +48,15 @@ jinja2>=3.1.0   # Plan v1.0 — DraftPipeline 의 Jinja2 템플릿 렌더링
 python-dotenv>=1.0.0
 rich>=13.0.0
 
+# Firebase → Supabase/PostgreSQL 운영 전환
+SQLAlchemy>=2.0.0
+psycopg[binary]>=3.2.0
+alembic>=1.13.0
+supabase>=2.0.0
+
 # === 풀 모드 추가 의존성 ===
 
 # Module A — HybridSearcher (벡터 검색)
-chromadb>=0.5.0
 langchain>=0.3.0
 langchain-community>=0.3.0
 langchain-chroma>=0.2.0

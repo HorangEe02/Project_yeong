@@ -1,4 +1,6 @@
 // hwp.ts — Phase 1: rhwp WASM 통합 HWP/HWPX 생성 라이브러리.
+import { api } from '@api/client';
+
 // 모든 모듈(B/D/F/E/A)에서 호출 가능. lazy import — 사용 시점에만 WASM 로드 (~3.9MB).
 //
 // 핵심 API: rhwp/core 0.7.7
@@ -8,7 +10,7 @@
 //   - exportHwp(): Uint8Array
 //   - exportHwpx(): Uint8Array
 //
-// WASM 파일: public/rhwp_bg.wasm (vite copy 단계에서 자동 배포)
+// WASM 파일: @rhwp/core 패키지 자산을 Vite가 lazy chunk와 함께 배포한다.
 
 // ──────────────────────────────────────────────────────────
 // 타입 (rhwp/core .d.ts 발췌 — 런타임 동적 로드라 import type 만 사용)
@@ -65,8 +67,8 @@ async function loadRhwp(): Promise<RhwpModule> {
       // 동적 import (Vite manualChunks → rhwp-wasm 청크)
       const mod = (await import('@rhwp/core')) as unknown as RhwpModule;
 
-      // WASM 초기화 — public/ 경로
-      await mod.default({ module_or_path: '/rhwp_bg.wasm' });
+      // WASM 초기화 — 패키지 자산 URL 사용. public/ 복제본을 만들지 않는다.
+      await mod.default();
 
       if (import.meta.env.DEV) {
         console.info('[rhwp] WASM 초기화 완료 (~3.9MB)');
@@ -144,6 +146,7 @@ async function buildHwpDocument(
   exportFormat: 'hwp' | 'hwpx',
   _options?: HwpDocOptions,
 ): Promise<BuildResult> {
+  void _options;
   const mod = await loadRhwp();
   // createEmpty 또는 인스턴스 생성 후 createBlankDocument
   // rhwp/core 0.7.7 : HwpDocument.createEmpty() 정적 메서드 노출
@@ -247,27 +250,37 @@ interface BackendFallbackPayload {
 
 /**
  * 백엔드 /api/export/{hwp|hwpx} 호출 → blob 응답.
- * 프론트 WASM 실패 또는 환경 미지원 시 fallback.
+ *
+ * axios `api` 클라이언트 사용 — request interceptor 가 JWT Bearer 토큰과
+ * CSRF 토큰(쿠키 → X-CSRF-Token 헤더)을 자동 첨부한다. raw fetch() 는 두
+ * 토큰을 모두 누락하여 CookieCSRFMiddleware 에서 403 으로 거부됨.
  */
 async function backendExportHwp(
   format: 'hwp' | 'hwpx',
   payload: BackendFallbackPayload,
 ): Promise<Blob> {
-  const res = await fetch(`/api/export/${format}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      content: payload.content,
-      title: payload.title,
-      doc_type: payload.doc_type ?? 'general',
-      author: payload.author,
-      source: payload.source ?? 'default',
-    }),
-  });
-  if (!res.ok) {
-    throw new Error(`백엔드 ${format.toUpperCase()} 변환 실패: HTTP ${res.status}`);
+  try {
+    const res = await api.post<Blob>(
+      `/export/${format}`,
+      {
+        content: payload.content,
+        title: payload.title,
+        doc_type: payload.doc_type ?? 'general',
+        author: payload.author,
+        source: payload.source ?? 'default',
+      },
+      { responseType: 'blob' },
+    );
+    return res.data;
+  } catch (err: unknown) {
+    const status =
+      typeof err === 'object' && err && 'response' in err
+        ? (err as { response?: { status?: number } }).response?.status
+        : undefined;
+    throw new Error(
+      `백엔드 ${format.toUpperCase()} 변환 실패: HTTP ${status ?? 'network'}`,
+    );
   }
-  return res.blob();
 }
 
 /**
@@ -312,6 +325,7 @@ export async function downloadHwp(
       } catch (frontErr) {
         throw new Error(
           `HWPX 변환 실패 (backend + WASM): ${frontErr instanceof Error ? frontErr.message : String(frontErr)}`,
+          { cause: frontErr },
         );
       }
     }
@@ -352,6 +366,7 @@ export async function downloadHwp(
     } catch (e2) {
       throw new Error(
         `HWP/HWPX 모두 실패: ${e2 instanceof Error ? e2.message : String(e2)} (이전: ${backErr instanceof Error ? backErr.message : String(backErr)})`,
+        { cause: e2 },
       );
     }
   }

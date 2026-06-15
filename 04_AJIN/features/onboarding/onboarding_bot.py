@@ -6,9 +6,15 @@
 """
 
 from pathlib import Path
+from typing import Literal
 
 from features.onboarding.glossary_matcher import GlossaryMatcher, GlossaryEntry
 from features.onboarding.department_router import DepartmentRouter
+from features.onboarding.i18n_router import (
+    resolve_language,
+    build_language_instruction,
+    verify_response_language,
+)
 from core.llm_client import get_llm, invoke_vision
 
 
@@ -40,6 +46,8 @@ class OnboardingBot:
         file_context: str = "",
         image_bytes: bytes | None = None,
         vision_model: str | None = None,
+        language: Literal["ko", "en", "auto"] = "auto",
+        references: list[dict] | None = None,
     ) -> dict:
         """사용자 질문에 대한 답변을 생성한다.
 
@@ -54,10 +62,18 @@ class OnboardingBot:
         if conversation_history is None:
             conversation_history = []
 
+        # v4.7 C-2 — 응답 언어 결정 ('auto' 이면 query 에서 감지)
+        resolved_lang = resolve_language(query, language)
+
         # 이미지가 첨부된 경우 비전 모델로 분석
         if image_bytes:
+            vision_instr = (
+                "다음 질문에 대해 이미지를 분석하여 한국어로 답변하세요."
+                if resolved_lang == "ko"
+                else "Analyze the image and answer the following question in English."
+            )
             vision_answer = invoke_vision(
-                prompt=f"다음 질문에 대해 이미지를 분석하여 한국어로 답변하세요.\n\n질문: {query}",
+                prompt=f"{vision_instr}\n\n{'질문' if resolved_lang == 'ko' else 'Question'}: {query}",
                 image_bytes=image_bytes,
                 model=vision_model,
             )
@@ -67,6 +83,7 @@ class OnboardingBot:
                 "glossary_entry": None,
                 "related_terms": [],
                 "model_used": vision_model or "auto",
+                "language": resolved_lang,
             }
 
         # 1단계: 용어 사전 정확 매칭
@@ -92,7 +109,25 @@ class OnboardingBot:
             conversation_history=conversation_history,
             model=model,
             file_context=file_context,
+            language=resolved_lang,
+            references=references or [],
         )
+
+        # v4.7 C-2 — 응답 언어 검증 (위반 시 1회 재요청)
+        if not verify_response_language(answer_text, resolved_lang):
+            retry_instr = build_language_instruction(resolved_lang)
+            retry_prompt = (
+                f"{retry_instr}\n\n"
+                f"Rewrite the following response in the target language only:\n\n"
+                f"{answer_text}"
+            )
+            try:
+                llm = get_llm(model=model, temperature=0.1) if model else get_llm(temperature=0.1)
+                retried = await llm.ainvoke(retry_prompt)
+                if hasattr(retried, "content") and retried.content:
+                    answer_text = retried.content
+            except Exception:  # noqa: BLE001 — 재요청 실패는 원본 유지
+                pass
 
         # 관련 용어 수집
         related = self.glossary.get_related_entries(glossary_entry)
@@ -103,6 +138,7 @@ class OnboardingBot:
             "glossary_entry": glossary_entry,
             "related_terms": related,
             "model_used": model or "default",
+            "language": resolved_lang,
         }
 
     def _search_knowledge(self, query: str, k: int = 3) -> str:
@@ -138,6 +174,25 @@ class OnboardingBot:
             f"- 난이도: {entry.difficulty}"
         )
 
+    def _format_references(self, references: list[dict]) -> str:
+        """v4.7 Sprint 2 P0 (축 ①) — 사용자가 InputComposer "/" 으로 인용한 항목을
+        system prompt 에 주입 가능한 텍스트 블록으로 포맷팅한다.
+
+        Returns: "[사용자가 인용한 항목]\n- person 박준영(사원)\n..." 또는 빈 문자열.
+        """
+        if not references:
+            return ""
+        lines = ["[사용자가 인용한 항목]"]
+        for ref in references:
+            title = (ref.get("title") or "").strip()
+            if not title:
+                continue
+            kind = (ref.get("kind") or "item").strip() or "item"
+            lines.append(f"- 사용자가 인용한 항목: {kind} {title}")
+        if len(lines) == 1:
+            return ""
+        return "\n".join(lines)
+
     def _format_history(self, history: list[dict]) -> str:
         """대화 이력을 텍스트로 포맷팅한다."""
         if not history:
@@ -158,6 +213,8 @@ class OnboardingBot:
         conversation_history: list[dict],
         model: str | None = None,
         file_context: str = "",
+        language: Literal["ko", "en"] = "ko",
+        references: list[dict] | None = None,
     ) -> str:
         """LLM을 사용하여 최종 답변을 생성한다."""
         dept_context = self.router.get_department_context(department)
@@ -175,6 +232,14 @@ class OnboardingBot:
                 f"[검색 참조 문서]\n{combined_context}"
             )
 
+        # v4.7 Sprint 2 P0 (축 ①) — 사용자가 인용한 검색 항목을 RAG 컨텍스트에 prepend.
+        ref_block = self._format_references(references or [])
+        if ref_block:
+            combined_context = f"{ref_block}\n\n{combined_context}"
+
+        # v4.7 C-2 — 언어 지시문 동적 주입.
+        lang_instruction = build_language_instruction(language)
+
         filled_prompt = (
             self.system_prompt
             .replace("{department_context}", dept_context)
@@ -182,6 +247,11 @@ class OnboardingBot:
             .replace("{rag_context}", combined_context)
             .replace("{conversation_history}", history_text)
             .replace("{user_query}", sanitize_llm_input(query))
+        )
+        # system prompt 끝에 언어 지시 (template 가 {language_instruction} 토큰을 가지지 않아도 작동)
+        filled_prompt = (
+            f"{filled_prompt}\n\n"
+            f"== Language Policy ==\n{lang_instruction}"
         )
 
         llm = get_llm(model=model, temperature=0.3) if model else get_llm(temperature=0.3)

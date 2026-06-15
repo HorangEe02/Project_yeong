@@ -28,12 +28,25 @@ if str(PROJECT_ROOT) not in sys.path:
 
 @pytest.fixture
 def client():
+    from types import SimpleNamespace
+
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
+    from backend.dependencies import get_current_user
     from backend.routers.health import router
 
     app = FastAPI()
     app.include_router(router, prefix="/api")
+    app.dependency_overrides[get_current_user] = lambda: SimpleNamespace(
+        user_id=1,
+        employee_id="A0001",
+        name="admin",
+        department="IT전략팀",
+        division="경영지원본부",
+        position="관리자",
+        role="SYS_ADMIN",
+        role_level=5,
+    )
     return TestClient(app)
 
 
@@ -51,7 +64,7 @@ def test_llm_status_response_schema(client):
     r = client.get("/api/health/llm-status")
     body = r.json()
     expected_top_keys = {
-        "status", "summary", "ollama", "gemini", "features",
+        "status", "summary", "routing", "ollama", "gemini", "features",
         "circuit_breakers", "feature_flags", "tunnel_active",
     }
     assert expected_top_keys.issubset(set(body.keys()))
@@ -117,23 +130,25 @@ def test_llm_status_local_ollama_not_tunnel(client):
     """기본 localhost:11434 → tunnel_active=False."""
     r = client.get("/api/health/llm-status")
     body = r.json()
-    if body["ollama"]["base_url"].startswith("http://localhost"):
+    if body["ollama"]["base_url"] == "configured:local":
         assert body["tunnel_active"] is False
         assert body["ollama"]["is_tunnel"] is False
 
 
 def test_llm_status_detects_trycloudflare_url(monkeypatch):
-    """OLLAMA_BASE_URL 이 trycloudflare.com 이면 is_tunnel=True."""
+    """OLLAMA_BASE_URL 이 trycloudflare.com 이면 tunnel 상태만 노출."""
     from backend.routers import health as health_mod
 
+    raw_url = "https://electrical-beginners-roman-science.trycloudflare.com"
     monkeypatch.setattr(
         health_mod,
         "OLLAMA_BASE_URL",
-        "https://electrical-beginners-roman-science.trycloudflare.com",
+        raw_url,
     )
     result = health_mod._check_ollama()
     assert result.is_tunnel is True
-    assert "trycloudflare" in result.base_url
+    assert result.base_url == "configured:external_https"
+    assert "trycloudflare" not in result.base_url
 
 
 def test_llm_status_empty_ollama_url():
@@ -181,6 +196,36 @@ def test_feature_b_block_can_be_false(client):
         assert r.json()["gemini"]["feature_b_blocked"] is False
 
 
+def test_routing_defaults_to_gemini_for_backward_compat(client):
+    """LLM_ROUTER_PRIMARY 미설정 시 기존 Gemini primary 기본값을 유지."""
+    with patch.dict(os.environ, {}, clear=False):
+        os.environ.pop("LLM_ROUTER_PRIMARY", None)
+        r = client.get("/api/health/llm-status")
+    routing = r.json()["routing"]
+    assert routing["primary_provider"] == "gemini"
+    assert routing["fallback_enabled"] is True
+    assert routing["embedding_backend"] in ("ollama", "gemini", "auto")
+
+
+def test_routing_reports_ollama_primary_and_embedding_backend(client):
+    """Ollama primary 운영값을 status API 가 그대로 노출."""
+    with patch.dict(
+        os.environ,
+        {
+            "LLM_ROUTER_PRIMARY": "ollama",
+            "LLM_ROUTER_FALLBACK_ENABLED": "false",
+            "EMBEDDING_BACKEND": "ollama",
+        },
+    ):
+        r = client.get("/api/health/llm-status")
+    routing = r.json()["routing"]
+    assert routing == {
+        "primary_provider": "ollama",
+        "fallback_enabled": False,
+        "embedding_backend": "ollama",
+    }
+
+
 # ════════════════════════════════════════════════════════════
 # 5. Circuit Breaker
 # ════════════════════════════════════════════════════════════
@@ -206,12 +251,13 @@ def test_circuit_breaker_state_enum(client):
 # ════════════════════════════════════════════════════════════
 
 
-def test_feature_flags_8_keys(client):
+def test_feature_flags_keys(client):
     r = client.get("/api/health/llm-status")
     flags = r.json()["feature_flags"]
     expected = {
         "multi_llm", "compare_mode", "dept_lock", "division_boundary",
         "work_fullscreen", "quick_questions_v2", "inline_actions", "cad_upload",
+        "analyzers_enabled",
     }
     assert set(flags.keys()) == expected
 

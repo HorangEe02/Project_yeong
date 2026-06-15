@@ -5,9 +5,11 @@
 //   components/equipment/
 //     ├── tabs/          (8 sub-tab 컴포넌트)
 //     ├── types.ts       (공유 타입)
-//     ├── mockData.ts    (12 mock 상수)
+//     ├── taxonomy.ts    (도메인 분류 상수 — 7장비 × 증상)
 //     ├── markdownBuilders.ts (5 빌더)
 //     └── stateMappers.ts     (백엔드→UI 매핑)
+//
+// v4.1 — Mock 의존 12 fallback 제거. API 실패는 ErrorState 로 표면화 (Phase 3).
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useUIStore, type EquipmentMainTab, type EquipmentSubTab } from '@store/ui';
@@ -15,14 +17,8 @@ import { useAuthStore } from '@store/auth';
 import { isMenuVisible, getLockReason } from '@lib/rbac';
 import type { Data } from 'plotly.js';
 import {
-  fetchOverview,
-  fetchMolds,
-  fetchMTBF,
-  fetchMLEngines,
   fetchMarkov,
-  fetchErrorCategories,
   fetchSPC,
-  fetchChecklist,
   searchError,
   searchManual,
   uploadSPCCsv,
@@ -30,37 +26,18 @@ import {
   type ManualSearchPayload,
 } from '@api/equipment';
 import type {
-  OverviewResponse,
-  MoldsResponse,
-  MTBFResponse,
-  MLEnginesStatusResponse,
   MarkovResponse,
-  ErrorCategoriesResponse,
   ErrorSearchResponse,
   SPCResponse,
   ManualSearchResponse,
-  InspectionChecklistResponse,
   SPCUploadResponse,
 } from '@/types/equipment';
 
 import type { EquipRow } from '@components/equipment/types';
-import {
-  MOCK_EQUIPMENT,
-  MOCK_ERR_RESULTS,
-  MOCK_INSPECTIONS,
-  MOCK_MAINT_COST,
-  MOCK_MARKOV_CHAIN,
-  MOCK_METRICS,
-  MOCK_ML_ENGINES,
-  MOCK_MOLDS,
-  MOCK_PROCESSES5,
-  MOCK_CL,
-  MOCK_LCL,
-  MOCK_SPC_DATA,
-  MOCK_UCL,
-  SYMPTOM_CATS,
-} from '@components/equipment/mockData';
+import { SYMPTOM_CATS } from '@components/equipment/taxonomy';
 import { backendRiskToUI, backendStatusToUI } from '@components/equipment/stateMappers';
+import { ErrorState } from '@components/common/ErrorState';
+import { useEquipmentData } from '@hooks/useEquipmentData';
 import { DashboardSubTab } from '@components/equipment/tabs/DashboardSubTab';
 import { AlertsSubTab } from '@components/equipment/tabs/AlertsSubTab';
 import { EquipmentTypeSubTab } from '@components/equipment/tabs/EquipmentTypeSubTab';
@@ -69,6 +46,11 @@ import { SPCSubTab } from '@components/equipment/tabs/SPCSubTab';
 import { MLEnginesSubTab } from '@components/equipment/tabs/MLEnginesSubTab';
 import { ManualErrorTab } from '@components/equipment/tabs/ManualErrorTab';
 import { InspectionTab } from '@components/equipment/tabs/InspectionTab';
+import { DailyHeadline } from '@components/equipment/DailyHeadline';
+import { OverviewGuideModal } from '@components/equipment/OverviewGuideModal';
+import { useIsMobile, useIsTablet } from '@hooks/useBreakpoint';
+import { AJINMobileEquipment } from '@components/uikit/AJINMobileEquipment';
+import { AJINTabletEquipment } from '@components/uikit/AJINTabletEquipment';
 
 // ──────────────────────────────────────────────────────────────────────────
 // Tabs 정의
@@ -104,24 +86,34 @@ export function Equipment() {
   const sub = useUIStore((s) => s.equipmentSubTab);
   const setSub = useUIStore((s) => s.setEquipmentSubTab);
 
-  // ── API state ─────────────────────────────────────────
-  const [overview, setOverview] = useState<OverviewResponse | null>(null);
-  const [molds, setMolds] = useState<MoldsResponse | null>(null);
-  const [mtbf, setMtbf] = useState<MTBFResponse | null>(null);
-  const [mlEngines, setMlEngines] = useState<MLEnginesStatusResponse | null>(null);
+  // ── Mount-load 6 endpoint 묶음 ─────────────────────────
+  const eqData = useEquipmentData('프레스');
+  const overview = eqData.overview.data;
+  const molds = eqData.molds.data;
+  const mtbf = eqData.mtbf.data;
+  const mlEngines = eqData.mlEngines.data;
+  const categories = eqData.categories.data;
+  const checklist = eqData.checklist.data;
+
+  const allMountFailed =
+    !!eqData.overview.error &&
+    !!eqData.molds.error &&
+    !!eqData.mtbf.error &&
+    !!eqData.mlEngines.error &&
+    !!eqData.categories.error &&
+    !!eqData.checklist.error;
+
+  // ── 사용자 트리거 API state ─────────────────────────────
   const [markov, setMarkov] = useState<MarkovResponse | null>(null);
-  const [categories, setCategories] = useState<ErrorCategoriesResponse | null>(null);
   const [spcResp, setSpcResp] = useState<SPCResponse | null>(null);
   const [errSearchResp, setErrSearchResp] = useState<ErrorSearchResponse | null>(null);
   const [manualResp, setManualResp] = useState<ManualSearchResponse | null>(null);
-  const [checklist, setChecklist] = useState<InspectionChecklistResponse | null>(null);
 
   const [errSearching, setErrSearching] = useState(false);
   const [manualSearching, setManualSearching] = useState(false);
   const [spcLoading, setSpcLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadResp, setUploadResp] = useState<SPCUploadResponse | null>(null);
-  const [globalApiError, setGlobalApiError] = useState<string | null>(null);
 
   // ── User input state ───────────────────────────────────
   const [errQuery, setErrQuery] = useState('프레스에서 이상한 소리');
@@ -130,33 +122,6 @@ export function Equipment() {
   const [ragQuery, setRagQuery] = useState('베어링 교체 절차');
   const [spcProcessId, setSpcProcessId] = useState<string>('bumper_beam');
   const [uploadProcessId, setUploadProcessId] = useState<string>('cch');
-
-  // ── Mount load ──────────────────────────────────────────
-  useEffect(() => {
-    (async () => {
-      try {
-        const [ov, mld, mt, ml, cat, ck] = await Promise.allSettled([
-          fetchOverview(),
-          fetchMolds(),
-          fetchMTBF(),
-          fetchMLEngines(),
-          fetchErrorCategories(),
-          fetchChecklist('프레스'),
-        ]);
-        if (ov.status === 'fulfilled') setOverview(ov.value);
-        if (mld.status === 'fulfilled') setMolds(mld.value);
-        if (mt.status === 'fulfilled') setMtbf(mt.value);
-        if (ml.status === 'fulfilled') setMlEngines(ml.value);
-        if (cat.status === 'fulfilled') setCategories(cat.value);
-        if (ck.status === 'fulfilled') setChecklist(ck.value);
-        const anySuccess = [ov, mld, mt, ml, cat, ck].some((r) => r.status === 'fulfilled');
-        if (!anySuccess) setGlobalApiError('백엔드 연결 실패 — Mock 데이터로 시연 모드');
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        setGlobalApiError(`API 로드 실패: ${msg} — Mock 데이터로 시연 모드`);
-      }
-    })();
-  }, []);
 
   // ── SPC tab 진입 시 lazy load ──────────────────────────
   useEffect(() => {
@@ -237,9 +202,9 @@ export function Equipment() {
     }
   }, [spcProcessId, uploadProcessId]);
 
-  // ── derive (API → mock fallback) ──────────────────────
+  // ── derive (API 응답 → UI 매핑; null 시 빈 데이터) ──────
   const metrics = useMemo(() => {
-    if (!overview) return MOCK_METRICS;
+    if (!overview) return [];
     const m = overview.metrics;
     const totalAlerts = (overview.processes || []).reduce((acc, p) => acc + (p.violation_count ?? 0), 0);
     return [
@@ -256,7 +221,7 @@ export function Equipment() {
   }, [overview]);
 
   const equipment7 = useMemo<EquipRow[]>(() => {
-    if (!overview || !overview.equipment_types?.length) return MOCK_EQUIPMENT;
+    if (!overview || !overview.equipment_types?.length) return [];
     return overview.equipment_types.map((e) => {
       const stateColor = e.color?.toLowerCase() ?? '';
       const state: EquipRow['state'] = stateColor.includes('red')
@@ -270,34 +235,45 @@ export function Equipment() {
         state,
         cpk: 1.5,
         alarm: e.codes,
+        dataClass: e.data_class,
+        sourceSystem: e.source_system,
       };
     });
   }, [overview]);
 
   const processes5 = useMemo(() => {
-    if (!overview?.processes?.length) return MOCK_PROCESSES5;
+    if (!overview?.processes?.length) return [];
     return overview.processes.map((p) => ({
       name: p.process_name,
       state: backendStatusToUI(p.status),
       cpk: p.current_cpk,
       viol: p.violation_count,
       rules: p.violated_rules.map((n) => `Rule ${n}`),
+      dataClass: p.data_class,
+      sourceSystem: p.source_system,
     }));
   }, [overview]);
 
   const moldList = useMemo(() => {
-    if (!molds?.items?.length) return MOCK_MOLDS;
+    if (!molds?.items?.length) return [];
     return molds.items.map((m) => ({
       id: m.mold_id,
       part: m.part_name || m.mold_name,
       shots: m.current_shots,
       max: m.max_shots,
       risk: backendRiskToUI(m.risk_level),
+      predictedReplaceDate: m.predicted_replacement_date,
+      ci: (m.confidence_interval && m.confidence_interval.length === 2
+        ? [m.confidence_interval[0], m.confidence_interval[1]]
+        : null) as [number, number] | null,
+      predictedRemaining: m.predicted_remaining_life,
+      dataClass: m.data_class,
+      sourceSystem: m.source_system,
     }));
   }, [molds]);
 
   const maintCost = useMemo(() => {
-    if (!mtbf?.top5_cost?.length) return MOCK_MAINT_COST;
+    if (!mtbf?.top5_cost?.length) return [];
     return mtbf.top5_cost.map((m, i) => {
       const item = mtbf.items.find((x) => x.machine_name === m.machine_name);
       return {
@@ -311,9 +287,10 @@ export function Equipment() {
 
   const mtbfBar = useMemo<Data[]>(() => {
     const src = mtbf?.items?.length ? mtbf.items : null;
-    const labels = src ? src.map((m) => m.machine_name) : MOCK_MAINT_COST.map((m) => m.eq);
-    const costs = src ? src.map((m) => Math.round(m.avg_repair_cost / 10000)) : MOCK_MAINT_COST.map((m) => m.cost);
-    const repairs = src ? src.map((m) => m.total_repairs) : MOCK_MAINT_COST.map((m) => m.jobs);
+    if (!src) return [];
+    const labels = src.map((m) => m.machine_name);
+    const costs = src.map((m) => Math.round(m.avg_repair_cost / 10000));
+    const repairs = src.map((m) => m.total_repairs);
 
     const maxCost = Math.max(...costs, 1);
     const colors = costs.map((c) => {
@@ -351,17 +328,18 @@ export function Equipment() {
   }, [mtbf]);
 
   const mlList = useMemo(() => {
-    if (!mlEngines?.engines?.length) return MOCK_ML_ENGINES;
+    if (!mlEngines?.engines?.length) return [];
     return mlEngines.engines.map((e) => ({
       name: e.name_en,
       p99: e.last_trained ?? '—',
       model: e.library,
+      status: e.status,
       online: e.status === 'online',
     }));
   }, [mlEngines]);
 
   const errResults = useMemo(() => {
-    if (!errSearchResp?.results?.length) return MOCK_ERR_RESULTS;
+    if (!errSearchResp?.results?.length) return [];
     return errSearchResp.results.map((r) => ({
       code: r.code,
       name: r.description,
@@ -374,7 +352,7 @@ export function Equipment() {
   }, [errSearchResp]);
 
   const markovChain = useMemo(() => {
-    if (!markov?.next_predictions?.length) return MOCK_MARKOV_CHAIN;
+    if (!markov?.next_predictions?.length) return [];
     return markov.next_predictions.map((p) => ({ code: p.code, name: p.description, prob: p.probability }));
   }, [markov]);
 
@@ -464,13 +442,7 @@ export function Equipment() {
         violations: spcResp.violations,
       };
     }
-    return {
-      values: MOCK_SPC_DATA,
-      cl: MOCK_CL,
-      ucl: MOCK_UCL,
-      lcl: MOCK_LCL,
-      violations: [],
-    };
+    return { values: [], cl: 0, ucl: 0, lcl: 0, violations: [] };
   }, [spcResp]);
 
   const yScale = useCallback(
@@ -484,7 +456,7 @@ export function Equipment() {
   );
 
   const inspectionRows = useMemo(() => {
-    if (!checklist?.templates?.length) return MOCK_INSPECTIONS;
+    if (!checklist?.templates?.length) return [];
     return checklist.templates.map((tpl) => ({
       eq: tpl.equipment_type,
       cycle: tpl.checklist_type,
@@ -499,6 +471,12 @@ export function Equipment() {
     if (!overview?.processes?.length) return 3;
     return overview.processes.filter((p) => p.violation_count > 0).length;
   }, [overview]);
+
+  // v3.6 — 모바일/태블릿 viewport early return (모든 hook 호출 후, conditional return 전)
+  const isMobileEquipment = useIsMobile();
+  const isTabletEquipment = useIsTablet();
+  if (isMobileEquipment) return <AJINMobileEquipment />;
+  if (isTabletEquipment) return <AJINTabletEquipment />;
 
   // ── 접근 거부 가드 ───────────────────────────────────
   if (!allowed) {
@@ -544,29 +522,57 @@ export function Equipment() {
   return (
     <div className="page lg-page" data-screen-label="F · Equipment AI">
       <section className="lg-hero">
-        <div className="lg-hero-eyebrow">EQUIPMENT & PROCESS AI · MODULE F</div>
-        <h1 className="lg-display">설비 / 공정 AI</h1>
-        <p className="lg-sub">
-          7종 ML 엔진 · 14개 부서. SPC Nelson 8 Rules · TF-IDF 에러 검색 · XGBoost 잔여수명 ·
-          Markov 연쇄 고장 예측을 한 화면에서.
-        </p>
-        {globalApiError && (
-          <div
-            style={{
-              marginTop: 12,
-              padding: '8px 12px',
-              borderRadius: 8,
-              background: 'color-mix(in oklab, var(--hud-orange) 12%, transparent)',
-              border: '1px solid color-mix(in oklab, var(--hud-orange) 30%, transparent)',
-              fontSize: 12,
-              color: 'var(--hud-orange)',
-              fontFamily: 'var(--hud-font-mono)',
-            }}
-          >
-            ⚠ {globalApiError}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: 12,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div>
+            <div className="lg-hero-eyebrow">EQUIPMENT & PROCESS AI · MODULE F</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div className="ne-orb sm" aria-hidden style={{ flexShrink: 0 }} />
+              <h1 className="lg-display" style={{ margin: 0 }}>설비 / 공정 AI</h1>
+            </div>
+            <p className="lg-sub">
+              7종 ML 엔진 · 14개 부서. SPC Nelson 8 Rules · TF-IDF 에러 검색 · XGBoost 잔여수명 ·
+              Markov 연쇄 고장 예측을 한 화면에서.
+            </p>
           </div>
-        )}
+          {/* W4 — 현장 모드(PWA) 진입 링크 */}
+          <a
+            href="/equipment/field"
+            style={{
+              padding: '8px 14px',
+              borderRadius: 999,
+              fontSize: 12,
+              border: '1px solid color-mix(in oklab, var(--hud-primary) 40%, transparent)',
+              background: 'color-mix(in oklab, var(--hud-primary) 8%, transparent)',
+              color: 'var(--hud-primary)',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+              alignSelf: 'flex-start',
+            }}
+            title="태블릿/스마트폰 최적화 화면 — 홈에 추가하면 PWA 실행"
+          >
+            📱 현장 모드 (PWA)
+          </a>
+        </div>
       </section>
+
+      {allMountFailed && (
+        <section style={{ marginTop: 16 }}>
+          <ErrorState
+            icon="offline"
+            title="설비 데이터 서버 연결 실패"
+            message="6개 핵심 API 모두 응답하지 않습니다. 백엔드 상태를 확인하거나 다시 시도해주세요."
+            onRetry={() => void eqData.refetch()}
+          />
+        </section>
+      )}
 
       <div className="lg-tabs">
         {MAIN_TABS.map((t) => (
@@ -598,7 +604,17 @@ export function Equipment() {
           </div>
 
           {sub === 'overview' && (
-            <DashboardSubTab metrics={metrics} equipment7={equipment7} overview={overview} />
+            <>
+              <OverviewGuideModal />
+              <DailyHeadline
+                onJump={(target) => {
+                  if (target === 'spc' || target === 'predictive' || target === 'alerts') {
+                    setSub(target);
+                  }
+                }}
+              />
+              <DashboardSubTab metrics={metrics} equipment7={equipment7} overview={overview} />
+            </>
           )}
           {sub === 'alerts' && <AlertsSubTab alertCount={alertCount} />}
           {sub === 'equipment' && <EquipmentTypeSubTab equipment7={equipment7} />}

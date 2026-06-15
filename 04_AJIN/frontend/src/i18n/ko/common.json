@@ -36,8 +36,44 @@
     "draft": "문서 검색/작성",
     "onboarding": "AI 업무 도우미",
     "compliance": "법규 모니터링",
-    "admin": "인사 관리",
-    "equipment": "설비/공정 AI"
+    "admin": "시스템 관리",
+    "equipment": "설비/공정 AI",
+    "management": "시스템 관리"
+  },
+  "management": {
+    "title": "시스템 관리",
+    "subtitle": "사용자 · 감사 로그 · 시스템 상태 · 사용 통계",
+    "cat": {
+      "users": "사용자",
+      "audit": "감사 로그",
+      "system": "시스템",
+      "stats": "사용 통계"
+    },
+    "actions": {
+      "bulk_upload": "CSV 업로드",
+      "bulk_role": "일괄 권한 변경",
+      "export_csv": "CSV 다운로드"
+    }
+  },
+  "admin": {
+    "tabs": {
+      "account_delegation": "계정 위임",
+      "security_alerts": "보안 알림",
+      "system_health": "시스템 헬스"
+    },
+    "notice": {
+      "title": "관리자 콘솔이 3 탭으로 단순화되었습니다",
+      "users": "사용자 추가는 사내 IdP에서 처리됩니다",
+      "search": "검색 분석은 /search/analytics 로 이동했습니다",
+      "stats": "사용 분석은 설비 → KPI 대시보드로 통합되었습니다",
+      "dismiss": "다시 보지 않기"
+    },
+    "idp_managed": {
+      "title": "사용자는 사내 IdP에서 관리됩니다",
+      "body": "신규 추가·수정·삭제는 IT전략팀에 요청하세요",
+      "console_link": "IdP 콘솔 열기",
+      "fallback": "관리자에게 문의"
+    }
   },
   "right_panel": {
     "system_analytics": "시스템 분석",
@@ -74,12 +110,10 @@
     "submit": "로그인",
     "policy_title": "비밀번호 정책",
     "policy": {
-      "min_length": "8자 이상",
-      "uppercase": "대문자 1자 이상",
-      "lowercase": "소문자 1자 이상",
-      "number": "숫자 1자 이상",
-      "special": "특수문자 1자 이상",
-      "no_repeat": "동일 문자 연속 3회 금지"
+      "min_length": "12자 이상",
+      "max_bytes": "UTF-8 72바이트 이하",
+      "not_common": "흔한 비밀번호 금지",
+      "not_context": "회사/서비스명 유사어 금지"
     },
     "error": {
       "title": "로그인 실패",
@@ -93,7 +127,7 @@
     },
     "demo": {
       "label": "데모 계정 빠른 로그인",
-      "hint": "본선 시연용 — DEV 모드 또는 ?demo=1 파라미터일 때만 노출"
+      "hint": "Mock 데모 전용 — 운영 전환 smoke에는 사용하지 않음"
     },
     "change_pw": {
       "title": "비밀번호 변경 필요",
@@ -223,7 +257,7 @@
       "error": "응답 실패"
     },
     "provider": {
-      "gemini": "Gemini 2.5 Pro",
+      "gemini": "Gemini 3.5 Flash",
       "ollama": "Ollama (사내)",
       "lm_studio": "LM Studio"
     },
@@ -287,7 +321,7 @@
     "model": {
       "label": "모델",
       "auto": "자동 (폴백)",
-      "gemini": "Gemini 2.5 Pro",
+      "gemini": "Gemini 3.5 Flash",
       "qwen": "Ollama qwen3.5:9b",
       "gemma": "Ollama gemma4:e4b",
       "forced_indicator": "(강제 선택)"
@@ -308,6 +342,24 @@
       "uploading": "이미지 업로드 중...",
       "analyzing": "비전 모델 분석 중...",
       "failed": "비전 분석 실패: {{msg}}"
+    },
+    "voice": {
+      "start": "음성으로 입력",
+      "stop": "녹음 중지",
+      "listening": "듣는 중…",
+      "error": {
+        "notSupported": "이 브라우저는 음성 입력을 지원하지 않습니다",
+        "permission": "마이크 권한이 필요합니다",
+        "noSpeech": "음성이 감지되지 않았습니다",
+        "network": "음성 인식 네트워크 오류"
+      }
+    },
+    "language": {
+      "label": "응답 언어",
+      "auto": "자동",
+      "korean": "한국어",
+      "english": "English",
+      "tooltip": "AI 답변 언어 선택 — 자동은 질문 언어를 감지"
     },
     "session": {
       "live": "LIVE",
@@ -426,15 +478,15 @@
     },
     "history": {
       "eyebrow": "HISTORY · 문서 이력",
-      "title": "Firestore 영구화 {{n}}건",
+      "title": "서버 저장소 영구화 {{n}}건",
       "subtitle": "/ 최근 30개 표시",
       "refresh": "↻ 새로고침",
       "loading": "로딩…",
-      "empty": "이력이 없습니다. 초안을 생성하면 자동으로 Firestore 에 저장됩니다.",
+      "empty": "이력이 없습니다. 초안을 생성하면 자동으로 서버 저장소에 저장됩니다.",
       "reedit": "재편집",
       "delete": "삭제",
       "deleteConfirm": "이 초안을 삭제하시겠습니까?",
-      "fbWarn": "Firestore 연결 실패 — {{err}}"
+      "fbWarn": "서버 저장소 연결 실패 — {{err}}"
     },
     "diff": {
       "eyebrow": "DIFF · 원본 ↔ 편집본",
@@ -562,15 +614,117 @@
       "crit": "CRIT"
     },
     "placeholder": {
-      "manual_error": "Day 7 Phase 4~5 — 에러 검색 + Markov 연쇄 고장 + 매뉴얼 RAG. 본격 구현 예정.",
-      "inspection": "Day 12 — 점검 체크리스트 + 점검 이력. 본격 구현 예정."
+      "manual_error": "에러 검색 · Markov 연쇄 고장 · 매뉴얼 RAG",
+      "inspection": "점검 체크리스트 · 점검 이력 · CSV 업로드"
     }
   },
-  "auth": {
-    "firebase": {
-      "warning": "Firebase 인증 실패 — 일부 기능(Storage/피드백)이 제한됩니다",
-      "bootstrap": "첫 로그인 — Firebase 계정 자동 생성",
-      "failed": "Firebase 로그인 실패"
+  "gamification": {
+    "sidebar": {
+      "title": "내 배지",
+      "count": "{{n}}개 획득",
+      "next": "다음 배지",
+      "progress": "{{cur}} / {{tgt}}",
+      "open": "전체 보기",
+      "leaderboard": "이번주 부서 순위",
+      "rank": "{{rank}}위 / {{total}}명",
+      "percentile": "상위 {{p}}%",
+      "too_small": "부서 인원 3명 미만 — 비공개"
+    },
+    "modal": {
+      "title": "배지 컬렉션",
+      "subtitle": "10종 배지 — 학습/기여 활동으로 획득",
+      "earned": "획득",
+      "locked": "미획득",
+      "close": "닫기",
+      "condition": "획득 조건"
+    },
+    "badges": {
+      "quiz_starter": {
+        "name": "첫 퀴즈",
+        "description": "AI 도우미 퀴즈를 처음 풀었어요",
+        "condition": "퀴즈 1회 응시"
+      },
+      "quiz_master_basic": {
+        "name": "기초 마스터",
+        "description": "기초 난이도 퀴즈 10개 정답",
+        "condition": "basic 퀴즈 정답 10개"
+      },
+      "quiz_master_advanced": {
+        "name": "고급 마스터",
+        "description": "고급 난이도 퀴즈 5개 정답",
+        "condition": "advanced 퀴즈 정답 5개"
+      },
+      "sop_explorer": {
+        "name": "SOP 탐험가",
+        "description": "SOP 3종 전체 단계 완료",
+        "condition": "SOP 3개 완료"
+      },
+      "sop_completer": {
+        "name": "SOP 완주자",
+        "description": "부서 관련 SOP 모두 완료",
+        "condition": "부서 SOP 100%"
+      },
+      "streak_7": {
+        "name": "7일 연속",
+        "description": "7일 연속 챗봇 사용",
+        "condition": "연속 사용 7일"
+      },
+      "streak_30": {
+        "name": "30일 연속",
+        "description": "30일 연속 챗봇 사용",
+        "condition": "연속 사용 30일"
+      },
+      "helpful_voice": {
+        "name": "피드백 영웅",
+        "description": "응답 피드백 50건",
+        "condition": "피드백 50회"
+      },
+      "glossary_native": {
+        "name": "용어 네이티브",
+        "description": "용어 검색 100건",
+        "condition": "용어 조회 100회"
+      },
+      "department_pioneer": {
+        "name": "부서 1등",
+        "description": "월간 부서 종합점수 1위",
+        "condition": "월간 부서 1위"
+      }
+    }
+  },
+  "permissions": {
+    "matrix": {
+      "title": "권한 매트릭스",
+      "dept_col": "부서",
+      "role_col": "역할"
+    },
+    "request": {
+      "title": "권한 변경 요청",
+      "reason": "변경 사유",
+      "dryrun": "변경 미리보기",
+      "submit": "결재 요청"
+    },
+    "queue": {
+      "title": "결재 대기열",
+      "empty": "대기 중인 요청 없음",
+      "action": {
+        "security": "보안 승인",
+        "executive": "임원 승인",
+        "reject": "반려"
+      }
+    },
+    "history": {
+      "title": "변경 이력"
+    },
+    "status": {
+      "pending": "대기",
+      "security_approved": "보안 승인됨",
+      "executive_approved": "임원 승인됨",
+      "applied": "적용됨",
+      "rejected": "반려됨"
+    },
+    "audit": {
+      "actor": "변경자",
+      "diff": "변경 내용"
     }
   },
   "common": {

@@ -1,11 +1,15 @@
 // PredictiveSubTab — F-predictive 서브탭 (XGBoost 금형 + MTBF Plotly + TOP 5).
+// W5 (P1): 위험 금형 카드에 컴플라이언스 영향 / 8D 작성 액션 추가 (F→D, F→B 연계).
 
+import { useNavigate } from 'react-router-dom';
+import { ShieldAlert, FileText } from 'lucide-react';
 import { PlotlyChart } from '@components/chart/PlotlyChart';
 import type { Data } from 'plotly.js';
 import { DownloadActions } from '@components/common/DownloadActions';
 import type { MoldsResponse, MTBFResponse } from '@/types/equipment';
 import type { MaintCostDisplay, MoldDisplay } from '../types';
 import { buildMoldMarkdown, buildMtbfMarkdown } from '../markdownBuilders';
+import { DataClassBadge } from '@/lib/syntheticBadge';
 
 interface Props {
   molds: MoldsResponse | null;
@@ -16,6 +20,20 @@ interface Props {
 }
 
 export function PredictiveSubTab({ molds, moldList, mtbf, mtbfBar, maintCost }: Props) {
+  const navigate = useNavigate();
+
+  const onComplianceImpact = (m: MoldDisplay) => {
+    // F→D: 부품명을 컴플라이언스 검색에 prefill (compliance/search 라우트 또는 root 라우트)
+    navigate('/compliance', { state: { prefillQuery: m.part, source: 'equipment.mold', mold_id: m.id } });
+  };
+
+  const onDraft8D = (m: MoldDisplay) => {
+    // F→B: 금형 위험 8D Report 초안
+    const rem = m.max - m.shots;
+    const prefill = `[금형 ${m.id} / ${m.part}] 잔여수명 임박\n- 잔여 shots: ${rem.toLocaleString()}\n- 사용률: ${((m.shots / m.max) * 100).toFixed(1)}%\n- 리스크: ${m.risk}\n\n해당 금형 관련 8D Report 초안을 작성해 주세요.`;
+    navigate('/draft', { state: { prefill, doc_type: '8D' } });
+  };
+
   return (
     <>
       <section className="lg-card">
@@ -32,11 +50,16 @@ export function PredictiveSubTab({ molds, moldList, mtbf, mtbfBar, maintCost }: 
           {moldList.map((m) => {
             const pct = m.shots / m.max;
             const rem = m.max - m.shots;
+            const risk = m.risk.toLowerCase();
+            const showActions = risk === 'critical' || risk === 'warning';
             return (
-              <div key={m.id} className={'lg-mold risk-' + m.risk.toLowerCase()}>
+              <div key={m.id} className={'lg-mold risk-' + risk}>
                 <div className="lg-mold-h">
                   <span className="id mono">{m.id}</span>
-                  <span className={'lg-risk-pill r-' + m.risk.toLowerCase()}>{m.risk}</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <DataClassBadge dataClass={m.dataClass} sourceSystem={m.sourceSystem} />
+                    <span className={'lg-risk-pill r-' + risk}>{m.risk}</span>
+                  </span>
                 </div>
                 <div className="lg-mold-part">{m.part}</div>
                 <div className="lg-mold-bar">
@@ -46,6 +69,57 @@ export function PredictiveSubTab({ molds, moldList, mtbf, mtbfBar, maintCost }: 
                   <span>{(pct * 100).toFixed(0)}% 사용</span>
                   <span className="rem">잔여 {(rem / 1000).toFixed(0)}k</span>
                 </div>
+
+                {/* W6 (P2) — ML 설명력: 신뢰구간 + 예측 교체일 */}
+                {(m.ci || m.predictedReplaceDate || m.predictedRemaining) && (
+                  <div
+                    style={{
+                      marginTop: 6,
+                      fontSize: 10,
+                      opacity: 0.7,
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {m.predictedReplaceDate && (
+                      <div>📅 예측 교체일: {m.predictedReplaceDate}</div>
+                    )}
+                    {m.ci && (
+                      <div>
+                        🎯 95% CI: {(m.ci[0] / 1000).toFixed(0)}k ~ {(m.ci[1] / 1000).toFixed(0)}k shots
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {showActions && (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      display: 'flex',
+                      gap: 6,
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => onComplianceImpact(m)}
+                      title="컴플라이언스 영향 확인 (D)"
+                      style={btnStyle}
+                    >
+                      <ShieldAlert size={11} />
+                      컴플라이언스
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDraft8D(m)}
+                      title="8D Report 초안 작성 (B)"
+                      style={btnStyle}
+                    >
+                      <FileText size={11} />
+                      8D Report
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -134,3 +208,16 @@ export function PredictiveSubTab({ molds, moldList, mtbf, mtbfBar, maintCost }: 
     </>
   );
 }
+
+const btnStyle: React.CSSProperties = {
+  padding: '4px 8px',
+  fontSize: 10,
+  borderRadius: 6,
+  border: '1px solid var(--hud-border)',
+  background: 'var(--hud-surface-2)',
+  color: 'var(--hud-text)',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+};

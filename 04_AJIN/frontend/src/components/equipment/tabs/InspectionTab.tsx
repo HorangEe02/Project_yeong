@@ -1,9 +1,10 @@
-// InspectionTab — F-inspection 메인 탭 (점검 체크리스트).
+// InspectionTab — F-inspection 메인 탭 (점검 체크리스트 + v4.3 CSV 업로드).
 
 import { DownloadActions } from '@components/common/DownloadActions';
 import type { InspectionChecklistResponse } from '@/types/equipment';
 import type { InspectionRow } from '../types';
 import { buildInspectionMarkdown } from '../markdownBuilders';
+import { InspectionUploadCard } from '../InspectionUploadCard';
 
 interface Props {
   checklist: InspectionChecklistResponse | null;
@@ -12,6 +13,8 @@ interface Props {
 
 export function InspectionTab({ checklist, inspectionRows }: Props) {
   return (
+    <>
+    <InspectionUploadCard />
     <section className="lg-card">
       <div className="lg-card-h">
         <div>
@@ -59,5 +62,6 @@ export function InspectionTab({ checklist, inspectionRows }: Props) {
         }}
       />
     </section>
+    </>
   );
 }

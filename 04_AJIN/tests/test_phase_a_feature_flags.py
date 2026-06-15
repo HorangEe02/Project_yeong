@@ -1,7 +1,7 @@
 """v3.3 Phase 0 — Feature C 피처 플래그 테스트.
 
 검증 대상:
-1. 8 플래그가 모두 정의되어 있고 dict() 변환 OK
+1. Feature C 플래그가 모두 정의되어 있고 dict() 변환 OK
 2. 기본값은 모두 False (안전한 점진 활성화)
 3. 환경변수 truthy 파싱 (true / 1 / yes / on / True)
 4. 부분 활성화 — 일부 플래그만 켜져도 다른 플래그는 영향 없음
@@ -28,7 +28,7 @@ from core.feature_flags import (
 
 
 # ──────────────────────────────────────────────
-# 1. 플래그 8종 모두 정의
+# 1. 플래그 전체 정의
 # ──────────────────────────────────────────────
 
 
@@ -41,11 +41,12 @@ EXPECTED_FLAGS = [
     "quick_questions_v2",
     "inline_actions",
     "cad_upload",
+    "analyzers_enabled",
 ]
 
 
-def test_feature_c_flags_has_all_eight():
-    """FeatureCFlags dataclass 에 8 필드 모두 존재."""
+def test_feature_c_flags_has_all_expected_flags():
+    """FeatureCFlags dataclass 에 기대 필드가 모두 존재."""
     flags = FeatureCFlags(
         multi_llm=False,
         compare_mode=False,
@@ -55,6 +56,7 @@ def test_feature_c_flags_has_all_eight():
         quick_questions_v2=False,
         inline_actions=False,
         cad_upload=False,
+        analyzers_enabled=False,
     )
     for name in EXPECTED_FLAGS:
         assert hasattr(flags, name), f"missing flag: {name}"
@@ -124,6 +126,7 @@ def test_partial_activation_isolation():
             "FEATURE_C_WORK_FULLSCREEN",
             "FEATURE_C_QUICK_QUESTIONS_V2",
             "FEATURE_C_INLINE_ACTIONS",
+            "FEATURE_C_ANALYZERS_ENABLED",
         ):
             os.environ.pop(k, None)
         flags = load_feature_c_flags()
@@ -138,6 +141,7 @@ def test_partial_activation_isolation():
     assert flags.work_fullscreen is False
     assert flags.quick_questions_v2 is False
     assert flags.inline_actions is False
+    assert flags.analyzers_enabled is False
 
 
 def test_default_all_false():

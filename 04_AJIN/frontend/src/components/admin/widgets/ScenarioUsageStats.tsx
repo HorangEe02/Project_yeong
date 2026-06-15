@@ -1,4 +1,4 @@
-// ScenarioUsageStats — 협업 시나리오 사용 통계 (AnalyticsTab 통합용, Phase 3).
+// ScenarioUsageStats — 협업 시나리오 사용 통계. v4.9 이후 AnalyticsTab 은 제거됨 (PR-E4).
 // /admin/scenarios/usage-stats — 인기 시나리오 + 매칭 0회 시나리오.
 
 import { useEffect, useState } from 'react';

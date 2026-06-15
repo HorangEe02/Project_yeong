@@ -1,58 +1,29 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import { useAuthStore, type AuthUser } from '@store/auth';
+import { useAuthStore } from '@store/auth';
 import { useMaintenanceStore } from '@store/maintenance';
-import { getFirebaseIdToken } from '@lib/firebaseAuth';
-
-/**
- * baseURL invariant: 항상 `/api` 로 끝난다.
- *
- * VITE_API_URL 가 빈 문자열/undefined → '/api' (same-origin, Hosting rewrite 가 Cloud Run 에 위임)
- * VITE_API_URL='http://localhost:8000' → 'http://localhost:8000/api' (dev cross-origin)
- * VITE_API_URL='http://localhost:8000/api' → 그대로
- *
- * 모든 API 호출은 `api.post('/auth/login')` 처럼 짧은 path 사용.
- */
-function _resolveApiUrl(): string {
-  const raw = (import.meta.env.VITE_API_URL ?? '').toString().replace(/\/$/, '');
-  if (!raw) return '/api';
-  if (raw.endsWith('/api')) return raw;
-  return `${raw}/api`;
-}
-
-const API_URL = _resolveApiUrl();
+import { API_BASE_URL } from './baseUrl';
+import { csrfHeaderFor } from './csrf';
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_BASE_URL,
   timeout: 30_000,
   withCredentials: true,
 });
 
-// Request interceptor — JWT 자동 첨부
+// Request interceptor — browser cookie auth + CSRF for unsafe methods.
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = useAuthStore.getState().accessToken;
-  if (token) {
-    config.headers.set('Authorization', `Bearer ${token}`);
+  const method = config.method ?? 'GET';
+  for (const [key, value] of Object.entries(csrfHeaderFor(method))) {
+    config.headers.set(key, value);
   }
   return config;
 });
 
-// Day 5++.5: 401 자동 복구 — refresh → firebase-exchange → fallback
+// 401 자동 복구 — HttpOnly refresh cookie 기준으로만 재발급.
 // 동시 다중 401 요청에 대해 inflight 중복을 막기 위해 전역 promise 캐시.
-let refreshing: Promise<string | null> | null = null;
-let exchanging: Promise<string | null> | null = null;
-
-interface FirebaseExchangeResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: 'bearer';
-  employee_id: string;
-  username: string;
-  role_name: string;
-  role_level: number;
-  must_change_pw: boolean;
-  department?: string;
-  position?: string;
-}
+const GUEST_EMPLOYEE_ID = 'GUEST';
+let refreshing: Promise<boolean> | null = null;
+let minting: Promise<boolean> | null = null;
 
 api.interceptors.response.use(
   (response) => {
@@ -65,6 +36,7 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
+      _guestRetry?: boolean;
     };
 
     // Plan A 변형: 503 + AI_UNAVAILABLE → maintenance banner 활성화
@@ -84,29 +56,29 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // 1) refresh_token 으로 access_token 재발급
-      if (useAuthStore.getState().refreshToken) {
-        refreshing ??= refreshAccessToken();
-        const newToken = await refreshing;
-        refreshing = null;
+      refreshing ??= refreshBrowserSession();
+      const refreshed = await refreshing;
+      refreshing = null;
 
-        if (newToken && originalRequest.headers) {
-          originalRequest.headers.set('Authorization', `Bearer ${newToken}`);
+      if (refreshed) {
+        return api(originalRequest);
+      }
+
+      // refresh 실패 — 게스트(쇼케이스) 세션이면 /login 으로 튕기는 대신 게스트로
+      // 재발급해 복구한다. 한 화면의 401 이 공유 세션을 clear() 로 날려 전 패널이
+      // 로그인 화면으로 빠지는 cascade 를 막는다 (showcase 읽기전용 UX 보호).
+      const current = useAuthStore.getState().user;
+      if (current?.employee_id === GUEST_EMPLOYEE_ID && !originalRequest._guestRetry) {
+        originalRequest._guestRetry = true;
+        minting ??= mintGuestSession();
+        const minted = await minting;
+        minting = null;
+        if (minted) {
           return api(originalRequest);
         }
       }
 
-      // 2) Firebase ID Token 으로 백엔드 JWT 재발급 (silent recovery)
-      exchanging ??= exchangeFirebaseToken();
-      const exchangedToken = await exchanging;
-      exchanging = null;
-
-      if (exchangedToken && originalRequest.headers) {
-        originalRequest.headers.set('Authorization', `Bearer ${exchangedToken}`);
-        return api(originalRequest);
-      }
-
-      // 3) 모두 실패 → clearAuth + /login 리다이렉트 (마지막 resort)
+      // refresh·게스트 재발급 모두 실패 → clearAuth + /login 리다이렉트
       useAuthStore.getState().clear();
       if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
         // replace 사용 — 뒤로가기 시 protected 페이지로 돌아가 무한 401 루프 방지
@@ -118,52 +90,43 @@ api.interceptors.response.use(
   },
 );
 
-async function refreshAccessToken(): Promise<string | null> {
+async function refreshBrowserSession(): Promise<boolean> {
   try {
-    const refreshToken = useAuthStore.getState().refreshToken;
-    if (!refreshToken) return null;
-
-    const response = await axios.post<{ access_token: string }>(
-      `${API_URL}/auth/refresh`,
-      { refresh_token: refreshToken },
+    const response = await axios.post(
+      `${API_BASE_URL}/auth/refresh`,
+      {},
+      {
+        withCredentials: true,
+        headers: csrfHeaderFor('POST'),
+      },
     );
 
-    const newToken = response.data.access_token;
-    useAuthStore.getState().setAccessToken(newToken);
-    return newToken;
+    useAuthStore.getState().setSession(response.data);
+    return true;
   } catch (e) {
     if (import.meta.env.DEV) {
       console.warn('[Auth] refresh 실패:', e);
     }
-    return null;
+    return false;
   }
 }
 
-async function exchangeFirebaseToken(): Promise<string | null> {
+// 게스트(쇼케이스) 세션 재발급 — refresh 불가한 게스트가 401 을 만나도 로그인으로
+// 튕기지 않고 읽기전용 세션을 자동 복구하기 위함. /auth/guest 는
+// SHOWCASE_GUEST_ENABLED=false 면 404 → 실패 처리되어 정상 로그인 흐름으로 폴백.
+async function mintGuestSession(): Promise<boolean> {
   try {
-    const idToken = await getFirebaseIdToken(true);
-    if (!idToken) return null;
-
-    const response = await axios.post<FirebaseExchangeResponse>(
-      `${API_URL}/auth/firebase-exchange`,
-      { id_token: idToken },
+    const response = await axios.post(
+      `${API_BASE_URL}/auth/guest`,
+      {},
+      { withCredentials: true, headers: csrfHeaderFor('POST') },
     );
-
-    const data = response.data;
-    const user: AuthUser = {
-      employee_id: data.employee_id,
-      username: data.username,
-      role_name: data.role_name,
-      role_level: data.role_level,
-      department: data.department,
-      position: data.position,
-    };
-    useAuthStore.getState().setSession(data.access_token, data.refresh_token, user);
-    return data.access_token;
+    useAuthStore.getState().setSession(response.data);
+    return true;
   } catch (e) {
     if (import.meta.env.DEV) {
-      console.warn('[Auth] Firebase exchange 실패:', e);
+      console.warn('[Auth] 게스트 세션 재발급 실패:', e);
     }
-    return null;
+    return false;
   }
 }

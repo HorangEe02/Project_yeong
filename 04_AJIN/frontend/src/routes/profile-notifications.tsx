@@ -25,8 +25,16 @@ export function ProfileNotifications() {
     fetchMyPrefs()
       .then((p) => {
         setEmail(p.email);
-        const { user_id: _uid, email: _em, ...rest } = p;
-        setPrefs(rest);
+        setPrefs({
+          enabled: p.enabled,
+          channel_email: p.channel_email,
+          channel_slack: p.channel_slack,
+          severity_threshold: p.severity_threshold,
+          digest_enabled: p.digest_enabled,
+          digest_hour_kst: p.digest_hour_kst,
+          plant_filter: p.plant_filter,
+          department_filter: p.department_filter,
+        });
       })
       .catch((e: unknown) => {
         setError(e instanceof Error ? e.message : '로드 실패');

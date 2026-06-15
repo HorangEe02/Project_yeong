@@ -38,15 +38,15 @@ export const SYSTEM_HEALTH = {
   gpu: 42,
   latencyMs: 124,
   qps: 8400,
-  // 실제 LLMRouter 폴백 체인: Gemini 2.5 Pro → Ollama (qwen3.5/gemma4) → LM Studio
+  // 실제 LLMRouter 폴백 체인: Gemini 3.5 Flash → Ollama (qwen3.5/gemma4) → LM Studio
   llmEngines: [
-    'Gemini 2.5 Pro',
+    'Gemini 3.5 Flash',
     'Qwen 3.5 (9B/4B)',
     'Gemma 4 (e4b/e2b)',
     'LM Studio (옵션)',
   ],
-  // 비전 모드: Gemini 2.5 Pro 1순위 + Ollama Gemma 4 (Qwen 비전 미지원)
-  visionModels: ['Gemini 2.5 Pro (Multimodal)', 'Gemma 4 e4b/e2b'],
+  // 비전 모드: Gemini 3.5 Flash 1순위 + Ollama Gemma 4 (Qwen 비전 미지원)
+  visionModels: ['Gemini 3.5 Flash (Multimodal)', 'Gemma 4 e4b/e2b'],
   // 임베딩 모델 — Ollama bge-m3 기본, EMBEDDING_BACKEND=gemini 시 Gemini Embeddings
   embeddingModels: ['bge-m3 (Ollama, 기본)', 'Gemini Embeddings (폴백)'],
   mlModels: [
@@ -74,22 +74,22 @@ export const SECURITY_LOG = [
  * 대시보드 시스템 정보 — 실제 백엔드 설정 (.env + core/llm_router.py) 기준.
  *
  * LLM 폴백 체인 (mode 별):
- *   - CHAT/DRAFT:   gemini-2.5-pro → qwen3.5:9b → gemma4:e4b → lm_studio
- *   - VISION:       gemini-2.5-pro → gemma4:e4b (qwen 비전 미지원)
- *   - SUMMARY:      gemini-2.5-pro → qwen3.5:4b → gemma4:e2b
- *   - INTENT:       gemini-2.5-pro → qwen3.5:4b
+ *   - CHAT/DRAFT:   gemini-3.5-flash → qwen3.5:9b → gemma4:e4b → lm_studio
+ *   - VISION:       gemini-3.5-flash → gemma4:e4b (qwen 비전 미지원)
+ *   - SUMMARY:      gemini-3.5-flash → qwen3.5:4b → gemma4:e2b
+ *   - INTENT:       gemini-3.5-flash → qwen3.5:4b
  *   - EMBEDDING:    bge-m3 (단일, 폴백시 Gemini Embeddings)
  *
  * Circuit Breaker: 3회 실패 → 60초 OPEN, HealthRegistry 로 자동 복구.
  */
 export const SYSTEM_INFO = {
   llm: [
-    'Gemini 2.5 Pro (1순위)',
+    'Gemini 3.5 Flash (1순위)',
     'Qwen 3.5 9B/4B (사내)',
     'Gemma 4 e4b/e2b (경량)',
     'LM Studio (옵션)',
   ],
-  vision: ['Gemini 2.5 Pro Multimodal', 'Gemma 4 e4b/e2b'],
+  vision: ['Gemini 3.5 Flash Multimodal', 'Gemma 4 e4b/e2b'],
   embedding: 'bge-m3 (Ollama) · Gemini Embeddings 폴백',
   ml: '7 종 (Intent · Error TF-IDF · SPC IF · Mold XGB · Markov · DocQual · RegRisk)',
   router: 'LLMRouter 폴백 체인 + Circuit Breaker (3회/60초)',

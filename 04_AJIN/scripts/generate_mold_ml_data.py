@@ -10,6 +10,11 @@ import pandas as pd
 import sqlite3
 from pathlib import Path
 from typing import List, Dict
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from core.data_lineage import write_source_manifest
 
 
 OUTPUT_DIR = Path("data/mold_ml")
@@ -202,6 +207,13 @@ def generate_training_data(n_variations: int = 20) -> pd.DataFrame:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     output_path = OUTPUT_DIR / "mold_training_data.csv"
     df.to_csv(output_path, index=False)
+    write_source_manifest(
+        output_path,
+        data_class="synthetic",
+        source_system="seed_equipment",
+        source_label="generate_mold_ml_data",
+        extra={"rows": int(len(df)), "n_variations": n_variations},
+    )
     print(f"학습 데이터 생성: {len(df)}건 → {output_path}")
     print(f"  잔여수명 범위: {df['remaining_life'].min():,} ~ {df['remaining_life'].max():,} 타")
     print(f"  평균 잔여수명: {df['remaining_life'].mean():,.0f} 타")

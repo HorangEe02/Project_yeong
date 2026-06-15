@@ -16,6 +16,12 @@ class EmployeeItem(BaseModel):
     phone: str = ""
     extension: str = ""
     plant: str = ""
+    # Sprint 1 P0 (Feature A §4.4) — 합성 데이터 시각 구분.
+    # 1 = seed/시연 / 0 = ERP·LDAP 실데이터 / None = 미정 (마이그레이션 전 row)
+    is_synthetic: int | None = None
+    data_class: str = "unknown"
+    source_system: str = "unknown"
+    source_label: str = ""
 
 
 class EmployeeSearchResponse(BaseModel):
@@ -33,21 +39,31 @@ class EmployeeListResponse(BaseModel):
     total: int = 0          # 가시성 필터 후 반환된 인원 수
     masked: int = 0         # PARTIAL (필드 마스킹) 처리 인원
     excluded: int = 0       # HIDDEN 처리되어 제외된 인원
+    real_count: int = 0
+    synthetic_count: int = 0
+    system_count: int = 0
     employees: list[EmployeeItem] = []
 
 
 class TeamNode(BaseModel):
     name: str
     headcount: int
+    real_count: int = 0
+    synthetic_count: int = 0
 
 
 class DivisionNode(BaseModel):
     name: str
     headcount: int
+    real_count: int = 0
+    synthetic_count: int = 0
     teams: list[TeamNode]
 
 
 class OrgTreeResponse(BaseModel):
     """본부 → 팀 트리 + 헤드카운트 (활성 직원 기준)."""
     total: int
+    real_count: int = 0
+    synthetic_count: int = 0
+    system_count: int = 0
     divisions: list[DivisionNode]

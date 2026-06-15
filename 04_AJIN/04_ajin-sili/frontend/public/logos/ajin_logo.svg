@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" width="200" height="48">
-  <g fill="none" stroke="#FCB132" stroke-width="1.6">
-    <rect x="6" y="10" width="28" height="28"></rect>
-    <path d="M12 32 L20 16 L28 32 M14 28 H26"></path>
-  </g>
-  <text x="44" y="22" font-family="Pretendard, &#39;Noto Sans KR&#39;, sans-serif" font-size="13" font-weight="700" letter-spacing="0.18em" fill="#E8E1D5">AJIN INDUSTRY</text>
-  <text x="44" y="38" font-family="Pretendard, &#39;Noto Sans KR&#39;, sans-serif" font-size="10" letter-spacing="0.32em" fill="#FCB132">AI ASSISTANT</text>
-</svg>

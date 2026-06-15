@@ -9,6 +9,11 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from datetime import datetime, timedelta
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from core.data_lineage import write_source_manifest
 
 
 OUTPUT_DIR = Path("data/spc_ml")
@@ -236,6 +241,13 @@ def generate_all_processes(n_points: int = 2000):
         df = inject_nelson_patterns(df, spec, process_id)
         output_path = OUTPUT_DIR / f"{process_id}.csv"
         df.to_csv(output_path, index=False)
+        write_source_manifest(
+            output_path,
+            data_class="synthetic",
+            source_system="seed_equipment",
+            source_label="generate_spc_ml_data",
+            extra={"process_id": process_id, "rows": int(len(df))},
+        )
 
         n_anomaly = (df["label"] == "anomaly").sum()
         print(f"  {spec['name']}: {len(df)}포인트 (이상: {n_anomaly}건, {n_anomaly/len(df)*100:.1f}%)")

@@ -66,6 +66,14 @@ export const useSopStore = create<SopState>()(
           const completedSteps = has
             ? prev.completedSteps.filter((n) => n !== stepNumber)
             : [...prev.completedSteps, stepNumber].sort((a, b) => a - b);
+          // v4.7 C-4 — 단계 완료 시(off→on) 만 백엔드 영속화 호출 (배지 평가 트리거)
+          if (!has) {
+            void import('@api/gamification').then((m) => {
+              m.reportSopProgress(sopId, stepNumber).catch(() => {
+                /* offline / 401 — silent */
+              });
+            });
+          }
           return {
             progress: {
               ...s.progress,

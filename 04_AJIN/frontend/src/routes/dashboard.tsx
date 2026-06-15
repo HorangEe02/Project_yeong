@@ -1,6 +1,6 @@
 // Dashboard 정밀 폴리싱 — 환영 헤더 + 카운트업 메트릭 + RBAC dim 카드 + 알람 카드 + 시스템 정보
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   getModuleCounts,
   getSystemInfo,
@@ -11,15 +11,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Lock } from 'lucide-react';
 import { useAuthStore } from '@store/auth';
-import { useMetricsStore } from '@store/metrics';
-import { MetricCard } from '@components/ui/MetricCard';
 import { Badge } from '@components/ui/Badge';
 import { Button } from '@components/ui/Button';
 import { isMenuVisible, getLockReason } from '@lib/rbac';
-import { ALARMS, SEVERITY_LABEL, type MockAlarm, type AlarmSeverity } from '@api/mock/seed/alarms';
-import { SYSTEM_INFO } from '@api/mock/seed/system';
+import { SEVERITY_LABEL, type Alarm, type AlarmSeverity } from '@/types/alarms';
 import { useEquipmentRTDB } from '@hooks/useEquipmentRTDB';
+import { useIsMobile, useIsTablet } from '@hooks/useBreakpoint';
+import { AJINMobileDashboard } from '@components/uikit/AJINMobileDashboard';
+import { AJINTabletDashboard } from '@components/uikit/AJINTabletDashboard';
+import { useComplianceAlarms } from '@hooks/useComplianceAlarms';
+import { useComplianceAlarmsSse } from '@hooks/useComplianceAlarmsSse';
+import { useComplianceRTDB, type ComplianceRtdbAlarm } from '@hooks/useComplianceRTDB';
 import type { RecentViolation } from '@/types/equipment';
+import { WidgetGrid } from '@components/dashboard/widgets/WidgetGrid';
+import { detectPersona, PERSONA_WIDGETS, PERSONA_LABELS } from '@components/dashboard/personas';
+import { useFeatureDFlags } from '@lib/featureFlags';
 
 interface ModuleCard {
   path: string;
@@ -60,12 +66,12 @@ function buildModules(counts: ModuleCounts | null): ModuleCard[] {
       ],
     },
     {
-      path: '/chat', slug: 'chat', titleKey: 'modules.onboarding', letter: 'C',
-      tagline: '사내 용어·업무 절차를 24시간 알려주는 AI',
+      path: '/onboarding', slug: 'onboarding', titleKey: 'modules.onboarding', letter: 'C',
+      tagline: '사내 용어·업무 절차·사수까지 — 첫 주 가이드',
       bullets: [
-        `업무 매뉴얼 ${c?.sopGuides ?? 8}종 · 협업 가이드 ${c?.collaborations ?? 5}종`,
-        '질문하기 / 학습하기 두 가지 모드',
-        '사진·문서 업로드해서 바로 질문 가능',
+        `업무 매뉴얼 ${c?.sopGuides ?? 8}종 · 협업 시나리오 ${c?.collaborations ?? 5}종`,
+        '부서별 빠른 질문 + AI 도우미 prefill 이동',
+        '도면·부품 사진 업로드 → Vision Q&A',
       ],
     },
     {
@@ -77,17 +83,9 @@ function buildModules(counts: ModuleCounts | null): ModuleCard[] {
         '관세 변동 비용 시뮬레이션',
       ],
     },
+    // v4.7 — F=시스템 관리(/admin) + G=인사/HR(/hr) 분리 복구. E=설비(구 F) swap 유지.
     {
-      path: '/admin', slug: 'admin', letter: 'E', titleKey: 'modules.admin',
-      tagline: '계정·권한·인력 통계를 한 곳에서 관리',
-      bullets: [
-        `직급별 접근 권한 ${c?.roles ?? 6}단계`,
-        '로그인·권한 변경 자동 감사 기록',
-        '부서별 인원 현황 7가지 차트',
-      ],
-    },
-    {
-      path: '/equipment', slug: 'equipment', letter: 'F', titleKey: 'modules.equipment',
+      path: '/equipment', slug: 'equipment', letter: 'E', titleKey: 'modules.equipment',
       tagline: '설비 이상을 사전에 감지·예측',
       bullets: [
         '공정 이상을 8가지 규칙으로 자동 감지',
@@ -95,12 +93,22 @@ function buildModules(counts: ModuleCounts | null): ModuleCard[] {
         '설비 다음 상태 확률 분석',
       ],
     },
+    {
+      path: '/admin', slug: 'admin', letter: 'F', titleKey: 'modules.admin',
+      tagline: '관리자 콘솔 — 보안 감사·시나리오·시스템 도구',
+      bullets: [
+        `직급별 접근 권한 ${c?.roles ?? 6}단계 + 보안 감사 로그`,
+        '협업 시나리오 관리·feature flags·시스템 진단',
+        'AI 활용 분석·검색 분석',
+      ],
+    },
+    // v4.8 — 기능 G(HR) 카드 제거
   ];
 }
 
-// RTDB live_alarms 의 RecentViolation → 대시보드 MockAlarm 형태로 어댑트.
+// RTDB live_alarms 의 RecentViolation → 대시보드 Alarm 형태로 어댑트.
 // SPC 위반은 모듈 F (설비) 로 매핑. severity 매핑: critical→CRITICAL, warning→HIGH, info→MEDIUM.
-function adaptViolation(v: RecentViolation): MockAlarm {
+function adaptViolation(v: RecentViolation): Alarm {
   const sevMap: Record<string, AlarmSeverity> = {
     critical: 'CRITICAL',
     warning: 'HIGH',
@@ -114,6 +122,21 @@ function adaptViolation(v: RecentViolation): MockAlarm {
     module: 'F',
     timestamp: new Date(v.timestamp || Date.now()).toISOString(),
     acknowledged: false,
+  };
+}
+
+// useComplianceRTDB 가 반환하는 D 알람 → 공통 Alarm 카드 schema.
+// alarm_aggregator → firebase_rtdb.push_alarm 체인을 거쳐 /live_alarms path 에
+// push 된 module='D' 알람을 그대로 매핑한다.
+function adaptComplianceRtdb(a: ComplianceRtdbAlarm): Alarm {
+  return {
+    id: a.id,
+    severity: a.severity,
+    title: a.title || (a.regulation_id ? `법규 변경 — ${a.regulation_id}` : '컴플라이언스 알림'),
+    detail: a.detail || (a.effective_date ? `시행일 ${a.effective_date}` : ''),
+    module: 'D',
+    timestamp: new Date(a.timestamp).toISOString(),
+    acknowledged: a.acknowledged,
   };
 }
 
@@ -135,12 +158,6 @@ export function Dashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
-  const metrics = useMetricsStore((s) => s.metrics);
-  const loadMetrics = useMetricsStore((s) => s.load);
-
-  useEffect(() => {
-    void loadMetrics();
-  }, [loadMetrics]);
 
   // 모듈 카드 동적 카운트 (실패 시 fallback default 사용)
   const [moduleCounts, setModuleCounts] = useState<ModuleCounts | null>(null);
@@ -153,42 +170,98 @@ export function Dashboard() {
   }, []);
   const modules = buildModules(moduleCounts);
 
-  // 시스템 정보(LLM/비전/임베딩 등) — 백엔드 .env 기반 응답을 fetch, 실패시 mock SYSTEM_INFO 폴백.
+  // 시스템 정보(LLM/비전/임베딩 등) — 관리자(role_level ≥ 5) 전용 → 그 외에는 fetch 생략.
   const [sysInfo, setSysInfo] = useState<SystemInfoResponse | null>(null);
+  const isAdminFetch = (user?.role_level ?? 0) >= 5;
   useEffect(() => {
+    if (!isAdminFetch) return;
     let cancelled = false;
     getSystemInfo()
       .then((info) => { if (!cancelled) setSysInfo(info as SystemInfoResponse); })
-      .catch(() => { /* fallback null → SYSTEM_INFO mock 사용 */ });
+      .catch(() => { /* 실패 시 sys 필드는 '—' 표기 */ });
     return () => { cancelled = true; };
-  }, []);
-  // 표시용 통합 객체 (백엔드 응답 우선, 누락 필드는 mock 으로 보완)
+  }, [isAdminFetch]);
   const sys = {
-    llm: sysInfo?.llm ?? SYSTEM_INFO.llm,
-    vision: sysInfo?.vision ?? SYSTEM_INFO.vision,
-    embedding: sysInfo?.embedding ?? SYSTEM_INFO.embedding,
-    router: sysInfo?.router ?? SYSTEM_INFO.router,
-    ml: sysInfo?.ml ?? SYSTEM_INFO.ml,
-    rbac: sysInfo?.rbac ?? SYSTEM_INFO.rbac,
-    data: sysInfo?.data ?? SYSTEM_INFO.data,
+    llm: sysInfo?.llm ?? [],
+    vision: sysInfo?.vision ?? [],
+    embedding: sysInfo?.embedding ?? '',
+    router: sysInfo?.router ?? '',
+    ml: sysInfo?.ml ?? '',
+    rbac: sysInfo?.rbac ?? '',
+    data: sysInfo?.data,
   };
 
   const lastLoginText = user
     ? formatRelativeTime((user as { last_login?: string }).last_login ?? null, i18n.language)
     : '';
 
-  // RTDB live_alarms 구독 — Cloud Run 백엔드 + Firebase RTDB 통합.
-  // 비어있으면 mock 으로 fallback (오프라인 데모 안전망 + D 모듈 시연 알람 보존).
+  // 페르소나 분류 + 위젯 매핑 (user 의 role_level/role_name/department 기반)
+  const personaId = useMemo(() => detectPersona(user), [user]);
+
+  // SYS 정보 (LLM/비전/임베딩 모델 라벨 + 데이터 카운트 + RBAC) 는 관리자 전용.
+  // _shell.tsx 의 SYS 우측 패널과 동일 임계값 (role_level >= 5).
+  const isAdmin = (user?.role_level ?? 0) >= 5;
+  const featureDFlags = useFeatureDFlags();
+  const personaWidgets = useMemo(
+    () => PERSONA_WIDGETS[personaId].filter((widget) => {
+      if (widget.id.includes('supplier') && !featureDFlags.d5_supply) return false;
+      if (widget.id.includes('tariff') && !featureDFlags.d3_whatif) return false;
+      return true;
+    }),
+    [featureDFlags.d3_whatif, featureDFlags.d5_supply, personaId],
+  );
+  const personaLabel = PERSONA_LABELS[personaId];
+
+  // RTDB live_alarms 구독 — F 모듈 SPC 위반 (Cloud Run + Firebase RTDB)
   const rtdbViolations = useEquipmentRTDB();
-  const liveAlarms: MockAlarm[] = rtdbViolations.map(adaptViolation);
-  const baseAlarms: MockAlarm[] = liveAlarms.length > 0
-    ? liveAlarms.concat(ALARMS.filter((a) => a.module === 'D'))  // D 컴플라이언스는 mock 보존
-    : ALARMS;
-  const activeAlarms = baseAlarms.filter((a) => !a.acknowledged);
+  const liveSpcAlarms: Alarm[] = rtdbViolations.map(adaptViolation);
+
+  // v4.2 P5 — D 컴플라이언스 알람 (1차 통로 — REST polling/SSE).
+  // Native EventSource cannot attach CSRF headers for cookie-auth POST flows,
+  // so release builds default to authenticated polling. SSE remains opt-in.
+  const complianceSseEnabled = import.meta.env.VITE_COMPLIANCE_ALARMS_SSE === 'true';
+  const [useSse, setUseSse] = useState(complianceSseEnabled && typeof EventSource !== 'undefined');
+  const sseAlarms = useComplianceAlarmsSse({
+    enabled: useSse,
+    onClose: () => setUseSse(false),
+  });
+  const polledAlarms = useComplianceAlarms({ enabled: !useSse });
+  const liveDAlarmsRest = useSse ? sseAlarms : polledAlarms;
+
+  // v4.x — D 컴플라이언스 알람 (2차 통로 — RTDB).
+  // alarm_aggregator → firebase_rtdb.push_alarm 체인이 /live_alarms 에 push 한
+  // module='D' 알람. F SPC 와 동일 통로를 공유 → 실시간성·응답성 일치.
+  const rtdbDRaw = useComplianceRTDB();
+  const liveDAlarmsRtdb: Alarm[] = rtdbDRaw.map(adaptComplianceRtdb);
+
+  // 양쪽 통로 머지 — id 기준 dedup (RTDB push 가 가장 빠르므로 우선).
+  const dAlarmMap = new Map<string, Alarm>();
+  for (const a of liveDAlarmsRest) dAlarmMap.set(a.id, a);
+  for (const a of liveDAlarmsRtdb) dAlarmMap.set(a.id, a);
+  const liveDAlarms = Array.from(dAlarmMap.values());
+
+  const activeAlarms = [...liveSpcAlarms, ...liveDAlarms].filter((a) => !a.acknowledged);
   const topAlarm = [...activeAlarms].sort((a, b) => {
     const order: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
     return order[a.severity] - order[b.severity];
   })[0];
+
+  // v3.5 모바일 / 태블릿 — uiux MobDashboard / PadDashboard 패턴 풀스크린.
+  const isMobileDashboard = useIsMobile();
+  const isTabletDashboard = useIsTablet();
+  const adaptedTopAlarm = topAlarm ? {
+    id: topAlarm.id,
+    severity: topAlarm.severity,
+    title: topAlarm.title,
+    detail: topAlarm.detail,
+    module: (topAlarm.module === 'D' ? 'D' : 'F') as 'F' | 'D',
+  } : null;
+  if (isMobileDashboard) {
+    return <AJINMobileDashboard activeAlarmsCount={activeAlarms.length} topAlarm={adaptedTopAlarm} />;
+  }
+  if (isTabletDashboard) {
+    return <AJINTabletDashboard activeAlarmsCount={activeAlarms.length} topAlarm={adaptedTopAlarm} />;
+  }
 
   return (
     <div className="page">
@@ -215,83 +288,21 @@ export function Dashboard() {
         )}
       </div>
 
-      {/* "사업장 상태" 메트릭 카드 4종 — v3.6
-          1. 가동 설비 (active+maintenance / total)
-          2. 금일 공정 알람 (RTDB live_alarms 24h + ALARMS F 모듈 합산)
-          3. 법규 미해결 (D 모듈 severity ≥ HIGH)
-          4. 시스템 응답 (latency ms · qps)
-          → 카드 클릭 시 해당 모듈로 즉시 이동, 임계값 색상 시그널 적용. */}
-      <div className="metrics-grid">
-        {/* 1. 가동 설비 */}
-        <MetricCard
-          value={metrics?.equipmentOnline ?? 25}
-          secondaryValue={`/ ${metrics?.equipmentTotal ?? 25}`}
-          labelEn={t('dashboard.metrics.equipment_en')}
-          labelKo={t('dashboard.metrics.equipment_ko')}
-          status={
-            metrics && metrics.equipmentOnline < metrics.equipmentTotal * 0.8
-              ? 'warn'
-              : 'ok'
-          }
-          onClick={() => navigate('/equipment')}
-        />
-
-        {/* 2. 금일 공정 알람 — RTDB SPC + F 모듈 알람 24h */}
-        {(() => {
-          const since = Date.now() - 24 * 60 * 60 * 1000;
-          const rtdbToday = rtdbViolations.filter((v) => {
-            const t = v.timestamp ? new Date(v.timestamp).getTime() : Date.now();
-            return t >= since;
-          }).length;
-          const mockToday = ALARMS.filter(
-            (a) => a.module === 'F' && new Date(a.timestamp).getTime() >= since
-          ).length;
-          const todayCount = rtdbToday + mockToday;
-          const status: 'ok' | 'warn' | 'crit' =
-            todayCount === 0 ? 'ok' : todayCount >= 5 ? 'crit' : 'warn';
-          return (
-            <MetricCard
-              value={todayCount}
-              secondaryValue="건"
-              labelEn={t('dashboard.metrics.today_alerts_en')}
-              labelKo={t('dashboard.metrics.today_alerts_ko')}
-              status={status}
-              onClick={() => navigate('/equipment')}
-            />
-          );
-        })()}
-
-        {/* 3. 법규 미해결 — Critical 이 있으면 빨강 */}
-        <MetricCard
-          value={metrics?.openAlarms ?? 0}
-          secondaryValue="건"
-          labelEn={t('dashboard.metrics.compliance_en')}
-          labelKo={t('dashboard.metrics.compliance_ko')}
-          status={
-            (metrics?.criticalAlarms ?? 0) > 0
-              ? 'crit'
-              : (metrics?.openAlarms ?? 0) > 0
-                ? 'warn'
-                : 'ok'
-          }
-          onClick={() => navigate('/compliance')}
-        />
-
-        {/* 4. 시스템 응답 — latency 200ms ↑ 주황, 500ms ↑ 빨강 */}
-        <MetricCard
-          value={Math.round(metrics?.latencyMs ?? 0)}
-          secondaryValue={`ms · ${(metrics?.qps ?? 0).toFixed(1)} QPS`}
-          labelEn={t('dashboard.metrics.system_en')}
-          labelKo={t('dashboard.metrics.system_ko')}
-          status={
-            (metrics?.latencyMs ?? 0) > 500
-              ? 'crit'
-              : (metrics?.latencyMs ?? 0) > 200
-                ? 'warn'
-                : 'ok'
-          }
-          onClick={() => navigate('/admin')}
-        />
+      {/* 페르소나별 위젯 그리드 — 사용자 역할/부서/직급에 맞춘 KPI 자동 큐레이션.
+          기존 4 메트릭 카드 (가동 설비 / 금일 알람 / 법규 미해결 / 시스템 응답) 는
+          P9 SYS_ADMIN 페르소나에 동일하게 매핑되어 보존된다.
+          모바일은 함수 상단의 isMobileDashboard early-return 으로 AJINMobileDashboard 가
+          전용 렌더링하므로 본 desktop layout 은 비-모바일 viewport 에서만 동작. */}
+      {/* v3.5 — Neural Expressive 브랜드 orb (data-neural=on 시 발광 애니메이션) */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '8px 0 12px' }}>
+        <div className="ne-orb sm" aria-hidden style={{ flexShrink: 0 }} />
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <span className="lg-eyebrow" style={{ fontSize: 10 }}>{personaLabel.en}</span>
+          <span className="dim" style={{ fontSize: 12 }}>· {personaLabel.ko} 맞춤 화면</span>
+        </div>
+      </div>
+      <div className="ne-brief-grid-wrap">
+        <WidgetGrid widgets={personaWidgets} />
       </div>
 
       {/* 진행 중 알람 카드 */}
@@ -318,7 +329,17 @@ export function Dashboard() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate(topAlarm.module === 'F' ? '/equipment' : topAlarm.module === 'D' ? '/compliance' : '/')}
+                onClick={() => {
+                  if (topAlarm.module === 'F') {
+                    navigate('/equipment');
+                  } else if (topAlarm.module === 'D') {
+                    // alarm.id = "D-{source}-{regulation_id}" — regulation_id 추출 후 deep-link
+                    const m = topAlarm.id.match(/^D-[a-z_]+-(.+)$/);
+                    navigate(m ? `/compliance?focus=${encodeURIComponent(m[1])}` : '/compliance');
+                  } else {
+                    navigate('/');
+                  }
+                }}
               >
                 {t('dashboard.alarm.view_all')}
               </Button>
@@ -387,31 +408,34 @@ export function Dashboard() {
         })}
       </div>
 
-      {/* 시스템 정보 */}
-      <section className="metric-card" style={{ marginTop: 24 }}>
-        <div className="label-en" style={{ color: 'var(--hud-primary)', marginBottom: 12 }}>
-          {t('dashboard.system.title')}
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px 16px', fontSize: 13 }}>
-          <span className="dim">{t('dashboard.system.llm')}</span>
-          <span>{sys.llm.join(' · ')}</span>
-          <span className="dim">{t('dashboard.system.vision')}</span>
-          <span>{sys.vision.join(' · ')}</span>
-          <span className="dim">{t('dashboard.system.embedding')}</span>
-          <span>{sys.embedding}</span>
-          <span className="dim">{t('dashboard.system.router')}</span>
-          <span>{sys.router}</span>
-          <span className="dim">{t('dashboard.system.ml')}</span>
-          <span>{sys.ml}</span>
-          <span className="dim">{t('dashboard.system.data')}</span>
-          <span>
-            사원 {sys.data.employees} · 에러 {sys.data.errorCodes} · 금형 {sys.data.molds} ·
-            SPC {sys.data.spcProcesses}공정 · 용어 {sys.data.glossary} · Few-shot {sys.data.fewShotRag}
-          </span>
-          <span className="dim">{t('dashboard.system.rbac')}</span>
-          <span>{sys.rbac}</span>
-        </div>
-      </section>
+      {/* 시스템 정보 — 관리자(role_level ≥ 5) 전용. 일반 사용자는 비노출. */}
+      {isAdmin && (
+        <section className="metric-card" style={{ marginTop: 24 }}>
+          <div className="label-en" style={{ color: 'var(--hud-primary)', marginBottom: 12 }}>
+            {t('dashboard.system.title')}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px 16px', fontSize: 13 }}>
+            <span className="dim">{t('dashboard.system.llm')}</span>
+            <span>{sys.llm.length ? sys.llm.join(' · ') : '—'}</span>
+            <span className="dim">{t('dashboard.system.vision')}</span>
+            <span>{sys.vision.length ? sys.vision.join(' · ') : '—'}</span>
+            <span className="dim">{t('dashboard.system.embedding')}</span>
+            <span>{sys.embedding || '—'}</span>
+            <span className="dim">{t('dashboard.system.router')}</span>
+            <span>{sys.router || '—'}</span>
+            <span className="dim">{t('dashboard.system.ml')}</span>
+            <span>{sys.ml || '—'}</span>
+            <span className="dim">{t('dashboard.system.data')}</span>
+            <span>
+              {sys.data
+                ? `사원 ${sys.data.employees} · 에러 ${sys.data.errorCodes} · 금형 ${sys.data.molds} · SPC ${sys.data.spcProcesses}공정 · 용어 ${sys.data.glossary} · Few-shot ${sys.data.fewShotRag}`
+                : '—'}
+            </span>
+            <span className="dim">{t('dashboard.system.rbac')}</span>
+            <span>{sys.rbac || '—'}</span>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

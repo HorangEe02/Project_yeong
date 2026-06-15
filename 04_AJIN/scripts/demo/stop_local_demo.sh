@@ -4,8 +4,9 @@
 # 동작:
 #   1. Cloudflare Tunnel 종료
 #   2. caffeinate 종료
-#   3. Cloud Run env 원복 (Gemini 단독 모드)
-#   4. (선택) ollama serve 백그라운드 종료
+#   3. 보안 프록시 종료
+#   4. Cloud Run env 원복 (Gemini 단독 모드)
+#   5. (선택) ollama serve 백그라운드 종료
 #
 # 사용:
 #   bash scripts/demo/stop_local_demo.sh
@@ -22,6 +23,7 @@ SERVICE="${SERVICE:-ajin-backend}"
 TUNNEL_PID_FILE="/tmp/ajin_cloudflared.pid"
 TUNNEL_URL_FILE="/tmp/ajin_tunnel_url.txt"
 OLLAMA_PID_FILE="/tmp/ajin_ollama.pid"
+PROXY_PID_FILE="/tmp/ajin_ollama_proxy.pid"
 CAFFEINATE_PID_FILE="/tmp/ajin_caffeinate.pid"
 
 KEEP_OLLAMA=false
@@ -41,7 +43,7 @@ echo "════════════════════════�
 echo "  AJIN AI Assistant — 시연 환경 종료"
 echo "═══════════════════════════════════════════════════════"
 
-step 1/4 "Cloudflare Tunnel 종료"
+step 1/5 "Cloudflare Tunnel 종료"
 if [ -f "$TUNNEL_PID_FILE" ]; then
     PID=$(cat "$TUNNEL_PID_FILE")
     if kill "$PID" 2>/dev/null; then
@@ -53,27 +55,34 @@ if [ -f "$TUNNEL_PID_FILE" ]; then
 fi
 pkill -f "cloudflared tunnel --url" 2>/dev/null || true
 
-step 2/4 "Sleep 방지 해제"
+step 2/5 "Sleep 방지 해제"
 if [ -f "$CAFFEINATE_PID_FILE" ]; then
     PID=$(cat "$CAFFEINATE_PID_FILE")
     kill "$PID" 2>/dev/null && ok "caffeinate 종료 (PID=$PID)" || warn "이미 종료됨"
     rm -f "$CAFFEINATE_PID_FILE"
 fi
 
-step 3/4 "Cloud Run env 원복"
+step 3/5 "보안 프록시 종료"
+if [ -f "$PROXY_PID_FILE" ]; then
+    PID=$(cat "$PROXY_PID_FILE")
+    kill "$PID" 2>/dev/null && ok "Ollama proxy 종료 (PID=$PID)" || warn "proxy 이미 종료됨"
+    rm -f "$PROXY_PID_FILE"
+fi
+
+step 4/5 "Cloud Run env 원복"
 if [ "$KEEP_GEMINI" = true ]; then
     warn "--keep-gemini 옵션 — Cloud Run env 변경 안 함"
 else
     gcloud run services update "$SERVICE" \
         --region "$REGION" \
         --project "$PROJECT" \
-        --update-env-vars "OLLAMA_BASE_URL=,FEATURE_B_BLOCK_GEMINI=false" \
+        --update-env-vars "OLLAMA_BASE_URL=,LLM_ROUTER_PRIMARY=gemini,EMBEDDING_BACKEND=gemini,FEATURE_B_BLOCK_GEMINI=false" \
         --quiet > /dev/null 2>&1 \
-        && ok "OLLAMA_BASE_URL 비움 (Gemini 단독 모드)" \
+        && ok "OLLAMA_BASE_URL 비움 + Gemini 단독 모드" \
         || warn "gcloud run update 실패 — 수동 확인 필요"
 fi
 
-step 4/4 "Ollama 정리"
+step 5/5 "Ollama 정리"
 if [ "$KEEP_OLLAMA" = true ]; then
     warn "--keep-ollama 옵션 — ollama 프로세스 유지"
 elif [ -f "$OLLAMA_PID_FILE" ]; then

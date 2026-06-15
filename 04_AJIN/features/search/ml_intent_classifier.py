@@ -19,6 +19,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import classification_report, accuracy_score
 
+from core.sklearn_cache import cache_matches_current_sklearn, write_cache_metadata
+
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +70,7 @@ class MLIntentClassifier:
         """모델 학습"""
 
         # 캐시 로드
-        if not force and MODEL_PATH.exists():
+        if not force and cache_matches_current_sklearn(MODEL_PATH):
             try:
                 with open(MODEL_PATH, "rb") as f:
                     cached = pickle.load(f)
@@ -120,7 +122,6 @@ class MLIntentClassifier:
         self.model = LogisticRegression(
             C=5.0,
             max_iter=1000,
-            multi_class="multinomial",
             solver="lbfgs",
             class_weight="balanced",
             random_state=42,
@@ -161,6 +162,7 @@ class MLIntentClassifier:
                 "model": self.model,
                 "metrics": self.metrics,
             }, f)
+        write_cache_metadata(MODEL_PATH, model_type="intent_classifier")
 
         logger.info(
             f"의도 분류 ML 모델 학습 완료 — "

@@ -28,6 +28,11 @@ DOC_REQUIRED_SECTIONS = {
     "품질문제 개선대책서": ["문제 현상", "발생 원인", "대책 내용", "효과 확인", "표준화"],
     "안전 인시던트 리포트": ["발생 일시", "발생 장소", "부상 여부", "원인", "재발 방지"],
     "규제 변경 영향 보고서": ["규제 개요", "영향 범위", "대응 방안", "일정", "담당"],
+    # v3.7 — HR/행정 문서
+    "휴가 신청서": ["신청자", "휴가 종류", "기간", "사유", "결재란"],
+    "출장 신청서": ["신청자", "출장지", "기간", "출장 목적", "결재란"],
+    "사직서": ["신청자", "입사일", "퇴직 희망일", "사직 사유", "인수인계", "결재란"],
+    "인사발령 통지": ["수신", "발신", "제목", "발령 구분", "변경 전", "변경 후", "발령일"],
 }
 
 DOC_LENGTH_RANGE = {
@@ -39,9 +44,17 @@ DOC_LENGTH_RANGE = {
     "품질문제 개선대책서": (300, 3000),
     "안전 인시던트 리포트": (200, 2000),
     "규제 변경 영향 보고서": (400, 4000),
+    # v3.7 — HR/행정 문서
+    "휴가 신청서": (150, 1000),
+    "출장 신청서": (200, 1500),
+    "사직서": (200, 1500),
+    "인사발령 통지": (200, 1500),
 }
 
-FORMAL_DOC_TYPES = ["8D 보고서", "ECN", "PPAP", "규제 변경 영향 보고서", "안전 인시던트 리포트"]
+FORMAL_DOC_TYPES = [
+    "8D 보고서", "ECN", "PPAP", "규제 변경 영향 보고서", "안전 인시던트 리포트",
+    "휴가 신청서", "출장 신청서", "사직서", "인사발령 통지",
+]
 
 # 금지 표현 (placeholder / 미완성 마커)
 FORBIDDEN_PATTERNS = [
@@ -50,14 +63,49 @@ FORBIDDEN_PATTERNS = [
     r"XX월\s*XX일", r"OOO\s*(팀장|과장|대리)", r"내용을\s*입력",
 ]
 
-# 자동차/제조업 전문 용어 (사용 여부 평가용)
-PROFESSIONAL_TERMS = [
+# v3.7 — 도메인별 전문 용어 사전 (B-1)
+# 자동차/제조 도메인 — 기존 PROFESSIONAL_TERMS 그대로
+AUTO_MFG_TERMS = [
     "Cpk", "SPC", "PPAP", "APQP", "FMEA", "8D", "ECN", "MSA",
     "IATF", "ISO", "OEM", "공차", "규격", "불량률", "시정조치",
     "예방조치", "근본원인", "관리계획서", "공정흐름도", "양산",
-    "초품", "금형", "프레스", "용접", "사출", "CNC", "Cpk",
+    "초품", "금형", "프레스", "용접", "사출", "CNC",
     "검사성적서", "출하검사", "수입검사", "공정검사",
 ]
+
+# HR/행정 도메인 — 휴가·출장·사직·인사발령에서 자주 쓰는 격식 용어
+HR_ADMIN_TERMS = [
+    "신청자", "결재", "결재란", "승인", "수신", "발신", "제목",
+    "휴가", "연차", "반차", "병가", "특별 휴가", "경조사",
+    "출장", "출장지", "출장 목적", "복귀일", "예상 경비",
+    "인수인계", "담당자", "사번", "소속", "직급", "부서",
+    "사직", "퇴직", "재직", "입사일", "퇴직 희망일",
+    "발령", "부서 이동", "승진", "직무 변경", "발령일", "효력",
+]
+
+# 하위 호환 — 기존 PROFESSIONAL_TERMS 참조 코드를 위해 유지 (deprecated)
+PROFESSIONAL_TERMS = AUTO_MFG_TERMS
+
+# 도메인 매핑 — doc_type 별 적용 용어 사전.
+#   None → 평가 비활성 (default 20점, 안내 메시지 제외)
+#   리스트 → 그 리스트로 평가
+DOC_PROFESSIONAL_TERMS: dict = {
+    # 자동차/제조
+    "8D 보고서":              AUTO_MFG_TERMS,
+    "ECN":                     AUTO_MFG_TERMS,
+    "PPAP":                    AUTO_MFG_TERMS,
+    "품질문제 개선대책서":      AUTO_MFG_TERMS,
+    "안전 인시던트 리포트":     AUTO_MFG_TERMS,
+    "규제 변경 영향 보고서":    AUTO_MFG_TERMS,
+    # HR/행정
+    "휴가 신청서":              HR_ADMIN_TERMS,
+    "출장 신청서":              HR_ADMIN_TERMS,
+    "사직서":                   HR_ADMIN_TERMS,
+    "인사발령 통지":            HR_ADMIN_TERMS,
+    # 일반 행정 — terminology 평가 비활성
+    "사내 이메일":              None,
+    "회의록":                   None,
+}
 
 
 @dataclass
@@ -128,17 +176,35 @@ def evaluate_document(
     details["char_count"] = char_count
     details["length_range"] = (min_len, max_len)
 
-    # ── 3. 전문 용어 사용 (0~25) ──
+    # ── 3. 전문 용어 사용 (0~25) ── v3.7: doc_type 별 도메인 분리 (B-1)
+    # DOC_PROFESSIONAL_TERMS 매핑:
+    #   - 등록 + 리스트 → 해당 도메인 용어로 평가
+    #   - 등록 + None → 평가 비활성 (default 20점)
+    #   - 미등록 → 안전한 default (20점, 안내 메시지 제외)
+    if doc_type in DOC_PROFESSIONAL_TERMS:
+        domain_terms = DOC_PROFESSIONAL_TERMS[doc_type]
+    else:
+        domain_terms = None  # 미등록 doc_type 은 평가 skip
+
     terms_found = []
-    for term in PROFESSIONAL_TERMS:
-        if term.lower() in text.lower():
-            terms_found.append(term)
+    if domain_terms:
+        for term in domain_terms:
+            if term.lower() in text.lower():
+                terms_found.append(term)
 
-    term_ratio = min(1.0, len(terms_found) / 8)  # 8개 이상이면 만점
-    terminology_score = term_ratio * 25
+        # 도메인 용어 사전 사이즈를 고려한 정규화 — 사전의 약 절반 또는 8개 중 작은 값을 만점 기준
+        target = min(8, max(3, len(domain_terms) // 4))
+        term_ratio = min(1.0, len(terms_found) / target)
+        terminology_score = term_ratio * 25
 
-    if len(terms_found) < 3:
-        improvements.append("전문 용어 사용이 부족합니다. 자동차/제조 관련 용어를 포함하세요.")
+        if len(terms_found) < max(2, target // 3):
+            domain_label = "HR/행정" if domain_terms is HR_ADMIN_TERMS else "자동차/제조"
+            improvements.append(
+                f"{domain_label} 관련 전문 용어 사용이 부족합니다."
+            )
+    else:
+        # 평가 비활성 — 사내 이메일/회의록/미등록 doc_type
+        terminology_score = 20.0  # default 만점에 가까운 점수 (도메인 강요 X)
 
     # TF-IDF 유사도 (참조 템플릿이 있는 경우)
     if reference_template and len(reference_template) > 50:

@@ -8,6 +8,7 @@ import type {
   ChatMessage,
   ChatMode,
   ChatMessageMeta,
+  ChatReference,
   ChatRequestBody,
   ForceProvider,
   HistoryTurn,
@@ -30,6 +31,21 @@ function generateSessionId(): string {
   return `A${padded}-${year}`;
 }
 
+/** v4.7 C-2 — 챗봇 응답 언어. UI 언어(`ajin-lang`)와 분리. */
+export type ChatLanguagePref = 'ko' | 'en' | 'auto';
+
+const CHAT_LANG_LS_KEY = 'ajin-chat-lang';
+
+function loadChatLanguage(): ChatLanguagePref {
+  try {
+    const v = localStorage.getItem(CHAT_LANG_LS_KEY);
+    if (v === 'ko' || v === 'en' || v === 'auto') return v;
+  } catch {
+    /* SSR / private mode */
+  }
+  return 'auto';
+}
+
 interface ChatState {
   messages: ChatMessage[];
   mode: ChatMode;
@@ -42,11 +58,20 @@ interface ChatState {
   sessionId: string;
   /** Day 5++ — 직전 응답의 의도 분류 시간 (mock). */
   intentMs: number | null;
+  /** v4.7 C-2 — 챗봇 응답 언어 선호. */
+  chatLanguage: ChatLanguagePref;
+  /** v4.7 Sprint 2 P0 (축 ①) — InputComposer "/" 으로 인용된 항목. send 시 payload 포함. */
+  references: ChatReference[];
+  addReference: (ref: ChatReference) => void;
+  removeReference: (id: string) => void;
+  clearReferences: () => void;
 
   setMode: (m: ChatMode) => void;
   setForceProvider: (p: ForceProvider | null) => void;
   /** Day 5++ — 의도 분류 시간(ms) 갱신. */
   setIntentMs: (n: number | null) => void;
+  /** v4.7 C-2 — chatLanguage 설정 + localStorage 영속. */
+  setChatLanguage: (v: ChatLanguagePref) => void;
   attachVision: (file: File) => void;
   attachFile: (file: File) => void;
   clearAttachment: () => void;
@@ -135,10 +160,27 @@ export const useChatStore = create<ChatState>((set, get) => ({
   forceProvider: null,
   sessionId: generateSessionId(),
   intentMs: null,
+  chatLanguage: loadChatLanguage(),
+  references: [],
+  addReference: (ref) =>
+    set((s) =>
+      s.references.some((r) => r.id === ref.id) ? s : { references: [...s.references, ref] },
+    ),
+  removeReference: (id) =>
+    set((s) => ({ references: s.references.filter((r) => r.id !== id) })),
+  clearReferences: () => set({ references: [] }),
 
   setMode: (m) => set({ mode: m }),
   setForceProvider: (p) => set({ forceProvider: p }),
   setIntentMs: (n: number | null) => set({ intentMs: n }),
+  setChatLanguage: (v) => {
+    try {
+      localStorage.setItem(CHAT_LANG_LS_KEY, v);
+    } catch {
+      /* SSR / private mode */
+    }
+    set({ chatLanguage: v });
+  },
   attachVision: (file) => set({ attachment: { kind: 'image', file } }),
   attachFile: (file) => set({ attachment: { kind: 'file', file } }),
   clearAttachment: () => set({ attachment: null }),
@@ -199,6 +241,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       mode: selectLLMMode(language),
       history: trimmed,
       language,
+      chat_language: get().chatLanguage,
       file_context: file.extractedText,
     };
     return body;
@@ -232,12 +275,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
       activeMessageId: assistantMsg.id,
     }));
 
+    const refs = get().references;
     const body: ChatRequestBody = {
       query: text,
       mode: selectLLMMode(language),
       history: trimmed,
       language,
+      chat_language: get().chatLanguage,
+      ...(refs.length > 0 ? { references: refs } : {}),
     };
+    // 한 번 전송한 references 는 자동 비움 — 다음 turn 에서 잔류 방지.
+    if (refs.length > 0) set({ references: [] });
     void CONTEXT_BUDGET; // 향후 백엔드 context_budget 도입 시 사용 (Day 5+)
     return body;
   },

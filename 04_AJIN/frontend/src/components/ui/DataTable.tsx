@@ -11,10 +11,11 @@ import {
 } from '@tanstack/react-table';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { Skeleton } from './Skeleton';
+import { useIsMobile } from '@hooks/useBreakpoint';
 
 interface Props<T> {
   data: T[];
-  columns: ColumnDef<T, any>[];
+  columns: ColumnDef<T, unknown>[];
   pagination?: boolean;
   pageSize?: number;
   sortable?: boolean;
@@ -22,6 +23,8 @@ interface Props<T> {
   emptyText?: string;
   onRowClick?: (row: T) => void;
   toolbar?: ReactNode;
+  /** v4.4 — 모바일(≤640px)에서 row 별 카드 렌더 함수. 미제공 시 column header×value 자동 stack. */
+  mobileCard?: (row: T, index: number) => ReactNode;
 }
 
 export function DataTable<T>({
@@ -34,8 +37,10 @@ export function DataTable<T>({
   emptyText = '데이터가 없습니다',
   onRowClick,
   toolbar,
+  mobileCard,
 }: Props<T>) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const isMobile = useIsMobile();
 
   const table = useReactTable({
     data,
@@ -51,6 +56,84 @@ export function DataTable<T>({
 
   if (loading) {
     return <Skeleton variant="card" count={3} />;
+  }
+
+  // v4.4 — 모바일 카드 뷰 자동 전환 (≤640px)
+  if (isMobile) {
+    const rows = table.getRowModel().rows;
+    return (
+      <div>
+        {toolbar && <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'flex-end' }}>{toolbar}</div>}
+        {rows.length === 0 ? (
+          <div className="ui-table-empty" style={{ padding: 20, textAlign: 'center', color: 'var(--hud-text-dim)' }}>
+            {emptyText}
+          </div>
+        ) : (
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {rows.map((row, idx) => (
+              <li
+                key={row.id}
+                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                style={{
+                  borderRadius: 'var(--r-card-mobile, 14px)',
+                  border: '1px solid var(--hud-border)',
+                  background: 'var(--hud-surface)',
+                  padding: 14,
+                  cursor: onRowClick ? 'pointer' : 'default',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 6,
+                }}
+              >
+                {mobileCard ? (
+                  mobileCard(row.original, idx)
+                ) : (
+                  row.getVisibleCells().map((cell) => {
+                    const header = cell.column.columnDef.header;
+                    const headerText = typeof header === 'string' ? header : cell.column.id;
+                    return (
+                      <div
+                        key={cell.id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'baseline',
+                          gap: 12,
+                          fontSize: 13,
+                        }}
+                      >
+                        <span style={{ color: 'var(--hud-text-dim)', fontSize: 11, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                          {headerText}
+                        </span>
+                        <span style={{ color: 'var(--hud-text)', textAlign: 'right', minWidth: 0 }}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </span>
+                      </div>
+                    );
+                  })
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        {pagination && table.getPageCount() > 1 && (
+          <div className="ui-table-pagination" style={{ marginTop: 10 }}>
+            <span>
+              {table.getState().pagination.pageIndex + 1} / {table.getPageCount()} 페이지 ·{' '}
+              {table.getFilteredRowModel().rows.length}건
+            </span>
+            <span style={{ display: 'flex', gap: 4 }}>
+              <button className="btn ghost sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+                ← 이전
+              </button>
+              <button className="btn ghost sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                다음 →
+              </button>
+            </span>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (

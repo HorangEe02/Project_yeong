@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import path from 'node:path';
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   // Plotly.js v3 번들 내부의 Node.js `global` 참조를 브라우저용 globalThis 로 치환.
   // 미적용 시 plotly__js.js 평가 단계에서 "ReferenceError: global is not defined" 발생.
@@ -32,14 +32,16 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:8000',
+        target: process.env.VITE_API_PROXY_TARGET || 'http://localhost:8000',
         changeOrigin: true,
       },
     },
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: mode !== 'production' && process.env.BUILD_SOURCEMAP === 'true',
+    // Known release chunks: plotly (~4.6 MiB) and @rhwp WASM (~4 MiB) are split intentionally.
+    chunkSizeWarningLimit: 6000,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -61,4 +63,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

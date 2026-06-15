@@ -27,12 +27,21 @@ services:
     volumes:
       - ~/.config/gcloud:/root/.config/gcloud
 
+    # AJIN_OLLAMA_SECRET 주입 — install_host_bridge.sh 가 생성한 cache 파일.
+    # 없으면 entrypoint Step 1 이 GCP Secret Manager 에서 fallback fetch (gcloud auth 필요).
+    env_file:
+      - path: ../../secrets/.demo-tunnel.env
+        required: false
+
     environment:
       GCP_PROJECT: ajin-cb
       GCP_REGION: asia-northeast3
       GCP_SERVICE: ajin-backend
-      HOSTING_BASE: https://ajin-cb.web.app
-      OLLAMA_HOST_INTERNAL: host.docker.internal:11434
+      HOSTING_BASE: https://ajin-ai-assistant-frontend.vercel.app
+      # secure_proxy port 8434 (caddy, X-AJIN-Secret 검사 → raw ollama 11434 으로 forward)
+      # ※ 8444 는 다른 프로젝트 python http.server 가 점유 — 잘못된 port 사용 시
+      #    backend 가 ollama 도달 못 함 → /api/health llm_connected=false
+      OLLAMA_HOST_INTERNAL: host.docker.internal:8434
 
     # SIGTERM 후 cleanup 시간 충분히 부여 (Cloud Run env update ~10초)
     stop_grace_period: 30s

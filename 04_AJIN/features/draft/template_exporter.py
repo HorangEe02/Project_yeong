@@ -361,8 +361,10 @@ def export_template(
     ext_map = {
         "docx": (".docx", text_to_docx_bytes),
         "pdf":  (".pdf",  text_to_pdf_bytes),
-        # v3.3: .hwpx → .odt (내부가 ODT 형식이므로 확장자 일치시켜 크로스플랫폼 호환)
-        "hwpx": (".odt", text_to_hwpx_bytes),
+        # Feature B Sprint 1 P0 (plan §15) — HWPX 복구.
+        # text_to_hwpx_bytes 는 HwpxExporter().export_bytes() 로 OWPML 1.4 ZIP 생성.
+        # v3.3 의 .odt 다운그레이드는 매핑 잔재였음 — 한컴 오피스 정식 포맷 복구.
+        "hwpx": (".hwpx", text_to_hwpx_bytes),
         "csv":  (".csv", text_to_csv_bytes),
         "xlsx": (".xlsx", text_to_xlsx_bytes),
     }

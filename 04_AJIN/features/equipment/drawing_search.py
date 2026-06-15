@@ -7,13 +7,26 @@ SQLite에 저장하고 다양한 방식으로 검색한다.
 1. 정확 매칭: 도면번호/부품번호로 O(1) 조회
 2. 키워드 검색: 부품명/설명에서 LIKE 검색
 3. 필터: 장비유형, 공정, 부서별 필터링
+
+v4.8 Feature F 트랙 A — Vision OCR 파일럿:
+4. extract_part_numbers(image_bytes): Gemini Vision API 로 도면에서 P/N 추출
 """
 
 import json
+import logging
+import os
+import re
 import sqlite3
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+
+from core.data_lineage import ensure_lineage_columns, lineage_values
+
+logger = logging.getLogger(__name__)
+
+# 부품번호 패턴 — 알파벳 2-5자 + 숫자 4자리 + 숫자 3-5자리 (KOR-2024-001, AJ-EWP-001 등)
+_PART_NUMBER_PATTERN = re.compile(r"\b[A-Z]{2,5}-\d{4}-\d{3,5}\b")
 
 DRAWING_DB_PATH = Path("data/equipment/drawings.db")
 
@@ -44,11 +57,28 @@ def init_drawing_db(db_path: Path = DRAWING_DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_part_number ON drawings(part_number);
         CREATE INDEX IF NOT EXISTS idx_equipment_type ON drawings(equipment_type);
     """)
+    ensure_lineage_columns(conn, "drawings")
 
     # 데이터가 없으면 샘플 시딩
     count = conn.execute("SELECT COUNT(*) FROM drawings").fetchone()[0]
     if count == 0:
         _seed_sample_data(conn)
+    else:
+        lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
+        conn.execute(
+            """UPDATE drawings
+                  SET data_class = ?,
+                      source_system = ?,
+                      source_label = ?,
+                      source_updated_at = ?
+                WHERE data_class IS NULL OR data_class = '' OR data_class = 'unknown'""",
+            (
+                lineage["data_class"],
+                lineage["source_system"],
+                lineage["source_label"],
+                lineage["source_updated_at"],
+            ),
+        )
 
     conn.commit()
     conn.close()
@@ -56,6 +86,7 @@ def init_drawing_db(db_path: Path = DRAWING_DB_PATH) -> None:
 
 def _seed_sample_data(conn: sqlite3.Connection) -> None:
     """아진산업 주력 제품 도면 샘플 15건"""
+    lineage = lineage_values("synthetic", "seed_equipment", "seed_equipment")
     samples = [
         # EWP (전동워터펌프)
         ("DWG-EWP-001", "AJ-EWP-H100", "EWP 하우징 상부", "C", "프레스", "AL6061-T6", "다이캐스팅", "부품개발팀",
@@ -117,9 +148,11 @@ def _seed_sample_data(conn: sqlite3.Connection) -> None:
     conn.executemany(
         """INSERT INTO drawings
            (drawing_number, part_number, part_name, revision, equipment_type,
-            material, process_type, department, file_path, description, bom_info)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        samples,
+            material, process_type, department, file_path, description, bom_info,
+            data_class, source_system, source_label, source_updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        [(*sample, lineage["data_class"], lineage["source_system"], lineage["source_label"],
+          lineage["source_updated_at"]) for sample in samples],
     )
 
 
@@ -223,3 +256,69 @@ def get_drawing_stats(db_path: Path = DRAWING_DB_PATH) -> dict:
         return {"total": total, "by_type": by_type}
     finally:
         conn.close()
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# v4.8 Feature F 트랙 A — Vision OCR 파일럿 (F-②)
+# ──────────────────────────────────────────────────────────────────────────
+
+_PART_NUMBER_PROMPT = (
+    "이 도면 이미지에서 부품 번호(P/N) 목록을 추출하세요. "
+    "형식 예: KOR-2024-001, USA-2023-456, AJ-EWP-001 등 "
+    "(알파벳 2~5자 + 4자리 연도 + 3~5자리 일련번호). "
+    "각 부품 번호를 한 줄에 하나씩, 다른 설명 없이 나열하세요. "
+    "발견되지 않으면 빈 문자열을 반환하세요."
+)
+
+
+def extract_part_numbers(image_bytes: bytes) -> list[str]:
+    """Gemini Vision API 로 도면 이미지에서 부품 번호(P/N) 목록을 추출.
+
+    Args:
+        image_bytes: 도면 이미지 원본 바이트 (PNG/JPEG).
+
+    Returns:
+        중복 제거된 부품 번호 리스트.
+
+    Raises:
+        RuntimeError("vision_disabled") — GEMINI_API_KEY 환경 변수 미설정.
+        RuntimeError("vision_failed") — SDK 미설치 또는 호출 실패.
+
+    Note:
+        본 함수는 search/vision_query.py 와 동일한 GEMINI_API_KEY 정책을 따른다.
+        실 호출 비용을 피하기 위해 features/search/vision_query._gemini_ocr 의
+        프롬프트만 부품번호 추출용으로 차이화 — 응답을 정규식 파싱.
+    """
+    if not image_bytes:
+        return []
+
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("vision_disabled")
+
+    try:
+        import google.generativeai as genai  # type: ignore
+    except Exception as e:
+        logger.warning("google-generativeai SDK 미설치: %s", e)
+        raise RuntimeError("vision_failed") from e
+
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel("gemini-3.5-flash")
+        response = model.generate_content(
+            [_PART_NUMBER_PROMPT, {"mime_type": "image/png", "data": image_bytes}]
+        )
+        text = getattr(response, "text", "") or ""
+    except Exception as e:
+        logger.warning("Gemini part-number OCR 호출 실패: %s", e)
+        raise RuntimeError("vision_failed") from e
+
+    matches = _PART_NUMBER_PATTERN.findall(text)
+    # 순서 보존 dedup
+    seen: set[str] = set()
+    result: list[str] = []
+    for m in matches:
+        if m not in seen:
+            seen.add(m)
+            result.append(m)
+    return result

@@ -28,15 +28,28 @@ export interface DraftCardPayload {
 }
 
 // ── Compliance ───────────────────────────────────────
+export interface ComplianceCardCitation {
+  change_id: number;
+  regulation_type: string;
+  item_id: string;
+  item_title: string;
+  grade?: string;
+}
+
 export interface ComplianceCardPayload {
-  regulation_id: string;
+  regulation_id?: string;
   title: string;
-  severity: string; // "CRITICAL" | "HIGH" | "MEDIUM" | ""
-  effective_date: string;
-  days_until_effective: number | null;
-  excerpt: string;
-  affected_departments: string[];
+  severity?: string; // "CRITICAL" | "HIGH" | "MEDIUM" | ""
+  effective_date?: string;
+  days_until_effective?: number | null;
+  excerpt?: string;
+  affected_departments?: string[];
   full_view_url: string;
+  // P1 D4 — regulation_qa payload (RAG)
+  answer?: string;             // LLM 답변 본문
+  citations?: ComplianceCardCitation[];
+  novice_mode?: boolean;
+  rag_hit?: boolean;
 }
 
 // ── Employee ─────────────────────────────────────────

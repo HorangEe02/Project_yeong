@@ -3,13 +3,21 @@
 // v3.3 Phase A — LLM 멀티 프로바이더 셀렉터 + localStorage 영속 + SSE force_provider 배선.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSSE } from '@hooks/useSSE';
+import { CRAGVerdictBanner, type CRAGVerdict } from '@components/chat/CRAGVerdictBanner';
+import { useIsMobile } from '@hooks/useBreakpoint';
+import { AJINMobileChat } from '@components/uikit/AJINMobileChat';
 import { useUIStore } from '@store/ui';
 import { useAuthStore } from '@store/auth';
 import { useToastStore } from '@store/toast';
+import { apiUrl } from '@api/baseUrl';
 import { buildChatUrl } from '@api/onboarding';
 import { ModelSelect } from '@/components/chat/ModelSelect';
+import { ModelHelpPopover } from '@components/common/ModelHelpPopover';
+import { LanguageToggle } from '@/components/chat/LanguageToggle';
+import { useChatStore } from '@store/chat';
+import { BadgeSidebar } from '@/components/chat/BadgeSidebar';
 import { ActionCardRouter } from '@/components/chat/cards';
 import type { ActionCard } from '@/components/chat/cards/types';
 import type { ForceProvider } from '@/types/chat';
@@ -20,7 +28,9 @@ import {
   saveChatSession,
   clearChatSession,
 } from '@lib/chatSession';
-import { downloadResponse, type DownloadFormat } from '@api/download';
+import { useFeatureCFlags } from '@lib/featureFlags';
+import { DownloadActions } from '@/components/chat/DownloadActions';
+import { FeedbackActions } from '@/components/chat/FeedbackActions';
 import {
   fetchSopList,
   fetchSopDetail,
@@ -77,13 +87,18 @@ interface ChatMessageMeta {
   latency: string; // human-readable latency (e.g., '124ms · 41 t/s')
   // v3.3 Phase A — 풍부한 LLM 메타 (있으면 표시, 없으면 legacy 필드 fallback)
   provider?: string;       // 'ollama' | 'gemini' | 'lm_studio'
-  model?: string;          // 'qwen3.5:9b' | 'gemini-2.5-pro' ...
+  model?: string;          // 'qwen3.5:9b' | 'gemini-3.5-flash' ...
   ttftMs?: number;         // first token latency
   totalLatencyMs?: number; // total response latency
   tokensIn?: number;
   tokensOut?: number;
   contextUsed?: number;    // 사용된 컨텍스트 char (또는 token)
   contextTotal?: number;   // 모드별 한도 (3000/2000)
+  // v4.x — CRAG retrieval evaluator (Phase 1 PR2). PR #12 backend wiring 에서 SSE 'done'
+  // metadata.crag_verdict / crag_top_score / citation_status='crag_blocked' 송출.
+  cragVerdict?: 'correct' | 'ambiguous' | 'incorrect';
+  cragTopScore?: number;
+  cragBlocked?: boolean;   // citation_status === 'crag_blocked' (incorrect 차단)
 }
 
 interface ChatMessage {
@@ -187,10 +202,9 @@ interface QuickQuestionsResponse {
 }
 
 async function fetchQuickQuestions(department: string): Promise<QuickQuestionItem[]> {
-  const apiUrl = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000';
   try {
     const res = await fetch(
-      `${apiUrl}/api/onboarding/quick-questions?department=${encodeURIComponent(department)}`,
+      apiUrl(`/onboarding/quick-questions?department=${encodeURIComponent(department)}`),
       { headers: { Accept: 'application/json' } },
     );
     if (!res.ok) return [];
@@ -244,14 +258,14 @@ function toCollabCard(it: UserScenarioItem): CollabCard {
 // 이전엔 8개 모두 onClick 핸들러 없어 클릭 불가. 01번만 i===0 스타일로 활성처럼 보였을 뿐.
 // 폴백 (백엔드 미가용 시 데모용) — sop_id 없이 단순 표시
 const SOP_FALLBACK: SopSummary[] = [
-  { sop_id: 'SOP-001', title: '금형 교체',     department: '생산기술팀', category: 'production', steps_count: 7 },
-  { sop_id: 'SOP-002', title: '용접 검사',     department: '품질보증팀', category: 'quality',    steps_count: 6 },
-  { sop_id: 'SOP-003', title: 'CNC 가공',      department: '생산기술팀', category: 'production', steps_count: 8 },
-  { sop_id: 'SOP-8D',  title: '8D Report 작성', department: '품질보증팀', category: 'quality',    steps_count: 8 },
-  { sop_id: 'SOP-ECN', title: 'ECN 발행',      department: '설계팀',     category: 'change',     steps_count: 5 },
-  { sop_id: 'SOP-SPC', title: 'SPC 분석',      department: '품질보증팀', category: 'quality',    steps_count: 6 },
-  { sop_id: 'SOP-PPAP', title: 'PPAP 제출',    department: '품질보증팀', category: 'quality',    steps_count: 9 },
-  { sop_id: 'SOP-SAFE', title: '안전 점검',    department: '안전관리팀', category: 'safety',     steps_count: 5 },
+  { sop_id: 'SOP-001', title: '프레스 금형 교체 절차', department: '금형생산팀', category: '설비', steps_count: 6 },
+  { sop_id: 'SOP-002', title: '용접 너겟 품질 검사 절차', department: '품질보증팀', category: '품질', steps_count: 4 },
+  { sop_id: 'SOP-003', title: 'EWP 하우징 CNC 가공 절차', department: '생산기술본부', category: '생산', steps_count: 4 },
+  { sop_id: 'SOP-8D', title: '8D Report 작성 (고객 클레임 대응)', department: '품질보증팀', category: '품질', steps_count: 5 },
+  { sop_id: 'SOP-ECN', title: 'ECN(설계변경통보) 접수 및 대응', department: '부품개발팀', category: '품질', steps_count: 3 },
+  { sop_id: 'SOP-MOLD-RECEIVE', title: '신규 금형 입고 및 검수', department: '금형생산팀', category: '설비', steps_count: 3 },
+  { sop_id: 'SOP-PPAP', title: 'PPAP(생산부품승인절차) 진행', department: '부품개발팀', category: '품질', steps_count: 5 },
+  { sop_id: 'SOP-PRESS-TRIAL', title: '프레스 트라이(시타) 참관 준비', department: '생산기술팀', category: '생산', steps_count: 4 },
 ];
 
 const QUIZ_Q = {
@@ -304,6 +318,7 @@ function nowHM(): string {
 
 export function Chat() {
   const setUIStreaming = useUIStore((s) => s.setStreaming);
+  const featureCFlags = useFeatureCFlags();
   // v3.3 Phase F-4 — 인-챗 카드의 "Module X 로 열기" 버튼을 SPA 내비게이션으로 처리.
   const navigate = useNavigate();
 
@@ -320,6 +335,7 @@ export function Chat() {
   const myDivision = useMemo(() => divisionOf(myDept), [myDept]);
 
   const [mode, setMode] = useState<ChatMode>('교육');
+  const isWorkFullscreen = mode === '업무' && featureCFlags.work_fullscreen;
   const [dept, setDept] = useState(myDept);
 
   // v3.6.1 — 사용자 전환 감지용 ref. employee_id 가 바뀌면 dept 재동기화 + 채팅 세션 리셋.
@@ -346,6 +362,16 @@ export function Chat() {
     }
   }, [user?.employee_id, isAdmin, isExecutive, myDept, myDivision]); // eslint-disable-line react-hooks/exhaustive-deps
   const [input, setInput] = useState('');
+  // /onboarding 의 빠른 질문 칩에서 navigate('/chat', { state: { prefill } }) 로 진입한 경우 prefill 적용
+  const location = useLocation();
+  useEffect(() => {
+    const state = location.state as { prefill?: string } | null;
+    if (state?.prefill) {
+      setInput(state.prefill);
+      // 동일 prefill 이 새로고침/뒤로가기 시 재적용되지 않도록 state 를 비움
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
   const [view, setView] = useState<SidePanel>('sop');
   const [sopStep, setSopStep] = useState(0);
   // v3.6 — SOP 목록 (백엔드 부서별 필터링). 미가용 시 SOP_FALLBACK 사용.
@@ -361,12 +387,13 @@ export function Chat() {
         }
       })
       .catch(() => {
-        // 백엔드 실패 → 폴백 유지 (오프라인 데모 보존)
+        // 백엔드 미응답 → SOP_FALLBACK 유지 (오프라인 데모 보존)
       });
     return () => {
       cancelled = true;
     };
-  }, [user?.username]);
+    // C6-2 v4.0 — 부서 변경에도 리페치 (백엔드 미지원이나 향후 ?dept= 확장 + 클라이언트 필터 갱신).
+  }, [user?.username, dept]);
 
   // 협업 시나리오 5종 (Phase 1+2 — DB 동적 로드, 미가용 시 정적 fallback).
   // HR_ADMIN 이 /admin → "협업 시나리오" 탭에서 편집/추가하면 즉시 반영됨.
@@ -381,21 +408,36 @@ export function Chat() {
         }
       })
       .catch(() => {
-        // 백엔드/인증 실패 → fallback 유지 (5종 보장)
+        // 백엔드/인증 미응답 → COLLAB_FALLBACK 유지 (5종 보장)
       });
     return () => {
       cancelled = true;
     };
-  }, [user?.username]);
+    // C6-2 v4.0 — 부서 변경 시도 협업 시나리오 재로드 (사용자 시나리오는 dept 의존적).
+  }, [user?.username, dept]);
+
+  // C3 v4.0 — SOP 부서 매칭 모드. "matching"(현재 부서) | "all"(사내 공통 8종 전체).
+  // 백엔드 /sop/list 가 dept 파라미터 미지원이라 클라이언트 측 필터링.
+  const [sopFilterMode, setSopFilterMode] = useState<'matching' | 'all'>('matching');
+  const displaySopList = useMemo(() => {
+    if (sopFilterMode === 'all') return sopList;
+    const matched = sopList.filter((s) => s.department === dept);
+    // 매칭 부서 SOP 가 0개면 전체 노출 (안내 라벨이 별도로 알려줌)
+    return matched.length > 0 ? matched : sopList;
+  }, [sopList, sopFilterMode, dept]);
+  const matchedDeptCount = useMemo(
+    () => sopList.filter((s) => s.department === dept).length,
+    [sopList, dept],
+  );
 
   // v3.6 — 선택된 SOP (상단 가이드 패널 + 퀴즈 탭 동기화).
   // 첫 진입 시 sopList[0] 자동 선택 → 가이드 패널이 항상 의미 있는 내용 표시.
   const [selectedSopId, setSelectedSopId] = useState<string | null>(null);
   useEffect(() => {
-    if (selectedSopId == null && sopList.length > 0) {
-      setSelectedSopId(sopList[0].sop_id);
+    if (selectedSopId == null && displaySopList.length > 0) {
+      setSelectedSopId(displaySopList[0].sop_id);
     }
-  }, [sopList, selectedSopId]);
+  }, [displaySopList, selectedSopId]);
 
   // 선택된 SOP 의 상세 (steps, prerequisites, safety_warnings 등)
   const [sopDetail, setSopDetail] = useState<SopDetail | null>(null);
@@ -485,17 +527,29 @@ export function Chat() {
     }
   }, [forceProvider]);
 
+  useEffect(() => {
+    if (!featureCFlags.multi_llm && forceProvider !== null) {
+      setForceProvider(null);
+    }
+  }, [featureCFlags.multi_llm, forceProvider]);
+
   // v3.3 Phase A-5 — 비교 모드 (이중창 Gemini ↔ Ollama).
   // 활성 시 같은 질문을 두 모델로 동시 호출하고 응답을 좌·우 패널에 병렬 스트리밍.
   // 기본 비활성 — 토큰 비용 2배라 명시적 토글 필요.
   const [compareMode, setCompareMode] = useState(false);
   const [compareProvider, setCompareProvider] = useState<ForceProvider | null>({
     provider: 'gemini',
-    model: 'gemini-2.5-pro',
+    model: 'gemini-3.5-flash',
   });
   const [compareMsgs, setCompareMsgs] = useState<ChatMessage[]>(
     () => loadChatSession<ChatMessage>(user?.employee_id)?.compareMsgs ?? welcomeMsgs,
   );
+
+  useEffect(() => {
+    if (!featureCFlags.compare_mode && compareMode) {
+      setCompareMode(false);
+    }
+  }, [featureCFlags.compare_mode, compareMode]);
 
   // 변경마다 영속 저장 (debounce 없음 — useState set 빈도가 낮아 불필요).
   // userId 를 함께 저장 → 다른 사용자 로그인 시 loadChatSession() 가 자동 폐기.
@@ -648,6 +702,13 @@ export function Chat() {
     onDone: (final) => {
       const id = activeMsgIdRef.current;
       if (!id) return;
+      // v4.x — CRAG verdict 추출. PR #12 backend wiring 의 'done' metadata 필드.
+      const rawVerdict = pickString(final, 'crag_verdict');
+      const cragVerdict: CRAGVerdict | undefined =
+        rawVerdict === 'correct' || rawVerdict === 'ambiguous' || rawVerdict === 'incorrect'
+          ? rawVerdict
+          : undefined;
+      const cragBlocked = pickString(final, 'citation_status') === 'crag_blocked';
       setMsgs((arr) =>
         arr.map((m) =>
           m.id === id
@@ -671,6 +732,9 @@ export function Chat() {
                   tokensOut:
                     pickNumber(final, 'tokens_out', 'output_tokens', 'completion_tokens') ??
                     m.meta?.tokensOut,
+                  cragVerdict: cragVerdict ?? m.meta?.cragVerdict,
+                  cragTopScore: pickNumber(final, 'crag_top_score') ?? m.meta?.cragTopScore,
+                  cragBlocked: cragBlocked || m.meta?.cragBlocked,
                 },
               }
             : m,
@@ -857,7 +921,7 @@ export function Chat() {
       if (i < reply.length) {
         setTimeout(tick, 25);
       } else {
-        const mockModel = compareProvider?.model ?? 'gemini-2.5-pro';
+        const mockModel = compareProvider?.model ?? 'gemini-3.5-flash';
         const mockProvider = compareProvider?.provider ?? 'gemini';
         setCompareMsgs((arr) =>
           arr.map((m) =>
@@ -891,13 +955,16 @@ export function Chat() {
     const raw = textOverride !== undefined ? textOverride : input;
     if (!raw.trim() || sse.isStreaming || compareSSE.isStreaming) return;
     const q = raw.trim();
+    const activeCompareMode = featureCFlags.compare_mode && compareMode;
+    const primaryProvider = featureCFlags.multi_llm ? forceProvider : null;
+    const secondaryProvider = featureCFlags.compare_mode ? compareProvider : null;
     if (textOverride === undefined) setInput('');
 
     const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', text: q, t: nowHM() };
 
     // 사용자 메시지 — 비교 모드면 양쪽 패널에 동일 표시
     setMsgs((arr) => [...arr, userMsg]);
-    if (compareMode) {
+    if (activeCompareMode) {
       setCompareMsgs((arr) => [...arr, userMsg]);
     }
 
@@ -906,7 +973,7 @@ export function Chat() {
     const isError = /(에러|코드|E-?\d)/i.test(q);
     const isPerson = /(부장|차장|어디|담당자)/i.test(q);
     const isSpc = /(spc|cpk|관리도|nelson)/i.test(q);
-    if (!compareMode && mode === '업무' && (isError || isPerson || isSpc)) {
+    if (!activeCompareMode && mode === '업무' && (isError || isPerson || isSpc)) {
       const aiText = isError
         ? 'E-101 베어링 마모 · HIGH · 평균 복구 35분 · 이력 24건. Markov 후속: E-205 윤활부족 (0.62) → E-310 모터과열 (0.31).'
         : isPerson
@@ -945,13 +1012,17 @@ export function Chat() {
           src: 'AUTO',
           conf: '—',
           latency: '...',
-          provider: forceProvider?.provider,
-          model: forceProvider?.model,
+          provider: primaryProvider?.provider,
+          model: primaryProvider?.model,
         },
-        paneSide: compareMode ? 'left' : undefined,
+        paneSide: activeCompareMode ? 'left' : undefined,
       },
     ]);
     setUIStreaming(true);
+
+    // v4.7 Sprint 2 P0 (축 ①) — InputComposer "/" 으로 인용된 항목을 payload 에 포함.
+    const chatState = useChatStore.getState();
+    const refs = chatState.references;
 
     void sse
       .start({
@@ -961,15 +1032,18 @@ export function Chat() {
           mode,
           department: dept,
           language: 'ko',
-          force_provider: forceProvider
-            ? [forceProvider.provider, forceProvider.model]
+          force_provider: primaryProvider
+            ? [primaryProvider.provider, primaryProvider.model]
             : null,
+          ...(refs.length > 0 ? { references: refs } : {}),
         },
       })
       .catch(() => simulateMockResponse(aiId));
+    // 전송 후 references 비움 (다음 turn 잔류 방지).
+    if (refs.length > 0) chatState.clearReferences();
 
     // ── COMPARE 패널 (compareProvider) — 비교 모드에서만 두 번째 호출 ──
-    if (compareMode) {
+    if (activeCompareMode) {
       const compareId = `ac-${Date.now()}`;
       compareActiveMsgIdRef.current = compareId;
       setCompareMsgs((arr) => [
@@ -984,8 +1058,8 @@ export function Chat() {
             src: 'AUTO',
             conf: '—',
             latency: '...',
-            provider: compareProvider?.provider,
-            model: compareProvider?.model,
+            provider: secondaryProvider?.provider,
+            model: secondaryProvider?.model,
           },
           paneSide: 'right',
         },
@@ -999,8 +1073,8 @@ export function Chat() {
             mode,
             department: dept,
             language: 'ko',
-            force_provider: compareProvider
-              ? [compareProvider.provider, compareProvider.model]
+            force_provider: secondaryProvider
+              ? [secondaryProvider.provider, secondaryProvider.model]
               : null,
           },
         })
@@ -1056,6 +1130,13 @@ export function Chat() {
             : 'color-mix(in oklab, var(--hud-text) 8%, transparent)'),
       }}
     >
+      {m.role === 'ai' && m.meta?.cragVerdict && m.meta.cragVerdict !== 'correct' && (
+        <CRAGVerdictBanner
+          verdict={m.meta.cragVerdict}
+          topScore={m.meta.cragTopScore}
+          blocked={m.meta.cragBlocked}
+        />
+      )}
       {m.meta && (
         <div
           className="mono"
@@ -1176,31 +1257,25 @@ export function Chat() {
             flexWrap: 'wrap',
           }}
         >
-          {/* v3.6 — 응답 다운로드 (DOCX/XLSX/CSV/TXT). 이전엔 onClick 미구현으로 작동 안 했음. */}
-          {(['docx', 'xlsx', 'csv', 'txt'] as DownloadFormat[]).map((fmt) => (
-            <button
-              key={fmt}
-              className="lg-btn ghost sm"
-              onClick={async () => {
-                try {
-                  const filename = `ajin-ai-${m.id}-${new Date().toISOString().slice(0, 10)}`;
-                  await downloadResponse(m.text || '', fmt, filename);
-                } catch (e) {
-                  console.warn(`[chat-download] ${fmt} 실패:`, e);
-                  alert(`${fmt.toUpperCase()} 다운로드 실패: ${e instanceof Error ? e.message : String(e)}`);
-                }
-              }}
-              title={`${fmt.toUpperCase()} 형식으로 다운로드`}
-            >
-              ↓ {fmt.toUpperCase()}
-            </button>
-          ))}
-          <button className="lg-btn ghost sm" title="좋아요">👍</button>
-          <button className="lg-btn ghost sm" title="싫어요">👎</button>
+          {/* v3.8 — 인라인 button 9줄을 컴포넌트로 교체.
+              이전엔 button label("↓ XLSX" 등) 이 사용자가 메시지를 드래그·복사할 때
+              함께 selection 에 잡혀 다음 입력에 leak 되는 UX 결함이 있었음.
+              컴포넌트는 user-select:none + 적절한 aria-label 보유. */}
+          <DownloadActions
+            content={m.text || ''}
+            filenameBase={`ajin-ai-${m.id}-${new Date().toISOString().slice(0, 10)}`}
+          />
+          <FeedbackActions messageId={m.id} />
         </div>
       )}
     </div>
   );
+
+  // v3.5 모바일 — uiux MobChat 패턴 풀스크린.
+  const isMobileChat = useIsMobile();
+  if (isMobileChat) {
+    return <AJINMobileChat />;
+  }
 
   return (
     <div className="page lg-page lg-chat-page" data-screen-label="C · AI Chat">
@@ -1224,7 +1299,7 @@ export function Chat() {
               style={{ minWidth: 180 }}
             >
               <label>
-                부서 컨텍스트{!isAdmin && (
+                부서{!isAdmin && (
                   <span style={{ marginLeft: 6, fontSize: 9, opacity: 0.6 }}>(고정)</span>
                 )}
               </label>
@@ -1282,14 +1357,28 @@ export function Chat() {
               </span>
             )}
             {/* v3.3 Phase A — LLM 멀티 프로바이더 셀렉터 (PRIMARY) */}
-            <ModelSelect
-              value={forceProvider}
-              onChange={setForceProvider}
-              feature="onboarding"
-              disabled={sse.isStreaming || compareSSE.isStreaming}
-            />
+            {/* H1 v4.0 — 셀렉터 옆 ⓘ 도움말 (현재 선택된 모델 카드 + 비교 페이지 진입) */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              {featureCFlags.multi_llm && (
+                <>
+                  <ModelSelect
+                    value={forceProvider}
+                    onChange={setForceProvider}
+                    feature="onboarding"
+                    disabled={sse.isStreaming || compareSSE.isStreaming}
+                  />
+                  <ModelHelpPopover modelId={forceProvider?.model ?? 'qwen3.5:9b'} />
+                </>
+              )}
+              {/* v4.7 C-2 — 챗봇 응답 언어 토글 (UI 언어와 분리) */}
+              <LanguageToggle
+                value={useChatStore((s) => s.chatLanguage)}
+                onChange={useChatStore((s) => s.setChatLanguage)}
+                disabled={sse.isStreaming || compareSSE.isStreaming}
+              />
+            </div>
             {/* v3.3 Phase A-5 — 비교 모드: 두 번째 ModelSelect (compareMode 활성 시만) */}
-            {compareMode && (
+            {featureCFlags.compare_mode && compareMode && (
               <ModelSelect
                 value={compareProvider}
                 onChange={setCompareProvider}
@@ -1298,29 +1387,31 @@ export function Chat() {
               />
             )}
             {/* v3.3 Phase A-5 — 비교 모드 토글 */}
-            <button
-              type="button"
-              onClick={() => setCompareMode((v) => !v)}
-              disabled={sse.isStreaming || compareSSE.isStreaming}
-              title={compareMode ? '비교 모드 끄기' : '같은 질문을 두 모델로 비교 (토큰 비용 2배)'}
-              style={{
-                padding: '9px 14px',
-                borderRadius: 999,
-                border: '1px solid color-mix(in oklab, var(--hud-text) 12%, transparent)',
-                cursor: 'pointer',
-                background: compareMode
-                  ? 'color-mix(in oklab, var(--hud-primary) 18%, transparent)'
-                  : 'transparent',
-                color: compareMode ? 'var(--hud-primary)' : 'var(--hud-text-dim)',
-                fontSize: 12,
-                fontWeight: 600,
-                fontFamily: 'var(--hud-font-mono)',
-                letterSpacing: '0.04em',
-                transition: 'all .15s',
-              }}
-            >
-              {compareMode ? '◐ 비교 ON' : '◯ 비교 OFF'}
-            </button>
+            {featureCFlags.compare_mode && (
+              <button
+                type="button"
+                onClick={() => setCompareMode((v) => !v)}
+                disabled={sse.isStreaming || compareSSE.isStreaming}
+                title={compareMode ? '비교 모드 끄기' : '같은 질문을 두 모델로 비교 (토큰 비용 2배)'}
+                style={{
+                  padding: '9px 14px',
+                  borderRadius: 999,
+                  border: '1px solid color-mix(in oklab, var(--hud-text) 12%, transparent)',
+                  cursor: 'pointer',
+                  background: compareMode
+                    ? 'color-mix(in oklab, var(--hud-primary) 18%, transparent)'
+                    : 'transparent',
+                  color: compareMode ? 'var(--hud-primary)' : 'var(--hud-text-dim)',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: 'var(--hud-font-mono)',
+                  letterSpacing: '0.04em',
+                  transition: 'all .15s',
+                }}
+              >
+                {compareMode ? '◐ 비교 ON' : '◯ 비교 OFF'}
+              </button>
+            )}
             {/* v3.6 — 채팅 기록 삭제 (확인 모달 + Undo 토스트). 단축키 ⌘/Ctrl+Shift+Backspace */}
             <button
               type="button"
@@ -1432,12 +1523,12 @@ export function Chat() {
       {/* v3.3 Phase C — 모드별 그리드:
            교육: lg-grid-1-2 (좌 SOP + 우 챗)
            업무: lg-grid-full (1컬럼 챗 풀화면, 좌측 패널 슬라이드 아웃) */}
-      <div className={`lg-grid ${mode === '교육' ? 'lg-grid-1-2' : 'lg-grid-full'}`}>
+      <div className={`lg-grid ${isWorkFullscreen ? 'lg-grid-full' : 'lg-grid-1-2'}`}>
         {/* ─── 좌(360px): SOP/협업/퀴즈 ─── lg-side-panel 클래스로 모드 전환 시 슬라이드.
              업무 모드에서는 lg-grid-full + 자체 CSS 가 transform: translateX(-110%) + pointer-events: none 으로 차단. */}
         <section
           className="lg-card lg-card-tight lg-side-panel"
-          aria-hidden={mode === '업무'}
+          aria-hidden={isWorkFullscreen}
         >
           <div
             style={{
@@ -1673,13 +1764,103 @@ export function Chat() {
                 </div>
 
               <div style={{ marginTop: 18 }}>
-                <div className="lg-eyebrow" style={{ marginBottom: 8 }}>
-                  SOP 8종
+                {/* C3 v4.0 — 사내 공통 SOP 안내 + 부서 매칭 / 전체 보기 토글.
+                    SOP 8 종은 사내 공통 자산 (부서 무관). 현재 부서와 매칭되는 항목 우선 노출. */}
+                <div
+                  className="lg-eyebrow"
+                  style={{
+                    marginBottom: 6,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                  }}
+                >
+                  <span>SOP {sopList.length}종 · 사내 공통</span>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      gap: 4,
+                      padding: 2,
+                      borderRadius: 999,
+                      border:
+                        '1px solid color-mix(in oklab, var(--hud-text) 10%, transparent)',
+                      background:
+                        'color-mix(in oklab, var(--hud-surface) 50%, transparent)',
+                    }}
+                    role="tablist"
+                  >
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={sopFilterMode === 'matching'}
+                      onClick={() => setSopFilterMode('matching')}
+                      title={`내 부서(${dept}) 매칭 SOP 만 노출`}
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: 999,
+                        border: 'none',
+                        background:
+                          sopFilterMode === 'matching'
+                            ? 'var(--hud-primary)'
+                            : 'transparent',
+                        color:
+                          sopFilterMode === 'matching'
+                            ? 'var(--hud-bg)'
+                            : 'var(--hud-text-dim)',
+                        fontSize: 9,
+                        letterSpacing: '0.06em',
+                        fontFamily: 'var(--hud-font-mono)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      내 부서
+                    </button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={sopFilterMode === 'all'}
+                      onClick={() => setSopFilterMode('all')}
+                      title="사내 공통 SOP 전체 노출"
+                      style={{
+                        padding: '2px 8px',
+                        borderRadius: 999,
+                        border: 'none',
+                        background:
+                          sopFilterMode === 'all' ? 'var(--hud-primary)' : 'transparent',
+                        color:
+                          sopFilterMode === 'all'
+                            ? 'var(--hud-bg)'
+                            : 'var(--hud-text-dim)',
+                        fontSize: 9,
+                        letterSpacing: '0.06em',
+                        fontFamily: 'var(--hud-font-mono)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      전체
+                    </button>
+                  </span>
                 </div>
+                {sopFilterMode === 'matching' && matchedDeptCount === 0 && (
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: 'var(--hud-text-dim)',
+                      marginBottom: 8,
+                      padding: '6px 10px',
+                      borderRadius: 8,
+                      background: 'color-mix(in oklab, var(--hud-text) 5%, transparent)',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    내 부서({dept})에 매칭되는 SOP 가 없어 사내 공통 8종을 모두 표시합니다.
+                  </div>
+                )}
                 {/* v3.6 — 백엔드에서 부서별 필터링된 SOP 목록을 클릭 가능 버튼으로 렌더.
                     클릭 시 채팅창에 "{SOP명} 알려줘" 자동 입력 + 전송. */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  {sopList.map((sop, i) => {
+                  {displaySopList.map((sop, i) => {
                     const isSelected = sop.sop_id === selectedSopId;
                     return (
                       <button
@@ -1833,7 +2014,7 @@ export function Chat() {
                     fontSize: 11,
                     color: 'var(--hud-orange)',
                   }}>
-                    ⚠ 백엔드 미가용 — 정적 폴백 표시 ({sopQuizErr})
+                    ● 백엔드 미가용 — 정적 응답 표시 ({sopQuizErr})
                   </div>
                 )}
 
@@ -1927,7 +2108,7 @@ export function Chat() {
                               color: 'var(--hud-text-dim)',
                               lineHeight: 1.55,
                             }}>
-                              💡 {q.explanation}
+                              해설 — {q.explanation}
                             </div>
                           )}
                           {q.related_step > 0 && (
@@ -1958,7 +2139,7 @@ export function Chat() {
                         color: 'var(--hud-primary)',
                         textAlign: 'center',
                       }}>
-                        🎯 점수: {dynQs.filter((q, i) => quizAnswers[i] === q.correct_index).length} / {dynQs.length}
+                        SCORE · {dynQs.filter((q, i) => quizAnswers[i] === q.correct_index).length} / {dynQs.length} 정답
                       </div>
                     )}
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -1966,7 +2147,7 @@ export function Chat() {
                         className="lg-btn ghost sm"
                         onClick={() => setQuizAnswers({})}
                       >
-                        🔄 다시 풀기
+                        다시 풀기
                       </button>
                       <button
                         className="lg-btn ghost sm"
@@ -2046,6 +2227,8 @@ export function Chat() {
               </>
             );
           })()}
+          {/* v4.7 C-4 — 좌측 사이드바 하단: 게이미피케이션 카드 */}
+          <BadgeSidebar />
         </section>
 
         {/* ─── 우(flex): 채팅 스트림 ─── lg-chat-pane: 업무 모드(lg-grid-full)에서 max-width:1280px 중앙정렬 */}
@@ -2053,7 +2236,7 @@ export function Chat() {
           <div className="lg-card-h">
             <div>
               <div className="lg-eyebrow">CHAT · {dept.toUpperCase()} · {mode.toUpperCase()}</div>
-              <h2 className="lg-h2">세션 #A47-2026</h2>
+              <h2 className="lg-h2">대화</h2>
             </div>
             <span
               className="lg-pill"
@@ -2064,7 +2247,7 @@ export function Chat() {
           </div>
 
           {/* v3.3 Phase A-5 — 메시지 스트림: compareMode면 좌·우 2 컬럼, 아니면 단일 */}
-          {compareMode ? (
+          {featureCFlags.compare_mode && compareMode ? (
             <div className="lg-grid lg-grid-compare">
               <div>
                 <div
@@ -2137,28 +2320,28 @@ export function Chat() {
             className="mono"
             style={{
               display: 'flex',
-              gap: mode === '교육' ? 12 : 8,
-              padding: mode === '교육' ? '10px 0' : '6px 12px',
-              fontSize: mode === '교육' ? 11 : 10,
+              gap: isWorkFullscreen ? 8 : 12,
+              padding: isWorkFullscreen ? '6px 12px' : '10px 0',
+              fontSize: isWorkFullscreen ? 10 : 11,
               color: 'var(--hud-text-dim)',
               letterSpacing: '0.06em',
               borderTop:
-                mode === '교육'
-                  ? '1px dashed color-mix(in oklab, var(--hud-text) 10%, transparent)'
-                  : 'none',
+                isWorkFullscreen
+                  ? 'none'
+                  : '1px dashed color-mix(in oklab, var(--hud-text) 10%, transparent)',
               borderBottom:
-                mode === '교육'
-                  ? '1px dashed color-mix(in oklab, var(--hud-text) 10%, transparent)'
-                  : '1px solid color-mix(in oklab, var(--hud-text) 8%, transparent)',
-              borderRadius: mode === '교육' ? 0 : 999,
+                isWorkFullscreen
+                  ? '1px solid color-mix(in oklab, var(--hud-text) 8%, transparent)'
+                  : '1px dashed color-mix(in oklab, var(--hud-text) 10%, transparent)',
+              borderRadius: isWorkFullscreen ? 999 : 0,
               background:
-                mode === '교육'
-                  ? 'transparent'
-                  : 'color-mix(in oklab, var(--hud-surface) 50%, transparent)',
-              margin: mode === '교육' ? '14px 0 12px' : '10px 0 8px',
-              flexWrap: mode === '교육' ? 'wrap' : 'nowrap',
-              overflowX: mode === '업무' ? 'auto' : undefined,
-              alignSelf: mode === '업무' ? 'flex-start' : undefined,
+                isWorkFullscreen
+                  ? 'color-mix(in oklab, var(--hud-surface) 50%, transparent)'
+                  : 'transparent',
+              margin: isWorkFullscreen ? '10px 0 8px' : '14px 0 12px',
+              flexWrap: isWorkFullscreen ? 'nowrap' : 'wrap',
+              overflowX: isWorkFullscreen ? 'auto' : undefined,
+              alignSelf: isWorkFullscreen ? 'flex-start' : undefined,
             }}
           >
             <span>
@@ -2170,7 +2353,7 @@ export function Chat() {
             </span>
             <span>·</span>
             <span>
-              모델 <b>{forceProvider ? formatModelLabel(forceProvider.model) : 'AUTO'}</b>
+              모델 <b>{featureCFlags.multi_llm && forceProvider ? formatModelLabel(forceProvider.model) : 'AUTO'}</b>
             </span>
             {mode === '교육' && (
               <>
@@ -2182,8 +2365,9 @@ export function Chat() {
             )}
           </div>
 
-          {/* COMPOSER */}
+          {/* COMPOSER — v3.5 ne-pill 클래스 추가 (Neural 활성 시 pill 형태 + glow ring) */}
           <div
+            className="ne-pill"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -2219,6 +2403,9 @@ export function Chat() {
                   : '질문을 입력하세요... (PDF/DOCX/이미지 첨부 가능, 최대 20MB)'
               }
               disabled={sse.isStreaming}
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
               style={{
                 flex: 1,
                 background: 'transparent',

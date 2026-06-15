@@ -44,9 +44,21 @@ _LIGHT_GRAY = (200, 200, 200)
 class PdfExporter:
     """마크다운 초안을 PDF로 변환한다."""
 
-    def export_bytes(self, markdown_text: str, doc_title: str = "") -> bytes:
-        """마크다운 텍스트를 PDF 바이트로 변환한다."""
+    def export_bytes(
+        self,
+        markdown_text: str,
+        doc_title: str = "",
+        author: str = "",
+    ) -> bytes:
+        """마크다운 텍스트를 PDF 바이트로 변환한다.
+
+        Feature B Sprint 1 P0 (plan §14.2) — 하단 footer 에 AI 워터마크 1줄 자동 부착.
+        """
+        from features.draft.watermark import compute_watermark_id
+
         pdf = _AjinPDF(doc_title)
+        pdf._watermark_id = compute_watermark_id(markdown_text)
+        pdf._reviewer = author
         pdf.add_page()
 
         # 결재란
@@ -56,16 +68,22 @@ class PdfExporter:
         # 본문
         pdf._render_markdown(markdown_text)
 
-        # 하단 회사 정보
+        # 하단 회사 정보 + 워터마크
         pdf._draw_company_footer()
 
         buffer = BytesIO()
         pdf.output(buffer)
         return buffer.getvalue()
 
-    def export(self, markdown_text: str, output_path: Path, doc_title: str = "") -> Path:
+    def export(
+        self,
+        markdown_text: str,
+        output_path: Path,
+        doc_title: str = "",
+        author: str = "",
+    ) -> Path:
         """마크다운 텍스트를 PDF 파일로 저장한다."""
-        pdf_bytes = self.export_bytes(markdown_text, doc_title)
+        pdf_bytes = self.export_bytes(markdown_text, doc_title, author=author)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_bytes(pdf_bytes)
         return output_path
@@ -95,7 +113,7 @@ class _AjinPDF(FPDF):
             return
 
         try:
-            self.add_font("korean", "", str(regular_path), uni=True)
+            self.add_font("korean", "", str(regular_path))
             self._kr_font = "korean"
 
             # Bold 폰트 (있으면 등록, 없으면 regular로 대체)
@@ -104,7 +122,7 @@ class _AjinPDF(FPDF):
                 if bp.exists():
                     bold_path = bp
                     break
-            self.add_font("korean", "B", str(bold_path or regular_path), uni=True)
+            self.add_font("korean", "B", str(bold_path or regular_path))
         except Exception:
             pass
 
@@ -309,7 +327,7 @@ class _AjinPDF(FPDF):
         self.ln(3)
 
     def _draw_company_footer(self):
-        """문서 하단 회사 정보"""
+        """문서 하단 회사 정보 + AI 워터마크 (Feature B Sprint 1 P0)."""
         self.ln(10)
         self.set_draw_color(*_LIGHT_GRAY)
         self.line(self.l_margin, self.get_y(), self.w - self.r_margin, self.get_y())
@@ -321,3 +339,11 @@ class _AjinPDF(FPDF):
                   align="C", new_x="LMARGIN", new_y="NEXT")
         self.cell(0, 4, "Confidential — 본 문서는 사내 업무용으로 작성되었습니다.",
                   align="C", new_x="LMARGIN", new_y="NEXT")
+
+        # AI 워터마크 — OEM 평가자 오인 방지. PdfExporter 가 _watermark_id 주입.
+        wm_id = getattr(self, "_watermark_id", "") or ""
+        if wm_id:
+            from features.draft.watermark import watermark_text
+            self.set_font(self._kr_font, "", 8)
+            self.cell(0, 5, watermark_text(wm_id, getattr(self, "_reviewer", "")),
+                      align="C", new_x="LMARGIN", new_y="NEXT")

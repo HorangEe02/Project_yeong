@@ -16,7 +16,7 @@ VERSION_DB_PATH = Path("data/draft_versions.db")
 
 
 def init_version_db(db_path: Path = VERSION_DB_PATH) -> None:
-    """문서 버전 DB 초기화"""
+    """문서 버전 DB 초기화 (B4 v4.0 — 검토 워크플로우 컬럼 추가)."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(db_path))
     conn.executescript("""
@@ -48,6 +48,19 @@ def init_version_db(db_path: Path = VERSION_DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_documents_author
         ON documents(author, created_at DESC);
     """)
+
+    # B4 v4.0 — 기존 versions 테이블에 status / reviewer_id / reviewed_at 컬럼 보강.
+    # ALTER 는 idempotent 하지 않아 columns 검사 후 ADD.
+    cols = {row[1] for row in conn.execute("PRAGMA table_info(versions)").fetchall()}
+    if "status" not in cols:
+        conn.execute("ALTER TABLE versions ADD COLUMN status TEXT DEFAULT 'draft'")
+    if "reviewer_id" not in cols:
+        conn.execute("ALTER TABLE versions ADD COLUMN reviewer_id TEXT DEFAULT ''")
+    if "reviewed_at" not in cols:
+        conn.execute("ALTER TABLE versions ADD COLUMN reviewed_at TEXT DEFAULT ''")
+    if "review_note" not in cols:
+        conn.execute("ALTER TABLE versions ADD COLUMN review_note TEXT DEFAULT ''")
+
     conn.commit()
     conn.close()
 
@@ -227,5 +240,181 @@ def get_version_stats(db_path: Path = VERSION_DB_PATH) -> dict:
         doc_count = conn.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
         ver_count = conn.execute("SELECT COUNT(*) FROM versions").fetchone()[0]
         return {"documents": doc_count, "versions": ver_count}
+    finally:
+        conn.close()
+
+
+# ─────────────────────────────────────────────────────────────
+# B4 v4.0 — 검토 워크플로우 (사용자별 영속 + 단일 검토자)
+#   상태 전이: draft → under_review → approved / rejected
+# ─────────────────────────────────────────────────────────────
+
+
+_VALID_STATUSES = {"draft", "under_review", "approved", "rejected"}
+
+
+def submit_for_review(
+    version_id: int,
+    reviewer_id: str,
+    db_path: Path = VERSION_DB_PATH,
+) -> Optional[dict]:
+    """초안 → 검토 요청. 단일 검토자 지정.
+
+    검토자 ID 가 비어 있으면 None 반환 (라우트에서 400 변환).
+    """
+    reviewer = reviewer_id.strip()
+    if not reviewer:
+        return None
+    conn = _get_conn(db_path)
+    try:
+        row = conn.execute(
+            """SELECT v.status, v.created_by, d.author
+               FROM versions v
+               JOIN documents d ON v.document_id = d.id
+               WHERE v.id = ?""",
+            (version_id,),
+        ).fetchone()
+        if not row or row["status"] != "draft":
+            return None
+        author = (row["created_by"] or row["author"] or "").strip()
+        if author and author == reviewer:
+            return None
+
+        cur = conn.execute(
+            """UPDATE versions
+               SET status = 'under_review',
+                   reviewer_id = ?,
+                   reviewed_at = '',
+                   review_note = ''
+               WHERE id = ? AND status = 'draft'""",
+            (reviewer, version_id),
+        )
+        if cur.rowcount == 0:
+            return None
+        conn.commit()
+        return get_version(version_id, db_path)
+    finally:
+        conn.close()
+
+
+def approve_version(
+    version_id: int,
+    reviewer_id: str,
+    note: str = "",
+    db_path: Path = VERSION_DB_PATH,
+    allow_reviewer_override: bool = False,
+) -> Optional[dict]:
+    """검토자가 버전을 승인. reviewer_id 가 일치해야 한다."""
+    reviewer = reviewer_id.strip()
+    if not reviewer:
+        return None
+    conn = _get_conn(db_path)
+    try:
+        row = conn.execute(
+            """SELECT v.reviewer_id, v.status, v.created_by, d.author
+               FROM versions v
+               JOIN documents d ON v.document_id = d.id
+               WHERE v.id = ?""",
+            (version_id,),
+        ).fetchone()
+        if not row:
+            return None
+        if row["status"] != "under_review":
+            return None
+        author = (row["created_by"] or row["author"] or "").strip()
+        if author and author == reviewer:
+            return None
+        # 단일 검토자 정책 — 지정된 검토자만 승인 가능. L5 관리자 우회는 라우터에서
+        # 명시적으로 allow_reviewer_override=True 를 전달하고 감사 로그에 남긴다.
+        if row["reviewer_id"] != reviewer and not allow_reviewer_override:
+            return None
+        conn.execute(
+            """UPDATE versions
+               SET status = 'approved',
+                   reviewer_id = ?,
+                   reviewed_at = datetime('now', 'localtime'),
+                   review_note = ?
+               WHERE id = ?""",
+            (reviewer, note, version_id),
+        )
+        conn.commit()
+        return get_version(version_id, db_path)
+    finally:
+        conn.close()
+
+
+def reject_version(
+    version_id: int,
+    reviewer_id: str,
+    note: str = "",
+    db_path: Path = VERSION_DB_PATH,
+) -> Optional[dict]:
+    """검토자가 버전을 반려."""
+    conn = _get_conn(db_path)
+    try:
+        row = conn.execute(
+            "SELECT reviewer_id, status FROM versions WHERE id = ?",
+            (version_id,),
+        ).fetchone()
+        if not row:
+            return None
+        if row["status"] != "under_review":
+            return None
+        if row["reviewer_id"] != reviewer_id.strip():
+            return None
+        conn.execute(
+            """UPDATE versions
+               SET status = 'rejected',
+                   reviewed_at = datetime('now', 'localtime'),
+                   review_note = ?
+               WHERE id = ?""",
+            (note, version_id),
+        )
+        conn.commit()
+        return get_version(version_id, db_path)
+    finally:
+        conn.close()
+
+
+def list_versions_for_user(
+    author: str = "",
+    reviewer: str = "",
+    status: str = "",
+    limit: int = 50,
+    db_path: Path = VERSION_DB_PATH,
+) -> list[dict]:
+    """사용자별 버전 목록 (B4 — 사용자별 영속 정책).
+
+    - author 지정 시: 해당 사용자가 작성한 버전
+    - reviewer 지정 시: 해당 사용자가 검토 대상으로 받은 버전
+    - status 지정 시: 추가 필터
+    """
+    conn = _get_conn(db_path)
+    try:
+        query = """
+            SELECT v.id as version_id, v.document_id, v.version_num,
+                   v.change_summary, v.created_at, v.created_by,
+                   v.status, v.reviewer_id, v.reviewed_at, v.review_note,
+                   d.doc_type, d.title, d.author, d.department
+            FROM versions v
+            JOIN documents d ON v.document_id = d.id
+        """
+        conditions = []
+        params: list = []
+        if author:
+            conditions.append("v.created_by = ?")
+            params.append(author)
+        if reviewer:
+            conditions.append("v.reviewer_id = ?")
+            params.append(reviewer)
+        if status and status in _VALID_STATUSES:
+            conditions.append("v.status = ?")
+            params.append(status)
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        query += " ORDER BY v.created_at DESC LIMIT ?"
+        params.append(limit)
+        rows = conn.execute(query, params).fetchall()
+        return [dict(r) for r in rows]
     finally:
         conn.close()

@@ -40,7 +40,7 @@ export function Drawer({
     <>
       <div className="ui-drawer-scrim" onClick={onClose} role="presentation" />
       <aside
-        className={clsx('ui-drawer', `side-${side}`)}
+        className={clsx('ui-drawer ui-glass', `side-${side}`)}
         style={sizeStyle}
         role="dialog"
         aria-modal="true"

@@ -1,139 +1,301 @@
-# AJIN AI Assistant
+# AJIN Compliance — AI 통합 업무 어시스턴트
 
-> 아진산업 실리 경진대회 DX 부문 — 사내 업무용 AI Assistant.
-> 자가 호스팅 Ollama × Cloud Run × Firebase Hosting 운영급 연동.
+> 아진산업 (KOSDAQ 013310) 사내 통합 AI 어시스턴트.
+> 6개 도메인 (검색·문서·온보딩·법규·관리·설비) 기반 OpenAPI 자동 산정 API surface.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61dafb)](frontend/)
-[![Backend](https://img.shields.io/badge/Backend-FastAPI-009688)](backend/)
-[![LLM](https://img.shields.io/badge/LLM-Ollama%20qwen3.5%2Fgemma4%20%7C%20Gemini-FF6B6B)](#-llm-아키텍처)
+![Backend](https://img.shields.io/badge/Backend-FastAPI-009688)
+![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite%20%2B%20TS-61dafb)
+![LLM](https://img.shields.io/badge/LLM-Ollama%20qwen3.5%2Fexaone%20%7C%20Vertex%20Gemini-FF6B6B)
+![API](https://img.shields.io/badge/OpenAPI-215%20paths%20%2F%20229%20endpoints-6BA539)
 
-🌐 **Live demo**: https://ajin-cb.web.app
+> 📦 **포트폴리오 아카이브** — 2026 KNU × 아진산업 SILLI 경진대회(DX 부문) 제출작.
+> 운영 배포 환경(Cloud Run · Vercel · Supabase)은 대회 종료 후 정리되어 라이브 링크는 비활성 상태이며,
+> 화면 미리보기는 [`uiux/`](uiux/) 의 스크린샷·디자인 시스템으로 확인할 수 있습니다.
 
-## 📌 한 줄 요약
+---
 
-사내 직원이 자연어로 질문하면 — **신입 온보딩, 법규 준수 점검, 검사 보고서 자동 작성, 동료·설비 검색** — 까지 한 번에 처리해주는 AI Assistant. 사내 데이터는 호스트의 Ollama 가, 일반 작업은 Gemini 가 답하는 **하이브리드 자가 호스팅** 아키텍처.
+## 한 줄 요약
 
-## ✨ 주요 기능
+**"650명 직원의 모든 업무 흐름 — 직원 검색 / 문서 작성 / 온보딩 / 법규 모니터링 / 인사 관리 / 설비 SPC — 을 한 화면에서 처리하는 AI 통합 콘솔"입니다.**
 
-| 모듈 | 기능 | 사용 LLM |
-|---|---|---|
-| **A. 인원 검색** | 이름·부서·직급으로 동료 정보 빠르게 찾기 | Ollama (bge-m3 임베딩 + qwen3.5) |
-| **B. 문서 작성** | 메일·보고서 초안을 AI 가 대신 작성 (Word·PDF·HWP 7가지로 저장) | Ollama qwen3.5:9b |
-| **C. AI 도우미** | 사내 용어·업무 절차를 24시간 알려주는 AI (이미지 첨부 시 vision) | Ollama (text) + Gemini (vision) |
-| **D. 법규 모니터** | 산업안전보건법 등 변경 사항 추적·알람 (Meilisearch + 임베딩) | Ollama embedding |
-| **E. 인사 관리** | 계정·권한·인력 통계 한 곳에서 관리 (RBAC L1~L5) | — |
-| **F. 설비/공정 AI** | 설비 이상 사전 감지·예측 | Ollama qwen3.5:9b |
+자동차 부품 제조 도메인 (현대·기아 협력사) 의 27 부서 × 6 사업장 × 6 해외법인을 위해 설계됐고, 한국 법규 (산안법·관세·MSDS·ISO·OEM 품질·EU CBAM 등) 자동 모니터링과 도메인 특화 한국어 LLM (qwen3.5·exaone·Vertex Gemini) 통합을 핵심으로 합니다.
 
-## 🏗 LLM 아키텍처 (Plan A 변형)
+---
+
+## 시스템 전체 다이어그램
 
 ```
-사용자
-  │ HTTPS
-  ▼
-ajin-cb.web.app  ────── /api/**  ──────► Cloud Run (asia-northeast3)
-(Firebase Hosting)                       ajin-backend (FastAPI)
-                                            │ X-AJIN-Secret 헤더
-                                            ▼
-                                  *.trycloudflare.com (임시 URL, watchdog 자동 갱신)
-                                            │
-                                            ▼
-                                  Cloudflare Edge
-                                            │
-                                            ▼
-                                  호스트 머신 (예: 24GB RAM)
-                                  ├─ cloudflared (launchd)
-                                  ├─ Caddy :8434 (header 검증)
-                                  └─ Ollama :11434
-                                       (qwen3.5:9b/4b, gemma4:e4b/e2b, bge-m3)
+┌──────────────────────────────────────────────────────────────────────┐
+│                      Frontend (Firebase Hosting)                      │
+│                                                                       │
+│  React + Vite + TypeScript + Zustand + Plotly                         │
+│  ┌──────┬──────┬──────┬──────┬──────┬──────┐                          │
+│  │  A   │  B   │  C   │  D   │  E   │  F   │  6 Feature 라우트       │
+│  │검색  │ 작성 │ 챗봇 │법규  │ 관리 │ 설비 │                          │
+│  └──────┴──────┴──────┴──────┴──────┴──────┘                          │
+└──────────────────────────────┬───────────────────────────────────────┘
+                                │ HTTPS
+                                │ /api/** rewrites
+                                ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                  Backend (Cloud Run / Docker)                         │
+│                                                                       │
+│  FastAPI OpenAPI API surface  +  uvicorn ASGI                         │
+│                                                                       │
+│  ┌────────────────────────────────────────────────────────────┐       │
+│  │  Auth Middleware (JWT + RBAC + 감사 로깅)                  │       │
+│  └────────────────────────────────────────────────────────────┘       │
+│       │                                                               │
+│       ▼                                                               │
+│  ┌──────┬──────┬──────────┬──────────┬──────┬──────────┐              │
+│  │  A   │  B   │     C    │     D    │  E   │     F    │              │
+│  │검색  │ 작성 │   챗봇   │   법규   │ 관리 │   설비   │              │
+│  │ OpenAPI tag 기준 router 그룹핑 — 정확한 수치는 docs/API.md 기준 │
+│  └──────┴──────┴──────────┴──────────┴──────┴──────────┘              │
+│       │      │      │           │         │       │                   │
+│       ▼      ▼      ▼           ▼         ▼       ▼                   │
+│  ┌────────────────────────────────────────────────────────────┐       │
+│  │                   LLM Router (Phase 2)                     │       │
+│  │  ┌──────────────┐    ┌──────────────────────────────────┐  │       │
+│  │  │   Ollama     │    │     Vertex AI Gemini (Phase B)   │  │       │
+│  │  │  (host/local)│    │     gemini-2.0-flash             │  │       │
+│  │  │  qwen3.5     │    │     asia-northeast3 region       │  │       │
+│  │  │  exaone-deep │    │     학습 미사용 보장              │  │       │
+│  │  │  gemma4      │    │                                  │  │       │
+│  │  └──────────────┘    └──────────────────────────────────┘  │       │
+│  └────────────────────────────────────────────────────────────┘       │
+│       │                                                               │
+│       ▼                                                               │
+│  ┌────────────────────────────────────────────────────────────┐       │
+│  │  SQLite × 15+ DBs                                          │       │
+│  │  • employees / auth / audit         (A·E)                  │       │
+│  │  • draft_versions                   (B)                    │       │
+│  │  • feedback                         (C)                    │       │
+│  │  • compliance / compliance_changes / scenarios /           │       │
+│  │    suppliers / industry_trend       (D)                    │       │
+│  │  • error_codes / error_history /                           │       │
+│  │    inspection_logs / mold_lifecycle (F)                    │       │
+│  │                                                            │       │
+│  │  ChromaDB                                                  │       │
+│  │  • 규제 본문 + 매뉴얼 + 판례 + 계약 RAG 인덱싱             │       │
+│  │                                                            │       │
+│  │  Redis (LLM 응답 캐시)                                     │       │
+│  └────────────────────────────────────────────────────────────┘       │
+└──────────────────────────────┬───────────────────────────────────────┘
+                                │
+                                ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                          외부 시스템 통합                              │
+│                                                                       │
+│  ┌─────────────┬─────────────┬─────────────┬─────────────┐            │
+│  │ 9 크롤 소스  │ 알림 채널    │ 협업·결재    │ 데이터·인증 │            │
+│  │             │             │             │             │            │
+│  │ 국내법      │ Slack       │ Atlassian   │ DART        │            │
+│  │ EU         │ Naver SENS  │   Jira      │ 대법원       │            │
+│  │ US/CN 통상  │ Twilio SMS  │ 자체 결재   │ Firebase    │            │
+│  │ MSDS       │ SMTP 메일   │ Hancom      │ Auth        │            │
+│  │ ISO        │             │  e-Approval │             │            │
+│  │ APQP       │             │             │             │            │
+│  │ OEM 품질   │             │             │             │            │
+│  │ EV 배터리   │             │             │             │            │
+│  │ 탄소·ESG   │             │             │             │            │
+│  └─────────────┴─────────────┴─────────────┴─────────────┘            │
+└──────────────────────────────────────────────────────────────────────┘
 ```
 
-- **호스트 가용**: 채팅 = Ollama qwen3.5:9b (자가 호스팅, 사내 데이터 안전)
-- **호스트 미가용**: maintenance banner 자동 표시 + 채팅 입력 비활성
-- **임베딩**: 항상 Gemini text-embedding-004 (호스트 무관)
-- **사고 시**: `LLM_ROUTER_PRIMARY=gemini` env 1줄로 즉시 Gemini-only 환원
+---
 
-자세한 다이어그램·흐름: [`ARCHITECTURE.md`](ARCHITECTURE.md)
+## 6 Feature 진입점 — 각 도메인 상세 문서
 
-## 🚀 빠른 시작 (로컬)
+각 Feature 문서는 비전공자도 읽을 수 있는 상세 설명을 제공하고, API 수치는 FastAPI OpenAPI 산출물에서 자동 계산합니다.
+
+<!-- OPENAPI_SUMMARY:START -->
+> 이 블록은 `scripts/generate_openapi_docs.py`가 FastAPI `app.openapi()` 기준으로 생성합니다.
+> endpoint는 OpenAPI operation(`METHOD + path`) 기준이며, path 수와 구분합니다.
+
+- **API 버전:** 1.1.0
+- **OpenAPI 버전:** 3.1.0
+- **총 path:** **215**
+- **총 endpoint:** **229**
+- **상세 인덱스:** [docs/API.md](docs/API.md)
+- **머신 리더블 요약:** [docs/openapi-summary.json](docs/openapi-summary.json)
+
+| Feature | 도메인 | OpenAPI tag | endpoint 수 |
+|---|---|---|---:|
+| **A** | 검색·조직도 | `search`, `employee`, `directory` | **15** |
+| **B** | 문서 작성 | `draft` | **27** |
+| **C** | AI 업무 도우미 | `onboarding`, `scenarios`, `feature-flags` | **39** |
+| **D** | 법규 모니터링 | `compliance`, `notifications` | **25** |
+| **E** | 인사·관리 | `admin`, `admin-scenarios`, `auth`, `idp` | **74** |
+| **F** | 설비·SPC | `equipment` | **19** |
+| **공통** | 인프라·헬스·모델 | `dashboard`, `models`, `export`, `health`, `me`, `slack`, `untagged`, `feedback`, `live-alarms`, `storage` | **30** |
+| 합계 | | | **229** |
+
+> 모듈 수는 OpenAPI에서 검증할 수 없는 코드 구조 수치이므로 이 자동 산정 표에서 제외합니다.
+<!-- OPENAPI_SUMMARY:END -->
+
+---
+
+## 운영 가이드
+
+| 주제 | 문서 |
+|---|---|
+| **API 인덱스** | [docs/API.md](docs/API.md) + [docs/openapi.json](docs/openapi.json) + [docs/openapi-summary.json](docs/openapi-summary.json) |
+| **Docker 운영 (Phase 1·2 컨테이너)** | [docs/DOCKER.md](docs/DOCKER.md) |
+| **백엔드 배포 (Cloud Run)** | [docs/BACKEND_DEPLOY.md](docs/BACKEND_DEPLOY.md) |
+| **풀 모드 배포 (frontend + backend + Ollama)** | [docs/FULL_MODE_DEPLOY.md](docs/FULL_MODE_DEPLOY.md) |
+| **변경 이력** | [CHANGELOG.md](CHANGELOG.md) |
+
+---
+
+## 빠른 시작 (4 단계)
 
 ```bash
-# 1. clone
-git clone https://github.com/HorangEe02/Project_yeong.git
-cd Project_yeong/04_AJIN
+# 1. 호스트 Ollama 셋업 (.env 작성 후)
+make setup
 
-# 2. 1-클릭 셋업
-bash scripts/setup-host.sh
+# 2. 컨테이너 시작
+make up
 
-# 3. 백엔드 dev 서버
-source .venv/bin/activate
-uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+# 3. 헬스 검증
+make health
 
-# 4. (다른 터미널) 프론트엔드 dev 서버
-cd frontend && npm run dev
-# → http://localhost:5173
-
-# 5. (선택) 시연 환경 활성화 (Cloudflare Tunnel + Cloud Run env 자동 동기화)
-bash scripts/demo/start_local_demo.sh
+# 4. (선택) 호스트 .venv 회귀 테스트
+make backend-venv
+make test
 ```
 
-상세 가이드: [`INSTALL.md`](INSTALL.md)
+자세한 내용은 [docs/DOCKER.md](docs/DOCKER.md).
 
-## 📂 디렉토리 구조
+---
 
-```
-04_AJIN/
-├── backend/             # FastAPI — REST/SSE API
-├── core/                # LLM router (provider chain) + auth + scenarios
-├── features/            # A~F 모듈 (search/draft/onboarding/compliance/admin/equipment)
-├── frontend/            # React + Vite — Liquid Glass 디자인
-├── docker/demo-tunnel/  # cloudflared 컨테이너 (시연용)
-├── infra/               # Caddyfile, launchd plist, watchdog 스크립트 (예시)
-├── scripts/             # setup·deploy·reindex 스크립트
-├── docs/                # 설계 문서·로드맵
-├── secrets/             # secret 파일 (git ignore, README 참고)
-├── data/                # 데모 데이터 (git ignore, setup-demo-data.py 로 생성)
-├── Dockerfile           # multi-stage (slim/full)
-├── cloudbuild.yaml      # Cloud Build 파이프라인
-├── firebase.json        # Firebase Hosting 설정
-└── .env.example         # 환경변수 템플릿
-```
+## 기술 스택 한눈에
 
-## 🛠 기술 스택
+### Backend
+- **Python 3.11+** + FastAPI + uvicorn
+- **SQLite × 15+** + ChromaDB + Redis
+- **LLM**: Ollama (qwen3.5/exaone/gemma4) + Vertex AI Gemini (Phase B)
+- **외부**: Atlassian Jira / Slack / Naver SENS / Twilio / Firebase Auth / DART OpenAPI
 
-| 영역 | 사용 기술 |
-|---|---|
-| Frontend | React 19 + Vite + TypeScript + Tailwind v4 (Liquid Glass) + Zustand + react-router-dom |
-| Backend | FastAPI + uvicorn + Pydantic v2 + langchain (Ollama/Gemini) |
-| 데이터베이스 | SQLite (auth/employees/compliance) + ChromaDB (vectorstore) + Meilisearch (전문검색) |
-| LLM | Ollama (qwen3.5/gemma4/bge-m3) + Gemini 2.5 Pro (cloud fallback + vision) |
-| 인증 | Firebase Auth + JWT + RBAC (L1~L5) |
-| 인프라 | Cloud Run + Firebase Hosting + Cloudflare Tunnel + Caddy reverse proxy |
-| CI/CD | GitHub Actions (lint + build + auto deploy) |
+### Frontend
+- **TypeScript** + React + Vite + Zustand
+- **Plotly.js** + MarkdownRenderer + lucide-react
+- **호스팅**: Vercel (https://ajin-ai-assistant-frontend.vercel.app/)
 
-## 🤝 기여하기
+### 인프라
+- **Docker Compose** — backend / frontend / redis / nginx-rp 4 컨테이너
+- **Cloud Run** + Vercel Hosting (배포 대상)
+- **GCP** 프로젝트 `ajin-compliance` (Phase B)
 
-PR 환영합니다. 기여 전 [`CONTRIBUTING.md`](CONTRIBUTING.md) 의 브랜치 명명·커밋 컨벤션·PR 규칙을 확인해 주세요.
+---
 
-main 브랜치는 보호되어 있으므로 직접 push 가 불가능합니다 — feature/* 브랜치에서 작업 → PR → 1명 review + CI 통과 → squash merge.
+## Phase 진행 상황
 
-## 🐛 문제 해결
+| Phase | 상태 | 내용 |
+|---|---|---|
+| **Phase 1** | ✅ 완료 | 통합 docker-compose + 호스트 Ollama (Mac M4 Pro Metal) |
+| **Phase 2** | ✅ 완료 | LLM 풀 feature 별 라우팅 (`LLM_FEATURE_ROUTES`) — 4 feature 분리 |
+| **Stage 1 dry-run** | 🔄 진행 중 | Mac offline 1주 관측 |
+| **Phase B** | 🔜 대기 | Vertex AI Gemini 일원화 (`LLM_PROVIDER=vertex` 1줄 swap) |
+| **Stage 2** | 📅 예정 | Firebase Hosting + Cloud Run 배포 |
+| **Phase 3** | 📅 장기 | Feature 마이크로서비스 분해 (D11 / D17 / D6 / D9 / D14·D15 순) |
 
-흔한 문제 (`ModuleNotFoundError`, `호스트 미가용 시 503`, `cloudflared URL 변경` 등) 는 [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md).
+---
 
-## 🔒 보안
+## 사내 도메인 컨텍스트
 
-- secret 노출 의심 시 즉시 [`SECURITY.md`](SECURITY.md) 의 보고 절차 참고
-- `data/employees.db`, `data/compliance.db` 등 사내 데이터는 PUBLIC repo 에 절대 commit 금지
-- `.env`, `secrets/*` 는 `.gitignore` 처리됨
+### 회사 정보 (`config.py:COMPANY_INFO`)
+- **아진산업(주)** (KOSDAQ 013310)
+- 자동차 차체용 신품 부품 제조업
+- 본사: 경상북도 경산시 진량읍 공단8로 26길 40
+- 매출 2025: 1조 886억원 (영업이익 643억원, +99.4%)
+- 주요 고객사: 현대자동차 / 기아자동차
+- 인증: IATF 16949 / ISO 14001 / ISO 45001 / AEO AAA
 
-## 📄 라이선스
+### 조직
+- **649명 직원**
+- **6 본부** (재경 / 관리 / 구매 / 생산 / 개발 / 생산기술) + 기술연구소 + 독립부서
+- **27 부서** (각 부서 ai_relevance: low / medium / high / critical)
+- **6 국내 사업장** (경산 본사 / 경산 2공장 / 경주 구어 + 계열사 3)
+- **6 해외법인** (미국 2 / 중국 3 / 베트남 1) — JOON INC (HMGMA 협력) 등
 
-[MIT](LICENSE) © 2026 박준영 (HorangEe02) — KNU SILLI 2026
+### 핵심 사용자 부서
+| 부서 | ai_relevance | 핵심 사용 Feature |
+|---|---|---|
+| 품질보증팀 | **critical** | A · B · D · F (8D / PPAP / SPC 주관) |
+| 안전보건팀 | high | D (산안법 1순위 수신) |
+| 생산기술팀 | high | C · F (4M 변경 관리) |
+| IT전략팀 | high | E (시스템 도구) |
+| 부품개발팀 | high | A (ECN/PPAP 검색) |
+| 구매팀 | high | B · D (협력사 이메일) |
+| 영업팀 | high | B (납기 이메일) |
+| 기술교육원 | high | C (온보딩 연계) |
 
-## 👤 팀
+전체 27 부서 매트릭스는 [config.py:DEPARTMENTS](config.py).
 
-- **박준영** ([@HorangEe02](https://github.com/HorangEe02)) — Lead, Backend, LLM/Infra
-- **박성훈, 이현아, 정유진** — Frontend, Compliance, Equipment, UX
+---
+
+## 보안·컴플라이언스
+
+- **JWT 인증** + RBAC 5 역할 (level 1-5)
+- **가시성 3 계층** — FULL / PARTIAL / HIDDEN (부서·역할 기반 자동)
+- **감사 로깅** — `api_audit_log` 테이블 (모든 요청)
+- **로그인 보안** — 5회 실패 → 15분 자동 잠금, bcrypt + 90일 강제 변경
+- **데이터 학습 차단** — `FEATURE_B_BLOCK_GEMINI=true` (사내 문서 보호) + Vertex AI paid tier 학습 미사용 보장
+- **외부 노출 0 옵션** — Mac offline 모드 (Phase 1·Stage 1)
+
+ISO 27001 + 개인정보보호법 + IATF 16949 컴플라이언스 정책 정합.
+
+---
+
+## Phase 2 LLM 라우팅 구조
+
+**4 feature × 2 provider** 매트릭스 (`config.py:LLM_FEATURE_ROUTES`):
+
+| Feature | tier | Ollama 모델 | Vertex 모델 | 사용처 |
+|---|---|---|---|---|
+| `rag_answer` | fast | qwen3.5:4b | gemini-2.0-flash | D — RAG 답변 |
+| `quiz_gen` | fast | qwen3.5:4b\* | gemini-2.0-flash | D — 학습 퀴즈 |
+| `short_answer_grade` | fast | qwen3.5:4b | gemini-2.0-flash | D — 단답 채점 |
+| `whatif_nl_route` | large | qwen3.5:9b | gemini-2.0-flash | D — What-if 자연어 |
+
+`LLM_PROVIDER=vertex` 1줄 swap 으로 Ollama → Vertex 자동 전환. 미설정 시 Ollama 폴백 (backward-compat).
+
+\* 원래 `gemma4:e2b` 였으나 호스트 Ollama 0.18.2 미지원으로 hotfix.
+
+---
+
+## 변경 이력 요약
+
+전체 이력은 [CHANGELOG.md](CHANGELOG.md). 최근 마일스톤:
+
+- **v3.5** (2026-04) — UX 개선·다운로드 확장·모델 정리·인코딩 수정 / 6 모듈 카드 (A~F 전체)
+- **v3.4** (2026-04) — Dark 모드 가독성·SPC 분석 탭·SOP 5종 추가·demo 시나리오 엔진
+- **Phase 2** (2026-05) — LLM 풀 feature 별 라우팅 도입
+- **Stage 1 hotfix** (2026-05-09) — `_call_ollama` think kwarg + INFO trace + gemma4 hotfix
+- **Phase B 코드** (2026-05-09) — Vertex AI Gemini dispatcher (`_call_llm`)
+
+---
+
+## 팀 / 크레딧
+
+- **박준영** ([@HorangEe02](https://github.com/HorangEe02)) — Lead · Backend · LLM/Infra
+- **박성훈 · 이현아 · 정유진** — Frontend · Compliance · Equipment · UX
 
 원 저장소: [`HorangEe02/Project_yeong/04_AJIN`](https://github.com/HorangEe02/Project_yeong/tree/main/04_AJIN)
+
+```bash
+git clone https://github.com/HorangEe02/Project_yeong.git
+cd Project_yeong/04_AJIN
+```
+
+## 라이선스
+
+[MIT](LICENSE) © 2026 박준영 (HorangEe02) — KNU × 아진산업 SILLI 2026
+
+> 사내 도메인 데이터(직원·법규 DB 등)는 데모/합성 데이터로 대체되어 있으며, 실제 사내 자료는 포함되지 않습니다.
+
+---
+
+문서 작성: 2026-05-10 | 시스템 마지막 검증: Phase B 코드 push (commit 8292bca)

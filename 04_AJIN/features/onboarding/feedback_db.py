@@ -50,8 +50,12 @@ def save_feedback(
     user_position: str = "",
     comment: str = "",
     db_path: Path = FEEDBACK_DB_PATH,
+    user_id: str = "",
 ) -> int:
-    """피드백 1건 저장. Returns: ID"""
+    """피드백 1건 저장. Returns: ID
+
+    v4.7 C-4: user_id 가 제공되면 daily activity + 배지 평가 트리거.
+    """
     conn = _get_conn(db_path)
     cursor = conn.execute(
         """INSERT INTO chat_feedback
@@ -65,6 +69,20 @@ def save_feedback(
     conn.commit()
     fb_id = cursor.lastrowid
     conn.close()
+
+    # v4.7 C-4 — 게이미피케이션 트리거 (실패는 로그만)
+    if user_id:
+        try:
+            from features.onboarding import gamification_db as gdb
+            from features.onboarding.gamification import evaluate_badges
+
+            if is_positive:
+                gdb.upsert_daily(
+                    user_id, field="positive_feedback", delta=1, user_department=user_department
+                )
+            evaluate_badges(user_id, user_department=user_department, event_hint="feedback")
+        except Exception:  # noqa: BLE001
+            logger.exception("gamification trigger on save_feedback failed (non-fatal)")
     return fb_id
 
 

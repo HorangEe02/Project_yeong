@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # AJIN AI Assistant — Demo Tunnel 컨테이너 entrypoint
-# 1) Mac Ollama 도달성 검증
+# 1) Mac Ollama 보안 프록시 도달성 검증
 # 2) Cloudflare Tunnel 시작 + URL 추출
-# 3) Cloud Run env 업데이트 (OLLAMA_BASE_URL + FEATURE_B_BLOCK_GEMINI=false)
+# 3) Cloud Run env 업데이트 (Ollama primary + secret header)
 # 4) cloudflared 를 foreground 유지 (컨테이너 alive)
 # 5) SIGTERM 시 trap → Cloud Run env 원복
 
@@ -12,7 +12,8 @@ PROJECT="${GCP_PROJECT:-ajin-cb}"
 REGION="${GCP_REGION:-asia-northeast3}"
 SERVICE="${GCP_SERVICE:-ajin-backend}"
 HOSTING_BASE="${HOSTING_BASE:-https://ajin-cb.web.app}"
-OLLAMA_HOST_INTERNAL="${OLLAMA_HOST_INTERNAL:-host.docker.internal:11434}"
+OLLAMA_HOST_INTERNAL="${OLLAMA_HOST_INTERNAL:-host.docker.internal:8434}"
+AJIN_OLLAMA_SECRET_NAME="${AJIN_OLLAMA_SECRET_NAME:-ajin-ollama-secret}"
 
 LOG_FILE="/tmp/cloudflared.log"
 URL_FILE="/tmp/tunnel_url.txt"
@@ -26,19 +27,34 @@ echo "════════════════════════�
 echo "  AJIN Demo Tunnel Container"
 echo "═══════════════════════════════════════════════════════"
 echo "  GCP_PROJECT=$PROJECT  REGION=$REGION  SERVICE=$SERVICE"
-echo "  Ollama target: $OLLAMA_HOST_INTERNAL"
+echo "  Secure Ollama proxy target: $OLLAMA_HOST_INTERNAL"
 
-# ── 1) Mac Ollama 도달성 ────────────────────────
-step 1/5 "Mac Ollama 도달성 검증"
-if curl -sf "http://$OLLAMA_HOST_INTERNAL/api/tags" --max-time 5 > /dev/null 2>&1; then
-    COUNT=$(curl -s "http://$OLLAMA_HOST_INTERNAL/api/tags" | jq '.models | length')
-    ok "Ollama 도달 OK — ${COUNT}개 모델"
+# ── 1) Mac Ollama 보안 프록시 도달성 ─────────────
+step 1/5 "Mac Ollama secure proxy 도달성 검증"
+if [ -z "${AJIN_OLLAMA_SECRET:-}" ]; then
+    warn "AJIN_OLLAMA_SECRET env 미설정 — Secret Manager 에서 fallback fetch 시도"
+    SECRET_FETCHED=$(gcloud secrets versions access latest --secret=ajin-ollama-secret --project="$PROJECT" 2>/dev/null || true)
+    if [ -n "$SECRET_FETCHED" ]; then
+        export AJIN_OLLAMA_SECRET="$SECRET_FETCHED"
+        ok "Secret Manager 에서 AJIN_OLLAMA_SECRET fetch 완료"
+    else
+        fail "AJIN_OLLAMA_SECRET 미설정 — Secret Manager 에도 ajin-ollama-secret 없음"
+        echo "    호스트에서 1회 실행:"
+        echo "      bash scripts/demo/install_host_bridge.sh"
+        exit 1
+    fi
+fi
+if curl -sf -H "X-AJIN-Secret: $AJIN_OLLAMA_SECRET" "http://$OLLAMA_HOST_INTERNAL/api/tags" --max-time 5 > /dev/null 2>&1; then
+    COUNT=$(curl -s -H "X-AJIN-Secret: $AJIN_OLLAMA_SECRET" "http://$OLLAMA_HOST_INTERNAL/api/tags" | jq '.models | length')
+    ok "Secure proxy 도달 OK — ${COUNT}개 모델"
 else
-    fail "Ollama 응답 없음 ($OLLAMA_HOST_INTERNAL)"
-    echo "    Mac 호스트에서 다음을 실행 후 재시도:"
-    echo "      launchctl setenv OLLAMA_HOST 0.0.0.0:11434"
-    echo "      pkill -x Ollama; pkill -x ollama"
-    echo "      OLLAMA_HOST=0.0.0.0:11434 ollama serve &"
+    fail "Secure proxy 응답 없음 ($OLLAMA_HOST_INTERNAL)"
+    echo
+    echo "    호스트 launchd 의 ollama-secure-proxy 가 정지된 것 같습니다."
+    echo "    Mac terminal 에서 다음을 실행 후 컨테이너 ▶ Start 재시도:"
+    echo "      launchctl kickstart -k gui/\$(id -u)/com.ajin.ollama-secure-proxy"
+    echo "    첫 setup 미완료라면:"
+    echo "      bash scripts/demo/install_host_bridge.sh"
     exit 1
 fi
 
@@ -58,14 +74,24 @@ TUNNEL_URL=""
 CF_PID=""
 cleanup() {
     echo
-    step "cleanup" "Cloud Run env 원복 + cloudflared 종료"
+    step "cleanup" "Cloud Run env 원복 + cloudflared 종료 + healthcheck marker 삭제"
+    # healthcheck marker 즉시 삭제 — Docker Desktop UI 가 즉시 unhealthy 표시
+    rm -f /tmp/cloudrun_applied /tmp/tunnel_url.txt 2>/dev/null || true
     if [ -n "$CF_PID" ] && kill -0 "$CF_PID" 2>/dev/null; then
         kill "$CF_PID" 2>/dev/null || true
         ok "cloudflared 종료 (PID=$CF_PID)"
     fi
+    # gcloud token 만료 감지 — 만료 시 명확한 수동 복구 안내
+    if ! gcloud auth print-access-token >/dev/null 2>&1; then
+        warn "gcloud access token 만료 — Cloud Run env 원복 실패 가능"
+        warn "  호스트에서 'gcloud auth login' 후 수동 실행:"
+        warn "    gcloud run services update $SERVICE --region $REGION \\"
+        warn "      --update-env-vars 'OLLAMA_BASE_URL=,LLM_ROUTER_PRIMARY=gemini,EMBEDDING_BACKEND=gemini,FEATURE_B_BLOCK_GEMINI=false' --quiet"
+        return
+    fi
     gcloud run services update "$SERVICE" \
         --region "$REGION" --project "$PROJECT" \
-        --update-env-vars "OLLAMA_BASE_URL=,FEATURE_B_BLOCK_GEMINI=false" \
+        --update-env-vars "OLLAMA_BASE_URL=,LLM_ROUTER_PRIMARY=gemini,EMBEDDING_BACKEND=gemini,FEATURE_B_BLOCK_GEMINI=false" \
         --quiet > /dev/null 2>&1 \
         && ok "OLLAMA_BASE_URL 비움 (Gemini 단독 모드)" \
         || warn "Cloud Run env 원복 실패 — 수동 확인 필요"
@@ -98,9 +124,9 @@ ok "Tunnel URL: $TUNNEL_URL"
 # 외부 접근 polling (60초)
 TUNNEL_READY=false
 for attempt in $(seq 1 12); do
-    if curl -sf "$TUNNEL_URL/api/tags" --max-time 5 > /dev/null 2>&1; then
+    if curl -sf -H "X-AJIN-Secret: $AJIN_OLLAMA_SECRET" "$TUNNEL_URL/api/tags" --max-time 5 > /dev/null 2>&1; then
         TUNNEL_READY=true
-        ok "외부 접근 OK (시도 $attempt/12)"
+        ok "authorized external access OK (시도 $attempt/12)"
         break
     fi
     sleep 5
@@ -110,13 +136,29 @@ done
 # ── 5) Cloud Run env 업데이트 ────────────────────
 step 4/5 "Cloud Run env 업데이트"
 echo "  OLLAMA_BASE_URL=$TUNNEL_URL"
-echo "  FEATURE_B_BLOCK_GEMINI=false"
+echo "  LLM_ROUTER_PRIMARY=ollama"
+echo "  EMBEDDING_BACKEND=ollama"
+echo "  FEATURE_B_BLOCK_GEMINI=true"
 gcloud run services update "$SERVICE" \
     --region "$REGION" --project "$PROJECT" \
-    --update-env-vars "OLLAMA_BASE_URL=$TUNNEL_URL,FEATURE_B_BLOCK_GEMINI=false" \
+    --update-env-vars "OLLAMA_BASE_URL=$TUNNEL_URL,LLM_ROUTER_PRIMARY=ollama,EMBEDDING_BACKEND=ollama,FEATURE_B_BLOCK_GEMINI=true" \
+    --update-secrets "AJIN_OLLAMA_SECRET=${AJIN_OLLAMA_SECRET_NAME}:latest" \
     --quiet > /dev/null 2>&1 \
-    && ok "Cloud Run env 적용 완료" \
+    && { ok "Cloud Run env 적용 완료"; touch /tmp/cloudrun_applied; } \
     || { fail "gcloud run update 실패"; exit 1; }
+
+# Cloud Run env 업데이트는 새 revision 만들지만, service 에 명시 traffic split
+# (tag 별 pinning) 이 적용되어 있으면 새 revision 가 traffic 0% 받음 → 새
+# OLLAMA_BASE_URL 미반영 → llm_connected=false. traffic 을 latest 로 강제
+# 이동하여 새 tunnel URL 즉시 적용.
+# (2026-05-28 — 이전 tunnel 재시작 후 traffic 가 옛 revision 에 고정되어
+#  ollama 도달 fail 한 사례 재발 방지)
+gcloud run services update-traffic "$SERVICE" \
+    --to-latest \
+    --region "$REGION" --project "$PROJECT" \
+    --quiet > /dev/null 2>&1 \
+    && ok "traffic → latest revision (새 OLLAMA_BASE_URL 활성)" \
+    || warn "traffic shift 실패 — 수동: gcloud run services update-traffic $SERVICE --region $REGION --to-latest"
 
 # ── 6) 통합 진단 (revision 활성 30초 대기) ──
 # v3.3 Phase H — /api/health/llm-status 로 모든 기능(A~F) 의 LLM 도달 상태 확인.

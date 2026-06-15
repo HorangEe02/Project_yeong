@@ -23,6 +23,7 @@
 <script type="text/babel" src="../web_app/Icons.jsx"></script>
 <script type="text/babel" src="MobScreens.jsx"></script>
 <script type="text/babel" src="PadScreens.jsx"></script>
+<script type="text/babel" src="PadModules.jsx"></script>
 <script type="text/babel">
 function App() {
   // Wrap each AJIN screen body in IOSDevice (iPhone) or PadFrame (iPad).
@@ -79,14 +80,44 @@ function App() {
         <DCArtboard id="pd-chat-d" label="07 · iPad · AI Chat" width={1024} height={720}>
           <PadChat theme="dark" />
         </DCArtboard>
+        <DCArtboard id="pd-search-d" label="08 · iPad · 인원 검색" width={1024} height={720}>
+          <PadSearch theme="dark" />
+        </DCArtboard>
+        <DCArtboard id="pd-draft-d" label="09 · iPad · 문서 작성" width={1024} height={720}>
+          <PadDraft theme="dark" />
+        </DCArtboard>
+        <DCArtboard id="pd-cmpl-d" label="10 · iPad · 규제" width={1024} height={720}>
+          <PadCompliance theme="dark" />
+        </DCArtboard>
+        <DCArtboard id="pd-admn-d" label="11 · iPad · 관리자" width={1024} height={720}>
+          <PadAdmin theme="dark" />
+        </DCArtboard>
+        <DCArtboard id="pd-eqpt-d" label="12 · iPad · 설비 AI" width={1024} height={720}>
+          <PadEquipment theme="dark" />
+        </DCArtboard>
       </DCSection>
 
       <DCSection id="tablets-light" title="iPad · 라이트 모드 (Light)">
-        <DCArtboard id="pd-home-l" label="08 · iPad · Dashboard" width={1024} height={720}>
+        <DCArtboard id="pd-home-l" label="06 · iPad · Dashboard" width={1024} height={720}>
           <PadDashboard theme="light" />
         </DCArtboard>
-        <DCArtboard id="pd-chat-l" label="09 · iPad · AI Chat" width={1024} height={720}>
+        <DCArtboard id="pd-chat-l" label="07 · iPad · AI Chat" width={1024} height={720}>
           <PadChat theme="light" />
+        </DCArtboard>
+        <DCArtboard id="pd-search-l" label="08 · iPad · 인원 검색" width={1024} height={720}>
+          <PadSearch theme="light" />
+        </DCArtboard>
+        <DCArtboard id="pd-draft-l" label="09 · iPad · 문서 작성" width={1024} height={720}>
+          <PadDraft theme="light" />
+        </DCArtboard>
+        <DCArtboard id="pd-cmpl-l" label="10 · iPad · 규제" width={1024} height={720}>
+          <PadCompliance theme="light" />
+        </DCArtboard>
+        <DCArtboard id="pd-admn-l" label="11 · iPad · 관리자" width={1024} height={720}>
+          <PadAdmin theme="light" />
+        </DCArtboard>
+        <DCArtboard id="pd-eqpt-l" label="12 · iPad · 설비 AI" width={1024} height={720}>
+          <PadEquipment theme="light" />
         </DCArtboard>
       </DCSection>
     </DesignCanvas>

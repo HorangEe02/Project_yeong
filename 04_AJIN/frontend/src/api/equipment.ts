@@ -5,6 +5,7 @@ import { api } from './client';
 import type {
   ErrorCategoriesResponse,
   ErrorSearchResponse,
+  HeadlineResponse,
   InspectionChecklistResponse,
   ManualSearchResponse,
   MarkovResponse,
@@ -113,6 +114,147 @@ export async function uploadSPCCsv(file: File): Promise<SPCUploadResponse> {
 export async function fetchChecklist(equipmentType: string): Promise<InspectionChecklistResponse> {
   const { data } = await api.get<InspectionChecklistResponse>(
     `${BASE}/inspection/checklist/${encodeURIComponent(equipmentType)}`,
+  );
+  return data;
+}
+
+// 13. GET /equipment/headline — W8 Daily Headline
+export async function fetchHeadline(): Promise<HeadlineResponse> {
+  const { data } = await api.get<HeadlineResponse>(`${BASE}/headline`);
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// v4.3 — 점검 이력 ETL (CSV 업로드 + PWA 제출 + ingest_log 조회)
+// ─────────────────────────────────────────────────────────────
+
+export interface InspectionIngestErrorRow {
+  row_index: number;
+  error_code: string;
+  error_msg: string;
+  raw_payload?: Record<string, unknown>;
+}
+
+export interface InspectionIngestResult {
+  rows_total: number;
+  rows_inserted: number;
+  rows_updated: number;
+  rows_skipped: number;
+  rows_error: number;
+  dry_run: boolean;
+  source: string;
+  started_at: string;
+  finished_at: string;
+  error_payload: InspectionIngestErrorRow[];
+  ingest_log_id?: number | null;
+}
+
+export async function uploadInspectionCsv(
+  file: File,
+  opts: { dryRun?: boolean } = {},
+): Promise<InspectionIngestResult> {
+  const fd = new FormData();
+  fd.append('file', file);
+  const { data } = await api.post<InspectionIngestResult>(
+    `${BASE}/inspection/upload-csv`,
+    fd,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      params: { dry_run: opts.dryRun ? true : false },
+    },
+  );
+  return data;
+}
+
+export interface InspectionResultItem {
+  item_no: number;
+  passed: boolean;
+  score?: number | null;
+  comment?: string;
+}
+
+export interface InspectionSubmitPayload {
+  equipment_id: string;
+  template_id: number;
+  inspection_date?: string;
+  results: InspectionResultItem[];
+  overall_status: 'PASS' | 'WARN' | 'FAIL';
+  note?: string;
+  client_uuid?: string;
+}
+
+export interface InspectionSubmitResponse {
+  inspection_log_id: number;
+  deduplicated: boolean;
+  source: string;
+}
+
+export async function submitInspection(
+  payload: InspectionSubmitPayload,
+): Promise<InspectionSubmitResponse> {
+  const { data } = await api.post<InspectionSubmitResponse>(
+    `${BASE}/inspection/submit`,
+    payload,
+  );
+  return data;
+}
+
+export interface IngestLogEntry {
+  id: number;
+  started_at: string;
+  finished_at: string | null;
+  source_label: string;
+  file_name: string;
+  rows_total: number;
+  rows_inserted: number;
+  rows_updated: number;
+  rows_skipped: number;
+  rows_error: number;
+  actor: string;
+}
+
+export async function fetchIngestLogRecent(limit = 20): Promise<{ items: IngestLogEntry[]; total: number }> {
+  const { data } = await api.get<{ items: IngestLogEntry[]; total: number }>(
+    `${BASE}/inspection/ingest-log/recent`,
+    { params: { limit } },
+  );
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// v4.8 Feature F 트랙 A — PLC 라이브 상태 + 도면 OCR
+// ─────────────────────────────────────────────────────────────
+
+export interface PLCStatusResponse {
+  healthy: boolean;
+  active_lanes: number;
+  last_message_ts: string | null;
+  last_message_age_sec: number | null;
+  rtdb_live: boolean;
+  streams: string[];
+  data_class: 'real' | 'synthetic' | 'system' | 'unknown';
+  source_system: string;
+  source_label: string;
+  error: string | null;
+}
+
+export async function fetchPLCStatus(): Promise<PLCStatusResponse> {
+  const { data } = await api.get<PLCStatusResponse>(`${BASE}/plc/status`);
+  return data;
+}
+
+export interface DrawingOCRResponse {
+  drawing_id: number;
+  part_numbers: string[];
+  source: string;
+  data_class: 'real' | 'synthetic' | 'system' | 'unknown';
+  source_system: string;
+  source_label: string;
+}
+
+export async function extractPartNumbers(drawingId: number): Promise<DrawingOCRResponse> {
+  const { data } = await api.post<DrawingOCRResponse>(
+    `${BASE}/drawing/${drawingId}/ocr`,
   );
   return data;
 }

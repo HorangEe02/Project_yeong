@@ -11,6 +11,8 @@ from typing import Dict, List
 from collections import defaultdict
 from pathlib import Path
 
+from core.data_lineage import should_include_non_real_data
+
 AUDIT_DB = "data/audit.db"
 AUTH_DB = "data/auth.db"
 FEEDBACK_DB = "data/feedback.db"
@@ -84,6 +86,37 @@ def _get_audit_table_name() -> str:
     except Exception:
         conn.close()
         return "audit_log"
+
+
+def _has_column(conn: sqlite3.Connection, table_name: str, column_name: str) -> bool:
+    """Return whether a SQLite table has a column.
+
+    Args:
+        conn: Open SQLite connection.
+        table_name: Table to inspect.
+        column_name: Column name to check.
+
+    Returns:
+        True when the column exists.
+    """
+    try:
+        return column_name in {row[1] for row in conn.execute(f"PRAGMA table_info({table_name})")}
+    except Exception:
+        return False
+
+
+def _login_real_filter(conn: sqlite3.Connection) -> str:
+    """Build the login_history real-data predicate for usage analytics.
+
+    Args:
+        conn: Open auth.db connection.
+
+    Returns:
+        SQL predicate. Missing lineage columns fall back to ``1=1``.
+    """
+    if should_include_non_real_data() or not _has_column(conn, "login_history", "data_class"):
+        return "1=1"
+    return "data_class = 'real'"
 
 
 def get_usage_by_feature(days: int = 30) -> List[Dict]:
@@ -181,8 +214,9 @@ def get_usage_by_hour(days: int = 7) -> List[Dict]:
         try:
             auth_conn = sqlite3.connect(AUTH_DB)
             cutoff = (date.today() - timedelta(days=days)).isoformat()
+            real_filter = _login_real_filter(auth_conn)
             cursor = auth_conn.execute(
-                "SELECT timestamp FROM login_history WHERE timestamp >= ? AND success = 1",
+                f"SELECT timestamp FROM login_history WHERE timestamp >= ? AND success = 1 AND {real_filter}",
                 (cutoff,)
             )
             for row in cursor.fetchall():
@@ -249,10 +283,11 @@ def get_daily_active_users(days: int = 30) -> List[Dict]:
     try:
         conn = sqlite3.connect(AUTH_DB)
         cutoff = (date.today() - timedelta(days=days)).isoformat()
+        real_filter = _login_real_filter(conn)
         cursor = conn.execute(
             """SELECT DATE(timestamp) as login_date, COUNT(DISTINCT employee_id) as dau
                FROM login_history
-               WHERE timestamp >= ? AND success = 1
+               WHERE timestamp >= ? AND success = 1 AND """ + real_filter + """
                GROUP BY DATE(timestamp)
                ORDER BY login_date""",
             (cutoff,)
@@ -282,6 +317,118 @@ def get_feedback_summary() -> Dict:
         }
     except Exception:
         return {"total": 0, "positive": 0, "negative": 0, "rate": 0}
+
+
+def get_feature_heatmap(period: str = "day", period_days: int = 7) -> Dict:
+    """v4.8 F-Stats — feature × time-bucket 히트맵.
+
+    period:
+        - "day"   : `period_days` 만큼 일 단위 셀 (기본 7일)
+        - "week"  : 최근 12주 (이번 주 포함)
+        - "month" : 최근 12개월 (이번 달 포함)
+
+    Returns:
+        {
+          "period": "day|week|month",
+          "buckets": [{"label": "...", "key": "YYYY-MM-DD|YYYY-Wnn|YYYY-MM"}],
+          "features": ["A","B","C","D","E","F"],
+          "matrix": { feature: { bucket_key: count } }
+        }
+    """
+    conn = _connect_audit()
+    table = _get_audit_table_name() if conn else "api_audit_log"
+
+    if period == "week":
+        bucket_count = 12
+        today = date.today()
+        # ISO 주 키. 시작일 = 이번 주 월요일 - (i-1) * 7
+        bucket_keys: List[str] = []
+        bucket_labels: List[str] = []
+        for i in range(bucket_count - 1, -1, -1):
+            d = today - timedelta(days=7 * i + today.weekday())
+            iso_y, iso_w, _ = d.isocalendar()
+            key = f"{iso_y}-W{iso_w:02d}"
+            bucket_keys.append(key)
+            bucket_labels.append(key)
+        cutoff = (today - timedelta(weeks=bucket_count)).isoformat()
+    elif period == "month":
+        bucket_count = 12
+        today = date.today()
+        bucket_keys = []
+        bucket_labels = []
+        y, m = today.year, today.month
+        for _ in range(bucket_count):
+            bucket_keys.append(f"{y:04d}-{m:02d}")
+            bucket_labels.append(f"{y:04d}-{m:02d}")
+            m -= 1
+            if m == 0:
+                m = 12
+                y -= 1
+        bucket_keys.reverse()
+        bucket_labels.reverse()
+        cutoff = (today - timedelta(days=31 * bucket_count)).isoformat()
+    else:
+        period = "day"
+        bucket_count = max(1, int(period_days))
+        today = date.today()
+        bucket_keys = [
+            (today - timedelta(days=i)).isoformat() for i in range(bucket_count - 1, -1, -1)
+        ]
+        bucket_labels = bucket_keys[:]
+        cutoff = (today - timedelta(days=bucket_count)).isoformat()
+
+    features = list(FEATURE_NAMES.keys())
+    matrix: Dict[str, Dict[str, int]] = {f: {k: 0 for k in bucket_keys} for f in features}
+
+    if conn is None:
+        return {
+            "period": period,
+            "buckets": [{"label": l, "key": k} for l, k in zip(bucket_labels, bucket_keys)],
+            "features": features,
+            "matrix": matrix,
+        }
+
+    try:
+        cursor = conn.execute(
+            f"SELECT endpoint, timestamp FROM {table} WHERE timestamp >= ?",
+            (cutoff,),
+        )
+        for endpoint, ts in cursor.fetchall():
+            if not endpoint or not ts:
+                continue
+            try:
+                dt = datetime.fromisoformat(ts)
+            except (TypeError, ValueError):
+                continue
+            d = dt.date()
+            if period == "day":
+                key = d.isoformat()
+            elif period == "week":
+                iso_y, iso_w, _ = d.isocalendar()
+                key = f"{iso_y}-W{iso_w:02d}"
+            else:  # month
+                key = f"{d.year:04d}-{d.month:02d}"
+            if key not in bucket_keys:
+                continue
+            feature: str = ""
+            for prefix, fkey in ENDPOINT_FEATURE_MAP.items():
+                if endpoint.startswith(prefix):
+                    feature = fkey
+                    break
+            if not feature:
+                continue
+            matrix[feature][key] += 1
+    except Exception:  # noqa: BLE001
+        pass
+    finally:
+        conn.close()
+
+    return {
+        "period": period,
+        "buckets": [{"label": l, "key": k} for l, k in zip(bucket_labels, bucket_keys)],
+        "features": features,
+        "matrix": matrix,
+    }
 
 
 def calculate_roi_estimate(days: int = 30) -> Dict:

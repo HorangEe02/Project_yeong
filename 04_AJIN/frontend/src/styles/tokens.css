@@ -9,24 +9,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap");
 
 /* -- Web fonts ------------------------------------------------------------- */
-/* Brand font (uploaded; original family name redacted in filenames).
-   Mapped to family "AJIN Sans" with full 100–800 weight ladder. */
-@font-face { font-family: "AJIN Sans"; font-weight: 100; font-style: normal; font-display: swap;
-  src: url("/fonts/__________-1Thin.otf") format("opentype"), url("/fonts/__________-1Thin.ttf") format("truetype"); }
-@font-face { font-family: "AJIN Sans"; font-weight: 200; font-style: normal; font-display: swap;
-  src: url("/fonts/__________-2ExtraLight.otf") format("opentype"), url("/fonts/__________-2ExtraLight.ttf") format("truetype"); }
-@font-face { font-family: "AJIN Sans"; font-weight: 300; font-style: normal; font-display: swap;
-  src: url("/fonts/__________-3Light.otf") format("opentype"), url("/fonts/__________-3Light.ttf") format("truetype"); }
+/* Brand font: A2Z (에이투지체) — SIL OFL 1.1 라이센스, 디자이너 이주임.
+   원본 폰트 패밀리는 "A2Z" 이며, 본 토큰 시스템은 "AJIN Sans" alias 로 참조한다.
+   라이센스 전문: frontend/public/fonts/LICENSE.txt
+   파일명 익명화 패턴 (__________) 는 OFL §3 Reserved Font Name 보호와는 별개의
+   배포 구성 — 폰트 자체 metadata 의 family name 은 보존됨. */
 @font-face { font-family: "AJIN Sans"; font-weight: 400; font-style: normal; font-display: swap;
-  src: url("/fonts/__________-4Regular.otf") format("opentype"), url("/fonts/__________-4Regular.ttf") format("truetype"); }
+  src: url("/fonts/__________-4Regular.otf") format("opentype"); }
 @font-face { font-family: "AJIN Sans"; font-weight: 500; font-style: normal; font-display: swap;
-  src: url("/fonts/__________-5Medium.otf") format("opentype"), url("/fonts/__________-5Medium.ttf") format("truetype"); }
+  src: url("/fonts/__________-5Medium.otf") format("opentype"); }
 @font-face { font-family: "AJIN Sans"; font-weight: 600; font-style: normal; font-display: swap;
-  src: url("/fonts/__________-6SemiBold.otf") format("opentype"), url("/fonts/__________-6SemiBold.ttf") format("truetype"); }
+  src: url("/fonts/__________-6SemiBold.otf") format("opentype"); }
 @font-face { font-family: "AJIN Sans"; font-weight: 700; font-style: normal; font-display: swap;
-  src: url("/fonts/__________-7Bold.otf") format("opentype"), url("/fonts/__________-7Bold.ttf") format("truetype"); }
-@font-face { font-family: "AJIN Sans"; font-weight: 800; font-style: normal; font-display: swap;
-  src: url("/fonts/__________-8ExtraBold.otf") format("opentype"), url("/fonts/__________-8ExtraBold.ttf") format("truetype"); }
+  src: url("/fonts/__________-7Bold.otf") format("opentype"); }
 /* Korean fallback: Noto Sans KR — @import 는 파일 상단으로 이동 (CSS 스펙) */
 
 /* -- Root tokens (DARK / HUD mode default) --------------------------------- */
@@ -249,4 +244,13 @@ a:hover { text-decoration: underline; }
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   border: 1px solid var(--glass-border);
+}
+
+/* Liquid Glass 미지원 브라우저 호환 — 사용자 Goal 6 확정 (Android Chrome 구형 호환).
+   backdrop-filter 둘 다 미지원 시 불투명 surface 로 단조롭게 표현 — border/shadow 유지.
+   대상: Android Chrome <76, Firefox 데스크탑 <103 등. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass, .glass-strong {
+    background: var(--hud-surface);
+  }
 }

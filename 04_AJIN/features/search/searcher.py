@@ -6,14 +6,28 @@ kiwipiepy 기반 한국어 형태소 분석을 적용한다.
 v2: 필터를 검색 전에 적용하여 정확도 향상.
 """
 
+from __future__ import annotations  # type annotation lazy evaluation — Chroma=None 시 runtime TypeError 방지
+
+import logging
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from rank_bm25 import BM25Okapi
-from langchain_chroma import Chroma
 
-from config import VECTORSTORE_DIR, RRF_K, TOP_K, USE_KIWI
+try:
+    from langchain_chroma import Chroma  # type: ignore[import-untyped]
+except ImportError:
+    # Slim image 에서는 langchain_chroma 미설치 — BM25 단독 fallback.
+    # ADR-0008 (ChromaDB → Supabase pgvector) 마이그레이션 기간 동안 image 양쪽 지원.
+    Chroma = None  # type: ignore[assignment, misc]
+
+from config import RERANKER_TOP_K_INPUT, RRF_K, TOP_K, USE_KIWI, VECTORSTORE_DIR
 from core.embedding_client import get_embeddings
+from features.search.reranker import get_reranker
+from features.search.vector_store import SupabasePgvectorStore
+
+logger = logging.getLogger("ajin.search")
 
 
 # ---------------------------------------------------------------------------
@@ -85,13 +99,27 @@ class HybridSearcher:
         self,
         vectorstore: Chroma | None = None,
         corpus_chunks: list[dict] | None = None,
+        pgvector_store: SupabasePgvectorStore | None = None,
     ):
         self.tokenizer = KoreanTokenizer()
+        # ADR-0008 완료: ChromaDB → Supabase pgvector 마이그레이션. 기본 postgres.
+        # 환경에 따라 명시적으로 'chroma' 설정 시 레거시 경로 유지.
+        self.vector_read_mode = os.getenv("VECTOR_READ_MODE", "postgres").strip().lower()
+        if self.vector_read_mode not in {"chroma", "postgres"}:
+            logger.warning("Invalid VECTOR_READ_MODE=%s; using postgres", self.vector_read_mode)
+            self.vector_read_mode = "postgres"
+        self.pgvector_store = None
 
         # 벡터스토어 로드
-        if vectorstore is not None:
+        if self.vector_read_mode == "postgres":
+            try:
+                self.pgvector_store = pgvector_store or SupabasePgvectorStore()
+            except Exception as e:
+                logger.warning(f"Supabase pgvector store 로드 실패 (검색 결과 없음): {e}")
+            self.vectorstore = None
+        elif vectorstore is not None:
             self.vectorstore = vectorstore
-        else:
+        elif Chroma is not None:
             try:
                 self.vectorstore = Chroma(
                     persist_directory=str(VECTORSTORE_DIR / "documents"),
@@ -99,9 +127,11 @@ class HybridSearcher:
                     collection_name="ajin_documents",
                 )
             except Exception as e:
-                import logging
-                logging.getLogger("ajin.search").warning(f"ChromaDB 로드 실패 (BM25 전용 모드): {e}")
+                logger.warning(f"ChromaDB 로드 실패 (BM25 전용 모드): {e}")
                 self.vectorstore = None
+        else:
+            # langchain_chroma 미설치 (slim image) — BM25 단독 운영.
+            self.vectorstore = None
 
         # BM25 코퍼스 로드 (JSON — pickle RCE 위험 제거)
         if corpus_chunks is not None:
@@ -127,6 +157,15 @@ class HybridSearcher:
         # 전체 BM25 인덱스 구축
         self._build_bm25_index(self.corpus_chunks)
 
+        # v4.x — BGE cross-encoder reranker (config.RERANKER_ENABLED=true 일 때만 로드)
+        # 출처: docs/RAG_ENHANCEMENT_PLAN.md §2.1, §4 Phase 1
+        # lazy: 첫 search 호출 시 모델 다운로드 (~600MB). env 비활성 시 None.
+        self.reranker = get_reranker()
+        if self.reranker is None:
+            logger.info("Reranker 비활성 — RRF 결과 그대로 반환")
+        else:
+            logger.info("Reranker 활성: model=%s (lazy load)", self.reranker.model_name)
+
     def _build_bm25_index(self, chunks: list[dict]):
         """BM25 인덱스를 구축한다."""
         if chunks:
@@ -148,22 +187,108 @@ class HybridSearcher:
 
         v2: 필터가 있으면 필터링된 코퍼스에서 BM25를 재구축하여
         해당 유형/기간의 문서만 대상으로 검색한다.
+        v4.x: 검색어가 비어있고 필터가 있으면 metadata-only 모드로 동작 —
+              문서 유형/부품명 드롭다운만 선택해도 결과 노출 (점수 0).
         """
+        normalized_query = (query or "").strip()
         has_filters = any([doc_type_filter, part_name_filter, date_from, date_to])
+
+        # v4.x — 검색어가 없는 경우
+        if not normalized_query:
+            if not has_filters:
+                return []
+            return self._list_by_filter(
+                k=k,
+                doc_type_filter=doc_type_filter,
+                part_name_filter=part_name_filter,
+                date_from=date_from,
+                date_to=date_to,
+            )
+
+        if self.vector_read_mode == "postgres":
+            return self._pgvector_search(
+                query=normalized_query,
+                k=k,
+                doc_type_filter=doc_type_filter,
+                part_name_filter=part_name_filter,
+                date_from=date_from,
+                date_to=date_to,
+            )
 
         if has_filters:
             return self._filtered_search(
-                query, k, doc_type_filter, part_name_filter, date_from, date_to
+                normalized_query, k, doc_type_filter, part_name_filter, date_from, date_to
             )
         else:
-            return self._unfiltered_search(query, k)
+            return self._unfiltered_search(normalized_query, k)
+
+    def _list_by_filter(
+        self,
+        k: int,
+        doc_type_filter: str | None,
+        part_name_filter: str | None,
+        date_from: str | None,
+        date_to: str | None,
+    ) -> list[SearchResult]:
+        """검색어 없이 doc_type / part_name 필터만으로 결과를 반환한다.
+
+        pgvector 모드: SupabasePgvectorStore.list_documents_by_metadata 사용.
+        chroma 모드: BM25 코퍼스에서 metadata 필터만 적용.
+        """
+        if self.vector_read_mode == "postgres" and self.pgvector_store is not None:
+            try:
+                rows = self.pgvector_store.list_documents_by_metadata(
+                    match_count=k,
+                    doc_type_filter=doc_type_filter,
+                    part_name_filter=part_name_filter,
+                )
+            except Exception as e:
+                logger.warning("list_documents_by_metadata failed: %s", e)
+                return []
+
+            results: list[SearchResult] = []
+            for row in rows:
+                metadata = dict(row.get("metadata") or {})
+                results.append(
+                    SearchResult(
+                        doc_id=str(row.get("source_doc_id") or metadata.get("doc_id") or ""),
+                        title=str(row.get("title") or metadata.get("title") or ""),
+                        doc_type=str(metadata.get("doc_type") or doc_type_filter or ""),
+                        part_name=str(metadata.get("part_name") or part_name_filter or ""),
+                        content=str(row.get("content") or "")[:300],
+                        score=float(row.get("score") or 0.0),
+                        metadata=metadata,
+                    )
+                )
+            return self._apply_post_filters(results, part_name_filter, date_from, date_to)[:k]
+
+        # chroma 모드 — corpus_chunks 직접 필터링
+        filtered = self._filter_corpus(
+            self.corpus_chunks, doc_type_filter, part_name_filter, date_from, date_to
+        )
+        results: list[SearchResult] = []
+        for chunk in filtered[:k]:
+            results.append(
+                SearchResult(
+                    doc_id=str(chunk.get("doc_id") or ""),
+                    title=str(chunk.get("title") or ""),
+                    doc_type=str(chunk.get("doc_type") or doc_type_filter or ""),
+                    part_name=str(chunk.get("part_name") or part_name_filter or ""),
+                    content=str(chunk.get("content") or "")[:300],
+                    score=0.0,
+                    metadata=dict(chunk.get("metadata") or {}),
+                )
+            )
+        return results
 
     def _unfiltered_search(self, query: str, k: int) -> list[SearchResult]:
-        """필터 없는 일반 검색"""
+        """필터 없는 일반 검색 — RRF 후 reranker 재정렬 (있을 때)."""
         bm25_results = self._bm25_search(query, self.corpus_chunks, k=k * 3)
         vector_results = self._vector_search(query, k=k * 3)
-        merged = self._rrf_merge(bm25_results, vector_results, self.corpus_chunks, k=k * 2)
-        return self._deduplicate(merged, k)
+        rrf_out_k = RERANKER_TOP_K_INPUT if self.reranker is not None else k * 2
+        merged = self._rrf_merge(bm25_results, vector_results, self.corpus_chunks, k=rrf_out_k)
+        reranked = self._rerank(query, merged, top_k=k)
+        return self._deduplicate(reranked, k)
 
     def _filtered_search(
         self,
@@ -202,13 +327,17 @@ class HybridSearcher:
             query, k=k * 3, doc_type_filter=doc_type
         )
 
-        # 4. RRF 결합
-        merged = self._rrf_merge(bm25_results, vector_results, filtered_chunks, k=k * 2)
+        # 4. RRF 결합 — reranker 있으면 더 많은 후보를 모아 cross-encoder 재정렬
+        rrf_out_k = RERANKER_TOP_K_INPUT if self.reranker is not None else k * 2
+        merged = self._rrf_merge(bm25_results, vector_results, filtered_chunks, k=rrf_out_k)
 
         # 5. 추가 필터 (part_name, date — 벡터 결과에서 온 항목 보정)
         post_filtered = self._apply_post_filters(merged, part_name, date_from, date_to)
 
-        return self._deduplicate(post_filtered, k)
+        # 6. Reranker 재정렬 (post-filter 후) → top-K
+        reranked = self._rerank(query, post_filtered, top_k=k)
+
+        return self._deduplicate(reranked, k)
 
     # ----- BM25 검색 -----
 
@@ -265,9 +394,99 @@ class HybridSearcher:
                 for doc, score in results
             ]
         except Exception as e:
-            import logging
-            logging.getLogger("ajin.search").warning(f"Vector search failed: {e}")
+            logger.warning(f"Vector search failed: {e}")
             return []
+
+    def _pgvector_search(
+        self,
+        query: str,
+        k: int,
+        doc_type_filter: str | None = None,
+        part_name_filter: str | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None,
+    ) -> list[SearchResult]:
+        """Supabase pgvector RPC 기반 문서 검색을 수행한다.
+
+        Args:
+            query: 사용자 검색어.
+            k: 최대 결과 수.
+            doc_type_filter: 문서 유형 필터.
+            part_name_filter: 부품명 필터.
+            date_from: 생성일 시작 필터.
+            date_to: 생성일 종료 필터.
+
+        Returns:
+            list[SearchResult]: 기존 API 응답 schema에 맞춘 검색 결과.
+        """
+
+        if self.pgvector_store is None:
+            return []
+        # reranker 있으면 더 많은 후보를 가져온 후 cross-encoder 재정렬 (RAG_ENHANCEMENT_PLAN §2.1)
+        candidate_k = RERANKER_TOP_K_INPUT if self.reranker is not None else k
+        try:
+            embedding = get_embeddings().embed_query(query)
+            rows = self.pgvector_store.hybrid_search_documents(
+                query_text=query,
+                query_embedding=embedding,
+                match_count=candidate_k,
+                doc_type_filter=doc_type_filter,
+                part_name_filter=part_name_filter,
+            )
+        except Exception as e:
+            logger.warning("Supabase pgvector search failed: %s", e)
+            return []
+
+        results: list[SearchResult] = []
+        for row in rows:
+            metadata = dict(row.get("metadata") or {})
+            result = SearchResult(
+                doc_id=str(row.get("source_doc_id") or metadata.get("doc_id") or ""),
+                title=str(row.get("title") or metadata.get("title") or ""),
+                doc_type=str(metadata.get("doc_type") or doc_type_filter or ""),
+                part_name=str(metadata.get("part_name") or part_name_filter or ""),
+                content=str(row.get("content") or "")[:300],
+                score=float(row.get("score") or row.get("similarity") or 0.0),
+                metadata=metadata,
+            )
+            results.append(result)
+
+        # post-filter 후 reranker 재정렬 → top-K (cross-encoder)
+        filtered = self._apply_post_filters(results, part_name_filter, date_from, date_to)
+        return self._rerank(query, filtered, top_k=k)
+
+    # ----- BGE Reranker 재정렬 (cross-encoder) -----
+
+    def _rerank(
+        self,
+        query: str,
+        results: list[SearchResult],
+        top_k: int,
+    ) -> list[SearchResult]:
+        """BGE cross-encoder 로 results 재정렬 후 top_k 반환.
+
+        reranker None (env 비활성 또는 import 실패) 또는 score 산출 실패 시 RRF 순서 유지.
+        결과 SearchResult.score 는 rerank_score 로 덮어쓰고, 원래 RRF 점수는
+        metadata["rrf_score"] 로 보존.
+        """
+        if not results or self.reranker is None:
+            return results[:top_k]
+
+        texts = [r.content for r in results]
+        scores = self.reranker.compute_scores(query, texts)
+        if scores is None:
+            # 모델 로드 실패 — RRF 순서 유지 (slim image 등 호환)
+            return results[:top_k]
+
+        for r, s in zip(results, scores):
+            rrf_score = r.score
+            r.score = float(s)
+            r.metadata = {
+                **r.metadata,
+                "rerank_score": float(s),
+                "rrf_score": float(rrf_score),
+            }
+        return sorted(results, key=lambda r: r.score, reverse=True)[:top_k]
 
     # ----- RRF 결합 -----
 
@@ -351,9 +570,11 @@ class HybridSearcher:
         """코퍼스를 메타데이터 조건으로 필터링한다."""
         filtered = chunks
         if doc_type:
+            # Frontend snake_case (예: "8d_report") ↔ corpus 표기 ("8D Report") 매칭 정규화.
+            target = doc_type.lower().replace("_", " ").strip()
             filtered = [
                 c for c in filtered
-                if c.get("metadata", {}).get("doc_type", "") == doc_type
+                if c.get("metadata", {}).get("doc_type", "").lower() == target
             ]
         if part_name:
             filtered = [

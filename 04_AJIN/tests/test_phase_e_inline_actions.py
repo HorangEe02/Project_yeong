@@ -54,6 +54,25 @@ from backend.schemas.onboarding import (
 )
 
 
+# ──────────────────────────────────────────────
+# v4.7 test isolation — env + cache clear (Pattern 4)
+# ──────────────────────────────────────────────
+
+
+@pytest.fixture(autouse=True)
+def isolate_action_env(monkeypatch):
+    """FEATURE_C_INLINE_ACTIONS env 격리 + lru_cache 무효화 — 직전 테스트의 setenv 잔존 방지."""
+    monkeypatch.delenv("FEATURE_C_INLINE_ACTIONS", raising=False)
+    # vision_query.get_capabilities lru_cache 무효화 (Phase E 가 import 한 경우)
+    try:
+        from features.search.vision_query import get_capabilities
+        if hasattr(get_capabilities, "cache_clear"):
+            get_capabilities.cache_clear()
+    except (ImportError, AttributeError):
+        pass
+    yield
+
+
 # ════════════════════════════════════════════════════════════
 # 1. detect_actions() — 매트릭스
 # ════════════════════════════════════════════════════════════
@@ -285,10 +304,21 @@ def test_summarize_unknown_kind():
 def client():
     from fastapi import FastAPI
     from fastapi.testclient import TestClient
+    from backend.dependencies import get_current_user
     from backend.routers.onboarding import router
 
     app = FastAPI()
     app.include_router(router)
+    app.dependency_overrides[get_current_user] = lambda: SimpleNamespace(
+        user_id=1,
+        employee_id="E001",
+        name="tester",
+        department="품질보증팀",
+        division="품질본부",
+        position="사원",
+        role="EMPLOYEE",
+        role_level=1,
+    )
     return TestClient(app)
 
 
@@ -401,20 +431,22 @@ def test_chat_sse_multi_action_emits_two_cards(client):
         assert set(kinds) == {"employee", "document"}
 
 
-def test_chat_sse_anon_employee_returns_auth_required(client):
-    """비인증 + 인사 검색 쿼리 → auth_required=True 카드."""
+def test_chat_sse_anon_employee_requires_login():
+    """비인증 온보딩 채팅은 API 경계에서 401 로 차단된다."""
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from backend.routers.onboarding import router
+
+    app = FastAPI()
+    app.include_router(router)
+    client = TestClient(app)
+
     with patch.dict(os.environ, {"FEATURE_C_INLINE_ACTIONS": "true"}):
         r = client.post(
             "/onboarding/chat",
             json={"query": "홍길동 차장 연락처", "department": "품질보증팀", "history": []},
         )
-        events = _parse_sse_events(r.text)
-        emp_cards = [
-            e for e in events
-            if e.get("type") == "action_card" and e.get("kind") == "employee"
-        ]
-        assert emp_cards
-        assert emp_cards[0]["payload"]["auth_required"] is True
+        assert r.status_code == 401
 
 
 # ════════════════════════════════════════════════════════════

@@ -22,19 +22,19 @@ export function determineVisibility(
   return 'PARTIAL';
 }
 
+// F5 — 마스킹 정책 완화 (2026-05-10 합의):
+//   사내 협업 자산(내선/이메일)은 PARTIAL 등급에서도 공개. 개인 휴대폰만 마스킹.
+//   인사팀 별도 운영 정책에 따른 결정.
 export function maskEmail(email: string, level: VisibilityLevel): string {
-  if (level === 'FULL') return email;
   if (level === 'HIDDEN') return '';
-  // PARTIAL: 앞 2자만 노출
-  const [name, domain] = email.split('@');
-  if (!name || !domain) return '***@***';
-  const visible = name.slice(0, 2);
-  return `${visible}${'*'.repeat(Math.max(name.length - 2, 1))}@***`;
+  // PARTIAL/FULL 모두 사내 이메일 공개
+  return email;
 }
 
 export function maskPhone(phone: string, level: VisibilityLevel): string {
   if (level === 'FULL') return phone;
   if (level === 'HIDDEN') return '';
+  // PARTIAL: 휴대폰만 마스킹 유지
   return '***-****-****';
 }
 
@@ -57,7 +57,8 @@ export function applyVisibility(
         visibility: level,
         emailMasked: maskEmail(e.email, level),
         phoneMasked: maskPhone(e.mobile, level),
-        extMasked: level === 'FULL' ? `#${e.ext}` : '#***',
+        // F5 — 내선번호는 사내 협업 자산. PARTIAL/FULL 모두 공개.
+        extMasked: level === 'HIDDEN' ? '' : `#${e.ext}`,
       };
     })
     .filter((e) => e.visibility !== 'HIDDEN');

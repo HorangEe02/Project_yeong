@@ -9,9 +9,10 @@ import os
 from typing import Literal
 
 import requests
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
+from backend.dependencies import require_role_level
 from backend.schemas.common import HealthResponse
 from config import OLLAMA_BASE_URL, VECTORSTORE_DIR, ollama_headers
 
@@ -92,6 +93,12 @@ class GeminiStatus(BaseModel):
     feature_b_blocked: bool  # FEATURE_B_BLOCK_GEMINI 토글 결과
 
 
+class RoutingStatus(BaseModel):
+    primary_provider: Literal["ollama", "gemini"]
+    fallback_enabled: bool
+    embedding_backend: Literal["ollama", "gemini", "auto"]
+
+
 class FeatureLLMStatus(BaseModel):
     id: str
     name: str
@@ -110,6 +117,7 @@ class CircuitState(BaseModel):
 class LLMStatusResponse(BaseModel):
     status: Literal["ok", "degraded", "error"]
     summary: str  # 사람이 읽는 요약 한 줄
+    routing: RoutingStatus
     ollama: OllamaStatus
     gemini: GeminiStatus
     features: list[FeatureLLMStatus]
@@ -118,13 +126,54 @@ class LLMStatusResponse(BaseModel):
     tunnel_active: bool = False  # OLLAMA_BASE_URL 가 trycloudflare.com 이면 true
 
 
+def redact_diagnostic_url(base_url: str) -> str:
+    """Return a non-sensitive runtime endpoint label for diagnostic responses.
+
+    Args:
+        base_url: Raw runtime URL used internally for health checks.
+
+    Returns:
+        A coarse label that preserves operational posture without exposing
+        hostnames, tunnel URLs, ports, paths, or credentials.
+    """
+
+    raw = (base_url or "").strip()
+    if not raw:
+        return ""
+    lower = raw.lower()
+    if "localhost" in lower or "127.0.0.1" in lower or "[::1]" in lower:
+        return "configured:local"
+    if _is_tunnel_url(raw):
+        return "configured:external_https"
+    return "configured:private"
+
+
+def _env_truthy(*keys: str) -> bool:
+    """env var 들 중 하나라도 truthy 인지."""
+    truthy = {"1", "true", "yes", "on"}
+    for k in keys:
+        if os.environ.get(k, "").strip().lower() in truthy:
+            return True
+    return False
+
+
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
-    """Ollama + ChromaDB 연결 상태를 확인한다."""
+    """Return runtime health for LLM and Supabase pgvector dependencies.
+
+    ADR-0008: ChromaDB 제거 — Supabase pgvector 일원화.
+    document_chunks 테이블의 row count 로 pgvector 연결성 검증.
+    """
     llm_connected = False
     models_loaded: list[str] = []
-    chroma_connected = False
-    chroma_doc_count = 0
+    pgvector_connected = False
+    pgvector_doc_count = 0
+    pgvector_required = _env_truthy(
+        "ENABLE_FEATURE_A",
+        "REQUIRE_PGVECTOR_HEALTH",
+        # 하위 호환 (ADR-0008 마이그레이션 기간 동안만):
+        "REQUIRE_CHROMA_HEALTH",
+    )
 
     # Ollama 연결 확인 (Plan A 변형: Caddy 경유 시 X-AJIN-Secret 부착)
     try:
@@ -139,25 +188,36 @@ async def health_check():
     except Exception:
         pass
 
-    # ChromaDB 연결 확인
+    # Supabase pgvector 연결 확인 (ADR-0008)
     try:
-        from chromadb import PersistentClient
-        client = PersistentClient(path=str(VECTORSTORE_DIR / "documents"))
-        col = client.get_collection("ajin_documents")
-        chroma_doc_count = col.count()
-        chroma_connected = True
+        from supabase import create_client
+        sb_url = os.environ.get("SUPABASE_URL", "").strip()
+        sb_key = os.environ.get("SUPABASE_SECRET_KEY", "").strip()
+        if sb_url and sb_key:
+            sb = create_client(sb_url, sb_key)
+            result = (
+                sb.table("document_chunks")
+                .select("id", count="exact")
+                .limit(1)
+                .execute()
+            )
+            pgvector_doc_count = result.count or 0
+            pgvector_connected = True
     except Exception:
         pass
 
-    status = "ok" if llm_connected and chroma_connected else "degraded"
-    if not llm_connected and not chroma_connected:
-        status = "error"
+    if not llm_connected:
+        status = "error" if pgvector_required and not pgvector_connected else "degraded"
+    elif pgvector_required and not pgvector_connected:
+        status = "degraded"
+    else:
+        status = "ok"
 
     return HealthResponse(
         status=status,
         llm_connected=llm_connected,
-        chroma_connected=chroma_connected,
-        chroma_doc_count=chroma_doc_count,
+        pgvector_connected=pgvector_connected,
+        pgvector_doc_count=pgvector_doc_count,
         models_loaded=models_loaded,
     )
 
@@ -171,8 +231,10 @@ async def health_check():
 
 def _check_ollama() -> OllamaStatus:
     """Ollama 도달성 + Tunnel 여부 + 설치 모델 목록."""
-    is_tunnel = "trycloudflare.com" in (OLLAMA_BASE_URL or "")
-    if not OLLAMA_BASE_URL or not OLLAMA_BASE_URL.strip():
+    base_url = (OLLAMA_BASE_URL or "").strip().rstrip("/")
+    safe_base_url = redact_diagnostic_url(base_url)
+    is_tunnel = _is_tunnel_url(base_url)
+    if not base_url:
         return OllamaStatus(
             ok=False,
             base_url="",
@@ -181,21 +243,21 @@ def _check_ollama() -> OllamaStatus:
         )
     try:
         resp = requests.get(
-            f"{OLLAMA_BASE_URL}/api/tags",
+            f"{base_url}/api/tags",
             headers=ollama_headers(),
             timeout=5,
         )
         if resp.status_code != 200:
             return OllamaStatus(
                 ok=False,
-                base_url=OLLAMA_BASE_URL,
+                base_url=safe_base_url,
                 is_tunnel=is_tunnel,
                 error=f"HTTP {resp.status_code}",
             )
         models = [m.get("name", "") for m in resp.json().get("models", [])]
         return OllamaStatus(
             ok=True,
-            base_url=OLLAMA_BASE_URL,
+            base_url=safe_base_url,
             is_tunnel=is_tunnel,
             model_count=len(models),
             models=models,
@@ -203,16 +265,16 @@ def _check_ollama() -> OllamaStatus:
     except Exception as e:
         return OllamaStatus(
             ok=False,
-            base_url=OLLAMA_BASE_URL,
+            base_url=safe_base_url,
             is_tunnel=is_tunnel,
-            error=str(e)[:200],
+            error=f"{type(e).__name__}: connection_failed",
         )
 
 
 def _check_gemini() -> GeminiStatus:
     """Gemini API 키 + Feature B 차단 정책."""
     api_key = bool(os.environ.get("GEMINI_API_KEY", "").strip())
-    model = os.environ.get("GEMINI_MODEL", "gemini-2.5-pro")
+    model = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
     block_b = os.environ.get("FEATURE_B_BLOCK_GEMINI", "true").strip().lower() in (
         "1", "true", "yes", "on",
     )
@@ -220,6 +282,39 @@ def _check_gemini() -> GeminiStatus:
         api_key_present=api_key,
         model=model,
         feature_b_blocked=block_b,
+    )
+
+
+def _is_enabled(value: str, *, default: bool = False) -> bool:
+    """환경변수 boolean 문자열을 보수적으로 해석."""
+    if not value.strip():
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "on")
+
+
+def _is_tunnel_url(base_url: str) -> bool:
+    """Cloud Run 이 로컬 Mac Ollama 로 붙는 터널 URL 여부를 판정."""
+    lower = base_url.lower()
+    if "trycloudflare.com" in lower or "cfargotunnel.com" in lower:
+        return True
+    return lower.startswith("https://") and "localhost" not in lower and "127.0.0.1" not in lower
+
+
+def _routing_status() -> RoutingStatus:
+    """현재 LLM routing 정책을 secret 없이 노출할 수 있는 형태로 반환."""
+    primary = os.environ.get("LLM_ROUTER_PRIMARY", "gemini").strip().lower()
+    if primary not in ("ollama", "gemini"):
+        primary = "gemini"
+
+    embedding = os.environ.get("EMBEDDING_BACKEND", "auto").strip().lower()
+    if embedding not in ("ollama", "gemini", "auto"):
+        embedding = "auto"
+
+    fallback = _is_enabled(os.environ.get("LLM_ROUTER_FALLBACK_ENABLED", "true"), default=True)
+    return RoutingStatus(
+        primary_provider=primary,  # type: ignore[arg-type]
+        fallback_enabled=fallback,
+        embedding_backend=embedding,  # type: ignore[arg-type]
     )
 
 
@@ -253,7 +348,11 @@ def _evaluate_features(ollama_ok: bool, gemini_ok: bool) -> list[FeatureLLMStatu
     return out
 
 
-@router.get("/health/llm-status", response_model=LLMStatusResponse)
+@router.get(
+    "/health/llm-status",
+    response_model=LLMStatusResponse,
+    dependencies=[Depends(require_role_level(5))],
+)
 async def llm_status() -> LLMStatusResponse:
     """v3.3 Phase H — 모든 기능의 LLM 도달 상태 통합 진단.
 
@@ -263,6 +362,7 @@ async def llm_status() -> LLMStatusResponse:
     """
     ollama = _check_ollama()
     gemini = _check_gemini()
+    routing = _routing_status()
     features = _evaluate_features(ollama.ok, gemini.api_key_present)
 
     # LLMRouter Circuit Breaker 스냅샷 (있으면)
@@ -299,22 +399,24 @@ async def llm_status() -> LLMStatusResponse:
 
     # 사람이 읽는 요약
     parts = []
+    parts.append(f"Primary {routing.primary_provider.upper()}")
     if ollama.is_tunnel:
-        parts.append("🚇 Cloudflare Tunnel 활성")
+        parts.append("Cloudflare Tunnel 활성")
     if ollama.ok:
-        parts.append(f"🟢 Ollama OK ({ollama.model_count} 모델)")
+        parts.append(f"Ollama OK ({ollama.model_count} 모델)")
     else:
-        parts.append("🔴 Ollama 도달 불가")
+        parts.append("Ollama 도달 불가")
     if gemini.api_key_present:
-        parts.append("🟢 Gemini 키 OK")
+        parts.append("Gemini 키 OK")
     else:
-        parts.append("⚪ Gemini 키 없음")
+        parts.append("Gemini 키 없음")
     parts.append(f"기능 A~F 매핑: {sum(1 for f in features if f.ok)}/{len(features)}")
     summary = " · ".join(parts)
 
     return LLMStatusResponse(
         status=status,
         summary=summary,
+        routing=routing,
         ollama=ollama,
         gemini=gemini,
         features=features,

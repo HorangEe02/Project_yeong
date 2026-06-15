@@ -10,6 +10,8 @@ export interface EquipRow {
   state: EquipState;
   cpk: number;
   alarm: number;
+  dataClass?: string;
+  sourceSystem?: string;
 }
 
 export interface ProcessHealthDisplay {
@@ -18,6 +20,8 @@ export interface ProcessHealthDisplay {
   cpk: number;
   viol: number;
   rules: string[];
+  dataClass?: string;
+  sourceSystem?: string;
 }
 
 export interface MoldDisplay {
@@ -26,6 +30,12 @@ export interface MoldDisplay {
   shots: number;
   max: number;
   risk: RiskLevel;
+  // W6 (P2) — XGBoost 예측 설명 필드 (백엔드 MoldItem 그대로 전달, 없으면 null)
+  predictedReplaceDate?: string | null;
+  ci?: [number, number] | null;
+  predictedRemaining?: number | null;
+  dataClass?: string;
+  sourceSystem?: string;
 }
 
 export interface MaintCostDisplay {
@@ -70,5 +80,6 @@ export interface MLEngineDisplay {
   name: string;
   p99: string;
   model: string;
+  status: 'online' | 'offline' | 'warning';
   online: boolean;
 }

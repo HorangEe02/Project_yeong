@@ -52,17 +52,199 @@ class DraftExportRequest(BaseModel):
 # Day 8 Phase 1 — 신규 5 엔드포인트 스키마
 # ═══════════════════════════════════════════════════════════
 
+# ── B6 v4.0 — 메일 발송 인터페이스 + 첨부 추천 ─────────────────
+
+
+class MailRecipientPayload(BaseModel):
+    email: str
+    name: str = ""
+
+
+class MailSendRequest(BaseModel):
+    """발송 요청 — 어댑터 (mock/SMTP/Graph) 가 처리."""
+
+    subject: str
+    body: str
+    body_format: Literal["markdown", "html", "text"] = "markdown"
+    to: list[MailRecipientPayload] = Field(default_factory=list)
+    cc: list[MailRecipientPayload] = Field(default_factory=list)
+    bcc: list[MailRecipientPayload] = Field(default_factory=list)
+    attachments: list[str] = Field(default_factory=list)
+    doc_type: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    # Feature B Sprint 1 P0 (plan §14.2) — mail send guard fields.
+    # version_id: 승인된 version_db row id. 0 = 미전달 → 가드가 412 block_no_version.
+    version_id: int = Field(default=0, ge=0, description="승인된 version_db row id")
+    # acknowledged_external: 외부 도메인 발송 시 사용자가 확인했는지.
+    acknowledged_external: bool = Field(default=False, description="외부 도메인 발송 확인 체크")
+    # watermark_id: docx/pdf/hwpx exporter 가 산출한 SHA1 8자. 감사 추적용.
+    watermark_id: str = Field(default="", description="export 단계에서 부여된 워터마크 ID")
+
+
+class MailSendResponse(BaseModel):
+    ok: bool
+    message_id: str = ""
+    sent_at: str = ""
+    adapter: str = ""
+    detail: str = ""
+
+
+class AttachmentSuggestionItem(BaseModel):
+    label: str
+    description: str = ""
+    required: bool = False
+    file_hint: str = ""
+
+
+class AttachmentRecommendResponse(BaseModel):
+    doc_type: str
+    items: list[AttachmentSuggestionItem]
+    required_labels: list[str]
+
+
+# ── B4 v4.0 — 버전 관리 (사용자별 영속 + 단일 검토자) ──────────
+
+
+class VersionSaveRequest(BaseModel):
+    """초안 새 버전 저장 요청."""
+
+    doc_type: str
+    title: str = ""
+    rendered_text: str
+    template_vars: dict[str, Any] = Field(default_factory=dict)
+    change_summary: str = "초기 작성"
+    document_id: int | None = None  # 기존 문서면 새 버전, 없으면 새 문서 생성
+
+
+class VersionSaveResponse(BaseModel):
+    document_id: int
+    version_id: int
+    version_num: int
+
+
+class VersionListItem(BaseModel):
+    version_id: int
+    document_id: int
+    version_num: int
+    change_summary: str = ""
+    created_at: str = ""
+    created_by: str = ""
+    status: str = "draft"  # draft | under_review | approved | rejected
+    reviewer_id: str = ""
+    reviewed_at: str = ""
+    review_note: str = ""
+    doc_type: str = ""
+    title: str = ""
+    author: str = ""
+    department: str = ""
+
+
+class VersionListResponse(BaseModel):
+    items: list[VersionListItem]
+    total: int
+
+
+class VersionReviewRequest(BaseModel):
+    """검토 액션 (submit / approve / reject)."""
+
+    action: Literal["submit", "approve", "reject"]
+    reviewer_id: str
+    note: str = ""
+
+
+class VersionDetailResponse(BaseModel):
+    """단일 버전의 본문 + 메타. rollback / 비교용."""
+
+    version_id: int
+    document_id: int
+    version_num: int
+    rendered_text: str
+    template_vars: dict[str, Any] = Field(default_factory=dict)
+    change_summary: str = ""
+    created_at: str = ""
+    created_by: str = ""
+    status: str = "draft"
+    reviewer_id: str = ""
+    reviewed_at: str = ""
+    review_note: str = ""
+    doc_type: str = ""
+    title: str = ""
+    author: str = ""
+    department: str = ""
+
+
+# ── B3 v4.0 — POST /draft/partial-edit ────────────────────────
+
+
+class PartialEditSection(BaseModel):
+    """단일 섹션 메타. 클라이언트에서 본문 파싱 결과 표시용."""
+
+    index: int
+    marker: str = ""
+    title: str = ""
+    start: int = 0
+    end: int = 0
+    preview: str = ""  # 첫 80자 정도 — 호버 시 노출
+
+
+class PartialEditScanRequest(BaseModel):
+    """본문 → 섹션 리스트 추출 (LLM 호출 없음)."""
+
+    body: str
+
+
+class PartialEditScanResponse(BaseModel):
+    sections: list[PartialEditSection]
+    total: int
+
+
+class PartialEditRequest(BaseModel):
+    """타겟 섹션 한 단락만 LLM 으로 재작성."""
+
+    body: str
+    target_section_index: int
+    instruction: str
+    doc_type: str = ""
+    tone: str = "표준"
+
+
+class PartialEditResponse(BaseModel):
+    """전체 본문(섹션 교체 적용) + 변경된 섹션 본문."""
+
+    new_body: str
+    new_section_content: str
+    target_section_index: int
+    model: str = ""
+    provider: str = ""
+
+
 # ── 1. GET /draft/doc-types ───────────────────────────────────
 
 
+class VarMetadata(BaseModel):
+    """B2 — 변수 입력 폼 메타 (필수★ + 그룹 + placeholder 예시)."""
+
+    name: str
+    label_ko: str = ""
+    required: bool = False
+    group: str = "내용"  # "수신/발신" | "기본" | "내용" | "일정" | "참조"
+    placeholder: str = ""
+
+
 class DocTypeMeta(BaseModel):
-    """13 문서 유형 메타 (canonical Draft.jsx 매핑)."""
+    """문서 유형 메타. v4.0 에서 카드 미리보기·가이드·부서 추천 필드 추가."""
 
     id: str
     category: Literal["internal", "external"]
     name_ko: str
     name_en: str = ""
     required_fields: list[str] = Field(default_factory=list)
+    # B1 — 카드 hover 미리보기 + 가이드 + 부서 추천 배지
+    usage_hint: str = ""           # "이럴 때 씁니다" 한 줄 설명
+    dept_recommend: list[str] = Field(default_factory=list)  # 추천 부서 (예: ["품질보증팀"])
+    example_output: str = ""       # 카드 hover 시 노출할 출력 한 줄
+    var_metadata: list[VarMetadata] = Field(default_factory=list)
 
 
 class DocTypeListResponse(BaseModel):
@@ -98,9 +280,9 @@ class CCRecRequest(BaseModel):
 
 
 class CCGroup(BaseModel):
-    """CC 그룹 (필수/권장/선택)."""
+    """CC 그룹 (필수/권장/자주 함께 보낸/선택). v4.0 — frequent 티어 추가."""
 
-    tier: Literal["required", "recommended", "optional"]
+    tier: Literal["required", "recommended", "frequent", "optional"]
     label_ko: str
     label_en: str
     departments: list[str] = Field(default_factory=list)
@@ -218,7 +400,12 @@ class LLMOption(BaseModel):
     blocked: bool = False  # Feature B 에서 보안상 차단됨
     blocked_reason: str = ""
     # v3.3 Feature C — exaone 패밀리 추가 (한국어 특화)
-    family: Literal["qwen", "gemma", "gemini", "exaone", "other"] = "other"
+    # v3.5 — nemotron 패밀리 (NVIDIA 대형) 추가
+    family: Literal["qwen", "gemma", "gemini", "exaone", "nemotron", "other"] = "other"
+    # v3.5 — 사용자 친화 호버 카드 + Use case 그룹화 (config.py MODEL_PROFILES 에서 추출)
+    summary_ko: str = ""
+    use_when_ko: str = ""
+    use_case: Literal["korean", "multilingual", "vision", "reasoning"] = "multilingual"
 
 
 class LLMOptionsResponse(BaseModel):

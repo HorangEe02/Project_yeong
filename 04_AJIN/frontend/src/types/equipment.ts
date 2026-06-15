@@ -5,6 +5,13 @@ export type Severity = 'critical' | 'warning' | 'info';
 export type RiskLevel = 'critical' | 'warning' | 'normal';
 export type ProcessStatus = 'good' | 'warning' | 'critical';
 export type EngineStatus = 'online' | 'offline' | 'warning';
+export type DataClass = 'real' | 'synthetic' | 'system' | 'unknown';
+
+export interface LineageFields {
+  data_class: DataClass;
+  source_system: string;
+  source_label: string;
+}
 
 export type EquipmentSubTab = 'overview' | 'alerts' | 'equipment' | 'predictive' | 'ml';
 
@@ -13,7 +20,7 @@ export type ProcessSlug = 'cch' | 'obc' | 'bumper_beam' | 'door' | 'ball_seat' |
 
 // ── Overview ────────────────────────────────────────────────
 
-export interface ProcessHealthCard {
+export interface ProcessHealthCard extends LineageFields {
   process_id: string;
   process_name: string;
   status: ProcessStatus;
@@ -25,7 +32,7 @@ export interface ProcessHealthCard {
   anomaly_rate: number;
 }
 
-export interface EquipmentTypeCard {
+export interface EquipmentTypeCard extends LineageFields {
   type: string;
   icon: string;
   codes: number;
@@ -44,7 +51,7 @@ export interface DashboardMetrics {
   inspections_recent: number;
 }
 
-export interface MLAlert {
+export interface MLAlert extends LineageFields {
   level: string;
   source: string;
   message: string;
@@ -59,7 +66,7 @@ export interface OverviewResponse {
 
 // ── SPC ─────────────────────────────────────────────────────
 
-export interface NelsonViolation {
+export interface NelsonViolation extends LineageFields {
   rule_number: number;
   rule_name: string;
   description: string;
@@ -69,7 +76,7 @@ export interface NelsonViolation {
   chart_annotation: string;
 }
 
-export interface SPCData {
+export interface SPCData extends LineageFields {
   process_id: string;
   process_name: string;
   timestamps: number[];
@@ -93,7 +100,7 @@ export interface SPCResponse {
   violation_count: number;
 }
 
-export interface RecentViolation {
+export interface RecentViolation extends LineageFields {
   id: string;
   process_id: string;
   process_name: string;
@@ -110,7 +117,7 @@ export interface ViolationsResponse {
 
 // ── Error Search ────────────────────────────────────────────
 
-export interface ErrorSearchResult {
+export interface ErrorSearchResult extends LineageFields {
   code: string;
   equipment_type: string;
   category: string;
@@ -127,7 +134,7 @@ export interface CausalityInfo {
   actions: string[];
 }
 
-export interface ManualExcerpt {
+export interface ManualExcerpt extends LineageFields {
   content: string;
   source: string;
   page: string;
@@ -152,7 +159,7 @@ export interface ErrorCategoriesResponse {
 
 // ── Markov ──────────────────────────────────────────────────
 
-export interface MarkovPrediction {
+export interface MarkovPrediction extends LineageFields {
   code: string;
   category: string;
   equipment_type: string;
@@ -186,7 +193,7 @@ export interface MarkovResponse {
 
 // ── Mold ────────────────────────────────────────────────────
 
-export interface MoldItem {
+export interface MoldItem extends LineageFields {
   mold_id: string;
   mold_name: string;
   mold_type: string;
@@ -212,7 +219,7 @@ export interface MoldsResponse {
 
 // ── MTBF ────────────────────────────────────────────────────
 
-export interface MTBFItem {
+export interface MTBFItem extends LineageFields {
   machine_id: string;
   machine_name: string;
   total_repairs: number;
@@ -241,7 +248,7 @@ export interface MTBFResponse {
 
 // ── ML Engines ──────────────────────────────────────────────
 
-export interface MLEngineStatus {
+export interface MLEngineStatus extends LineageFields {
   id: string;
   name_en: string;
   name_ko: string;
@@ -271,7 +278,7 @@ export interface ChecklistItem {
   unit: string;
 }
 
-export interface ChecklistTemplate {
+export interface ChecklistTemplate extends LineageFields {
   id: number;
   template_name: string;
   equipment_type: string;
@@ -284,7 +291,7 @@ export interface InspectionChecklistResponse {
   total: number;
 }
 
-export interface SPCUploadResponse {
+export interface SPCUploadResponse extends LineageFields {
   process_id: string;
   n_samples: number;
   mean: number;
@@ -292,4 +299,23 @@ export interface SPCUploadResponse {
   cpk: number | null;
   grade: string;
   violation_count: number;
+}
+
+// W8 — Daily Headline (공장장 시점 한 줄 요약)
+export interface HeadlineItem {
+  severity: 'critical' | 'warning' | 'normal';
+  label: string;
+  detail: string;
+  target_module: '' | 'spc' | 'predictive' | 'alerts';
+  target_id: string;
+  data_class: DataClass;
+  source_system: string;
+  source_label: string;
+}
+
+export interface HeadlineResponse {
+  generated_at: string;
+  summary: string;
+  items: HeadlineItem[];
+  active_alarm_count: number;
 }

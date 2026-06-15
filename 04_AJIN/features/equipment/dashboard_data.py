@@ -5,10 +5,27 @@
 - ML 경고 통합
 """
 
+import importlib
 import sqlite3
 from datetime import date, timedelta
 from typing import Dict, List
 from pathlib import Path
+
+from core.data_lineage import should_include_non_real_data
+
+
+def _real_where(base: str = "1=1") -> str:
+    """Return a WHERE predicate honoring production real-data mode.
+
+    Args:
+        base: Existing SQL predicate.
+
+    Returns:
+        Predicate that excludes synthetic/demo rows in production mode.
+    """
+    if should_include_non_real_data():
+        return base
+    return f"({base}) AND data_class='real'"
 
 
 def get_equipment_summary() -> Dict:
@@ -27,14 +44,15 @@ def get_equipment_summary() -> Dict:
     if ec_db.exists():
         try:
             conn = sqlite3.connect(str(ec_db))
-            total = conn.execute("SELECT COUNT(*) FROM error_codes").fetchone()[0]
+            total = conn.execute(f"SELECT COUNT(*) FROM error_codes WHERE {_real_where()}").fetchone()[0]
             summary["error_codes"]["total"] = total
             for row in conn.execute(
-                "SELECT equipment_type, COUNT(*) FROM error_codes GROUP BY equipment_type"
+                f"SELECT equipment_type, COUNT(*) FROM error_codes WHERE {_real_where()} GROUP BY equipment_type"
             ):
                 summary["error_codes"]["by_type"][row[0]] = row[1]
+            critical_where = _real_where("severity='critical'")
             critical = conn.execute(
-                "SELECT COUNT(*) FROM error_codes WHERE severity='critical'"
+                f"SELECT COUNT(*) FROM error_codes WHERE {critical_where}"
             ).fetchone()[0]
             summary["error_codes"]["critical"] = critical
             conn.close()
@@ -47,7 +65,7 @@ def get_equipment_summary() -> Dict:
         try:
             conn = sqlite3.connect(str(mold_db))
             conn.row_factory = sqlite3.Row
-            molds = conn.execute("SELECT * FROM molds").fetchall()
+            molds = conn.execute(f"SELECT * FROM molds WHERE {_real_where()}").fetchall()
             conn.close()
             summary["molds"]["total"] = len(molds)
             for m in molds:
@@ -85,7 +103,7 @@ def get_equipment_summary() -> Dict:
     if draw_db.exists():
         try:
             conn = sqlite3.connect(str(draw_db))
-            summary["drawings"]["total"] = conn.execute("SELECT COUNT(*) FROM drawings").fetchone()[0]
+            summary["drawings"]["total"] = conn.execute(f"SELECT COUNT(*) FROM drawings WHERE {_real_where()}").fetchone()[0]
             conn.close()
         except Exception:
             pass
@@ -132,7 +150,7 @@ def get_equipment_type_status() -> List[Dict]:
         try:
             conn = sqlite3.connect(str(ec_db))
             for row in conn.execute(
-                "SELECT equipment_type, COUNT(*) FROM error_codes GROUP BY equipment_type"
+                f"SELECT equipment_type, COUNT(*) FROM error_codes WHERE {_real_where()} GROUP BY equipment_type"
             ):
                 type_counts[row[0]] = row[1]
             conn.close()
@@ -152,15 +170,81 @@ def get_equipment_type_status() -> List[Dict]:
     return result
 
 
+def _load_module(module_name: str):
+    """Import a Feature F module without initializing model singletons.
+
+    Args:
+        module_name: Fully qualified module name.
+
+    Returns:
+        Imported module object when dependencies are available, otherwise None.
+    """
+
+    try:
+        return importlib.import_module(module_name)
+    except Exception:
+        return None
+
+
+def _has_any_file(path: Path, pattern: str) -> bool:
+    """Check whether a data directory contains at least one expected artifact.
+
+    Args:
+        path: Directory to inspect.
+        pattern: Glob pattern for required files.
+
+    Returns:
+        True when the directory exists and contains at least one matching file.
+    """
+
+    return path.exists() and any(path.glob(pattern))
+
+
 def get_ml_status() -> Dict:
-    """ML 모델 상태 요약 — 파일 존재 여부로 경량 판단 (모델 초기화 없음)"""
-    # 모델 초기화 없이 데이터/모델 파일 존재 여부로 판단 (< 1ms)
+    """Return deployable status for the 7 Feature F ML/search engines.
+
+    The check intentionally avoids loading model pickles or fitting estimators.
+    It verifies that each module can import in the current runtime and that the
+    minimal data artifacts needed to execute the public route are present.
+
+    Returns:
+        Mapping of stable status keys to readiness booleans.
+    """
+
+    ml_search = _load_module("features.equipment.ml_error_search")
+    spc_ml = _load_module("features.equipment.spc_ml_predictor")
+    mold_ml = _load_module("features.equipment.mold_ml_predictor")
+    markov = _load_module("features.equipment.markov_predictor")
+    maintenance = _load_module("features.equipment.maintenance_predictor")
+    causality = _load_module("features.equipment.error_causality")
+    manual_rag = _load_module("features.equipment.manual_rag")
+
+    error_tfidf_ready = ml_search is not None and Path("data/equipment/error_codes.db").exists()
+    spc_ready = spc_ml is not None and _has_any_file(Path("data/spc_ml"), "*.csv")
+
+    mold_training = Path("data/mold_ml/mold_training_data.csv").exists()
+    mold_cached = Path("data/mold_ml/xgb_mold_life.pkl").exists()
+    mold_runtime_can_load_cache = bool(getattr(mold_ml, "XGBOOST_AVAILABLE", False)) if mold_ml else False
+    mold_ready = mold_ml is not None and (mold_training or (mold_cached and mold_runtime_can_load_cache))
+
+    markov_ready = markov is not None and (
+        Path("data/markov_ml/markov_model.pkl").exists()
+        or Path("data/markov_ml/event_sequences.json").exists()
+    )
+    mtbf_ready = maintenance is not None
+    causality_ready = causality is not None and bool(getattr(causality, "CAUSALITY_RULES", None))
+    manual_ready = manual_rag is not None and _has_any_file(Path("data/equipment/manuals"), "*")
+
     return {
         "intent_classifier": Path("data/intent_ml").exists(),
-        "error_tfidf": Path("data/equipment/error_codes.db").exists(),
-        "spc_anomaly": Path("data/spc_ml").exists() and any(Path("data/spc_ml").glob("*.csv")),
-        "mold_xgboost": Path("data/mold_ml/mold_training_data.csv").exists(),
-        "markov": Path("data/markov_ml/event_sequences.json").exists(),
-        "doc_quality": True,  # 규칙 기반
-        "reg_risk": Path("data/regulation_ml").exists(),
+        "error_tfidf": error_tfidf_ready,
+        "spc_anomaly": spc_ready,
+        "mold_xgboost": mold_ready,
+        "markov": markov_ready,
+        "rf_mtbf": mtbf_ready,
+        "causality": causality_ready,
+        "manual_rag": manual_ready,
+        # Backward-compatible aliases for older callers.
+        "doc_quality": causality_ready,
+        "reg_risk": manual_ready,
     }

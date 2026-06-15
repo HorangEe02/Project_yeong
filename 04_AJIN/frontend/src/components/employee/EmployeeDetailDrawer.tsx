@@ -1,11 +1,19 @@
 // EmployeeDetailDrawer — Module A 인원 상세 패널.
 // 디자인 시스템 v3.5 (HUD): 2px radius, 골드 강조, 영문 eyebrow + 한글 본문, 이모지 미사용.
 
-import { Mail, Phone, Building2, IdCard, MapPin, Briefcase, Hash, Users } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Mail, Phone, Building2, IdCard, MapPin, Briefcase, Hash, Users, AtSign, MessageSquare, Star } from 'lucide-react';
 import { Drawer } from '@components/ui/Drawer';
 import { Button } from '@components/ui/Button';
 import { Badge } from '@components/ui/Badge';
+import { EmployeeExtrasSection } from '@components/employee/EmployeeExtrasSection';
+import { DigitalEmployeeBadge } from '@components/employee/DigitalEmployeeBadge';
 import type { FilteredEmployee } from '@lib/visibility';
+import {
+  isFavoritePerson,
+  toggleFavoritePerson,
+  subscribeHistoryChanges,
+} from '@lib/searchHistory';
 
 interface Props {
   employee: FilteredEmployee | null;
@@ -15,6 +23,9 @@ interface Props {
   onMail?: (emp: FilteredEmployee) => void;
   onDraft?: (emp: FilteredEmployee) => void;
   onCall?: (emp: FilteredEmployee) => void;
+  /** W3 — 멘션 복사(클립보드) / 챗봇 문의(/chat 진입) */
+  onMention?: (emp: FilteredEmployee) => void;
+  onAskChat?: (emp: FilteredEmployee) => void;
   /** 키보드 네비게이션용 인접 인원 핸들러. */
   onPrev?: () => void;
   onNext?: () => void;
@@ -95,9 +106,21 @@ export function EmployeeDetailDrawer({
   onMail,
   onDraft,
   onCall,
+  onMention,
+  onAskChat,
   onPrev,
   onNext,
 }: Props) {
+  // W4 — 즐겨찾기 상태 (employee 변경 / localStorage 변경 시 갱신)
+  const [isFav, setIsFav] = useState(false);
+  useEffect(() => {
+    if (!employee) return;
+    setIsFav(isFavoritePerson(employee.id));
+    return subscribeHistoryChanges(() => {
+      if (employee) setIsFav(isFavoritePerson(employee.id));
+    });
+  }, [employee]);
+
   if (!employee) {
     return (
       <Drawer isOpen={isOpen} onClose={onClose} side="right" width={420} title="인원 상세">
@@ -107,6 +130,16 @@ export function EmployeeDetailDrawer({
   }
 
   const e = employee;
+  const handleToggleFav = () => {
+    const nowFav = toggleFavoritePerson({
+      id: e.id,
+      name: e.name,
+      team: e.team,
+      position: e.position,
+      email: e.visibility === 'FULL' ? e.email : undefined,
+    });
+    setIsFav(nowFav);
+  };
   const visibilityFull = e.visibility === 'FULL';
   const phoneRaw = e.mobile || '';
   const phoneClean = phoneRaw.replace(/[^0-9]/g, '');
@@ -114,27 +147,21 @@ export function EmployeeDetailDrawer({
   return (
     <Drawer isOpen={isOpen} onClose={onClose} side="right" width={420} title="인원 상세">
       <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {/* ── 헤더: 아바타 + 이름/직급/마스킹 뱃지 ─────────────── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: 2,
-              background:
-                'linear-gradient(135deg, var(--hud-primary) 0%, var(--hud-primary-light, #FFD066) 100%)',
-              color: 'var(--hud-bg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 18,
-              fontWeight: 800,
-              letterSpacing: '0.04em',
+        {/* ── 헤더: 디지털 사원증 + 이름/직급/마스킹 뱃지 ─────────────── */}
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 4 }}>
+          <DigitalEmployeeBadge
+            employee={{
+              name: e.name,
+              employeeId: e.id ? String(e.id) : '—',
+              team: e.team,
+              position: e.position,
+              hq: e.hq,
+              photoUrl: null, // PR #2 에서 photo_url 필드 추가 시 e.photoUrl 로 교체
             }}
-            aria-hidden
-          >
-            {e.name.slice(-2)}
-          </div>
+            variant="compact"
+          />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               className="label-en"
@@ -146,22 +173,85 @@ export function EmployeeDetailDrawer({
             <div style={{ fontSize: 13, color: 'var(--hud-text-dim)', marginTop: 2 }}>
               {e.position} · {e.hq}
             </div>
-            <div style={{ marginTop: 6 }}>
+            <div style={{ marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
               {visibilityFull ? (
                 <Badge status="ok">FULL ACCESS · 전체 조회</Badge>
               ) : (
                 <Badge status="warn">MASKED · 일부 마스킹</Badge>
               )}
+              {/* W4 — 즐겨찾기 토글 (lg-btn 캐노니컬 패턴) */}
+              <button
+                type="button"
+                onClick={handleToggleFav}
+                aria-pressed={isFav}
+                aria-label={isFav ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+                title={isFav ? '즐겨찾기 해제' : '즐겨찾기에 추가'}
+                className={`lg-btn ${isFav ? '' : 'ghost'} sm`}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Star
+                  size={12}
+                  strokeWidth={2}
+                  fill={isFav ? 'currentColor' : 'none'}
+                />
+                {isFav ? '즐겨찾기됨' : '즐겨찾기'}
+              </button>
             </div>
           </div>
         </div>
 
-        {/* ── 빠른 액션 ───────────────────────────────────────── */}
-        <div style={{ display: 'flex', gap: 8 }}>
-          {onMail && visibilityFull && (
-            <Button variant="primary" size="sm" onClick={() => onMail(e)}>
-              <Mail size={14} strokeWidth={1.5} style={{ marginRight: 6 }} />
-              메일 보내기
+        {/* ── W3 빠른 액션 4종 (메일 / 멘션 / 초안 / 챗봇) + 전화 (옵션) ─── */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: 8,
+          }}
+        >
+          {onMail && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => onMail(e)}
+              disabled={!e.email}
+              icon={<Mail size={14} strokeWidth={1.5} />}
+              title={e.email ? '메일 보내기' : '이메일 정보 없음'}
+            >
+              메일
+            </Button>
+          )}
+          {onMention && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onMention(e)}
+              icon={<AtSign size={14} strokeWidth={1.5} />}
+              title="멘션 형식으로 클립보드에 복사"
+            >
+              멘션 복사
+            </Button>
+          )}
+          {onDraft && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onDraft(e)}
+              disabled={!visibilityFull}
+              icon={<Mail size={14} strokeWidth={1.5} />}
+              title={visibilityFull ? '이 사람에게 보내는 초안 작성' : '권한이 제한된 사원입니다'}
+            >
+              초안 작성
+            </Button>
+          )}
+          {onAskChat && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onAskChat(e)}
+              icon={<MessageSquare size={14} strokeWidth={1.5} />}
+              title="챗봇으로 더 알아보기"
+            >
+              챗봇 문의
             </Button>
           )}
           {onCall && visibilityFull && phoneClean && (
@@ -172,14 +262,11 @@ export function EmployeeDetailDrawer({
                 if (onCall) onCall(e);
                 window.location.href = `tel:${phoneClean}`;
               }}
+              icon={<Phone size={14} strokeWidth={1.5} />}
+              title="휴대전화 걸기"
+              style={{ gridColumn: '1 / -1' }}
             >
-              <Phone size={14} strokeWidth={1.5} style={{ marginRight: 6 }} />
-              전화
-            </Button>
-          )}
-          {onDraft && (
-            <Button variant="ghost" size="sm" onClick={() => onDraft(e)}>
-              문서 작성 →
+              전화 {phoneClean}
             </Button>
           )}
         </div>
@@ -216,14 +303,17 @@ export function EmployeeDetailDrawer({
             icon={Mail}
             eyebrow="EMAIL"
             label="이메일"
-            value={visibilityFull ? e.email : e.emailMasked}
+            value={e.email || '—'}
             mono
-            href={visibilityFull ? `mailto:${e.email}` : undefined}
+            href={e.email ? `mailto:${e.email}` : undefined}
           />
           <InfoRow icon={MapPin} eyebrow="PLANT" label="사업장" value={e.plant} />
           {/* 마지막 행 — borderBottom 제거 */}
           <div style={{ height: 4 }} />
         </div>
+
+        {/* ── W7 부가 정보 (출장/직속부하/결재) — 권한 분기 ─── */}
+        <EmployeeExtrasSection employeeId={e.id} />
 
         {/* ── 인접 인원 네비게이션 (선택) ───────────────────── */}
         {(onPrev || onNext) && (
@@ -249,13 +339,13 @@ export function EmployeeDetailDrawer({
           </div>
         )}
 
-        {/* ── 마스킹 안내 ─────────────────────────────────────── */}
+        {/* ── 마스킹 안내 (F5 — 휴대전화만 마스킹) ─────────────── */}
         {!visibilityFull && (
           <div
             style={{
               padding: 12,
               border: '1px dashed var(--hud-border, #2A2520)',
-              borderRadius: 2,
+              borderRadius: 12,
               fontSize: 12,
               color: 'var(--hud-text-muted)',
               lineHeight: 1.6,
@@ -263,8 +353,9 @@ export function EmployeeDetailDrawer({
           >
             <strong style={{ color: 'var(--hud-orange, #E8A317)' }}>제한 모드</strong>
             <br />
-            타 본부·부서 인원은 사내 보안 정책에 따라 휴대전화·이메일이 일부 마스킹되어 표시됩니다.
-            상세 조회가 필요하면 인사관리팀에 문의하세요.
+            타 본부·부서 인원은 휴대전화만 일부 마스킹되어 표시됩니다. 내선번호와 사내
+            이메일은 협업 자산으로 공개되며, 휴대전화 등 상세 개인정보는 인사관리팀이 별도
+            관리합니다.
           </div>
         )}
       </div>

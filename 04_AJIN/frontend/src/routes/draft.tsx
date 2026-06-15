@@ -3,10 +3,14 @@
 // Phase 2: 기본 UI + 3탭 + selector + SSE 스트리밍 + 7포맷 다운로드 + 품질/CC/Diff 카드.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { useUIStore, type DraftPageTab } from '@store/ui';
 import { useDraftStore } from '@store/draft';
+import { useAuthStore } from '@store/auth';
+import { useToast } from '@store/toast';
 import { useSSE } from '@hooks/useSSE';
+import { useIsMobile } from '@hooks/useBreakpoint';
+import { AJINMobileDraft } from '@components/uikit/AJINMobileDraft';
 import {
   fetchDocTypes,
   recommendCC,
@@ -15,6 +19,7 @@ import {
   buildStreamV2Request,
   fetchDiagnose,
   fetchLlmOptions,
+  prefillTemplate,
   uploadReference,
 } from '@api/draft';
 import type {
@@ -25,10 +30,17 @@ import type {
   LLMProvider,
   UploadReferenceResponse,
 } from '@/types/draft';
-import { Upload, FileText, X as XIcon, AlertCircle } from 'lucide-react';
 import { formatDraftOutput } from '@lib/formatDraftOutput';
 import { DownloadActions } from '@components/common/DownloadActions';
 import { autoPersistDraft, loadHistory, deleteDraft as firestoreDeleteDraft } from '@lib/firestore-draft';
+import { TemplateCard } from '@components/draft/TemplateCard';
+import { TemplateUploadCard } from '@components/draft/TemplateUploadCard';
+import { VariableForm } from '@components/draft/VariableForm';
+import { DraftBodyView } from '@components/draft/DraftBodyView';
+import { VersionTimeline } from '@components/draft/VersionTimeline';
+import { MailSendModal } from '@components/draft/MailSendModal';
+import { ModelHelpPopover } from '@components/common/ModelHelpPopover';
+import { ModelSelect } from '@components/chat/ModelSelect';
 import type { DraftDocument } from '@/types/draft';
 
 // ──────────────────────────────────────────────────────────────────
@@ -45,10 +57,13 @@ const MOCK_DOC_TYPES: DocTypeMeta[] = [
   { id: 'internal_email', category: 'internal', name_ko: '사내 이메일',   name_en: 'Internal Email',  required_fields: ['recipient', 'subject'] },
   { id: 'meeting_min',    category: 'internal', name_ko: '회의록',       name_en: 'Meeting Minutes', required_fields: ['date', 'attendees'] },
   { id: 'weekly_report',  category: 'internal', name_ko: '주간 보고',     name_en: 'Weekly Report',   required_fields: ['week', 'summary'] },
-  { id: 'leave_request',  category: 'internal', name_ko: '휴가 신청서',   name_en: 'Leave Request',   required_fields: ['start_date', 'reason'] },
-  { id: 'quote',          category: 'internal', name_ko: '견적서',       name_en: 'Quote',           required_fields: ['customer', 'items'] },
-  { id: 'travel_report',  category: 'internal', name_ko: '출장 보고서',   name_en: 'Travel Report',   required_fields: ['destination', 'purpose'] },
-  { id: 'spc_report',     category: 'internal', name_ko: 'SPC Report',   name_en: 'SPC Report',      required_fields: ['process', 'period'] },
+  { id: 'leave_request',          category: 'internal', name_ko: '휴가 신청서',     name_en: 'Leave Request',         required_fields: ['start_date', 'reason'] },
+  { id: 'business_trip_request',  category: 'internal', name_ko: '출장 신청서',     name_en: 'Business Trip Request', required_fields: ['destination', 'purpose'] },
+  { id: 'resignation_letter',     category: 'internal', name_ko: '사직서',          name_en: 'Resignation Letter',    required_fields: ['last_work_date', 'reason'] },
+  { id: 'personnel_notice',       category: 'internal', name_ko: '인사발령 통지',   name_en: 'Personnel Notice',      required_fields: ['target_employee', 'effective_date'] },
+  { id: 'quote',                  category: 'internal', name_ko: '견적서',          name_en: 'Quote',                 required_fields: ['customer', 'items'] },
+  { id: 'travel_report',          category: 'internal', name_ko: '출장 보고서',     name_en: 'Travel Report',         required_fields: ['destination', 'purpose'] },
+  { id: 'spc_report',             category: 'internal', name_ko: 'SPC Report',     name_en: 'SPC Report',            required_fields: ['process', 'period'] },
 ];
 
 const TONES = [
@@ -118,7 +133,7 @@ function _diagnoseHint(d: DiagnoseResponse): string {
 
   // 2) 진정한 Gemini 단독 모드 (OLLAMA_BASE_URL 빈값 + Gemini 키 OK)
   if (!d.ollama.ok && d.gemini.ok && d.templates.ok && d.prompts.ok && !isLocalOllamaIntended) {
-    return '클라우드 시연 환경 — 로컬 Ollama 대신 Gemini 2.5 Pro 로 자동 동작합니다.';
+    return '클라우드 시연 환경 — 로컬 Ollama 대신 Gemini 3.5 Flash 로 자동 동작합니다.';
   }
 
   if (!d.ollama.ok) return `Ollama 미기동 — 로컬 시연 시 \`ollama serve\` 실행 또는 클라우드 환경에서 Gemini 사용`;
@@ -143,9 +158,17 @@ const MAIN_TABS: { k: DraftPageTab; en: string; ko: string }[] = [
 // ──────────────────────────────────────────────────────────────────
 
 export function Draft() {
+  const isMobile = useIsMobile();
+  if (isMobile) return <AJINMobileDraft />;
+  return <DraftDesktop />;
+}
+
+function DraftDesktop() {
   // ── Tab state (persist) ────────────────────────────────
   const tab = useUIStore((s) => s.draftPageTab);
   const setTab = useUIStore((s) => s.setDraftPageTab);
+  const currentUser = useAuthStore((s) => s.user);
+  const canViewDiagnostics = (currentUser?.role_level ?? 0) >= 5;
 
   // ── Draft state ────────────────────────────────────────
   const docTypes = useDraftStore((s) => s.docTypes);
@@ -158,6 +181,111 @@ export function Draft() {
   const setMeta = useDraftStore((s) => s.setMeta);
   const userRequest = useDraftStore((s) => s.userRequest);
   const setUserRequest = useDraftStore((s) => s.setUserRequest);
+  // 부록 4 — F-fav
+  const favoritedDocTypes = useDraftStore((s) => s.favoritedDocTypes);
+  const toggleFavorite = useDraftStore((s) => s.toggleFavorite);
+  // 부록 6 — P4-1 / P4-3 / P4-4
+  const prefsBaseVersion = useDraftStore((s) => s.prefsBaseVersion);
+  const setPrefsBaseVersion = useDraftStore((s) => s.setPrefsBaseVersion);
+  const deptRecommendations = useDraftStore((s) => s.deptRecommendations);
+  const setDeptRecommendations = useDraftStore((s) => s.setDeptRecommendations);
+  const personalPicks = useDraftStore((s) => s.personalPicks);
+  const setPersonalPicks = useDraftStore((s) => s.setPersonalPicks);
+  // 부록 4 — F-toast (부록 5 P3-4 — TTL 적용)
+  const { addToast } = useToast();
+  useEffect(() => {
+    const KEY = 'ajin_draft_toast:v2';
+    const TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7일
+    import('@/utils/flagTTL').then(({ isFlagFresh, markFlag }) => {
+      if (isFlagFresh(KEY)) return;
+      addToast({
+        type: 'info',
+        message:
+          '흐름이 새로 정렬됐습니다. 템플릿을 먼저 선택하면 주제/컨텍스트 영역이 활성화됩니다.',
+        duration: 6000,
+      });
+      markFlag(KEY, TTL_MS);
+    });
+  }, []);
+
+  // 부록 5 P3-1 + 부록 6 P4-1/P4-3/P4-4 — 마운트 시 서버에서 prefs/추천 fetch
+  useEffect(() => {
+    let cancelled = false;
+    import('@api/draft').then((m) => {
+      // P3-1 + P4-4: prefs + base_version
+      m.fetchDraftPrefsV2()
+        .then((r) => {
+          if (cancelled) return;
+          const serverFavs = r.favorited_doc_types ?? [];
+          setPrefsBaseVersion(r.updated_at ?? '');
+          if (serverFavs.length > 0) {
+            const state = useDraftStore.getState();
+            if (
+              serverFavs.length !== state.favoritedDocTypes.length ||
+              !serverFavs.every((id) => state.favoritedDocTypes.includes(id))
+            ) {
+              useDraftStore.setState({ favoritedDocTypes: serverFavs });
+            }
+          }
+        })
+        .catch(() => {});
+      // P4-1: 부서 추천
+      m.fetchDeptRecommendations(3)
+        .then((r) => {
+          if (cancelled) return;
+          setDeptRecommendations(r.recommendations.map((x) => x.doc_type_id));
+        })
+        .catch(() => setDeptRecommendations([]));
+      // P4-3: 개인 자주 사용
+      m.fetchPersonalPicks(5)
+        .then((r) => {
+          if (cancelled) return;
+          setPersonalPicks(r.picks.map((x) => x.doc_type_id));
+        })
+        .catch(() => setPersonalPicks([]));
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 부록 5 P3-1 + 부록 6 P4-4 — 즐겨찾기 변경 시 merge PUT
+  const favSyncRef = useRef<number | null>(null);
+  const prevFavsRef = useRef<string[]>(favoritedDocTypes);
+  useEffect(() => {
+    if (favSyncRef.current !== null) {
+      window.clearTimeout(favSyncRef.current);
+    }
+    // remove_ids 계산 — 이전 상태에서 사라진 항목 (사용자 명시 제거)
+    const prevFavs = prevFavsRef.current;
+    const removedIds = prevFavs.filter((id) => !favoritedDocTypes.includes(id));
+    prevFavsRef.current = favoritedDocTypes;
+
+    favSyncRef.current = window.setTimeout(() => {
+      import('@api/draft').then(({ updateDraftPrefsMerge }) => {
+        updateDraftPrefsMerge(favoritedDocTypes, prefsBaseVersion, removedIds)
+          .then((r) => {
+            // 서버가 merge 한 결과를 다시 store 에 반영 (다른 기기 변경 흡수)
+            if (r.updated_at) setPrefsBaseVersion(r.updated_at);
+            const merged = r.favorited_doc_types ?? [];
+            if (r.conflict_detected) {
+              // silent merge — 즐겨찾기는 low-stakes (부록 6 결정)
+              useDraftStore.setState({ favoritedDocTypes: merged });
+              prevFavsRef.current = merged;
+            }
+          })
+          .catch(() => {
+            // 비인증·네트워크 오류는 무시 — 로컬 persist 가 영구 보존
+          });
+      });
+    }, 300);
+    return () => {
+      if (favSyncRef.current !== null) {
+        window.clearTimeout(favSyncRef.current);
+      }
+    };
+  }, [favoritedDocTypes, prefsBaseVersion, setPrefsBaseVersion]);
 
   // v3.6 — 사용자 업로드 참조 양식 (DOCX/PDF/HWP/HWPX/TXT/MD)
   // 업로드 → 백엔드 텍스트 추출 → uploadedRef.text 가 stream-v2 payload 의 reference_template_text 로 전달
@@ -190,24 +318,71 @@ export function Draft() {
     if (uploadInputRef.current) uploadInputRef.current.value = '';
   }, []);
 
-  // ── /search 에서 'prefillRecipient' state 와 함께 진입 시 textarea 에 자동 입력 ──
+  // ── /search 또는 /equipment 알람에서 prefill state 와 함께 진입 시 textarea 자동 입력 ──
+  // W2 (P0): /equipment AlertsSubTab → 8D Report 액션 → location.state.prefill 본문 채움
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const requestTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // v4.7 Sprint 2 P0 (축 ③) — URL 쿼리 ?template=spc_violation&violation_id=...
+  //   알람 토스트 "메일 초안" 클릭 → /draft?template=spc_violation&violation_id=v-001 진입.
+  //   prefill_engine 호출 → subject/body 채움 후 textarea + draft output 으로 주입.
+  const [spcPrefillSubject, setSpcPrefillSubject] = useState<string>('');
+  const [spcPrefillTo, setSpcPrefillTo] = useState<string>('');
+  const [spcPrefillCc, setSpcPrefillCc] = useState<string>('');
+  useEffect(() => {
+    const tmpl = searchParams.get('template');
+    const vid = searchParams.get('violation_id');
+    if (tmpl !== 'spc_violation' || !vid) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await prefillTemplate('spc_violation', vid);
+        if (cancelled) return;
+        // textarea: 사용자 인풋 영역에는 short subject 만 (LLM 호출 불필요한 직접 prefill).
+        setUserRequest(r.subject);
+        // 결과 영역 (output) 에 본문 직접 주입 — 메일 발송 모달의 body source.
+        useDraftStore.getState().setOutput(r.body);
+        setSpcPrefillSubject(r.subject);
+        setSpcPrefillTo(r.to.map((p) => p.email).filter(Boolean).join(', '));
+        setSpcPrefillCc(r.cc.map((p) => p.email).filter(Boolean).join(', '));
+        // 1회 사용 후 query param 제거 (새로고침 시 중복 호출 방지).
+        const next = new URLSearchParams(searchParams);
+        next.delete('template');
+        next.delete('violation_id');
+        setSearchParams(next, { replace: true });
+      } catch {
+        // 조회 실패 시 무시 — 사용자에게는 빈 폼.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     const s = (location.state ?? {}) as {
       prefillRecipient?: string;
       prefillPosition?: string;
       prefillTeam?: string;
       prefillEmail?: string;
+      prefill?: string;        // W2: 알람 → 8D Report 작성 본문
+      doc_type?: string;       // W2: 추천 문서 유형 (예: '8D')
     };
-    if (!s.prefillRecipient) return;
 
-    const parts = [s.prefillRecipient];
-    if (s.prefillPosition) parts.push(s.prefillPosition);
-    const who = parts.join(' ');
-    const team = s.prefillTeam ? `(${s.prefillTeam})` : '';
-    const email = s.prefillEmail ? `\n수신: ${s.prefillEmail}` : '';
-    const prefilled = `${who}${team} 앞으로 다음 내용을 작성해주세요:${email}\n\n`;
+    let prefilled = '';
+    if (s.prefillRecipient) {
+      const parts = [s.prefillRecipient];
+      if (s.prefillPosition) parts.push(s.prefillPosition);
+      const who = parts.join(' ');
+      const team = s.prefillTeam ? `(${s.prefillTeam})` : '';
+      const email = s.prefillEmail ? `\n수신: ${s.prefillEmail}` : '';
+      prefilled = `${who}${team} 앞으로 다음 내용을 작성해주세요:${email}\n\n`;
+    } else if (s.prefill) {
+      prefilled = s.prefill;
+    }
+
+    if (!prefilled) return;
 
     setUserRequest(prefilled);
 
@@ -238,6 +413,9 @@ export function Draft() {
   const hasEdits = useDraftStore((s) => s.hasEdits);
   const diff = useDraftStore((s) => s.diff);
   const setDiff = useDraftStore((s) => s.setDiff);
+
+  // B6 v4.0 — 메일 발송 모달
+  const [mailModalOpen, setMailModalOpen] = useState(false);
 
   // ── Plan v1.0 — provider/modelId 셀렉터 + stage 진행 상태 ──
   const provider = useDraftStore((s) => s.provider);
@@ -272,11 +450,14 @@ export function Draft() {
   // ── Mount: doc-types + diagnose + llm-options 병렬 로드 ──
   useEffect(() => {
     (async () => {
+      const diagnoseRequest = canViewDiagnostics
+        ? fetchDiagnose()
+        : Promise.resolve<DiagnoseResponse | null>(null);
       const [dt, dg, opt] = await Promise.allSettled([
         fetchDocTypes(),
-        fetchDiagnose(),
+        diagnoseRequest,
         fetchLlmOptions('draft'),
-      ]);
+      ] as const);
 
       // doc-types
       if (dt.status === 'fulfilled' && dt.value.items?.length) {
@@ -289,12 +470,14 @@ export function Draft() {
       }
 
       // diagnose 배너
-      if (dg.status === 'fulfilled') {
+      if (!canViewDiagnostics) {
+        setDiagnose(null);
+      } else if (dg.status === 'fulfilled' && dg.value) {
         setDiagnose(dg.value);
         if (!dg.value.summary_ok) {
           setGlobalApiError(_diagnoseHint(dg.value));
         }
-      } else {
+      } else if (dg.status === 'rejected') {
         setGlobalApiError('백엔드 연결 실패 — 시연 모드 (Mock 데이터). 백엔드 서버 가동을 확인해 주세요.');
       }
 
@@ -312,7 +495,7 @@ export function Draft() {
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [canViewDiagnostics]);
 
   // ── Plan v3.0 — diagnose + llm-options 주기적 polling (15초)
   // Cloud Run cold start / Mac sleep / Tunnel 끊김 등 환경 변화를 자동 반영.
@@ -324,13 +507,18 @@ export function Draft() {
     const tick = async () => {
       if (cancelled || (typeof document !== 'undefined' && document.hidden)) return;
       try {
+        const diagnoseRequest = canViewDiagnostics
+          ? fetchDiagnose()
+          : Promise.resolve<DiagnoseResponse | null>(null);
         const [dg, opt] = await Promise.allSettled([
-          fetchDiagnose(),
+          diagnoseRequest,
           fetchLlmOptions('draft'),
-        ]);
+        ] as const);
         if (cancelled) return;
 
-        if (dg.status === 'fulfilled') {
+        if (!canViewDiagnostics) {
+          setDiagnose(null);
+        } else if (dg.status === 'fulfilled' && dg.value) {
           setDiagnose(dg.value);
           if (dg.value.summary_ok) {
             setGlobalApiError(null);
@@ -353,13 +541,57 @@ export function Draft() {
       window.clearInterval(id);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [canViewDiagnostics]);
 
   // ── 카테고리별 doc-types 필터 ──────────────────────────
-  const filteredDocTypes = useMemo(
-    () => (docTypes.length ? docTypes : MOCK_DOC_TYPES).filter((d) => d.category === activeCategory),
-    [docTypes, activeCategory],
-  );
+  const filteredDocTypes = useMemo(() => {
+    const base = (docTypes.length ? docTypes : MOCK_DOC_TYPES).filter(
+      (d) => d.category === activeCategory,
+    );
+    // 부록 6 정렬 우선순위: 즐겨찾기(★) > 개인 자주 사용 > 부서 추천 > 나머지
+    const favSet = new Set(favoritedDocTypes);
+    const personalSet = new Set(personalPicks);
+    const deptSet = new Set(deptRecommendations);
+    const rank = (id: string) => {
+      if (favSet.has(id)) return 0;
+      if (personalSet.has(id)) return 1;
+      if (deptSet.has(id)) return 2;
+      return 3;
+    };
+    return [...base].sort((a, b) => {
+      const ra = rank(a.id);
+      const rb = rank(b.id);
+      if (ra !== rb) return ra - rb;
+      return 0; // 동일 priority 는 base 순서 유지
+    });
+  }, [docTypes, activeCategory, favoritedDocTypes, personalPicks, deptRecommendations]);
+
+  // 부록 5 P3-2 — TF-IDF 백엔드 추천 (500ms debounce + 3s timeout). 자유 입력 → POST /draft/recommend
+  const [recommendedIds, setRecommendedIds] = useState<string[]>([]);
+  useEffect(() => {
+    const q = (userRequest || '').trim();
+    if (!q) {
+      setRecommendedIds([]);
+      return;
+    }
+    const t = setTimeout(() => {
+      import('@api/draft').then(({ fetchDraftRecommend }) => {
+        fetchDraftRecommend(q, 2)
+          .then((r) => {
+            // 현재 카테고리 탭의 docType id 와 매칭되는 것만 노출
+            const validIds = new Set(filteredDocTypes.map((d) => d.id));
+            setRecommendedIds(
+              (r.doc_type_ids || []).filter((id) => validIds.has(id)),
+            );
+          })
+          .catch(() => {
+            // 네트워크/타임아웃: 추천 없음 (사용자가 카드 직접 픽 — 정상 흐름)
+            setRecommendedIds([]);
+          });
+      });
+    }, 500);
+    return () => clearTimeout(t);
+  }, [userRequest, filteredDocTypes]);
 
   // 카테고리 변경 시 docTypeId 재정렬
   useEffect(() => {
@@ -786,178 +1018,138 @@ export function Draft() {
                 <div className="lg-eyebrow">REQUEST · 작성 요청</div>
                 <h2 className="lg-h2">무엇을 작성할까요?</h2>
               </div>
-              {/* Plan v1.0 — pill 자리에 모델 셀렉터 (Qwen / Gemma — Gemini 는 보안 차단) */}
-              <div className="lg-field" style={{ minWidth: 240, margin: 0 }}>
-                <label>LLM · MODEL</label>
-                <select
-                  value={`${provider}:${modelId}`}
-                  onChange={(e) => {
-                    const [p, ...rest] = e.target.value.split(':');
-                    const id = rest.join(':');
-                    setProvider(p as LLMProvider);
-                    setModelId(id);
-                  }}
-                  disabled={isStreaming}
-                >
-                  {llmOptions.length === 0 && (
-                    <option value={`${provider}:${modelId}`}>{modelId} · 로딩…</option>
-                  )}
-                  {llmOptions.map((o) => {
-                    const tag = o.provider === 'gemini'
-                      ? (o.blocked ? '🔒 차단' : 'Cloud')
-                      : 'Local';
-                    const disabled = !o.available || o.blocked;
-                    return (
-                      <option
-                        key={`${o.provider}:${o.id}`}
-                        value={`${o.provider}:${o.id}`}
-                        disabled={disabled}
-                        title={o.blocked_reason || ''}
-                      >
-                        {o.label} · {tag}
-                      </option>
-                    );
-                  })}
-                </select>
-              </div>
-            </div>
-
-            <div className="lg-field" style={{ marginBottom: 14 }}>
-              <label>요청 내용</label>
-              <textarea
-                ref={requestTextareaRef}
-                className="lg-textarea"
-                value={userRequest}
-                onChange={(e) => setUserRequest(e.target.value)}
-                rows={3}
-                placeholder="예: 현대차 SQ팀에 PPAP Level 3 제출 안내"
-              />
-            </div>
-
-            {/* v3.6 — 참조 양식 업로드 (외부용 신청서 등 양식 그대로 작성)
-                지원: DOCX · PDF · HWP · HWPX · TXT · MD (5MB 이하)
-                업로드된 텍스트는 LLM 프롬프트에 prepend 되어 양식 구조 유지를 강제. */}
-            <div
-              className="lg-field"
-              style={{
-                marginBottom: 14,
-                padding: 12,
-                border: '1px dashed var(--hud-border, #2A2520)',
-                borderRadius: 2,
-                background: 'var(--hud-surface, #111820)',
-              }}
-            >
-              <label
-                className="label-en"
+              {/* Plan v1.0 — pill 자리에 모델 셀렉터 (Qwen / Gemma — Gemini 는 보안 차단)
+                  v3.6 — Chat 페이지(C 기능) 와 동일한 ModelSelect 도입 (Use case 그룹화 + 호버 카드 + 다크모드 대응).
+                  feature='draft' → 백엔드가 draft 컨텍스트 옵션 (Gemini blocked) 반환.
+                  ModelHelpPopover 는 ModelSelect 옆에 별도 배치. */}
+              <div
                 style={{
-                  fontSize: 10,
-                  letterSpacing: '0.1em',
-                  color: 'var(--hud-text-muted)',
-                  marginBottom: 6,
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  gap: 8,
+                  minWidth: 240,
+                  margin: 0,
                 }}
               >
-                REFERENCE TEMPLATE · 참조 양식 (선택)
-              </label>
-              <div style={{ fontSize: 12, color: 'var(--hud-text-dim)', marginBottom: 8 }}>
-                기업 양식·신청서 등을 업로드하면 그 구조 그대로 작성됩니다.
-              </div>
-
-              {!uploadedRef ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <input
-                    ref={uploadInputRef}
-                    type="file"
-                    accept=".docx,.pdf,.hwp,.hwpx,.txt,.md,.markdown"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) void handleRefUpload(f);
+                <div style={{ flex: 1, minWidth: 220 }}>
+                  <ModelSelect
+                    value={modelId ? { provider, model: modelId } : null}
+                    onChange={(next) => {
+                      if (next) {
+                        setProvider(next.provider as LLMProvider);
+                        setModelId(next.model);
+                      }
+                      // next 가 null (자동) → store 의 현재 default 유지
                     }}
-                    style={{ display: 'none' }}
+                    feature="draft"
+                    disabled={isStreaming}
                   />
-                  <button
-                    type="button"
-                    className="lg-btn ghost sm"
-                    onClick={() => uploadInputRef.current?.click()}
-                    disabled={uploadBusy}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                  >
-                    <Upload size={14} strokeWidth={1.5} />
-                    {uploadBusy ? '업로드 중…' : '양식 파일 업로드'}
-                  </button>
-                  <span style={{ fontSize: 11, color: 'var(--hud-text-muted)' }}>
-                    DOCX · PDF · HWP · HWPX · TXT · MD (≤ 5MB)
-                  </span>
                 </div>
-              ) : (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: 10,
-                    border: '1px solid var(--hud-primary)',
-                    borderRadius: 2,
-                    background: 'var(--hud-primary-dim, #FCB13233)',
-                  }}
-                >
-                  <FileText
-                    size={20}
-                    strokeWidth={1.5}
-                    style={{ color: 'var(--hud-primary)' }}
-                  />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: 'var(--hud-text)',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                      title={uploadedRef.filename}
-                    >
-                      {uploadedRef.filename}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--hud-text-dim)', marginTop: 2 }}>
-                      {uploadedRef.detected_format.toUpperCase()} ·{' '}
-                      {uploadedRef.extracted_chars.toLocaleString()}자 추출
-                      {uploadedRef.truncated && ' · ⚠ 30,000자에서 잘림'}
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    className="lg-btn ghost sm"
-                    onClick={handleRefClear}
-                    title="양식 제거"
-                    style={{ padding: '4px 8px' }}
-                  >
-                    <XIcon size={14} strokeWidth={1.5} />
-                  </button>
-                </div>
-              )}
-
-              {uploadError && (
-                <div
-                  style={{
-                    marginTop: 8,
-                    padding: 8,
-                    borderRadius: 2,
-                    background: 'rgba(232,163,23,0.12)',
-                    border: '1px solid var(--hud-orange, #E8A317)',
-                    fontSize: 12,
-                    color: 'var(--hud-orange, #E8A317)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  <AlertCircle size={14} strokeWidth={1.5} />
-                  {uploadError}
-                </div>
-              )}
+                <ModelHelpPopover modelId={modelId} />
+              </div>
             </div>
+
+            {/* B2 v4.0 — 구조화 변수 입력 폼 (필수★ + 그룹 + placeholder 예시).
+                선택된 doc_type 의 var_metadata 를 기반으로 자동 생성. 값은 meta.custom_fields 에 저장. */}
+            {(() => {
+              const selectedDoc = filteredDocTypes.find((d) => d.id === docTypeId);
+              const vars = selectedDoc?.var_metadata ?? [];
+              if (vars.length === 0) return null;
+              const customFields = (meta.custom_fields ?? {}) as Record<string, string>;
+              return (
+                <VariableForm
+                  variables={vars}
+                  values={customFields}
+                  onChange={(name, value) =>
+                    setMeta({
+                      custom_fields: { ...customFields, [name]: value },
+                    })
+                  }
+                />
+              );
+            })()}
+
+            {/* 부록 3 — 권장 변경: TEMPLATE PICK 을 1차 anchor 로 위로.
+                기존 자유 입력 + REFERENCE TEMPLATE 단독 영역은 11번째 카드 + 카드 픽 후 펼쳐지는 영역으로 통합. */}
+            <div style={{ marginTop: 14, marginBottom: 14 }}>
+              <div className="lg-eyebrow" style={{ marginBottom: 10 }}>
+                TEMPLATE PICK · 템플릿 선택 ({filteredDocTypes.length}종 + 사용자 양식)
+              </div>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                  gap: 12,
+                }}
+              >
+                {filteredDocTypes.map((d) => (
+                  <TemplateCard
+                    key={d.id}
+                    doc={d}
+                    selected={d.id === docTypeId}
+                    onSelect={(picked) => setDocTypeId(picked.id)}
+                    isFavorited={favoritedDocTypes.includes(d.id)}
+                    onToggleFavorite={toggleFavorite}
+                    recommended={recommendedIds.includes(d.id)}
+                    deptRecommended={deptRecommendations.includes(d.id)}
+                    personalPick={personalPicks.includes(d.id)}
+                  />
+                ))}
+                {/* 11번째 카드 — 사용자 양식 업로드 */}
+                <TemplateUploadCard
+                  uploadedRef={uploadedRef}
+                  uploadBusy={uploadBusy}
+                  uploadError={uploadError}
+                  onUpload={(f) => void handleRefUpload(f)}
+                  onClear={handleRefClear}
+                />
+              </div>
+            </div>
+
+            {/* 카드 미선택 안내 (CTA) */}
+            {!docTypeId && (
+              <div
+                style={{
+                  marginBottom: 14,
+                  padding: '10px 14px',
+                  border: '1px solid var(--hud-orange, #E8A317)',
+                  background: 'rgba(232,163,23,0.10)',
+                  color: 'var(--hud-orange, #E8A317)',
+                  fontSize: 13,
+                  borderRadius: 2,
+                }}
+              >
+                위에서 템플릿을 먼저 선택하세요. 선택 후 주제·어조·생성 버튼이 활성화됩니다.
+              </div>
+            )}
+
+            {/* 부록 3 — docTypeId 미선택 시 dimmed 처리 (페이지 흐름 유지) */}
+            <div
+              style={{
+                opacity: docTypeId ? 1 : 0.4,
+                pointerEvents: docTypeId ? 'auto' : 'none',
+                transition: 'opacity 0.2s ease',
+              }}
+            >
+              <div className="lg-field" style={{ marginBottom: 14 }}>
+                <label>주제 / 컨텍스트 (자유 입력)</label>
+                <textarea
+                  ref={requestTextareaRef}
+                  className="lg-textarea"
+                  value={userRequest}
+                  onChange={(e) => setUserRequest(e.target.value)}
+                  rows={3}
+                  placeholder="예: 이번 주 PPAP 진행 현황 / 협력사 회신 안내"
+                />
+                <details style={{ marginTop: 6, fontSize: 11, color: 'var(--hud-text-dim)' }}>
+                  <summary style={{ cursor: 'pointer' }}>예시 더 보기</summary>
+                  <div style={{ marginTop: 4, lineHeight: 1.5 }}>
+                    · 현대차 SQ팀에 PPAP Level 3 제출 안내 — 구조화 변수 외 추가 컨텍스트<br/>
+                    · 회의 결과 요약 (참석자, 주요 안건, 결정 사항)<br/>
+                    · 휴가 신청 사유 + 인수인계 계획
+                  </div>
+                </details>
+              </div>
 
             <div
               className="lg-filter-grid"
@@ -998,6 +1190,7 @@ export function Draft() {
                 </button>
               )}
             </div>
+            </div>{/* /dimmed wrapper (부록 3) */}
 
             <div className="lg-output-box">
               <div className="lg-output-h">
@@ -1017,7 +1210,7 @@ export function Draft() {
                       ? '✱ Gemini 사고 중 — Pro 는 첫 토큰까지 ~30s, Flash 는 즉시'
                       : '⚠ 응답 지연 — 다른 모델로 재시도 권장';
                     const tip = isGeminiThinking
-                      ? 'Gemini 2.5 Pro 는 thinking 모드로 reasoning 후 응답합니다. Flash 모델은 thinking 없이 즉시 streaming.'
+                      ? 'Gemini 3.5 Flash 는 thinking 모드로 reasoning 후 응답합니다. Flash 모델은 thinking 없이 즉시 streaming.'
                       : '모델 cold start / 네트워크 buffering 가능성';
                     return (
                       <span
@@ -1067,6 +1260,37 @@ export function Draft() {
                     color: 'var(--hud-text)',
                   }}
                 />
+              )}
+              {/* B3 v4.0 — 섹션별 부분 수정 (명시적 마커가 있을 때만 자동 노출) */}
+              {output && !isStreaming && (
+                <DraftBodyView
+                  body={output}
+                  onBodyChange={(newBody) => setOutput(newBody, { fromUser: false })}
+                  docType={docTypeId}
+                  tone={toneId}
+                />
+              )}
+
+              {/* B6 v4.0 — 메일 발송 진입 버튼 (output 완료 시 노출) */}
+              {output && !isStreaming && (
+                <div
+                  style={{
+                    marginTop: 14,
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    gap: 8,
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="lg-btn"
+                    onClick={() => setMailModalOpen(true)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                    title="메일 발송 모달 열기 (Mock 발송)"
+                  >
+                    메일로 보내기 →
+                  </button>
+                </div>
               )}
               {output && (
                 <DownloadActions
@@ -1174,7 +1398,12 @@ export function Draft() {
                         group.departments.map((d) => (
                           <span key={d} className="lg-cc-chip">
                             {d}
-                            <i>{group.tier === 'required' ? 'OEM' : group.tier === 'recommended' ? '결재' : '참조'}</i>
+                            <i>{
+                              group.tier === 'required' ? 'OEM'
+                              : group.tier === 'recommended' ? '결재'
+                              : group.tier === 'frequent' ? '자주 함께'
+                              : '참조'
+                            }</i>
                           </span>
                         ))
                       ) : (
@@ -1242,12 +1471,20 @@ export function Draft() {
 
       {/* HISTORY */}
       {tab === 'history' && (
-        <section className="lg-card">
+        <>
+          {/* B4 v4.0 — 버전 관리 타임라인 (사용자별 영속 + 검토 워크플로우) */}
+          <VersionTimeline
+            onLoadVersion={(rendered) => {
+              setOutput(rendered, { fromUser: false });
+              setTab('internal');
+            }}
+          />
+          <section className="lg-card">
           <div className="lg-card-h">
             <div>
               <div className="lg-eyebrow">HISTORY · 문서 이력</div>
               <h2 className="lg-h2">
-                Firestore 영구화 {historyDocs.length}건{' '}
+                서버 저장소 영구화 {historyDocs.length}건{' '}
                 <span className="lg-h2-sub">/ 최근 30개 표시</span>
               </h2>
             </div>
@@ -1275,7 +1512,7 @@ export function Draft() {
                 fontFamily: 'var(--hud-font-mono)',
               }}
             >
-              ⚠ Firestore 연결 실패 — {historyError}
+              ⚠ 서버 저장소 연결 실패 — {historyError}
             </div>
           )}
 
@@ -1298,7 +1535,7 @@ export function Draft() {
                     <td colSpan={7} className="lg-empty">
                       {historyLoading
                         ? '이력 로딩 중...'
-                        : '이력이 없습니다. 초안을 생성하면 자동으로 Firestore 에 저장됩니다.'}
+                        : '이력이 없습니다. 초안을 생성하면 자동으로 서버 저장소에 저장됩니다.'}
                     </td>
                   </tr>
                 ) : (
@@ -1387,7 +1624,31 @@ export function Draft() {
             </div>
           )}
         </section>
+        </>
       )}
+
+      {/* B6 v4.0 — 메일 발송 모달
+          Feature B Sprint 1 P0 (plan §14.2):
+            - versionId 는 현재 draft route 에서 미추적. 0 전달 → 백엔드 412
+              block_no_version 으로 사용자에게 "승인 필요" 안내.
+              Sprint 2 에서 version_db state 연동 시 실 id 전달.
+            - meta.cc 는 사용자가 직접 입력한 CC. ccRec (recommendCC 결과) 의
+              departments 는 컴포넌트 1339L 에서 별도 UI 카드로 표시. */}
+      <MailSendModal
+        isOpen={mailModalOpen}
+        onClose={() => setMailModalOpen(false)}
+        body={output}
+        defaultSubject={
+          spcPrefillSubject ||
+          meta.title ||
+          (docTypes.find((d) => d.id === docTypeId)?.name_ko ?? '')
+        }
+        docType={docTypeId}
+        prefillTo={spcPrefillTo || meta.recipient || ''}
+        prefillCc={spcPrefillCc || (meta.cc ?? []).join(', ')}
+        versionId={0}
+        internalDomains={['ajin.co.kr']}
+      />
 
       {/* P3-3: Diff Modal — 원본(LLM) ↔ 편집본 비교 */}
       {compareOpen && (

@@ -35,16 +35,22 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    PIP_ROOT_USER_ACTION=ignore \
     PORT=8080
 
 # 애플리케이션 코드 — 두 모드 공통
 COPY backend/ ./backend/
 COPY core/ ./core/
 COPY features/ ./features/
+COPY scripts/verify_supabase_remote.py ./scripts/verify_supabase_remote.py
 COPY config.py .
 
+# alembic schema migrations (Cloud Run job 또는 startup hook 에서 사용)
+COPY alembic.ini ./alembic.ini
+COPY alembic/ ./alembic/
+
 EXPOSE 8080
-CMD exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080} --proxy-headers
+CMD ["sh", "-c", "exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8080} --proxy-headers"]
 
 
 # ════════════════════════════════════════════════════════════════
@@ -71,8 +77,10 @@ COPY data/crawled/ ./data/crawled/
 COPY data/metadata/ ./data/metadata/
 COPY data/.jwt_secret ./data/.jwt_secret
 
-# Module B (문서 작성) 자산
-COPY data/knowledge_base/templates/ ./data/knowledge_base/templates/
+# Module B/C 지식베이스 자산
+# - B: draft templates
+# - C: SOP 8종, quick questions, collaboration guides, department guides, glossary
+COPY data/knowledge_base/ ./data/knowledge_base/
 COPY data/templates/ ./data/templates/
 RUN mkdir -p ./data/knowledge_base/uploads
 
@@ -81,14 +89,31 @@ COPY data/equipment/error_codes.db ./data/equipment/error_codes.db
 COPY data/equipment/error_history.db ./data/equipment/error_history.db
 COPY data/equipment/drawings.db ./data/equipment/drawings.db
 COPY data/equipment/molds.db ./data/equipment/molds.db
+COPY data/equipment/mold_lifecycle.db ./data/equipment/mold_lifecycle.db
+COPY data/equipment/maintenance.db ./data/equipment/maintenance.db
 COPY data/equipment/inspection.db ./data/equipment/inspection.db
+COPY data/equipment/ml_cache/ ./data/equipment/ml_cache/
+COPY data/equipment/manuals/ ./data/equipment/manuals/
+COPY data/spc_ml/ ./data/spc_ml/
+COPY data/mold_ml/ ./data/mold_ml/
+COPY data/markov_ml/ ./data/markov_ml/
+
+# P3-A — ChromaDB 인덱스 + BM25 코퍼스 베이킹 (~15MB).
+# slim 빌드는 chromadb/langchain-chroma 패키지를 의도적으로 제외하므로
+# HybridSearcher 초기화는 안 됨 (ENABLE_FEATURE_A=false 환원). 그러나 vectorstore
+# 파일은 보존하여 향후 full mode 전환 또는 BM25 코퍼스 단독 사용 시 즉시 활용 가능.
+COPY vectorstore/ ./vectorstore/
 
 # 슬림 모드 기본 환경변수
+# P3-A 결과: ENABLE_FEATURE_A=true 시 HybridSearcher 가 langchain_chroma 미설치로 실패.
+# vector 검색 활성화는 full mode 빌드를 별도 배포해야 함 — v2.0 로드맵.
 ENV ENABLE_FEATURE_A=false \
     ENABLE_FEATURE_B=true \
     ENABLE_FEATURE_E=false \
     OLLAMA_BASE_URL= \
-    FEATURE_B_BLOCK_GEMINI=false \
+    LLM_ROUTER_PRIMARY=ollama \
+    EMBEDDING_BACKEND=ollama \
+    FEATURE_B_BLOCK_GEMINI=true \
     UPLOAD_MAX_BYTES=5242880
 
 
@@ -132,7 +157,9 @@ ENV ENABLE_FEATURE_A=true \
     ENABLE_FEATURE_B=true \
     ENABLE_FEATURE_E=true \
     OLLAMA_BASE_URL= \
-    EMBEDDING_BACKEND=gemini \
+    LLM_ROUTER_PRIMARY=ollama \
+    EMBEDDING_BACKEND=ollama \
+    FEATURE_B_BLOCK_GEMINI=true \
     AUTH_BACKEND=firestore
 
 

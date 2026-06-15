@@ -1,7 +1,7 @@
-"""사내 인원 SQLite 데이터베이스
+"""사내 인원 SQLite 데이터베이스.
 
-⚠️ 모든 인원 데이터는 시연용 가상 데이터입니다.
-실제 아진산업 임직원과는 일체 관련이 없습니다.
+Seed rows and real ERP/Admin rows can coexist. Operational filtering relies on
+the shared ``data_class`` lineage columns rather than deleting demo data.
 """
 
 import sqlite3
@@ -29,7 +29,13 @@ CREATE TABLE IF NOT EXISTS employees (
     is_team_leader  INTEGER DEFAULT 0,
     photo_url       TEXT DEFAULT '',
     overseas_assignment TEXT DEFAULT NULL,
-    language_skills TEXT DEFAULT NULL
+    language_skills TEXT DEFAULT NULL,
+    is_synthetic INTEGER NOT NULL DEFAULT 1,
+    source_system TEXT NOT NULL DEFAULT 'seed',
+    canonical_employee_id TEXT DEFAULT NULL,
+    data_class TEXT NOT NULL DEFAULT 'unknown',
+    source_label TEXT DEFAULT '',
+    source_updated_at TEXT DEFAULT ''
 );
 """
 
@@ -77,10 +83,68 @@ class EmployeeDatabase:
             except sqlite3.OperationalError:
                 pass  # 이미 컬럼이 존재하면 무시
         self.conn.commit()
+        # Sprint 1 P0 — canonical directory migration 0001
+        # (is_synthetic / source_system / canonical_employee_id
+        #  / headcount_snapshot / search_history)
+        from core.directory import migrations as _dir_migrations
+        _dir_migrations.apply_employees()
 
     def close(self):
         if self.conn:
             self.conn.close()
+
+    # ── INSERT / UPSERT (Plan v3.7 — Module E 동기화) ──
+
+    def add_employee(self, emp: dict) -> None:
+        """employees.db 에 새 직원 INSERT OR REPLACE.
+
+        Plan v3.7 — Module E (인사 관리) 에서 계정 생성 시 호출.
+        호출자가 필드 매핑 보장. 누락 컬럼은 schema default 적용.
+        필수 키: employee_id, name. 권장: position, position_level, division,
+                department, email, phone, hire_date, is_active.
+        """
+        if not emp.get("employee_id") or not emp.get("name"):
+            raise ValueError("add_employee: employee_id, name 필수")
+
+        # 컬럼 화이트리스트 — schema 외 키 무시
+        allowed = {
+            "employee_id", "name", "name_en", "gender", "position", "position_level",
+            "division", "department", "department_id", "role", "email", "phone",
+            "extension", "plant", "plant_id", "hire_date", "is_active",
+            "is_team_leader", "photo_url", "overseas_assignment", "language_skills",
+            "is_synthetic", "source_system", "canonical_employee_id", "data_class",
+            "source_label", "source_updated_at",
+        }
+        clean = {k: v for k, v in emp.items() if k in allowed}
+        cols = list(clean.keys())
+        placeholders = ",".join(["?"] * len(cols))
+        self.conn.execute(
+            f"INSERT OR REPLACE INTO employees ({','.join(cols)}) VALUES ({placeholders})",
+            tuple(clean[c] for c in cols),
+        )
+        self.conn.commit()
+
+        # Firebase reverse-sync를 대체하는 Postgres mirror. APP_DB_BACKEND=sqlite에서는 no-op.
+        try:
+            from features.search.employee.postgres_repository import upsert_employee
+            upsert_employee(clean)
+        except Exception as e:
+            import logging
+            logging.warning(f"[add_employee] Postgres mirror 호출 실패: {e}")
+
+        # Plan v3.8 — ChromaDB incremental upsert (백그라운드, 사용자 응답 차단 X).
+        # 임베딩 호출 0.5~2초 → daemon thread 로 fire-and-forget. 실패 silent skip.
+        try:
+            import threading
+            from features.search.employee.semantic_search import index_employee_one
+            threading.Thread(
+                target=index_employee_one,
+                args=(emp,),
+                daemon=True,
+            ).start()
+        except Exception as e:
+            import logging
+            logging.warning(f"[add_employee] ChromaDB 비차단 호출 실패: {e}")
 
     # ── 개인 검색 ──
 
@@ -228,3 +292,83 @@ class EmployeeDatabase:
             params,
         ).fetchall()
         return [dict(r) for r in rows]
+
+
+# ──────────────────────────────────────────────────────────────────
+# Plan v3.7 — Firestore reverse-sync (Module E ↔ Module A 영속화)
+# ──────────────────────────────────────────────────────────────────
+
+
+def persist_employee_to_firestore(emp: dict) -> bool:
+    """SQLite employees 변경을 Firestore 'employees' 컬렉션에 upsert.
+
+    Cloud Run instance 재시작 시 employees.db 가 Dockerfile 의 baked-in
+    원본으로 복원되는데, 그 후 부팅 lifespan 의 sync_employees_from_firestore
+    함수가 Firestore → SQLite 로 다시 mirror 한다 (auth_users 패턴 동일).
+
+    AUTH_BACKEND != 'firestore' (로컬 dev) 또는 firestore 클라이언트 실패 시
+    silent skip — SQLite INSERT 자체는 이미 완료된 상태.
+    """
+    import os
+    from core.feature_flags import firebase_writes_enabled
+
+    if os.environ.get("AUTH_BACKEND", "").lower() != "firestore":
+        return False
+    if not firebase_writes_enabled():
+        print("[employees] Firebase write 비활성 — Firestore employees upsert 스킵")
+        return False
+    if not emp.get("employee_id"):
+        print(f"[employees] Firestore upsert 스킵 — employee_id 누락: {emp}")
+        return False
+    try:
+        from google.cloud import firestore  # type: ignore
+        db = firestore.Client()
+        db.collection("employees").document(emp["employee_id"]).set(emp, merge=True)
+        print(f"[employees] Firestore employees/{emp['employee_id']} upsert 완료")
+        return True
+    except Exception as e:
+        print(f"[employees] Firestore upsert 실패 ({emp.get('employee_id')}): {e}")
+        return False
+
+
+def sync_employees_from_firestore_if_enabled(emp_db: "EmployeeDatabase") -> int:
+    """AUTH_BACKEND=firestore 인 경우 Firestore 'employees' 컬렉션을
+    employees.db 로 부팅 mirror. 인스턴스 재시작 후 새 계정 복원용.
+
+    백엔드 lifespan (backend/main.py) 에서 EmployeeDatabase 초기화 직후 1회 호출.
+    Returns: 동기화된 직원 수.
+    """
+    import os
+    from core.feature_flags import firebase_read_fallback_enabled
+
+    if os.environ.get("AUTH_BACKEND", "").lower() != "firestore":
+        return 0
+    if not firebase_read_fallback_enabled():
+        print("[employees] Firestore read fallback 비활성 — employees mirror sync 스킵")
+        return 0
+
+    try:
+        from google.cloud import firestore  # type: ignore
+        db = firestore.Client()
+    except Exception as e:
+        print(f"[employees] Firestore 클라이언트 초기화 실패: {e}")
+        return 0
+
+    synced = 0
+    try:
+        for snap in db.collection("employees").stream():
+            d = snap.to_dict() or {}
+            emp_id = d.get("employee_id") or snap.id
+            if not emp_id:
+                continue
+            d["employee_id"] = emp_id  # doc id 가 employee_id 가 아닐 수 있음
+            try:
+                emp_db.add_employee(d)
+                synced += 1
+            except Exception as e:
+                print(f"[employees] {emp_id} 동기화 실패: {e}")
+    except Exception as e:
+        print(f"[employees] Firestore stream 실패: {e}")
+        return synced
+
+    return synced

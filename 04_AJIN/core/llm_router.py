@@ -28,7 +28,7 @@ def _build_model_map() -> dict[LLMMode, dict[str, str | None]]:
     gemma_large = os.getenv("OLLAMA_MODEL_GEMMA_LARGE", "gemma4:e4b")
     gemma_small = os.getenv("OLLAMA_MODEL_GEMMA_SMALL", "gemma4:e2b")
     embedding = os.getenv("OLLAMA_MODEL_EMBEDDING", "bge-m3")
-    gemini = os.getenv("GEMINI_MODEL", "gemini-2.5-pro")
+    gemini = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 
     return {
         LLMMode.CHAT:        {"gemini": gemini, "ollama": chat_large, "ollama_alt": gemma_large, "lm_studio": "default"},
@@ -40,6 +40,17 @@ def _build_model_map() -> dict[LLMMode, dict[str, str | None]]:
         LLMMode.INTENT:      {"gemini": gemini, "ollama": chat_small, "ollama_alt": None,        "lm_studio": None},
         LLMMode.EMBEDDING:   {"gemini": None,   "ollama": embedding,  "ollama_alt": None,        "lm_studio": None},
     }
+
+
+def _routing_primary() -> str:
+    """Return the configured text-generation primary provider.
+
+    Returns:
+        ``"ollama"`` when Ollama is explicitly configured as primary, otherwise
+        ``"gemini"`` for backward-compatible fallback behavior.
+    """
+    primary = os.getenv("LLM_ROUTER_PRIMARY", "gemini").strip().lower()
+    return "ollama" if primary == "ollama" else "gemini"
 
 
 class LLMRouter:
@@ -234,12 +245,18 @@ class LLMRouter:
             ]
             return [(p, m) for p, m in order if m]
 
-        # intent: Phase 1 에서는 단순화 — Gemini → Ollama (TF-IDF 는 Phase 2)
+        # intent: 운영 primary 설정을 존중한다. TF-IDF fallback 은 별도 분류기에서 담당.
         if mode is LLMMode.INTENT:
-            order = [
-                ("gemini", slot.get("gemini")),
-                ("ollama", slot.get("ollama")),
-            ]
+            if _routing_primary() == "ollama":
+                order = [
+                    ("ollama", slot.get("ollama")),
+                    ("gemini", slot.get("gemini")),
+                ]
+            else:
+                order = [
+                    ("gemini", slot.get("gemini")),
+                    ("ollama", slot.get("ollama")),
+                ]
             return [(p, m) for p, m in order if m]
 
         # 기본 체인 — LLM_ROUTER_PRIMARY 환경변수로 1순위 토글 (Plan A 변형 v3.7).
@@ -247,8 +264,7 @@ class LLMRouter:
         #   LLM_ROUTER_PRIMARY=gemini (또는 미설정) → gemini → ollama → ollama_alt → lm_studio
         # 자가 호스팅 모드(Mac 또는 사내 GPU 서버) 운영 시 ollama, Gemini 폴백 운영 시 gemini.
         # 사고 시 Cloud Run env 만 변경해 즉시 전환 가능.
-        primary = os.getenv("LLM_ROUTER_PRIMARY", "gemini").lower()
-        if primary == "ollama":
+        if _routing_primary() == "ollama":
             order = [
                 ("ollama", slot.get("ollama")),
                 ("ollama", slot.get("ollama_alt")),

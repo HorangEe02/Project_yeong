@@ -1,4 +1,5 @@
-"""백엔드 인증 패키지 — Firebase ID Token 검증 등.
+"""백엔드 인증 패키지.
 
-Day 5++.5: Firebase Auth ID Token 검증 모듈 추가.
+PR-E3: Firebase Auth ID Token 검증 모듈 폐기 (외부 IdP — OIDC/SAML/LDAP 으로 대체).
+RTDB push (`backend.services.firebase_rtdb`) 는 별도 모듈로 유지된다.
 """

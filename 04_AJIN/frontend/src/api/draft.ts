@@ -197,3 +197,335 @@ export async function fetchTemplates(): Promise<TemplatesResponse> {
   const { data } = await api.get<TemplatesResponse>(`${BASE}/templates`);
   return data;
 }
+
+// ──────────────────────────────────────────────────────────
+// v4.7 Sprint 2 P0 (축 ③) — 템플릿 prefill (SPC 위반 → 메일 초안)
+// ──────────────────────────────────────────────────────────
+
+export interface TemplatePrefillRecipient {
+  email: string;
+  name?: string;
+}
+
+export interface TemplatePrefillResponse {
+  subject: string;
+  body: string;
+  to: TemplatePrefillRecipient[];
+  cc: TemplatePrefillRecipient[];
+}
+
+/** GET /draft/templates/{template_id}/prefill?context_id=... */
+export async function prefillTemplate(
+  templateId: string,
+  contextId: string,
+): Promise<TemplatePrefillResponse> {
+  const { data } = await api.get<TemplatePrefillResponse>(
+    `${BASE}/templates/${encodeURIComponent(templateId)}/prefill`,
+    { params: { context_id: contextId } },
+  );
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// B3 v4.0 — 대화형 부분 수정 (Partial Edit)
+// ─────────────────────────────────────────────────────────────
+
+export interface PartialEditSection {
+  index: number;
+  marker: string;
+  title: string;
+  start: number;
+  end: number;
+  preview: string;
+}
+
+export interface PartialEditScanResponse {
+  sections: PartialEditSection[];
+  total: number;
+}
+
+export async function scanSections(body: string): Promise<PartialEditScanResponse> {
+  const { data } = await api.post<PartialEditScanResponse>(`${BASE}/scan-sections`, { body });
+  return data;
+}
+
+export interface PartialEditRequestPayload {
+  body: string;
+  target_section_index: number;
+  instruction: string;
+  doc_type?: string;
+  tone?: string;
+}
+
+export interface PartialEditResponseData {
+  new_body: string;
+  new_section_content: string;
+  target_section_index: number;
+  model: string;
+  provider: string;
+}
+
+export async function partialEdit(
+  req: PartialEditRequestPayload,
+): Promise<PartialEditResponseData> {
+  const { data } = await api.post<PartialEditResponseData>(`${BASE}/partial-edit`, req);
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// B4 v4.0 — 버전 관리 (사용자별 영속 + 단일 검토자)
+// ─────────────────────────────────────────────────────────────
+
+export type VersionStatus = 'draft' | 'under_review' | 'approved' | 'rejected';
+
+export interface VersionSavePayload {
+  doc_type: string;
+  title?: string;
+  rendered_text: string;
+  template_vars?: Record<string, unknown>;
+  change_summary?: string;
+  document_id?: number | null;
+}
+
+export interface VersionSaveResult {
+  document_id: number;
+  version_id: number;
+  version_num: number;
+}
+
+export async function saveDraftVersion(payload: VersionSavePayload): Promise<VersionSaveResult> {
+  const { data } = await api.post<VersionSaveResult>(`${BASE}/versions`, payload);
+  return data;
+}
+
+export interface VersionListItemData {
+  version_id: number;
+  document_id: number;
+  version_num: number;
+  change_summary: string;
+  created_at: string;
+  created_by: string;
+  status: VersionStatus;
+  reviewer_id: string;
+  reviewed_at: string;
+  review_note: string;
+  doc_type: string;
+  title: string;
+  author: string;
+  department: string;
+}
+
+export interface VersionListResponseData {
+  items: VersionListItemData[];
+  total: number;
+}
+
+export async function listDraftVersions(
+  scope: 'mine' | 'review' | 'all' = 'mine',
+  status: VersionStatus | '' = '',
+  limit = 50,
+): Promise<VersionListResponseData> {
+  const { data } = await api.get<VersionListResponseData>(`${BASE}/versions`, {
+    params: { scope, status, limit },
+  });
+  return data;
+}
+
+export interface VersionDetailData extends VersionListItemData {
+  rendered_text: string;
+  template_vars: Record<string, unknown>;
+}
+
+export async function getDraftVersion(versionId: number): Promise<VersionDetailData> {
+  const { data } = await api.get<VersionDetailData>(`${BASE}/versions/${versionId}`);
+  return data;
+}
+
+export type VersionReviewAction = 'submit' | 'approve' | 'reject';
+
+export interface VersionReviewPayload {
+  action: VersionReviewAction;
+  reviewer_id: string;
+  note?: string;
+}
+
+export interface VersionReviewResult {
+  ok: boolean;
+  version_id: number;
+  new_status: VersionStatus;
+  reviewer_id: string;
+}
+
+export async function reviewDraftVersion(
+  versionId: number,
+  payload: VersionReviewPayload,
+): Promise<VersionReviewResult> {
+  const { data } = await api.post<VersionReviewResult>(
+    `${BASE}/versions/${versionId}/review`,
+    payload,
+  );
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// B6 v4.0 — 메일 발송 + 첨부 추천
+// ─────────────────────────────────────────────────────────────
+
+export interface AttachmentSuggestion {
+  label: string;
+  description: string;
+  required: boolean;
+  file_hint: string;
+}
+
+export interface AttachmentRecommendResponseData {
+  doc_type: string;
+  items: AttachmentSuggestion[];
+  required_labels: string[];
+}
+
+export async function fetchAttachmentRecommendations(
+  docType: string,
+): Promise<AttachmentRecommendResponseData> {
+  const { data } = await api.get<AttachmentRecommendResponseData>(
+    `${BASE}/mail/attachment-recommendations`,
+    { params: { doc_type: docType } },
+  );
+  return data;
+}
+
+export interface MailRecipientPayload {
+  email: string;
+  name?: string;
+}
+
+export interface MailSendPayload {
+  subject: string;
+  body: string;
+  body_format?: 'markdown' | 'html' | 'text';
+  to: MailRecipientPayload[];
+  cc?: MailRecipientPayload[];
+  bcc?: MailRecipientPayload[];
+  attachments?: string[];
+  doc_type?: string;
+  metadata?: Record<string, unknown>;
+  // Feature B Sprint 1 P0 (plan §14.2) — mail send guard fields.
+  // version_id: 승인된 draft version row id. 0/미전달 시 백엔드가 412 반환.
+  // acknowledged_external: 외부 도메인 발송 확인 (ConfirmDialog 통과 후 true).
+  // watermark_id: export 단계에서 부여된 SHA1 8자.
+  version_id?: number;
+  acknowledged_external?: boolean;
+  watermark_id?: string;
+}
+
+export interface MailSendResult {
+  ok: boolean;
+  message_id: string;
+  sent_at: string;
+  adapter: string;
+  detail: string;
+}
+
+export async function sendDraftMail(payload: MailSendPayload): Promise<MailSendResult> {
+  const { data } = await api.post<MailSendResult>(`${BASE}/mail/send`, payload);
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 부록 5 P3-1 — 서버 sync 즐겨찾기 / P3-2 — TF-IDF 추천
+// ─────────────────────────────────────────────────────────────
+
+export interface DraftPrefsResponse {
+  favorited_doc_types: string[];
+}
+
+export async function fetchDraftPrefs(): Promise<DraftPrefsResponse> {
+  const { data } = await api.get<DraftPrefsResponse>(`${BASE}/prefs/me`);
+  return data;
+}
+
+export async function updateDraftPrefs(
+  favoritedDocTypes: string[],
+): Promise<DraftPrefsResponse> {
+  const { data } = await api.put<DraftPrefsResponse>(`${BASE}/prefs/me`, {
+    favorited_doc_types: favoritedDocTypes,
+  });
+  return data;
+}
+
+export interface DraftRecommendResponse {
+  doc_type_ids: string[];
+  scores: number[];
+  warning?: string;
+}
+
+export async function fetchDraftRecommend(
+  userRequest: string,
+  topK = 2,
+): Promise<DraftRecommendResponse> {
+  const { data } = await api.post<DraftRecommendResponse>(
+    `${BASE}/recommend`,
+    { user_request: userRequest, top_k: topK },
+    { timeout: 3000 },
+  );
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// 부록 6 P4-1 + P4-3 + P4-4 — 부서/개인 추천 + 충돌 해결 merge
+// ─────────────────────────────────────────────────────────────
+
+export interface DeptRecommendItem {
+  doc_type_id: string;
+  count: number;
+}
+export interface DeptRecommendResponse {
+  department: string;
+  recommendations: DeptRecommendItem[];
+}
+export async function fetchDeptRecommendations(topK = 3): Promise<DeptRecommendResponse> {
+  const { data } = await api.get<DeptRecommendResponse>(
+    `${BASE}/recommend/by-dept`,
+    { params: { top_k: topK } },
+  );
+  return data;
+}
+
+export interface PersonalPickItem {
+  doc_type_id: string;
+  count: number;
+  last_picked_at?: string;
+}
+export interface PersonalPickResponse {
+  user_id: string;
+  picks: PersonalPickItem[];
+}
+export async function fetchPersonalPicks(topK = 5): Promise<PersonalPickResponse> {
+  const { data } = await api.get<PersonalPickResponse>(
+    `${BASE}/recommend/personal`,
+    { params: { top_k: topK } },
+  );
+  return data;
+}
+
+// P3-1 응답에 P4-4 의 updated_at 포함됨 — 별도 wrapper
+export interface DraftPrefsWithVersion {
+  favorited_doc_types: string[];
+  updated_at?: string;
+}
+export async function fetchDraftPrefsV2(): Promise<DraftPrefsWithVersion> {
+  const { data } = await api.get<DraftPrefsWithVersion>(`${BASE}/prefs/me`);
+  return data;
+}
+export async function updateDraftPrefsMerge(
+  favoritedDocTypes: string[],
+  baseVersion: string,
+  removedIds: string[] = [],
+): Promise<DraftPrefsWithVersion & { merged?: boolean; conflict_detected?: boolean }> {
+  const { data } = await api.put(`${BASE}/prefs/me`, {
+    favorited_doc_types: favoritedDocTypes,
+    base_version: baseVersion,
+    removed_ids: removedIds,
+  });
+  return data;
+}

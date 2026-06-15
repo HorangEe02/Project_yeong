@@ -28,6 +28,7 @@ def _load_or_create_secret() -> str:
 
 JWT_SECRET = _load_or_create_secret()
 JWT_ALGORITHM = "HS256"
+JWT_ACCESS_EXPIRE_MINUTES = int(os.environ.get("JWT_ACCESS_EXPIRE_MINUTES", "15"))
 JWT_EXPIRE_HOURS = 24
 JWT_REFRESH_EXPIRE_DAYS = 7
 
@@ -37,25 +38,87 @@ def create_access_token(
     username: str,
     role_name: str,
     role_level: int,
-    expires_hours: int = JWT_EXPIRE_HOURS,
+    expires_hours: int | None = None,
+    expires_minutes: int | None = None,
 ) -> str:
     """액세스 토큰을 생성한다."""
     # SEC-P0: PyJWT 필수 — 무서명 폴백 토큰 제거
     import jwt
+
+    if expires_hours is not None:
+        expires_delta = timedelta(hours=expires_hours)
+    else:
+        expires_delta = timedelta(minutes=expires_minutes or JWT_ACCESS_EXPIRE_MINUTES)
 
     payload = {
         "sub": employee_id,
         "username": username,
         "role": role_name,
         "role_level": role_level,
-        "exp": datetime.now(timezone.utc) + timedelta(hours=expires_hours),
+        "exp": datetime.now(timezone.utc) + expires_delta,
         "iat": datetime.now(timezone.utc),
         "type": "access",
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
-def create_refresh_token(employee_id: str) -> str:
+def mint_from_idp(
+    employee_id: str,
+    username: str,
+    role_name: str,
+    role_level: int,
+    idp_subject: str,
+    idp_name: str = "oidc",
+    expires_hours: int | None = None,
+    expires_minutes: int | None = None,
+) -> str:
+    """v4.7 Feature E — 외부 IdP 인증 결과로 JWT 발급.
+
+    일반 `create_access_token` 과 동일한 페이로드 + IdP 메타 claim.
+    감사 로그에서 IdP 발급 토큰을 식별할 수 있도록 `idp` claim 포함.
+    """
+    import jwt
+
+    if expires_hours is not None:
+        expires_delta = timedelta(hours=expires_hours)
+    else:
+        expires_delta = timedelta(minutes=expires_minutes or JWT_ACCESS_EXPIRE_MINUTES)
+
+    payload = {
+        "sub": employee_id,
+        "username": username,
+        "role": role_name,
+        "role_level": role_level,
+        "exp": datetime.now(timezone.utc) + expires_delta,
+        "iat": datetime.now(timezone.utc),
+        "type": "access",
+        "idp": idp_name,
+        "idp_sub": idp_subject,
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def mint_mid_token(employee_id: str, ttl_seconds: int = 60) -> str:
+    """v4.7 Feature E Phase 2 — 2FA 중간 토큰.
+
+    1차 로그인 (id/pw 통과) 후 2FA 코드 검증 대기용. TTL 60초.
+    이 토큰은 `2fa_required=true, mid=true` claim 으로 식별되며,
+    오직 `POST /auth/2fa/verify` 에서만 소비된다.
+    """
+    import jwt
+
+    payload = {
+        "sub": employee_id,
+        "exp": datetime.now(timezone.utc) + timedelta(seconds=ttl_seconds),
+        "iat": datetime.now(timezone.utc),
+        "type": "mid",
+        "mid": True,
+        "2fa_required": True,
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def create_refresh_token(employee_id: str, jti: str | None = None) -> str:
     """리프레시 토큰을 생성한다."""
     try:
         import jwt
@@ -67,6 +130,7 @@ def create_refresh_token(employee_id: str) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(days=JWT_REFRESH_EXPIRE_DAYS),
         "iat": datetime.now(timezone.utc),
         "type": "refresh",
+        "jti": jti or secrets.token_urlsafe(24),
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 

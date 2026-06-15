@@ -24,6 +24,13 @@ class GlossaryEntry:
     departments_involved: list[str] = field(default_factory=list)
     difficulty: str = "basic"
     tags: list[str] = field(default_factory=list)
+    citation_id: str = ""
+    owner_department: str = ""
+    reviewed_at: str = ""
+    effective_date: str = ""
+    version: str = ""
+    status: str = "published"
+    source_path: str = ""
 
 
 # 한국어 조사 목록 (긴 것부터 매칭)
@@ -37,89 +44,44 @@ PARTICLES = [
 
 
 # v2.0: 용어 별칭(alias) — 구어체/약어/영어를 정식 용어명으로 매핑 (80+항목)
-TERM_ALIASES: dict[str, str] = {
-    # ── EV 부품 ──
-    "워터펌프": "EWP", "전동워터펌프": "EWP", "water pump": "EWP",
-    "쿨링채널": "CCH", "냉각채널": "CCH", "cooling channel": "CCH",
-    "충전기": "OBC", "온보드차저": "OBC",
-    "배터리관리": "BMS", "배터리시스템": "BMS",
-    # ── 글로벌 ──
-    "조지아": "JOON INC", "조지아공장": "JOON INC", "준": "JOON INC", "georgia": "JOON INC",
-    "메타플랜트": "HMGMA", "현대메타플랜트": "HMGMA", "metaplant": "HMGMA",
-    "앨라배마": "AJIN USA", "alabama": "AJIN USA",
-    "인플레이션감축법": "IRA", "감축법": "IRA",
-    # ── 경량화 ──
-    "탄소섬유": "CFRP", "carbon fiber": "CFRP",
-    "프리프레그": "Prepreg",
-    # ── 품질 (dept_quality_terms) ──
-    "공정능력": "Cpk", "공정능력지수": "Cpk",
-    "위험우선순위": "RPN", "알피엔": "RPN",
-    "부품제출보증서": "PSW", "피에스더블유": "PSW",
-    "측정시스템분석": "MSA", "엠에스에이": "MSA",
-    "팔디": "8D", "8디": "8D", "에잇디": "8D",
-    "피피엠": "PPM", "불량률": "PPM",
-    "씨피케이": "Cpk", "공정능력치": "Cpk",
-    "초물검사": "초물", "첫물": "초물",
-    "전수검사": "전검",
-    "리워크": "리워크", "재작업": "리워크",
-    "스크랩": "스크랩", "폐기": "스크랩",
-    "합부판정": "양불 판정", "양부판정": "양불 판정",
-    # ── 생산 (dept_production_terms) ──
-    "사이클": "C/T", "사이클타임": "C/T", "씨티": "C/T",
-    "택트": "택타임", "tact time": "택타임",
-    "간판": "칸반", "kanban": "칸반",
-    "가동율": "가동률",
-    "오이이": "OEE", "설비종합효율": "OEE",
-    "작업지시서": "작지", "워크오더": "작지",
-    "포카요케": "포카요케", "실수방지": "포카요케",
-    "안돈": "안돈", "이상알림": "안돈",
-    # ── 생산기술 (dept_production_engineering_terms) ──
-    "트라이": "T/O", "트라이아웃": "T/O", "tryout": "T/O",
-    "탄성회복": "스프링백", "springback": "스프링백",
-    "버": "바리", "burr": "바리",
-    "에스엠이디": "SMED", "싱글교체": "SMED",
-    "치구": "지그", "jig": "지그",
-    "캐파": "CAPA", "시정예방": "CAPA",
-    # ── 구매 (dept_purchasing_terms) ──
-    "최소발주": "MOQ", "엠오큐": "MOQ",
-    "발주서": "PO", "피오": "PO",
-    "리드타임": "L/T", "엘티": "L/T",
-    "공급사": "벤더", "vendor": "벤더",
-    "원가절감": "VA/VE", "코스트다운": "코스트 다운",
-    "소모품": "MRO",
-    # ── 영업 (dept_sales_terms) ──
-    "견적요청": "RFQ", "알에프큐": "RFQ",
-    "완성차": "OEM", "오이엠": "OEM",
-    "수요예측": "포캐스트", "forecast": "포캐스트",
-    "신규개발": "NPI",
-    "양산개시": "SOP",
-    "생산종료": "EOP",
-    # ── R&D (dept_rnd_terms) ──
-    "설변요청": "ECR", "설계변경요청": "ECR",
-    "설변통보": "ECN", "설계변경통보": "ECN",
-    "기하공차": "GD&T", "지디앤티": "GD&T",
-    "시제품": "시작품", "prototype": "시작품",
-    "바디인화이트": "BIW", "비아이더블유": "BIW",
-    "설계검증": "DVPR", "디비피알": "DVPR",
-    # ── 안전 (dept_safety_terms) ──
-    "산안": "산안법", "산업안전보건법": "산안법",
-    "티비엠": "TBM", "툴박스미팅": "TBM",
-    "니어미스": "아차사고", "near miss": "아차사고",
-    "잠금태그": "LOTO", "lockout tagout": "LOTO",
-    "보호구": "PPE", "피피이": "PPE",
-    "중대재해법": "중대재해",
-    # ── 관리 (dept_management_terms) ──
-    "이알피": "ERP", "사프": "ERP",
-    "엠이에스": "MES", "생산실행": "MES",
-    "핵심지표": "KPI", "케이피아이": "KPI",
-    "결재라인": "결재 라인",
-    "품의": "품의서",
-    # ── 공통 (dept_common_terms) ──
-    "포엠": "4M 변경", "4M변경": "4M 변경",
-    "카이젠": "개선", "kaizen": "개선",
-    "오에스": "3정 5S", "5에스": "3정 5S",
-    "수평전개": "수평전개", "요코텐": "수평전개",
-}
+# Feature C Sprint 1 P0 (plan §27) — 별칭 외부화.
+# 정의는 별도 JSON, 별칭은 data/knowledge_base/glossary_aliases/aliases.json.
+# admin 편집 직후 다음 호출에서 반영 (mtime 캐싱).
+
+import threading as _threading
+
+_ALIASES_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "knowledge_base" / "glossary_aliases" / "aliases.json"
+_ALIASES_CACHE: dict[str, str] | None = None
+_ALIASES_MTIME: float = 0.0
+_ALIASES_LOCK = _threading.Lock()
+
+
+def _load_aliases() -> dict[str, str]:
+    """aliases.json 로드 (mtime 캐싱). 파일 부재 시 빈 dict."""
+    global _ALIASES_CACHE, _ALIASES_MTIME
+    with _ALIASES_LOCK:
+        if not _ALIASES_PATH.exists():
+            _ALIASES_CACHE = {}
+            return _ALIASES_CACHE
+        mtime = _ALIASES_PATH.stat().st_mtime
+        if _ALIASES_CACHE is not None and mtime == _ALIASES_MTIME:
+            return _ALIASES_CACHE
+        try:
+            data = json.loads(_ALIASES_PATH.read_text(encoding="utf-8"))
+            _ALIASES_CACHE = {str(k): str(v) for k, v in data.items()}
+        except json.JSONDecodeError:
+            _ALIASES_CACHE = {}
+        _ALIASES_MTIME = mtime
+        return _ALIASES_CACHE
+
+
+def __getattr__(name):
+    """PEP 562 — TERM_ALIASES lazy lookup. 호출자 zero touch."""
+    if name == "TERM_ALIASES":
+        return _load_aliases()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 
 
 class GlossaryMatcher:
@@ -151,11 +113,13 @@ class GlossaryMatcher:
             for item in items:
                 try:
                     entry = GlossaryEntry(**item)
+                    if entry.status != "published":
+                        continue
                     self.entries[entry.term] = entry
                 except TypeError:
                     # 필드 불일치 — 부분 매핑 시도
                     entry = self._make_entry_flexible(item)
-                    if entry:
+                    if entry and entry.status == "published":
                         self.entries[entry.term] = entry
                 except Exception:
                     continue  # v2.6: 개별 항목 실패 시 스킵 (전체 중단 방지)
@@ -166,7 +130,9 @@ class GlossaryMatcher:
             self._register_keys(entry, all_term_names)
 
         # v1.6: alias 등록 — 구어체/약어를 정식 용어로 매핑
-        for alias, term in TERM_ALIASES.items():
+        # NOTE: 모듈 전역 `TERM_ALIASES`는 PEP 562 `__getattr__`로 노출되나
+        # 모듈 자체 함수 본문에서는 자동 해석되지 않으므로 직접 로더 호출.
+        for alias, term in _load_aliases().items():
             if term in self.entries and alias.lower() not in self._lookup:
                 self._lookup[alias.lower()] = term
 
@@ -179,19 +145,35 @@ class GlossaryMatcher:
         # Type C/D: {"category": ..., "terms": ...}
         if isinstance(data, dict) and "terms" in data:
             terms = data["terms"]
+            inherited = {
+                k: data.get(k)
+                for k in (
+                    "citation_id",
+                    "owner_department",
+                    "reviewed_at",
+                    "effective_date",
+                    "version",
+                    "status",
+                    "source_path",
+                )
+                if data.get(k)
+            }
             # Type C: terms가 리스트 [{"term": ...}, ...]
             if isinstance(terms, list):
-                return terms
+                return [
+                    {**inherited, **item} if isinstance(item, dict) else item
+                    for item in terms
+                ]
             # v2.6 Type D: terms가 딕셔너리 {"용어": "설명문자열", ...}
             if isinstance(terms, dict):
                 items = []
                 for key, val in terms.items():
                     if isinstance(val, str):
-                        items.append({"term": key, "definition": val})
+                        items.append({**inherited, "term": key, "definition": val})
                     elif isinstance(val, dict):
                         if "term" not in val:
                             val["term"] = key
-                        items.append(val)
+                        items.append({**inherited, **val})
                 return items
             return []
 
@@ -230,6 +212,13 @@ class GlossaryMatcher:
             departments_involved=item.get("departments_involved", item.get("department", [])),
             difficulty=item.get("difficulty", "basic"),
             tags=item.get("tags", item.get("aliases", [])),
+            citation_id=item.get("citation_id", ""),
+            owner_department=item.get("owner_department", ""),
+            reviewed_at=item.get("reviewed_at", ""),
+            effective_date=item.get("effective_date", ""),
+            version=item.get("version", ""),
+            status=item.get("status", "published"),
+            source_path=item.get("source_path", ""),
         )
 
     def _register_keys(self, entry: GlossaryEntry, all_term_names: set[str] = None):

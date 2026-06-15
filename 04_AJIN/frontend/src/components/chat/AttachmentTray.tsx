@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Paperclip, Image as ImageIcon } from 'lucide-react';
 import { useToastStore } from '@store/toast';
 import { validateImageFile, validateGenericFile } from '@api/upload';
+import { useFeatureCFlags } from '@lib/featureFlags';
 
 interface Props {
   disabled?: boolean;
@@ -15,9 +16,20 @@ interface Props {
 
 export function AttachmentTray({ disabled, onAttachImage, onAttachFile }: Props) {
   const { t } = useTranslation();
+  const flags = useFeatureCFlags();
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const addToast = useToastStore((s) => s.addToast);
+  const acceptedFiles = [
+    '.pdf', '.txt', '.md', '.log', '.docx', '.doc', '.xlsx', '.xls',
+    '.csv', '.hwp', '.hwpx',
+    ...(flags.cad_upload
+      ? [
+          '.dxf', '.step', '.stp', '.igs', '.iges',
+          '.sldprt', '.sldasm', '.prt', '.catpart', '.catproduct',
+        ]
+      : []),
+  ].join(',');
 
   const handleImagePick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,17 +88,7 @@ export function AttachmentTray({ disabled, onAttachImage, onAttachFile }: Props)
       <input
         ref={fileInputRef}
         type="file"
-        // v3.3 Phase G-4 — CAD/HWP 확장자 추가 (백엔드 _ALLOWED_EXTENSIONS 와 정합).
-        // 백엔드 FEATURE_C_CAD_UPLOAD 플래그 OFF 면 CAD 만 415 응답 — 사용자에게 토스트로 안내.
-        accept={[
-          // 기존
-          '.pdf', '.txt', '.md', '.log', '.docx', '.doc', '.xlsx', '.xls',
-          '.csv', '.hwp', '.hwpx',
-          // 텍스트 CAD
-          '.dxf', '.step', '.stp', '.igs', '.iges',
-          // 바이너리 CAD (메타만 추출)
-          '.sldprt', '.sldasm', '.prt', '.catpart', '.catproduct',
-        ].join(',')}
+        accept={acceptedFiles}
         hidden
         onChange={handleFilePick}
       />

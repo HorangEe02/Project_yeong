@@ -29,8 +29,8 @@ RUN chmod +x /app/entrypoint.sh
 
 # 컨테이너 health: cloudflared 가 살아있고 tunnel URL 이 있는지
 # v3.6 — pidof 우선 사용 (procps 없는 base image 호환). 둘 다 미설치면 마지막 fallback 으로 /proc 직접 검사.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=3 \
     CMD ( pidof cloudflared > /dev/null 2>&1 || pgrep -x cloudflared > /dev/null 2>&1 || ls /proc/*/comm 2>/dev/null | xargs -I{} sh -c 'grep -q ^cloudflared$ "{}"' ) \
-        && [ -f /tmp/tunnel_url.txt ] || exit 1
+        && [ -f /tmp/tunnel_url.txt ] && [ -f /tmp/cloudrun_applied ] || exit 1
 
 ENTRYPOINT ["/app/entrypoint.sh"]

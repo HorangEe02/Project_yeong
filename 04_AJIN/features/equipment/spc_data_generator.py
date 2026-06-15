@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
+from core.data_lineage import write_source_manifest
+
 
 @dataclass
 class SPCGeneratorConfig:
@@ -165,6 +167,13 @@ def regenerate_all_samples(n_samples: int = 200, seed: int = 42):
             writer.writerow(["sample", "value", "unit", "part_number", "process"])
             for j, val in enumerate(values, start=1):
                 writer.writerow([j, val, proc["unit"], proc["part_number"], proc["name"]])
+        write_source_manifest(
+            out_path,
+            data_class="synthetic",
+            source_system="seed_equipment",
+            source_label="spc_data_generator",
+            extra={"process": proc["name"], "samples": n_samples},
+        )
 
         # spc_ml용 (대시보드에서 사용)
         # process_id는 파일명에서 추출
@@ -176,6 +185,13 @@ def regenerate_all_samples(n_samples: int = 200, seed: int = 42):
             writer.writerow(["sample", "value", "unit", "part_number", "process"])
             for j, val in enumerate(values, start=1):
                 writer.writerow([j, val, proc["unit"], proc["part_number"], proc["name"]])
+        write_source_manifest(
+            ml_path,
+            data_class="synthetic",
+            source_system="seed_equipment",
+            source_label="spc_data_generator",
+            extra={"process": proc["name"], "samples": n_samples},
+        )
 
         # meta 업데이트
         proc["n_samples"] = n_samples

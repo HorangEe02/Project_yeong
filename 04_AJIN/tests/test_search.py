@@ -9,11 +9,18 @@ import asyncio
 import json
 import sys
 from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 # 프로젝트 루트를 sys.path에 추가
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+from backend.dependencies import get_current_user
+from backend.routers import search as search_router
 from features.search.metadata_extractor import rule_based_extract
 from features.search.summarizer import format_results_for_display
 from features.search.searcher import SearchResult
@@ -90,7 +97,7 @@ def test_metadata_extraction():
               f"고객={meta.customer}, 기간={meta.date_from}~{meta.date_to}")
 
     print(f"\n  결과: {passed}/{total} 통과")
-    return passed == total
+    assert passed == total
 
 
 # ===== 검색 결과 포맷팅 테스트 (Ollama 불필요) =====
@@ -131,7 +138,169 @@ def test_result_formatting():
     assert "검색 결과가 없습니다" in empty
     print("\n  ✅ 빈 결과 메시지 정상")
     print("\n  ✅ 포맷팅 테스트 통과")
-    return True
+
+
+# ===== API 가시성/감사 로그 테스트 =====
+
+
+def _user(role_level: int = 1, department: str = "품질보증팀", role: str = "EMPLOYEE"):
+    """Create a minimal authenticated user for router tests."""
+    return SimpleNamespace(
+        user_id=1,
+        employee_id="E001",
+        name="tester",
+        username="tester",
+        department=department,
+        division="품질본부",
+        position="사원",
+        role=role,
+        role_level=role_level,
+    )
+
+
+def _search_client(user=None) -> TestClient:
+    """Create a router-only search API client."""
+    app = FastAPI()
+    app.include_router(search_router.router, prefix="/api")
+    if user is not None:
+        app.dependency_overrides[get_current_user] = lambda: user
+    return TestClient(app, raise_server_exceptions=False)
+
+
+class _FakeSearcher:
+    """Fake searcher returning same-department and cross-department results."""
+
+    def search(self, **_kwargs):
+        """Return two deterministic search results."""
+        return [
+            SimpleNamespace(
+                doc_id="DOC-SAME",
+                title="same dept",
+                doc_type="8D Report",
+                part_name="EWP",
+                content="same",
+                score=0.9,
+                metadata={
+                    "department": "품질보증팀",
+                    "file_path": "/internal/same.pdf",
+                    "data_class": "real",
+                    "source_system": "erp_dms",
+                    "source_label": "DMS",
+                },
+            ),
+            SimpleNamespace(
+                doc_id="DOC-OTHER",
+                title="other dept",
+                doc_type="ECN",
+                part_name="CCH",
+                content="other",
+                score=0.7,
+                metadata={
+                    "department": "생산기술팀",
+                    "file_path": "/internal/other.pdf",
+                    "data_class": "synthetic",
+                    "source_system": "seed_docs",
+                    "source_label": "DEMO",
+                },
+            ),
+        ]
+
+
+def test_search_documents_masks_cross_department_metadata_and_audits(monkeypatch) -> None:
+    """Search documents should hide internal paths for cross-department users."""
+    audit_rows: list[dict] = []
+    monkeypatch.setattr(search_router, "log_api_access", lambda **kwargs: audit_rows.append(kwargs))
+    client = _search_client(_user(role_level=1, department="품질보증팀"))
+    client.app.dependency_overrides[search_router.get_searcher] = lambda: _FakeSearcher()
+
+    response = client.post("/api/search/documents", json={"query": "민감 검색어", "k": 3})
+
+    assert response.status_code == 200
+    payload = response.json()
+    by_id = {item["doc_id"]: item for item in payload["results"]}
+    assert by_id["DOC-SAME"]["metadata"]["visibility"] == "full"
+    assert by_id["DOC-SAME"]["metadata"]["file_path"] == "/internal/same.pdf"
+    assert by_id["DOC-OTHER"]["metadata"]["visibility"] == "partial"
+    assert "file_path" not in by_id["DOC-OTHER"]["metadata"]
+    assert by_id["DOC-OTHER"]["metadata"]["data_class"] == "synthetic"
+    assert audit_rows[-1]["endpoint"] == "/api/search/documents"
+    assert audit_rows[-1]["result_count"] == 2
+    assert "민감 검색어" not in audit_rows[-1]["detail"]
+    assert "query_len=6" in audit_rows[-1]["detail"]
+
+
+def test_search_documents_l4_can_see_cross_department_metadata(monkeypatch) -> None:
+    """L4+ users can see full metadata across departments."""
+    monkeypatch.setattr(search_router, "log_api_access", lambda **_kwargs: None)
+    client = _search_client(_user(role_level=4, department="품질보증팀", role="HR_ADMIN"))
+    client.app.dependency_overrides[search_router.get_searcher] = lambda: _FakeSearcher()
+
+    response = client.post("/api/search/documents", json={"query": "품질", "k": 3})
+
+    assert response.status_code == 200
+    by_id = {item["doc_id"]: item for item in response.json()["results"]}
+    assert by_id["DOC-OTHER"]["metadata"]["visibility"] == "full"
+    assert by_id["DOC-OTHER"]["metadata"]["file_path"] == "/internal/other.pdf"
+
+
+def test_search_drawings_preserves_lineage_and_masks_paths(monkeypatch) -> None:
+    """Drawing search should preserve lineage while masking cross-department file paths."""
+    audit_rows: list[dict] = []
+    monkeypatch.setattr(search_router, "log_api_access", lambda **kwargs: audit_rows.append(kwargs))
+
+    from features.equipment import drawing_search
+
+    monkeypatch.setattr(drawing_search, "search_by_number", lambda _q: [])
+    monkeypatch.setattr(
+        drawing_search,
+        "search_by_keyword",
+        lambda *_args, **_kwargs: [
+            {
+                "id": 7,
+                "drawing_number": "DWG-7",
+                "part_number": "P-7",
+                "part_name": "part",
+                "department": "생산기술팀",
+                "file_path": "drawings/secret.pdf",
+                "bom_info": "{\"secret\": true}",
+                "data_class": "real",
+                "source_system": "drawing_db",
+                "source_label": "DRAWING",
+            }
+        ],
+    )
+    client = _search_client(_user(role_level=1, department="품질보증팀"))
+
+    response = client.get("/api/search/drawings", params={"q": "DWG"})
+
+    assert response.status_code == 200
+    item = response.json()["items"][0]
+    assert item["visibility"] == "partial"
+    assert item["file_path"] == ""
+    assert item["bom_info"] == ""
+    assert item["data_class"] == "real"
+    assert item["source_system"] == "drawing_db"
+    assert audit_rows[-1]["endpoint"] == "/api/search/drawings"
+    assert "DWG" not in audit_rows[-1]["detail"]
+
+
+def test_vision_query_disabled_is_audited_without_raw_text(monkeypatch) -> None:
+    """Vision query disabled path should still create a safe audit row."""
+    audit_rows: list[dict] = []
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setattr(search_router, "log_api_access", lambda **kwargs: audit_rows.append(kwargs))
+    client = _search_client(_user())
+    client.app.dependency_overrides[search_router.get_searcher] = lambda: None
+
+    response = client.post(
+        "/api/search/vision-query",
+        files={"image": ("drawing.png", b"image", "image/png")},
+    )
+
+    assert response.status_code == 403
+    assert audit_rows[-1]["endpoint"] == "/api/search/vision-query"
+    assert audit_rows[-1]["status_code"] == 403
+    assert audit_rows[-1]["result_count"] == 0
 
 
 # ===== 메인 =====
@@ -140,8 +309,8 @@ def main():
     print("\n🏭 AJIN AI Assistant — 기능 A 검색 테스트\n")
 
     all_passed = True
-    all_passed &= test_metadata_extraction()
-    all_passed &= test_result_formatting()
+    test_metadata_extraction()
+    test_result_formatting()
 
     print("\n" + "=" * 60)
     if all_passed:

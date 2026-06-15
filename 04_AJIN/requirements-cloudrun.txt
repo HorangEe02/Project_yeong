@@ -19,6 +19,10 @@ PyJWT>=2.8.0
 bcrypt>=4.0.0
 firebase-admin>=6.4.0
 
+# H8 — Cloud Logging → BigQuery audit pipeline.
+# /admin/audit/bq-stats 엔드포인트가 사용. ~15MB, slim 빌드에 큰 영향 없음.
+google-cloud-bigquery>=3.18.0
+
 # ML/통계 (Module D 분류기·관세 시뮬레이션·SPC)
 numpy>=1.24.0
 pandas>=2.0.0
@@ -49,12 +53,24 @@ python-docx>=1.1.0
 fpdf2>=2.8.0
 openpyxl>=3.1.0
 jinja2>=3.1.0  # DocxExporter / PdfExporter / HwpxExporter 템플릿 렌더 의존
+python-hwpx>=2.9.1  # HWPX 생성 (정식 OWPML) — features/draft/hwpx_exporter.py
 
 # 파일 파싱
 pypdf>=3.0.0
 olefile>=0.46  # v3.6 — Module B 사용자 양식 업로드 시 HWP(5.0) PrvText 추출용
 
+# HTML 파싱 (P2 F11 — BaseCrawler._cached_fetch_html, EU/CarbonESG/EvBattery 라이브 fetch)
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
 # 유틸
 python-dotenv>=1.0.0
 rich>=13.0.0
 psutil>=5.9.0  # 시스템 CPU/메모리 메트릭 (대시보드 우측 패널)
+redis>=5.0  # Docker/Cloud Run slim runtime health + PLC gateway status
+
+# Firebase → Supabase/PostgreSQL 운영 전환
+SQLAlchemy>=2.0.0
+psycopg[binary]>=3.2.0
+alembic>=1.13.0
+supabase>=2.0.0

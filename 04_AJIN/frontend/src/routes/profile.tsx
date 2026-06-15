@@ -5,15 +5,25 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, AlertTriangle, ShieldCheck } from 'lucide-react';
-import { useAuthStore } from '@store/auth';
 import {
   getMe,
   updateMe,
+  updateMyPhoto,
   getMyLoginHistory,
   type MeProfile,
   type LoginHistoryEntry,
 } from '@api/me';
-import { changePassword as apiChangePassword, extractError } from '@api/auth';
+import { changePassword as apiChangePassword, extractError, logout } from '@api/auth';
+import { MobileTabPrefsCard } from '@components/profile/MobileTabPrefsCard';
+import { DigitalEmployeeBadge } from '@components/employee/DigitalEmployeeBadge';
+import {
+  ProfilePhotoUploadModal,
+  loadStoredPhoto,
+  saveStoredPhoto,
+} from '@components/employee/ProfilePhotoUploadModal';
+import { useIsMobile, useIsTablet } from '@hooks/useBreakpoint';
+import { AJINMobileProfile } from '@components/uikit/AJINMobileProfile';
+import { AJINTabletProfile } from '@components/uikit/AJINTabletProfile';
 
 // 부서 드롭다운 옵션 — 자유 입력 차단 (백엔드 config.DEPARTMENTS 30개와 동기화 권장)
 const DEPARTMENT_OPTIONS = [
@@ -36,12 +46,13 @@ const ROLE_OPTIONS = [
   { value: 'SYS_ADMIN', label: 'SYS_ADMIN (Lv 5)' },
 ];
 
-type ProfileTab = 'basic' | 'security' | 'activity';
+type ProfileTab = 'basic' | 'security' | 'activity' | 'mobile';
 
 const TABS: { k: ProfileTab; en: string; ko: string }[] = [
   { k: 'basic', en: 'BASIC', ko: '기본 정보' },
   { k: 'security', en: 'SECURITY', ko: '보안' },
   { k: 'activity', en: 'ACTIVITY', ko: '활동 이력' },
+  { k: 'mobile', en: 'MOBILE', ko: '모바일 빠른 탭' },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -72,7 +83,7 @@ interface PwStrength {
 
 function pwStrength(pw: string): PwStrength {
   let s = 0;
-  if (pw.length >= 8) s++;
+  if (pw.length >= 12 && new TextEncoder().encode(pw).length <= 72) s++;
   if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) s++;
   if (/\d/.test(pw)) s++;
   if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pw)) s++;
@@ -102,23 +113,44 @@ function formatTs(iso: string | null): string {
 
 export function Profile() {
   const navigate = useNavigate();
-  const clearAuth = useAuthStore((s) => s.clear);
 
   const [tab, setTab] = useState<ProfileTab>('basic');
   const [profile, setProfile] = useState<MeProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // PR #2 — 사원증 사진 (localStorage 우선, 추후 backend photo_url 통합)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
 
   // ── 초기 로드 ──
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     getMe()
-      .then((p) => { if (!cancelled) { setProfile(p); setLoadError(null); } })
+      .then((p) => {
+        if (!cancelled) {
+          setProfile(p);
+          setLoadError(null);
+          // 우선순위: backend photo_url > localStorage 캐시
+          // (backend 가 오프라인이거나 컬럼이 비어 있어도 LS 가 시연 fallback 제공)
+          if (p.photo_url) {
+            setPhotoUrl(p.photo_url);
+          } else {
+            const stored = loadStoredPhoto(p.employee_id);
+            if (stored) setPhotoUrl(stored);
+          }
+        }
+      })
       .catch((e) => { if (!cancelled) setLoadError(extractError(e).detail); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, []);
+
+  // v3.6 — 모바일/태블릿 viewport early return (Design System v3.5 reference 매칭)
+  const isMobileProfile = useIsMobile();
+  const isTabletProfile = useIsTablet();
+  if (isMobileProfile) return <AJINMobileProfile />;
+  if (isTabletProfile) return <AJINTabletProfile />;
 
   return (
     <div className="page lg-page" data-screen-label="Profile · 내 프로필">
@@ -160,29 +192,113 @@ export function Profile() {
       {loading && <div className="lg-card"><div className="lg-sub">불러오는 중…</div></div>}
 
       {!loading && profile && tab === 'basic' && (
-        <BasicTab
-          profile={profile}
-          onUpdated={(p) => setProfile(p)}
-          onReissued={() => {
-            clearAuth();
-            navigate('/login', { replace: true });
-          }}
-        />
+        <>
+          {/* 디지털 사원증 — AJIN 브랜드 톤. 탭하면 앞·뒷면 flip. */}
+          <section
+            className="lg-card"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 28,
+              padding: 24,
+              marginBottom: 16,
+              flexWrap: 'wrap',
+            }}
+          >
+            <DigitalEmployeeBadge
+              employee={{
+                name: profile.username,
+                employeeId: profile.employee_id,
+                team: profile.department,
+                position: profile.position,
+                photoUrl,
+              }}
+              variant="large"
+              onPhotoClick={() => setPhotoModalOpen(true)}
+            />
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <div className="lg-eyebrow">ID CARD · 디지털 사원증</div>
+              <h2 className="lg-h2" style={{ margin: '6px 0 8px' }}>
+                {profile.username}
+              </h2>
+              <p
+                style={{
+                  color: 'var(--hud-text-dim)',
+                  fontSize: 13,
+                  lineHeight: 1.7,
+                  marginBottom: 12,
+                }}
+              >
+                사원증을 탭하면 앞·뒷면이 전환됩니다. 우측 카메라 아이콘으로 사진을
+                변경할 수 있습니다 (1:1 정사각형 자동 crop).
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'auto 1fr',
+                  rowGap: 6,
+                  columnGap: 14,
+                  fontSize: 12,
+                }}
+              >
+                <span style={{ color: 'var(--hud-text-dim)' }}>사번</span>
+                <span style={{ fontFamily: 'var(--hud-font-mono)', letterSpacing: '0.06em' }}>
+                  {profile.employee_id}
+                </span>
+                <span style={{ color: 'var(--hud-text-dim)' }}>역할</span>
+                <span>
+                  {profile.role_name} · Lv {profile.role_level}
+                </span>
+                <span style={{ color: 'var(--hud-text-dim)' }}>부서</span>
+                <span>{profile.department || '—'}</span>
+              </div>
+            </div>
+          </section>
+
+          <BasicTab
+            profile={profile}
+            onUpdated={(p) => setProfile(p)}
+            onReissued={() => {
+              void logout().finally(() => navigate('/login', { replace: true }));
+            }}
+          />
+
+          {/* PR #2 — 사진 변경 modal */}
+          <ProfilePhotoUploadModal
+            employeeId={profile.employee_id}
+            open={photoModalOpen}
+            onClose={() => setPhotoModalOpen(false)}
+            onConfirm={async (dataUrl) => {
+              // 1) 즉시 UI 반영 + localStorage 캐시 (offline fallback)
+              setPhotoUrl(dataUrl);
+              saveStoredPhoto(profile.employee_id, dataUrl);
+              // 2) backend PATCH /auth/me/photo — 영구 저장 + 다른 디바이스 동기화
+              try {
+                const updated = await updateMyPhoto(dataUrl);
+                setProfile(updated);
+              } catch (e) {
+                // backend 실패해도 localStorage 캐시로 시연 가능
+                console.warn('[profile.photo] backend PATCH 실패 — localStorage fallback:', e);
+              }
+            }}
+          />
+        </>
       )}
       {!loading && profile && tab === 'security' && (
         <SecurityTab
-          employeeId={profile.employee_id}
           onChanged={() => {
             // 비밀번호 변경 후 자동 로그아웃 → /login
             setTimeout(() => {
-              clearAuth();
-              navigate('/login', { replace: true });
+              void logout().finally(() => navigate('/login', { replace: true }));
             }, 1200);
           }}
         />
       )}
       {!loading && profile && tab === 'activity' && (
         <ActivityTab />
+      )}
+      {!loading && profile && tab === 'mobile' && (
+        <MobileTabPrefsCard />
       )}
     </div>
   );
@@ -515,13 +631,7 @@ function ReadOnlyField({ label, value }: { label: string; value: string }) {
 // Tab 2: SECURITY — 비밀번호 변경
 // ─────────────────────────────────────────────────────────────
 
-function SecurityTab({
-  employeeId,
-  onChanged,
-}: {
-  employeeId: string;
-  onChanged: () => void;
-}) {
+function SecurityTab({ onChanged }: { onChanged: () => void }) {
   const [cur, setCur] = useState('');
   const [next, setNext] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -538,7 +648,6 @@ function SecurityTab({
     setErrMsg(null);
     try {
       await apiChangePassword({
-        employee_id: employeeId,
         current_password: cur,
         new_password: next,
       });
@@ -605,7 +714,7 @@ function SecurityTab({
             </div>
           )}
           <span style={{ fontSize: 11, color: 'var(--hud-text-dim)' }}>
-            8자 이상 · 대소문자 · 숫자 · 특수문자 4가지 모두 권장
+            12자 이상 · UTF-8 72바이트 이하 · 흔한/회사명 유사 비밀번호 금지
           </span>
         </div>
 

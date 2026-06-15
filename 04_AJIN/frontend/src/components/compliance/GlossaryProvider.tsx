@@ -10,9 +10,9 @@ import {
   useEffect,
   useMemo,
   useState,
-  type ReactNode,
-} from 'react';
+  type ReactNode } from 'react';
 import { fetchGlossary } from '@api/compliance';
+import { useFeatureDFlagsState } from '@lib/featureFlags';
 import { GlossaryTerm } from './GlossaryTerm';
 
 export interface GlossaryTermData {
@@ -35,8 +35,7 @@ const GlossaryContext = createContext<GlossaryContextValue>({
   byKey: new Map(),
   list: [],
   loading: false,
-  error: null,
-});
+  error: null });
 
 function buildKeyMap(items: GlossaryTermData[]): Map<string, GlossaryTermData> {
   const map = new Map<string, GlossaryTermData>();
@@ -55,12 +54,22 @@ function normKey(s: string): string {
 }
 
 export function GlossaryProvider({ children }: { children: ReactNode }) {
+  const { flags, loading: flagsLoading } = useFeatureDFlagsState();
   const [list, setList] = useState<GlossaryTermData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (flagsLoading) return;
+    if (!flags.d2_rag) {
+      setList([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
+    setLoading(true);
+    setError(null);
     fetchGlossary()
       .then((r) => {
         if (!cancelled) setList(r.terms || []);
@@ -76,7 +85,7 @@ export function GlossaryProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [flags.d2_rag, flagsLoading]);
 
   const byKey = useMemo(() => buildKeyMap(list), [list]);
 
@@ -96,7 +105,7 @@ export function useGlossary() {
  *
  * 매칭 정책:
  *  - 단어 경계 기반 (영문은 \b, 한국어는 인접 비-한글)
- *  - 길이 우선 (긴 매칭이 우선) — 'IATF 16949' 가 'IATF' 보다 우선
+ *  - 길이 우선 (긴 매칭이 우선) — 'IATF 16949'가 'IATF'보다 우선
  *  - 동일 텍스트에서 같은 용어는 첫 번째 출현만 강조 (잡음 감소)
  */
 export function GlossaryAutoText({ text }: { text: string }) {
@@ -137,7 +146,6 @@ export function GlossaryAutoText({ text }: { text: string }) {
         if (after) out.push(after);
 
         segments.splice(i, 1, ...out);
-        i += out.length - 1;       // 새 세그먼트 건너뛰기
         break;                      // 다음 key 로
       }
     }

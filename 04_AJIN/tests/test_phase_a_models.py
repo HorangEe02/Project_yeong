@@ -33,6 +33,21 @@ from backend.schemas.draft import LLMOption, LLMOptionsResponse
 
 
 # ──────────────────────────────────────────────
+# v4.7 test isolation — env 격리 (Pattern 1)
+# ──────────────────────────────────────────────
+
+
+@pytest.fixture(autouse=True)
+def isolate_llm_env(monkeypatch):
+    """각 테스트마다 LLM 관련 env 변수 격리 — 다른 테스트의 setenv 잔존 방지."""
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("OLLAMA_HOST", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("FEATURE_B_BLOCK_GEMINI", raising=False)
+    yield
+
+
+# ──────────────────────────────────────────────
 # 1. _VISIBLE_FAMILIES — exaone 추가 검증
 # ──────────────────────────────────────────────
 
@@ -163,13 +178,14 @@ def test_build_llm_options_gemini_blocked_in_draft_only():
     draft_gemini = [o for o in draft_res.options if o.provider == "gemini"]
     onb_gemini = [o for o in onb_res.options if o.provider == "gemini"]
 
-    assert len(draft_gemini) == 1
-    assert draft_gemini[0].blocked is True
-    assert "보안 정책" in draft_gemini[0].blocked_reason
+    # v2: Gemini 라인업이 2.5 Pro + Flash 2종으로 확장 — 두 옵션 모두 동일한 규칙 적용.
+    assert len(draft_gemini) >= 1
+    assert all(o.blocked is True for o in draft_gemini)
+    assert all("보안 정책" in o.blocked_reason for o in draft_gemini)
 
-    assert len(onb_gemini) == 1
-    assert onb_gemini[0].blocked is False
-    assert onb_gemini[0].available is True
+    assert len(onb_gemini) >= 1
+    assert all(o.blocked is False for o in onb_gemini)
+    assert all(o.available is True for o in onb_gemini)
 
 
 def test_build_llm_options_gemini_unavailable_when_key_missing():
@@ -179,9 +195,10 @@ def test_build_llm_options_gemini_unavailable_when_key_missing():
             res = _build_llm_options("onboarding")
 
     gemini = [o for o in res.options if o.provider == "gemini"]
-    assert len(gemini) == 1
-    assert gemini[0].available is False
-    assert "GEMINI_API_KEY" in gemini[0].blocked_reason
+    # v2: Gemini 라인업이 Pro/Flash 2종 — 두 옵션 모두 키 미설정 시 unavailable.
+    assert len(gemini) >= 1
+    assert all(o.available is False for o in gemini)
+    assert all("GEMINI_API_KEY" in o.blocked_reason for o in gemini)
 
 
 # ──────────────────────────────────────────────

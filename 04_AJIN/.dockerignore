@@ -40,6 +40,13 @@ __pycache__/
 logs/
 *.log
 tmp/
+
+# Runtime secrets stay on the host and are injected by Compose env_file.
+.env
+.env.*
+!.env.example
+!.env.supabase.example
+!.env.docker.example
 .env.development.local
 .env.development.local.example
 .env.development

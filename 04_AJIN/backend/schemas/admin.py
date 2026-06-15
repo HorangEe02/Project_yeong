@@ -69,6 +69,9 @@ class LoginHistoryEntry(BaseModel):
     success: bool
     ip_address: str = ""
     flag: str | None = None
+    # v4.9.1 — 부서·역할 필터용 (employees JOIN). Firestore audit 보강 시 빈 문자열 fallback.
+    department: str | None = None
+    role_name: str | None = None
 
 
 class AdminUserDetailResponse(BaseModel):
@@ -99,9 +102,10 @@ class CreateEmployeeResponse(BaseModel):
     department: str
     role_name: str
     role_level: int
-    initial_password: str
+    initial_password: str = ""
     must_change_pw: bool = True
     issuance_note: str = ""
+    credential_delivery: str = "local_plaintext"
     instructions_markdown: str
 
 
@@ -117,8 +121,10 @@ class UpdateUserRequest(BaseModel):
 
 class ResetPasswordResponse(BaseModel):
     employee_id: str
-    initial_password: str
+    initial_password: str = ""
     must_change_pw: bool = True
+    credential_delivery: str = "local_plaintext"
+    issuance_note: str = ""
 
 
 class LockUserRequest(BaseModel):
@@ -189,6 +195,7 @@ class LoginStatsResponse(BaseModel):
     locked_accounts: int
     hour_distribution: list[dict[str, Any]]
     failed_trend: list[dict[str, Any]]
+    daily_counts: list[dict[str, Any]] = Field(default_factory=list)  # v4.9 — 달력 히트맵
 
 
 class LoginHistoryResponse(BaseModel):

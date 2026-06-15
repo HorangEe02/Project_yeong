@@ -17,7 +17,7 @@ export type MessageCategory = 'sop' | 'scenario' | 'action' | 'chat' | 'vision';
 
 export interface ChatMessageMeta {
   provider?: string; // "gemini" | "ollama" | "lm_studio"
-  model?: string; // "gemini-2.5-pro" | "qwen3.5:9b" | "gemma4:e4b" ...
+  model?: string; // "gemini-3.5-flash" | "qwen3.5:9b" | "gemma4:e4b" ...
   fallbackFrom?: string | null;
   finalProvider?: string;
   finalModel?: string;
@@ -64,16 +64,29 @@ export interface HistoryTurn {
   content: string;
 }
 
+/** v4.7 Sprint 2 P0 (축 ①) — InputComposer "/" 으로 인용된 검색 항목. */
+export interface ChatReference {
+  /** 'person' | 'doc' | 'page' | 'drawing' | 'ocr' (확장 가능) */
+  kind: string;
+  id: string;
+  title: string;
+}
+
 export interface ChatRequestBody {
   query: string;
   mode: LLMMode;
   history: HistoryTurn[];
+  /** UI 언어 (ko/en) — 기존 SSE 분기용 (chat / chat_korean). */
   language: 'ko' | 'en';
+  /** v4.7 C-2 — 챗봇 응답 언어 (LanguageToggle 결과). 백엔드 OnboardingChatRequest.language 매핑. */
+  chat_language?: 'ko' | 'en' | 'auto';
   department?: string;
   /** Phase 4-B — 첨부 파일에서 추출된 텍스트 (백엔드 file_context 로 매핑). */
   file_context?: string;
   /** Phase 5 — 단일 (provider, model) 강제. 백엔드 ChatRequest.force_provider 로 매핑. */
   force_provider?: [string, string];
+  /** v4.7 Sprint 2 P0 (축 ①) — 사용자가 InputComposer "/" 로 인용한 검색 항목. */
+  references?: ChatReference[];
 }
 
 /** Phase 4-B — 비전/파일 첨부 슬롯 (단일). 한 번에 하나만 첨부. */
@@ -87,7 +100,7 @@ export interface AttachmentSlot {
 /** Phase 5 — 강제 모델 선택 (자동이면 null). */
 export interface ForceProvider {
   provider: string; // "gemini" | "ollama"
-  model: string; // "gemini-2.5-pro" | "qwen3.5:9b" | "gemma4:e4b"
+  model: string; // "gemini-3.5-flash" | "qwen3.5:9b" | "gemma4:e4b"
 }
 
 /** Day 5++ — 좌측 컬럼 하단 QuickPrompts chip (DAY5_PLUS_HUD_PLAN Section 5-bis). */

@@ -46,13 +46,22 @@ ACTION_PATTERNS = {
             r"([가-힣]{1,3})\s*(부장|차장|과장|대리|팀장|본부장|책임|선임|수석|이사|상무|전무)(?:님|에게|께|씨)?",
             # v3.5 — "연락드리는 방법", "어디 있어", "어디 계세요" 같은 자연어 질문
             r"(.+?)\s*(연락|어디|위치|있어|있나|계세요|계신|만나|찾고)",
+            # v3.9 — 부서명 + 인원 조회 자연어 ("인사팀 인원 정보", "재무팀 직원 명단")
+            # NOTE: "현황" 은 SPC/공정 현황 운영 도메인과 충돌하여 제외.
+            r"(.+?)\s*(인원|팀원|직원|부서원|구성원|명단|소속)",
+            # v3.9 — "인사팀 정보 알려줘", "품질경영팀 소개해" 같은 부서 단위 조회
+            r"(.+?)(팀|본부|실|센터|부)\s*(정보|소개|알려|알리)",
         ],
         # v3.5 — 키워드 확장 (직급 단어 + 자연어 동사)
+        # v3.9 — 부서원 조회 단어 추가 (인원/팀원/직원/부서원/구성원/명단/현황/소속)
         "keywords": [
             "연락처", "전화번호", "내선", "이메일", "담당자",
             "연락", "어디", "위치", "메일", "이메일주소",
             "부장", "차장", "과장", "대리", "팀장", "본부장",
             "선임", "책임", "수석", "이사", "상무", "전무",
+            # NOTE: "현황" 은 SPC/공정 현황 같은 운영 도메인과 충돌하여 제거.
+            # 부서원 조회는 "인원/팀원/직원/부서원/구성원/명단/소속" 키워드로 충분.
+            "인원", "팀원", "직원", "부서원", "구성원", "명단", "소속",
         ],
     },
     "spc_status": {
@@ -71,6 +80,18 @@ ACTION_PATTERNS = {
     "regulation_status": {
         "patterns": [],
         "keywords": ["법규", "규제", "관세", "REACH", "산안법", "안전거리", "시행", "컴플라이언스"],
+    },
+    # P1 D4: 규제·법규 자연어 Q&A + 신입 풀이 모드 (RAG 기반)
+    "regulation_qa": {
+        "patterns": [
+            r"(.+?)\s*(풀어서|쉽게|이해 안)",         # "산안법 풀어서"
+            r"(.+?)\s*(위반\s*하면|위반시|적용하면)",  # "이거 위반하면?"
+            r"(.+?)\s*(우리\s*회사|어떻게\s*적용)",    # "우리 회사 적용?"
+        ],
+        "keywords": [
+            "풀어서 설명", "쉽게 알려", "이해 안 돼", "이해 못",
+            "위반하면", "위반시", "처벌", "어떻게 적용", "쉬운 말로",
+        ],
     },
     # v3.3 Phase E — 문서 검색·다운로드 (Module A 인-챗 진입점)
     "document_search": {
@@ -95,15 +116,18 @@ ACTION_TYPE_TO_KIND: Dict[str, ActionKind] = {
     "spc_status":         "error",
     "employee_search":    "employee",
     "regulation_status":  "compliance",
+    "regulation_qa":      "compliance",   # P1 D4 — RAG 답변 (compliance kind 재사용)
     "compose_email":      "draft",
     "compose_document":   "draft",
     "document_search":    "document",
 }
 
 # 우선순위 (낮은 인덱스 = 높음). 다중 매칭 시 이 순서로 정렬.
+# regulation_qa 는 regulation_status 보다 우선 — 자연어 질문이 더 구체적.
 _ACTION_PRIORITY = [
     "error_code",
     "employee_search",
+    "regulation_qa",
     "regulation_status",
     "document_search",
     "compose_document",
@@ -197,6 +221,27 @@ def detect_actions(query: str) -> list[DetectedAction]:
                     params={"keyword": keyword, "query": query},
                 ))
                 break  # 같은 액션 내 첫 키워드만
+
+    # v3.9 — DEPARTMENT_ALIASES 보강 매칭. 부서명만 입력해도 ("총무인사팀", "인사팀")
+    # employee_search 액션을 발화 (Feature A 와 동등한 인식률 확보).
+    # NOTE: 다른 액션(compliance/error/document/draft)이 이미 detect 되었다면
+    # 부서 별칭 보강을 생략한다. "산안법 안전거리" 의 "안전" 같은 짧은 부서 prefix
+    # 가 무관한 액션 카드를 동반 발화하던 v3.9 회귀를 차단.
+    if not detected:
+        try:
+            from features.search.employee.search import DEPARTMENT_ALIASES
+            for alias in sorted(DEPARTMENT_ALIASES.keys(), key=len, reverse=True):
+                if alias and alias in query:
+                    detected.append(DetectedAction(
+                        action_type="employee_search",
+                        kind="employee",
+                        confidence=0.6,
+                        matched_keyword=alias,
+                        params={"keyword": alias, "query": query},
+                    ))
+                    break  # 가장 긴 별칭 1개만
+        except Exception:
+            pass
 
     if not detected:
         return []

@@ -1,8 +1,7 @@
 // v3.3 Phase F — DocumentCard: 문서 검색 결과 + 다운로드 액션.
 
 import type { DocumentCardPayload } from './types';
-
-const API_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:8000';
+import { apiUrl } from '@api/baseUrl';
 
 interface Props {
   payload: DocumentCardPayload;
@@ -67,7 +66,7 @@ export function DocumentCard({ payload }: Props) {
             {item.download_url && (
               <div style={{ marginTop: 8 }}>
                 <a
-                  href={`${API_URL}${item.download_url}`}
+                  href={apiUrl(item.download_url)}
                   target="_blank"
                   rel="noreferrer"
                   className="lg-btn ghost sm"

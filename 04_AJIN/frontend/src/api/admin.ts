@@ -82,6 +82,9 @@ export interface LoginHistoryEntry {
   success: boolean;
   ip_address: string;
   flag?: string | null;
+  // v4.9 — 선택 필드 (backend 확장 시 활성). 미응답 시 SecurityTab 부서·역할 필터 미노출.
+  department?: string | null;
+  role_name?: string | null;
 }
 
 export interface AdminUserDetailResponse {
@@ -117,6 +120,8 @@ export interface ResetPasswordResponse {
   employee_id: string;
   initial_password: string;
   must_change_pw: boolean;
+  credential_delivery?: 'local_plaintext' | 'idp_invite_required' | string;
+  issuance_note?: string;
 }
 
 export async function resetPassword(employeeId: string): Promise<ResetPasswordResponse> {
@@ -207,6 +212,7 @@ export interface CreateEmployeeResponse {
   initial_password: string;
   must_change_pw: boolean;
   issuance_note: string;
+  credential_delivery?: 'local_plaintext' | 'idp_invite_required' | string;
   instructions_markdown: string;
 }
 
@@ -240,6 +246,12 @@ export async function fetchSecurityAlerts(hours = 24): Promise<SecurityAlertsRes
   return data;
 }
 
+export interface DailyCount {
+  date: string;   // YYYY-MM-DD
+  count: number;
+  failed: number;
+}
+
 export interface LoginStatsResponse {
   days: number;
   total_logins: number;
@@ -250,6 +262,7 @@ export interface LoginStatsResponse {
   locked_accounts: number;
   hour_distribution: { hour: number; count: number; failed: number }[];
   failed_trend: { date: string; success: number; failed: number }[];
+  daily_counts: DailyCount[];   // v4.9 — 달력 히트맵
 }
 
 export async function fetchLoginStats(days = 30): Promise<LoginStatsResponse> {
@@ -262,8 +275,118 @@ export interface LoginHistoryResponse {
   history: LoginHistoryEntry[];
 }
 
+// v4.9.2 — 90일 초과 archived 로그인 이력 (BigQuery audit)
+export interface ArchivedLoginHistoryResponse {
+  total: number;
+  history: LoginHistoryEntry[];
+  source: 'bigquery';
+  available: boolean;
+}
+
+export async function fetchArchivedLogins(date: string, limit = 500): Promise<ArchivedLoginHistoryResponse> {
+  const { data } = await api.get<ArchivedLoginHistoryResponse>('/admin/security/login-history-archived', {
+    params: { date, limit },
+  });
+  return data;
+}
+
 export async function fetchLoginHistory(limit = 50): Promise<LoginHistoryResponse> {
   const { data } = await api.get<LoginHistoryResponse>('/admin/security/login-history', { params: { limit } });
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// PR-E5 — Audit Dashboard (5-dim) + 7-pattern anomaly feed
+// ─────────────────────────────────────────────────────────────
+
+export type AnomalySeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+export type AnomalyPattern =
+  | 'brute_force'
+  | 'unusual_hour'
+  | 'inactive_access'
+  | 'privilege_escalation'
+  | 'mass_export'
+  | 'off_hours_export'
+  | 'deprecated_account_active';
+
+export interface AnomalyFeedItem {
+  pattern: AnomalyPattern;
+  severity: AnomalySeverity;
+  title: string;
+  description: string;
+  employee_id: string;
+  timestamp: string;
+  details: Record<string, unknown>;
+}
+
+export interface AnomalyFeedResponse {
+  window_hours: number;
+  total: number;
+  items: AnomalyFeedItem[];
+}
+
+export async function fetchAuditAnomalyFeed(window_hours = 24): Promise<AnomalyFeedResponse> {
+  const { data } = await api.get<AnomalyFeedResponse>('/admin/audit/anomaly/feed', {
+    params: { window_hours },
+  });
+  return data;
+}
+
+export interface TimePatternBucket {
+  hour: number;     // 0-23
+  weekday: number;  // 0=Mon ~ 6=Sun
+  department: string;
+  count: number;
+}
+
+export interface PermissionViolationRow {
+  timestamp: string;
+  employee_id: string;
+  name: string;
+  department: string;
+  role: string;
+  endpoint: string;
+  method: string;
+  status_code: number;
+  detail: string;
+  ip_address: string;
+}
+
+export interface FeatureUsageSummaryRow {
+  feature: string;
+  name: string;
+  count: number;
+  avg_rating: number;
+  feedback_count: number;
+}
+
+export interface ChangeAuditRow {
+  timestamp: string;
+  actor: string;
+  actor_name: string;
+  actor_role: string;
+  action: string;
+  endpoint: string;
+  method: string;
+  status_code: number;
+  detail: string;
+}
+
+export interface AuditDashboardResponse {
+  period: 'day' | 'week' | 'month';
+  time_pattern: TimePatternBucket[];
+  anomalies: AnomalyFeedItem[];
+  permission_violations: PermissionViolationRow[];
+  feature_usage: FeatureUsageSummaryRow[];
+  change_audit: ChangeAuditRow[];
+}
+
+export async function fetchAuditDashboard(
+  period: 'day' | 'week' | 'month' = 'week',
+): Promise<AuditDashboardResponse> {
+  const { data } = await api.get<AuditDashboardResponse>('/admin/audit/dashboard', {
+    params: { period },
+  });
   return data;
 }
 
@@ -440,4 +563,156 @@ export async function fetchSystemHealth(): Promise<SystemHealthResponse> {
 export async function downloadSystemBackup(): Promise<Blob> {
   const { data } = await api.post('/admin/system/backup', undefined, { responseType: 'blob' });
   return data as Blob;
+}
+
+// ─────────────────────────────────────────────────────────────
+// PR-E8 — Permission 매트릭스 + 결재 워크플로우
+// backend/routers/admin.py PR-E7~E8 endpoints 와 1:1 매핑.
+// ─────────────────────────────────────────────────────────────
+
+export interface PermissionItem {
+  key: string;
+  description: string;
+  min_role: string;
+  departments: string[] | null;
+  allow_same_division: boolean;
+  min_position_level: number;
+  created_at?: string;
+  updated_at?: string;
+  updated_by?: string;
+}
+
+export interface PermissionListResponse {
+  total: number;
+  items: PermissionItem[];
+}
+
+export async function fetchPermissionsList(): Promise<PermissionListResponse> {
+  const { data } = await api.get<PermissionListResponse>('/admin/permissions/list');
+  return data;
+}
+
+export async function fetchPermission(key: string): Promise<PermissionItem> {
+  const { data } = await api.get<PermissionItem>(`/admin/permissions/${encodeURIComponent(key)}`);
+  return data;
+}
+
+export interface PermissionChangeRequestBody {
+  permission_key: string;
+  new_value: {
+    description?: string;
+    min_role?: string;
+    departments?: string[] | null;
+    allow_same_division?: boolean;
+    min_position_level?: number;
+    [k: string]: unknown;
+  };
+  reason: string;
+}
+
+export interface PermissionPreviewResponse {
+  permission_key: string;
+  before: PermissionItem | null;
+  after: PermissionChangeRequestBody['new_value'];
+  is_new: boolean;
+  reason: string;
+}
+
+export async function previewPermissionChange(
+  body: PermissionChangeRequestBody,
+): Promise<PermissionPreviewResponse> {
+  const { data } = await api.post<PermissionPreviewResponse>(
+    '/admin/permissions/preview', body,
+  );
+  return data;
+}
+
+export interface PermissionRequestCreated {
+  request_id: number;
+  status: string;
+}
+
+export async function requestPermissionChange(
+  body: PermissionChangeRequestBody,
+): Promise<PermissionRequestCreated> {
+  const { data } = await api.post<PermissionRequestCreated>(
+    '/admin/permissions/request', body,
+  );
+  return data;
+}
+
+export type PermissionRequestStatus =
+  | 'pending'
+  | 'security_approved'
+  | 'executive_approved'
+  | 'applied'
+  | 'rejected';
+
+export interface PermissionChangeRequestRow {
+  request_id: number;
+  permission_key: string;
+  requested_by: string;
+  old_value: PermissionItem | null;
+  new_value: PermissionChangeRequestBody['new_value'];
+  status: PermissionRequestStatus;
+  security_approver: string | null;
+  executive_approver: string | null;
+  requested_at: string;
+  applied_at: string | null;
+  reason: string;
+}
+
+export async function approvePermissionSecurity(
+  requestId: number,
+): Promise<PermissionChangeRequestRow> {
+  const { data } = await api.post<PermissionChangeRequestRow>(
+    `/admin/permissions/approve/security/${requestId}`,
+  );
+  return data;
+}
+
+export async function approvePermissionExecutive(
+  requestId: number,
+): Promise<PermissionChangeRequestRow> {
+  const { data } = await api.post<PermissionChangeRequestRow>(
+    `/admin/permissions/approve/executive/${requestId}`,
+  );
+  return data;
+}
+
+export async function rejectPermissionRequest(
+  requestId: number, reason: string,
+): Promise<PermissionChangeRequestRow> {
+  const { data } = await api.post<PermissionChangeRequestRow>(
+    `/admin/permissions/reject/${requestId}`, { reason },
+  );
+  return data;
+}
+
+export interface PermissionQueueResponse {
+  status: string;
+  items: PermissionChangeRequestRow[];
+}
+
+export async function fetchPermissionQueue(
+  status: 'pending' | 'security_approved' = 'pending',
+): Promise<PermissionQueueResponse> {
+  const { data } = await api.get<PermissionQueueResponse>(
+    '/admin/permissions/queue', { params: { status } },
+  );
+  return data;
+}
+
+export interface PermissionHistoryResponse {
+  limit: number;
+  items: PermissionChangeRequestRow[];
+}
+
+export async function fetchPermissionHistory(
+  limit: number = 50,
+): Promise<PermissionHistoryResponse> {
+  const { data } = await api.get<PermissionHistoryResponse>(
+    '/admin/permissions/history', { params: { limit } },
+  );
+  return data;
 }

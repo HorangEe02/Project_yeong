@@ -142,7 +142,146 @@ INTERNAL_DOC_TYPES = {
   5. 결재란: 신청자 / 팀장 / 부서장
 - 사유는 정중하고 구체적으로 (1~2문장)
 - 마지막에 "위와 같이 휴가를 신청하오니 승인하여 주시기 바랍니다." 포함
-- placeholder 사용 금지""",
+- placeholder 사용 금지
+
+■ 출력 형식 규칙 (필수)
+- 각 항목은 반드시 별도 줄에 작성 (한 줄에 여러 항목 넣지 말 것)
+- 헤더는 마크다운 굵게: **수신:**, **발신:**, **제목:**, **결재란** 등 ** 사용
+- 항목 목록은 줄바꿈 후 "- " 접두로 시작 (예: \"- 휴가 종류: 연차\")
+- 한자 사용 금지 — 모두 한글로 (예: 不在 → 부재, 出張 → 출장, 結裁 → 결재)
+- 섹션(수신/발신/제목/본문/결재란) 사이에는 빈 줄 1개
+- 줄바꿈 문자(\\n)를 명시적으로 사용해 가독성 확보""",
+    },
+
+    "출장 신청서": {
+        "icon": "✈️",
+        "description": "국내/해외 출장 신청서 (출장 승인 요청)",
+        "tone": "formal",
+        "language": "ko",
+        "fields": [
+            {"key": "applicant",    "label": "신청자",        "type": "text",     "required": True,  "placeholder": "구매조달팀 김구매 과장"},
+            {"key": "trip_type",    "label": "출장 구분",     "type": "select",   "required": True,  "options": ["국내 출장", "해외 출장", "단기 (1~3일)", "장기 (4일 이상)"]},
+            {"key": "destination",  "label": "출장지",        "type": "text",     "required": True,  "placeholder": "현대모비스 울산공장 / Stuttgart, Germany"},
+            {"key": "start_date",   "label": "출발일",        "type": "text",     "required": True,  "placeholder": "2026-06-10"},
+            {"key": "end_date",     "label": "복귀일",        "type": "text",     "required": True,  "placeholder": "2026-06-12"},
+            {"key": "purpose",      "label": "출장 목적",     "type": "textarea", "required": True,  "placeholder": "PPAP 4단계 승인 회의 + 양산 라인 점검"},
+            {"key": "estimated_cost", "label": "예상 경비",   "type": "text",     "required": False, "placeholder": "1,200,000원 (항공 + 숙박 + 식대)"},
+            {"key": "handover",     "label": "업무 인수인계", "type": "textarea", "required": False, "placeholder": "긴급 ECN 검토: 박설계 대리"},
+        ],
+        "prompt_template": """당신은 아진산업의 인사 행정 문서 작성 전문가입니다. 출장 신청서를 작성하세요.
+
+■ 신청자: {applicant}
+■ 출장 구분: {trip_type}
+■ 출장지: {destination}
+■ 기간: {start_date} ~ {end_date}
+■ 출장 목적: {purpose}
+
+{estimated_cost_section}
+{handover_section}
+
+작성 규칙:
+- 양식 구조:
+  1. 제목: "출장 신청서"
+  2. 신청자 / 부서 / 직급
+  3. 출장 구분 / 출장지 / 기간
+  4. 출장 목적 (구체적·정량적)
+  5. 예상 경비 (있으면)
+  6. 업무 인수인계
+  7. 결재란: 신청자 / 팀장 / 부서장
+- 마지막에 "위와 같이 출장을 신청하오니 승인하여 주시기 바랍니다." 포함
+- placeholder 사용 금지
+
+■ 출력 형식 규칙 (필수)
+- 각 항목은 반드시 별도 줄에 작성
+- 헤더는 마크다운 굵게: **수신:**, **발신:**, **제목:**, **결재란** 등
+- 항목 목록은 줄바꿈 후 "- " 접두
+- 한자 사용 금지 — 모두 한글로
+- 섹션 사이에는 빈 줄 1개""",
+    },
+
+    "사직서": {
+        "icon": "📤",
+        "description": "퇴직(사직) 의사 표명 사직서",
+        "tone": "formal",
+        "language": "ko",
+        "fields": [
+            {"key": "applicant",        "label": "신청자",        "type": "text",     "required": True,  "placeholder": "품질관리팀 이품질 대리"},
+            {"key": "join_date",        "label": "입사일",        "type": "text",     "required": True,  "placeholder": "2020-03-02"},
+            {"key": "last_work_date",   "label": "퇴직 희망일",   "type": "text",     "required": True,  "placeholder": "2026-06-30"},
+            {"key": "reason",           "label": "사직 사유",     "type": "textarea", "required": True,  "placeholder": "개인 사정 (대학원 진학 / 가족 간호 등)"},
+            {"key": "handover",         "label": "업무 인수인계 계획", "type": "textarea", "required": True, "placeholder": "주요 업무: SPC 일일 관제, 8D 사례 정리. 인수자: 박품질 사원 (퇴직일 2주 전까지 OJT)"},
+        ],
+        "prompt_template": """당신은 아진산업의 인사 행정 문서 작성 전문가입니다. 사직서를 정중한 격식으로 작성하세요.
+
+■ 신청자: {applicant}
+■ 입사일: {join_date}
+■ 퇴직 희망일: {last_work_date}
+■ 사직 사유: {reason}
+■ 업무 인수인계 계획: {handover}
+
+작성 규칙:
+- 양식 구조:
+  1. 제목: "사직서"
+  2. 신청자 / 부서 / 직급 / 사번 (사번은 placeholder 가능 — [사번])
+  3. 입사일 / 퇴직 희망일
+  4. 사직 사유 (개인 사유는 구체화 강요하지 말 것)
+  5. 업무 인수인계 계획 (담당자, 기간, OJT 내용)
+  6. 결재란: 신청자 / 팀장 / 부서장 / 인사팀장
+- 톤: 정중하고 차분한 격식체
+- 마지막에 "위와 같이 사직 의사를 표명하오니 승인하여 주시기 바랍니다." 포함
+- placeholder 사용 금지 (사번 외)
+
+■ 출력 형식 규칙 (필수)
+- 각 항목은 반드시 별도 줄에 작성
+- 헤더는 마크다운 굵게: **제목:**, **신청자:**, **결재란** 등
+- 한자 사용 금지 — 모두 한글로
+- 섹션 사이에는 빈 줄 1개""",
+    },
+
+    "인사발령 통지": {
+        "icon": "📜",
+        "description": "부서 이동/승진/직무 변경 등 인사발령 통지서 (인사팀 발신)",
+        "tone": "formal",
+        "language": "ko",
+        "fields": [
+            {"key": "issued_by",        "label": "발신 (인사팀/대표)", "type": "text",     "required": True,  "placeholder": "아진산업(주) 인사팀장"},
+            {"key": "subject",          "label": "발령 구분",     "type": "select",   "required": True,  "options": ["부서 이동", "승진", "직무 변경", "겸직 발령", "발령 취소", "신규 채용 발령"]},
+            {"key": "target_employee",  "label": "대상자",        "type": "text",     "required": True,  "placeholder": "박품질 (사번 20-1234)"},
+            {"key": "old_position",     "label": "변경 전",       "type": "text",     "required": True,  "placeholder": "품질관리팀 / 대리"},
+            {"key": "new_position",     "label": "변경 후",       "type": "text",     "required": True,  "placeholder": "품질혁신팀 / 과장"},
+            {"key": "effective_date",   "label": "발령일",        "type": "text",     "required": True,  "placeholder": "2026-07-01"},
+            {"key": "remarks",          "label": "비고",         "type": "textarea", "required": False, "placeholder": "기존 업무 인수인계 6/30 까지 완료 / 인사발령 환영회 7/3"},
+        ],
+        "prompt_template": """당신은 아진산업의 인사팀 문서 작성 전문가입니다. 인사발령 통지서를 작성하세요.
+
+■ 발신: {issued_by}
+■ 발령 구분: {subject}
+■ 대상자: {target_employee}
+■ 변경 전: {old_position}
+■ 변경 후: {new_position}
+■ 발령일: {effective_date}
+
+{remarks_section}
+
+작성 규칙:
+- 양식 구조:
+  1. 문서번호 (HR-YYYY-NNNN 패턴, placeholder 가능)
+  2. 제목: "인사발령 통지서"
+  3. 수신: 대상자 / 참조: 소속 부서장
+  4. 발신: 인사팀장
+  5. 발령 내용 표 (구분 / 변경 전 / 변경 후 / 발령일)
+  6. 비고 (있으면)
+  7. 결재: 인사팀장 / 임원
+- 톤: 공식 통지문 (객관적, 사실 중심)
+- 마지막에 "본 발령은 위 일자부터 효력이 발생합니다." 포함
+- placeholder 사용 금지 (문서번호 외)
+
+■ 출력 형식 규칙 (필수)
+- 각 항목은 반드시 별도 줄에 작성
+- 헤더는 마크다운 굵게: **수신:**, **발신:**, **제목:** 등
+- 발령 내용 표는 마크다운 표 형식
+- 한자 사용 금지 — 모두 한글로
+- 섹션 사이에는 빈 줄 1개""",
     },
 
     "견적서": {

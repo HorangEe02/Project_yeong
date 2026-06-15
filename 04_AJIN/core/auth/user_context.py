@@ -9,7 +9,18 @@ from typing import Optional
 
 @dataclass
 class UserContext:
-    """현재 로그인한 사용자의 컨텍스트 정보"""
+    """현재 로그인한 사용자의 컨텍스트 정보.
+
+    Args:
+        user_id: 내부 사용자 ID.
+        employee_id: 사원번호.
+        name: 사용자 이름.
+        department: 소속 부서.
+        division: 소속 본부.
+        position: 직급.
+        role: RBAC 역할 이름.
+        role_level: RBAC 숫자 레벨.
+    """
     user_id: int
     employee_id: str          # 사원번호
     name: str
@@ -17,6 +28,7 @@ class UserContext:
     division: str             # 소속 본부 (예: "품질본부")
     position: str             # 직급 (예: "과장")
     role: str                 # RBAC 역할 (예: "MANAGER")
+    role_level: int = 1       # RBAC 레벨 (SYS_ADMIN=L5)
     email: Optional[str] = None
     phone: Optional[str] = None
     site: Optional[str] = None  # 근무 사업장 (예: "경산 본사")
@@ -149,6 +161,11 @@ def get_user_context_from_session() -> Optional[UserContext]:
         user_id = st.session_state.get("user_id", 0)
 
     division = DEPARTMENT_TO_DIVISION.get(department, "기타")
+    try:
+        from core.auth.rbac import get_role_level
+        role_level = get_role_level(role)
+    except Exception:
+        role_level = 1
 
     return UserContext(
         user_id=user_id,
@@ -158,6 +175,7 @@ def get_user_context_from_session() -> Optional[UserContext]:
         division=division,
         position=position or "사원",
         role=role,
+        role_level=role_level,
         email=email or None,
         phone=phone or None,
         site=site or "경산 본사",

@@ -1,34 +1,70 @@
-// Day 6 Phase 3 — RTDB live_alarms 구독.
-// 다른 사용자가 푸시한 알람 도 합치도록 구독 — 본선 시연 멀티 사용자 시나리오.
+// Backend live alarm polling hook.
+//
+// Replaces legacy Firebase RTDB `live_alarms` reads with the Postgres-backed
+// `/api/live-alarms/recent` endpoint.
 
 import { useEffect, useState } from 'react';
-import { off, onValue, ref as rtdbRef } from 'firebase/database';
-import { rtdb } from '@lib/firebase';
-import type { RecentViolation } from '@/types/equipment';
+import { fetchLiveAlarmsRecent, type LiveAlarmItem } from '@api/liveAlarms';
+import type { RecentViolation, Severity } from '@/types/equipment';
 
-interface RTDBAlarmEntry {
-  id?: string;
-  process_id?: string;
-  process_name?: string;
-  rule_number?: number;
-  severity?: string;
-  message?: string;
-  timestamp?: number;
-  pushed_at?: number;
+const POLL_MS = 5000;
+
+function normalizeSeverity(raw: string): Severity {
+  const severity = raw.trim().toLowerCase();
+  if (severity === 'critical') return 'critical';
+  if (severity === 'high' || severity === 'warning') return 'warning';
+  return 'info';
 }
 
-function normalize(key: string, raw: RTDBAlarmEntry): RecentViolation | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const sev = raw.severity ?? 'info';
-  const severity = (sev === 'critical' || sev === 'warning' || sev === 'info' ? sev : 'info') as RecentViolation['severity'];
+function normalizeTimestamp(alarm: LiveAlarmItem): number {
+  const payloadTimestamp = alarm.payload.timestamp ?? alarm.payload.pushed_at;
+  if (typeof payloadTimestamp === 'number') return payloadTimestamp;
+  if (typeof payloadTimestamp === 'string') {
+    const parsed = Number(payloadTimestamp);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+
+  const detectedAt = alarm.payload.detected_at;
+  if (typeof detectedAt === 'string') {
+    const parsed = Date.parse(detectedAt);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+
+  const createdAt = Date.parse(alarm.created_at);
+  return Number.isFinite(createdAt) ? createdAt : Date.now();
+}
+
+function readString(payload: Record<string, unknown>, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = payload[key];
+    if (typeof value === 'string' && value.trim()) return value;
+  }
+  return '';
+}
+
+function readRuleNumber(payload: Record<string, unknown>): number {
+  const value = payload.rule_number;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return 0;
+}
+
+function normalize(alarm: LiveAlarmItem): RecentViolation {
+  const process = readString(alarm.payload, 'process_id', 'process');
   return {
-    id: raw.id ?? key,
-    process_id: raw.process_id ?? '',
-    process_name: raw.process_name ?? '',
-    rule_number: raw.rule_number ?? 0,
-    severity,
-    message: raw.message ?? '',
-    timestamp: raw.timestamp ?? raw.pushed_at ?? Date.now(),
+    id: alarm.id,
+    process_id: process,
+    process_name: readString(alarm.payload, 'process_name', 'process') || process,
+    rule_number: readRuleNumber(alarm.payload),
+    severity: normalizeSeverity(alarm.severity),
+    message: alarm.message,
+    timestamp: normalizeTimestamp(alarm),
+    data_class: String(alarm.payload.data_class ?? 'real') as RecentViolation['data_class'],
+    source_system: readString(alarm.payload, 'source_system', 'source') || 'live_alarms',
+    source_label: readString(alarm.payload, 'source_label', 'source') || 'live_alarms',
   };
 }
 
@@ -36,32 +72,26 @@ export function useEquipmentRTDB(): RecentViolation[] {
   const [items, setItems] = useState<RecentViolation[]>([]);
 
   useEffect(() => {
-    if (!rtdb) return;
-    const r = rtdbRef(rtdb, 'live_alarms');
-    const unsub = onValue(
-      r,
-      (snap) => {
-        const val = snap.val() as Record<string, RTDBAlarmEntry> | null;
-        if (!val) {
-          setItems([]);
-          return;
-        }
-        const list: RecentViolation[] = [];
-        for (const [key, entry] of Object.entries(val)) {
-          const n = normalize(key, entry);
-          if (n) list.push(n);
-        }
-        // 최신순 + 최대 50개
-        list.sort((a, b) => b.timestamp - a.timestamp);
-        setItems(list.slice(0, 50));
-      },
-      () => {
-        // 구독 권한 거부 시 빈 리스트 유지
-        setItems([]);
-      },
-    );
+    let cancelled = false;
+    let timer: ReturnType<typeof setInterval> | null = null;
 
-    return () => off(r, 'value', unsub);
+    const refresh = async () => {
+      try {
+        const res = await fetchLiveAlarmsRecent('equipment', 50);
+        if (cancelled) return;
+        setItems(res.alarms.map(normalize).sort((a, b) => b.timestamp - a.timestamp));
+      } catch {
+        if (!cancelled) setItems([]);
+      }
+    };
+
+    void refresh();
+    timer = setInterval(refresh, POLL_MS);
+
+    return () => {
+      cancelled = true;
+      if (timer) clearInterval(timer);
+    };
   }, []);
 
   return items;

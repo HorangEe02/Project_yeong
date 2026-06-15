@@ -20,6 +20,7 @@ from fastapi import APIRouter, Depends
 
 from backend.dependencies import get_current_user
 from config import DATA_DIR, DEPARTMENTS
+from core.data_lineage import should_include_non_real_data
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
@@ -42,17 +43,23 @@ def _safe_count(db_path: Path, query: str) -> int:
 
 
 def _count_employees() -> int:
-    return _safe_count(DATA_DIR / "employees.db", "SELECT COUNT(*) FROM employees")
+    if should_include_non_real_data():
+        return _safe_count(DATA_DIR / "employees.db", "SELECT COUNT(*) FROM employees")
+    return _safe_count(DATA_DIR / "employees.db", "SELECT COUNT(*) FROM employees WHERE data_class='real'")
 
 
 def _count_test_accounts() -> int:
-    return _safe_count(DATA_DIR / "auth.db", "SELECT COUNT(*) FROM users WHERE is_active=1")
+    if should_include_non_real_data():
+        return _safe_count(DATA_DIR / "auth.db", "SELECT COUNT(*) FROM users WHERE is_active=1")
+    return _safe_count(DATA_DIR / "auth.db", "SELECT COUNT(*) FROM users WHERE is_active=1 AND data_class='real'")
 
 
 def _count_error_codes() -> int:
     p = DATA_DIR / "equipment" / "error_codes.db"
     if p.exists():
-        return _safe_count(p, "SELECT COUNT(*) FROM error_codes")
+        if should_include_non_real_data():
+            return _safe_count(p, "SELECT COUNT(*) FROM error_codes")
+        return _safe_count(p, "SELECT COUNT(*) FROM error_codes WHERE data_class='real'")
     return 0
 
 
@@ -134,19 +141,32 @@ def _system_metrics() -> dict[str, float]:
 async def get_ingestion(user=Depends(get_current_user)):
     err = _count_error_codes()
     molds_db = DATA_DIR / "equipment" / "molds.db"
-    molds_n = _safe_count(molds_db, "SELECT COUNT(*) FROM molds WHERE status='active'") \
+    if should_include_non_real_data():
+        mold_filter = ""
+        mold_where = "status='active'"
+    else:
+        mold_filter = " WHERE data_class='real'"
+        mold_where = "status='active' AND data_class='real'"
+    molds_n = _safe_count(molds_db, f"SELECT COUNT(*) FROM molds WHERE {mold_where}") \
         if molds_db.exists() else 0
-    molds_total = _safe_count(molds_db, "SELECT COUNT(*) FROM molds") if molds_db.exists() else 0
+    molds_total = _safe_count(molds_db, f"SELECT COUNT(*) FROM molds{mold_filter}") if molds_db.exists() else 0
 
     drawings_db = DATA_DIR / "equipment" / "drawings.db"
-    draw_n = _safe_count(drawings_db, "SELECT COUNT(*) FROM drawings") if drawings_db.exists() else 0
+    draw_q = "SELECT COUNT(*) FROM drawings"
+    if not should_include_non_real_data():
+        draw_q += " WHERE data_class='real'"
+    draw_n = _safe_count(drawings_db, draw_q) if drawings_db.exists() else 0
 
     inspect_db = DATA_DIR / "equipment" / "inspection.db"
     if inspect_db.exists():
         # checklist_templates(템플릿 6) + inspection_logs(실 기록 1) 합산.
         # total 은 시연 목표(72)와 max 비교 → 진행률 표시.
-        templates_n = _safe_count(inspect_db, "SELECT COUNT(*) FROM checklist_templates")
-        logs_n = _safe_count(inspect_db, "SELECT COUNT(*) FROM inspection_logs")
+        if should_include_non_real_data():
+            templates_n = _safe_count(inspect_db, "SELECT COUNT(*) FROM checklist_templates")
+            logs_n = _safe_count(inspect_db, "SELECT COUNT(*) FROM inspection_logs")
+        else:
+            templates_n = _safe_count(inspect_db, "SELECT COUNT(*) FROM checklist_templates WHERE data_class='real'")
+            logs_n = _safe_count(inspect_db, "SELECT COUNT(*) FROM inspection_logs WHERE data_class='real'")
         inspect_n = templates_n + logs_n
         inspect_total = max(inspect_n, 72)
     else:
@@ -176,7 +196,7 @@ async def get_system_info(user=Depends(get_current_user)):
     프론트는 본 응답을 사용하고, 실패 시 mock SYSTEM_INFO 로 폴백한다.
     """
     # ── LLM / 비전 / 임베딩 모델 — .env 직독으로 단일 진실 (LLMRouter 와 동일)
-    gemini_pro = os.environ.get("GEMINI_MODEL", "gemini-2.5-pro")
+    gemini_pro = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
     chat_large = os.environ.get("OLLAMA_MODEL_CHAT_LARGE", "qwen3.5:9b")
     chat_small = os.environ.get("OLLAMA_MODEL_CHAT_SMALL", "qwen3.5:4b")
     gemma_large = os.environ.get("OLLAMA_MODEL_GEMMA_LARGE", "gemma4:e4b")
@@ -184,16 +204,29 @@ async def get_system_info(user=Depends(get_current_user)):
     embedding = os.environ.get("OLLAMA_MODEL_EMBEDDING", "bge-m3")
     lm_studio_enabled = os.environ.get("LM_STUDIO_ENABLED", "false").lower() == "true"
     embedding_backend = os.environ.get("EMBEDDING_BACKEND", "ollama").lower()
+    primary_provider = os.environ.get("LLM_ROUTER_PRIMARY", "gemini").strip().lower()
+    if primary_provider not in ("ollama", "gemini"):
+        primary_provider = "gemini"
 
     cb_threshold = os.environ.get("LLM_ROUTER_CIRCUIT_BREAKER_THRESHOLD", "3")
     cb_recovery = os.environ.get("LLM_ROUTER_CIRCUIT_RECOVERY_SEC", "60")
     fallback_on = os.environ.get("LLM_ROUTER_FALLBACK_ENABLED", "true").lower() == "true"
 
-    llm_engines = [
-        f"Gemini {gemini_pro.removeprefix('gemini-').upper()} (1순위)",
-        f"Qwen {chat_large} / {chat_small} (사내)",
-        f"Gemma {gemma_large} / {gemma_small} (경량)",
-    ]
+    gemini_label = f"Gemini {gemini_pro.removeprefix('gemini-').upper()}"
+    qwen_label = f"Qwen {chat_large} / {chat_small}"
+    gemma_label = f"Gemma {gemma_large} / {gemma_small}"
+    if primary_provider == "ollama":
+        llm_engines = [
+            f"{qwen_label} (1순위 · Ollama)",
+            f"{gemma_label} (Ollama 경량/비전)",
+            f"{gemini_label} (fallback)",
+        ]
+    else:
+        llm_engines = [
+            f"{gemini_label} (1순위)",
+            f"{qwen_label} (fallback · Ollama)",
+            f"{gemma_label} (Ollama 경량/비전)",
+        ]
     if lm_studio_enabled:
         llm_engines.append("LM Studio (옵션)")
 
@@ -218,6 +251,7 @@ async def get_system_info(user=Depends(get_current_user)):
         "vision": vision_models,
         "embedding": embed_caption,
         "router": (
+            f"Primary {primary_provider.upper()} · "
             f"LLMRouter 폴백 {'활성' if fallback_on else '비활성'} · "
             f"Circuit Breaker {cb_threshold}회/{cb_recovery}초"
         ),
@@ -274,9 +308,12 @@ async def get_module_counts(user=Depends(get_current_user)):
     molds = 0
     molds_db = DATA_DIR / "equipment" / "molds.db"
     if molds_db.exists():
+        mold_query = "SELECT COUNT(*) FROM molds WHERE status IN ('active','maintenance')"
+        if not should_include_non_real_data():
+            mold_query += " AND data_class='real'"
         molds = _safe_count(
             molds_db,
-            "SELECT COUNT(*) FROM molds WHERE status IN ('active','maintenance')",
+            mold_query,
         )
 
     # roles — auth.db

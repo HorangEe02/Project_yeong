@@ -12,9 +12,7 @@ export interface MockError {
 }
 
 export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: 'bearer';
+  token_type: 'cookie';
   employee_id: string;
   username: string;
   role_name: string;
@@ -22,6 +20,9 @@ export interface LoginResponse {
   must_change_pw: boolean;
   department?: string;
   position?: string;
+  // v4.7 Feature E Phase 2 — 2FA 중간 응답
+  require_2fa?: boolean;
+  mid_token?: string | null;
 }
 
 const networkLatency = (ms = 200) =>
@@ -62,9 +63,7 @@ export async function mockLogin(body: { employee_id: string; password: string })
   account.last_login = new Date().toISOString();
 
   return {
-    access_token: `mock.jwt.${account.employee_id}.${Date.now()}`,
-    refresh_token: `mock.refresh.${account.employee_id}`,
-    token_type: 'bearer',
+    token_type: 'cookie',
     employee_id: account.employee_id,
     username: account.username,
     role_name: account.role_name,
@@ -85,8 +84,8 @@ export async function mockChangePassword(body: {
   if (!account) throw { status: 404, detail: '사용자를 찾을 수 없습니다.' } satisfies MockError;
   if (account.password !== body.current_password)
     throw { status: 401, detail: '현재 비밀번호가 올바르지 않습니다.' } satisfies MockError;
-  if (body.new_password.length < 8)
-    throw { status: 400, detail: '새 비밀번호는 8자 이상이어야 합니다.' } satisfies MockError;
+  if (body.new_password.length < 12)
+    throw { status: 400, detail: '새 비밀번호는 12자 이상이어야 합니다.' } satisfies MockError;
 
   account.password = body.new_password;
   account.must_change_pw = false;

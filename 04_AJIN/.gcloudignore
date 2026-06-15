@@ -30,6 +30,18 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
+
+# Python 가상환경 + 패키지 매니저 캐시
+# (디렉토리 이동 후 .uv-cache 가 깨진 심볼릭 링크로 남아 Cloud Build upload 실패 트리거 — 2026-05-25 D-16)
+.venv/
+.uv-cache/
+
+# ChromaDB persistence (ADR-0008 후 backup 용도, Cloud Run 불필요)
+chroma_db/
+
+# Cloud Build 출력
+outputs/
 
 # Git/IDE
 .git/
@@ -61,3 +73,10 @@ node_modules/
 # Cloud Build 메타
 .gcloudignore
 .dockerignore
+
+# 한국어 긴 파일명 (Cloud Build 의 ext4 filesystem 255 byte limit 초과 → 2026-05-27 build fail)
+# 사용자 제출용 자료 — Cloud Run 빌드 컨텍스트와 무관
+참가 신청서/
+
+# Secrets — build context 에 절대 포함되어선 안 됨 (Cloud Run 은 Secret Manager 사용)
+_secrets/

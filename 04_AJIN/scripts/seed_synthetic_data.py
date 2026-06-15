@@ -491,6 +491,8 @@ SPC_PROCESSES = [
 
 def seed_spc_data():
     """SPC 합성 CSV 데이터 생성"""
+    from core.data_lineage import write_source_manifest
+
     spc_dir = Path("data/spc_samples")
     spc_dir.mkdir(parents=True, exist_ok=True)
 
@@ -512,6 +514,13 @@ def seed_spc_data():
             lines.append(f"{i},{v},{proc['unit']},{proc['part']},{proc['name']}")
 
         filepath.write_text("\n".join(lines), encoding="utf-8")
+        write_source_manifest(
+            filepath,
+            data_class="synthetic",
+            source_system="seed_equipment",
+            source_label="seed_synthetic_data:spc",
+            extra={"process": proc["name"], "samples": proc["n_samples"]},
+        )
 
     # 메타 정보 JSON
     meta = []

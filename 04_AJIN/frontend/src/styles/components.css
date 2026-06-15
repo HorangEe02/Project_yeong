@@ -207,8 +207,6 @@
 }
 .ui-drawer {
   position: fixed;
-  background: var(--hud-surface);
-  border: 1px solid var(--hud-border);
   z-index: 1000;
   display: flex; flex-direction: column;
   box-shadow: var(--shadow-md);
@@ -835,7 +833,9 @@
 }
 
 /* ── DownloadActions ──────────────────────────────────── */
-.download-actions { display: flex; flex-direction: column; gap: 4px; }
+/* v3.8: user-select:none — 사용자가 메시지 본문을 드래그·복사할 때 button label
+   ("↓ XLSX" 등) 이 selection 에 함께 잡혀 다음 입력에 leak 되는 UX 결함 방지. */
+.download-actions { display: flex; flex-direction: column; gap: 4px; user-select: none; -webkit-user-select: none; }
 .download-actions-eyebrow {
   font-size: 9px;
   letter-spacing: 0.12em;
@@ -863,10 +863,13 @@
 .download-error { font-size: 11px; color: var(--hud-red, #ef4444); }
 
 /* ── FeedbackActions ───────────────────────────────────── */
+/* v3.8: user-select:none — DownloadActions 와 동일 이유 (👍/👎 leak 방지). */
 .feedback-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .feedback-btn {
   display: inline-flex;

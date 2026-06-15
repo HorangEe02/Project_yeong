@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import os
 import pickle
 from pathlib import Path
 
@@ -20,6 +21,7 @@ from config import (
     CHUNK_SIZE, CHUNK_OVERLAP,
 )
 from core.embedding_client import get_embeddings
+from features.search.vector_store import DocumentChunkInput, SupabasePgvectorStore
 
 
 # ──────────────────────────────────────────────────────────────
@@ -653,6 +655,79 @@ def build_vectorstore(
     return vectorstore
 
 
+def build_pgvector_store(
+    documents: list[Document],
+    batch_size: int = 50,
+    store: SupabasePgvectorStore | None = None,
+) -> int:
+    """문서를 임베딩하여 Supabase Postgres pgvector에 저장한다.
+
+    Args:
+        documents: 청크 분할 전 원본 문서 목록.
+        batch_size: 임베딩 및 upsert 배치 크기.
+        store: 테스트 또는 커스텀 연결을 위한 pgvector adapter.
+
+    Returns:
+        int: Postgres에 upsert한 청크 수.
+
+    Raises:
+        RuntimeError: Postgres 연결 또는 embedding backend 호출이 실패한 경우.
+        ValueError: embedding 차원이 pgvector schema와 일치하지 않는 경우.
+    """
+
+    splitter = create_splitter()
+    chunks = splitter.split_documents(documents)
+
+    print(f"  원본 문서 수: {len(documents)}")
+    print(f"  pgvector 청크 분할 후: {len(chunks)}")
+
+    if not chunks:
+        return 0
+
+    embeddings = get_embeddings()
+    pgvector_store = store or SupabasePgvectorStore()
+    per_doc_index: dict[str, int] = {}
+    written = 0
+    total_batches = (len(chunks) + batch_size - 1) // batch_size
+
+    for i in range(0, len(chunks), batch_size):
+        batch = chunks[i:i + batch_size]
+        batch_num = i // batch_size + 1
+        print(f"  pgvector 임베딩 배치 {batch_num}/{total_batches} ({len(batch)} 청크)...")
+
+        vectors = embeddings.embed_documents([chunk.page_content for chunk in batch])
+        payloads: list[DocumentChunkInput] = []
+        for chunk, vector in zip(batch, vectors, strict=True):
+            metadata = dict(chunk.metadata)
+            source_doc_id = str(
+                metadata.get("doc_id")
+                or metadata.get("source_doc_id")
+                or metadata.get("source")
+                or f"doc-{i}"
+            )
+            chunk_index = per_doc_index.get(source_doc_id, 0)
+            per_doc_index[source_doc_id] = chunk_index + 1
+            metadata["chunk_index"] = chunk_index
+            payloads.append(
+                DocumentChunkInput(
+                    source_doc_id=source_doc_id,
+                    source_path=str(metadata.get("source", "")) or None,
+                    title=str(metadata.get("title", "")) or None,
+                    doc_type=str(metadata.get("doc_type", "")) or None,
+                    part_name=str(metadata.get("part_name", "")) or None,
+                    chunk_index=chunk_index,
+                    content=chunk.page_content,
+                    embedding=vector,
+                    metadata=metadata,
+                    data_class=str(metadata.get("data_class", "real")),
+                )
+            )
+        written += pgvector_store.upsert_document_chunks(payloads)
+
+    print(f"  Supabase pgvector 저장 완료: {written} 청크")
+    return written
+
+
 def save_bm25_corpus(documents: list[Document]) -> None:
     """BM25 검색용 코퍼스를 JSON으로 저장한다. (pickle → JSON 보안 개선)"""
     splitter = create_splitter()
@@ -723,12 +798,26 @@ def run_indexing():
         print("⚠️ 로드된 문서가 없습니다.")
         return
 
-    # 5. 청크 분할 + 임베딩 + ChromaDB 저장
-    print("\n[5/6] 청크 분할 및 임베딩 중... (시간 소요)")
-    vectorstore = build_vectorstore(all_documents)
+    write_mode = os.getenv("VECTOR_WRITE_MODE", "chroma").strip().lower()
+    if write_mode not in {"chroma", "postgres", "dual"}:
+        raise ValueError("VECTOR_WRITE_MODE must be one of chroma, postgres, or dual")
+
+    # 5. 청크 분할 + 임베딩 + vector store 저장
+    vectorstore = None
+    if write_mode in {"chroma", "dual"}:
+        print("\n[5/7] ChromaDB 청크 분할 및 임베딩 중... (시간 소요)")
+        vectorstore = build_vectorstore(all_documents)
+    else:
+        print("\n[5/7] ChromaDB 저장 생략 (VECTOR_WRITE_MODE=postgres)")
+
+    if write_mode in {"postgres", "dual"}:
+        print("\n[6/7] Supabase pgvector 청크 분할 및 임베딩 중... (시간 소요)")
+        build_pgvector_store(all_documents)
+    else:
+        print("\n[6/7] Supabase pgvector 저장 생략 (VECTOR_WRITE_MODE=chroma)")
 
     # 6. BM25 인덱스 구축용 코퍼스 저장
-    print("\n[6/6] BM25 코퍼스 저장 중...")
+    print("\n[7/7] BM25 코퍼스 저장 중...")
     save_bm25_corpus(all_documents)
 
     # 소스별 통계

@@ -4,9 +4,12 @@ Ollama 서버가 실행 중이어야 LLM 기반 답변 생성이 정상 동작�
 용어 사전 매칭, 부서별 라우팅, 대화 관리는 Ollama 없이도 테스트 가능하다.
 """
 
+import importlib
 import json
 import sys
 from pathlib import Path
+
+import pytest
 
 # 프로젝트 루트를 sys.path에 추가
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -15,6 +18,19 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from features.onboarding.glossary_matcher import GlossaryMatcher
 from features.onboarding.department_router import DepartmentRouter, DEPARTMENT_PROFILES
 from features.onboarding.conversation_manager import ConversationManager, ConversationSession
+
+
+# ──────────────────────────────────────────────
+# v4.7 test isolation — module state reset (Pattern 2)
+# ──────────────────────────────────────────────
+
+
+@pytest.fixture(autouse=True)
+def reset_glossary_module():
+    """glossary_matcher 의 _ALIASES_CACHE 등 module-level state 를 매 테스트 전 reload."""
+    import features.onboarding.glossary_matcher as gm
+    importlib.reload(gm)
+    yield
 
 
 # ===== 1. 용어 사전 데이터 검증 =====
@@ -69,7 +85,7 @@ def test_glossary_data():
         print("  ✅ 용어 수 충족")
     else:
         print("  ❌ 용어 수 부족")
-    return result
+    assert result
 
 
 # ===== 2. 용어 사전 매칭 테스트 =====
@@ -117,7 +133,7 @@ def test_glossary_matcher():
         print(f"  {status} '{query}' {term_info}")
 
     print(f"\n  결과: {passed}/{total} 통과")
-    return passed >= total - 2  # 2개까지 허용
+    assert passed >= total - 2  # 2개까지 허용
 
 
 # ===== 3. 부서별 라우팅 테스트 =====
@@ -154,7 +170,7 @@ def test_department_router():
     print("  ✅ 미등록 부서(총무팀) → None 반환")
 
     print("\n  ✅ 부서별 라우팅 테스트 통과")
-    return all_ok
+    assert all_ok
 
 
 # ===== 4. 대화 관리 테스트 =====
@@ -204,7 +220,6 @@ def test_conversation_manager():
     print("  ✅ FAQ 카운터 정상")
 
     print("\n  ✅ 대화 관리 테스트 통과")
-    return True
 
 
 # ===== 5. SOP/가이드 문서 존재 검증 =====
@@ -250,7 +265,7 @@ def test_knowledge_documents():
 
     if all_ok:
         print("\n  ✅ 모든 문서 검증 통과")
-    return all_ok
+    assert all_ok
 
 
 # ===== 6. 시스템 프롬프트 검증 =====
@@ -284,7 +299,7 @@ def test_system_prompt():
     print(f"  프롬프트 길이: {len(content)}자")
     if all_ok:
         print("\n  ✅ 시스템 프롬프트 검증 통과")
-    return all_ok
+    assert all_ok
 
 
 # ===== 메인 =====
@@ -293,12 +308,12 @@ def main():
     print("\n🏭 AJIN AI Assistant — 기능 C 온보딩 챗봇 테스트\n")
 
     all_passed = True
-    all_passed &= test_glossary_data()
-    all_passed &= test_glossary_matcher()
-    all_passed &= test_department_router()
-    all_passed &= test_conversation_manager()
-    all_passed &= test_knowledge_documents()
-    all_passed &= test_system_prompt()
+    test_glossary_data()
+    test_glossary_matcher()
+    test_department_router()
+    test_conversation_manager()
+    test_knowledge_documents()
+    test_system_prompt()
 
     print("\n" + "=" * 60)
     if all_passed:

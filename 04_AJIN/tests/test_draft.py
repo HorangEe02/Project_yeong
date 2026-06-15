@@ -112,7 +112,7 @@ def test_classifier():
                   f"상황={tc.get('expected_situation')}")
 
     print(f"\n  결과: {passed}/{total} 통과")
-    return passed == total
+    assert passed == total
 
 
 # ===== 2. 템플릿 렌더링 테스트 (Ollama 불필요) =====
@@ -268,7 +268,6 @@ def test_template_rendering():
     print(f"     → 길이: {len(rendered_ecn)}자")
 
     print("\n  ✅ 모든 템플릿 렌더링 테스트 통과")
-    return True
 
 
 # ===== 3. 프롬프트 파일 검증 =====
@@ -318,7 +317,7 @@ def test_prompts_exist():
 
     if all_ok:
         print("\n  ✅ 모든 프롬프트 파일 검증 통과")
-    return all_ok
+    assert all_ok
 
 
 # ===== 4. .docx 출력 테스트 =====
@@ -421,7 +420,6 @@ NBR 소재 O-ring의 내열성 저하가 근본 원인
     print(f"     → 파일 크기: {result_8d.stat().st_size:,} bytes")
 
     print("\n  ✅ .docx 출력 테스트 통과")
-    return True
 
 
 # ===== 5. 분류기 → 템플릿 매핑 일관성 테스트 =====
@@ -445,7 +443,7 @@ def test_template_mapping():
 
     if all_ok:
         print("\n  ✅ 모든 템플릿 매핑 검증 통과")
-    return all_ok
+    assert all_ok
 
 
 # ===== 메인 =====
@@ -454,11 +452,11 @@ def main():
     print("\n🏭 AJIN AI Assistant — 기능 B 초안 작성 테스트\n")
 
     all_passed = True
-    all_passed &= test_classifier()
-    all_passed &= test_template_rendering()
-    all_passed &= test_prompts_exist()
-    all_passed &= test_docx_export()
-    all_passed &= test_template_mapping()
+    test_classifier()
+    test_template_rendering()
+    test_prompts_exist()
+    test_docx_export()
+    test_template_mapping()
 
     print("\n" + "=" * 60)
     if all_passed:

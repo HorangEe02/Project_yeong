@@ -214,7 +214,9 @@ def enrich_violations(violations: List["NelsonViolation"]) -> list:
         violations: analyze_nelson_rules() 결과의 violations 리스트
 
     Returns:
-        각 violation에 guide 정보가 추가된 dict 리스트
+        각 violation에 guide + action_suggestions(축 ③) 가 추가된 dict 리스트.
+        action_suggestions 는 기본 ['mail_to_dept', 'create_ticket', 'open_sop'] —
+        프론트엔드 토스트가 액션 버튼으로 렌더링하는 라벨 ID 배열.
     """
     from dataclasses import asdict
 
@@ -223,6 +225,8 @@ def enrich_violations(violations: List["NelsonViolation"]) -> list:
         v_dict = asdict(v) if hasattr(v, "__dataclass_fields__") else dict(v)
         guide = get_rule_guide(v_dict.get("rule_number", 0))
         v_dict["guide"] = guide
+        # v4.7 Sprint 2 P0 (축 ③) — 토스트에서 노출할 액션 후보.
+        v_dict["action_suggestions"] = ["mail_to_dept", "create_ticket", "open_sop"]
         enriched.append(v_dict)
     return enriched
 

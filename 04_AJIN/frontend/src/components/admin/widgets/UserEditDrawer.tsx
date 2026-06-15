@@ -67,12 +67,16 @@ export function UserEditDrawer({ user, tree, currentUserLevel, currentUserId, on
 
   const handleReset = async () => {
     if (!canEdit) return;
-    if (!confirm(`${user.employee_id} 의 비밀번호를 초기값으로 재설정합니다. 계속할까요?`)) return;
+    if (!confirm(`${user.employee_id} 의 임시 비밀번호를 새로 발급합니다. 계속할까요?`)) return;
     setBusy(true);
     try {
       const res = await resetPassword(user.employee_id);
-      setResetPw(res.initial_password);
-      setMsg(`비밀번호 재설정 완료 — 초기 PW: ${res.initial_password}`);
+      setResetPw(res.initial_password || '');
+      setMsg(
+        res.initial_password
+          ? `비밀번호 재설정 완료 — 임시 PW: ${res.initial_password}`
+          : (res.issuance_note || '비밀번호 재설정 요청 완료 — 사내 IdP 초대/초기화 절차를 사용하세요.'),
+      );
       onChanged();
     } catch (e) {
       setMsg(`재설정 실패: ${(e as Error).message}`);

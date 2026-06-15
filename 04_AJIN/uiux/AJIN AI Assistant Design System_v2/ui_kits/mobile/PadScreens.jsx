@@ -51,7 +51,7 @@ function PadDashboard({ theme = "dark" } = {}) {
             {/* Sidebar */}
             <div className="rail">
               <div className="aj-brand" style={{padding:'4px 8px 14px'}}>
-                <div className="mark" style={{width:32, height:32, fontSize:16}}>A</div>
+                <div className="mark" style={{width:36, height:36}}><img src="../../assets/ajin_symbol.svg" alt="AJIN"/></div>
                 <div>
                   <div className="word" style={{fontSize:14}}>AJ<i>·</i>IN</div>
                   <div className="ko" style={{fontSize:9}}>아진산업 · v2.4</div>

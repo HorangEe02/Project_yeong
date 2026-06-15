@@ -48,6 +48,16 @@ interface DraftState {
   ccRec: CCRecResponse | null;
   diff: DiffResponse | null;
 
+  // ── 부록 4 F-fav — 즐겨찾기 (영구) ──────────
+  favoritedDocTypes: string[];
+
+  // ── 부록 6 P4-4 — multi-device merge baseline (서버 GET 시 수신) ─
+  prefsBaseVersion: string;
+
+  // ── 부록 6 P4-1+P4-3 — 부서/개인 추천 캐시 (비영구) ──────────
+  deptRecommendations: string[];   // doc_type_id 만 (count 는 별도 노출 불필요)
+  personalPicks: string[];          // doc_type_id 만
+
   // ── 액션 ───────────────────────────────────────
   setContext: (c: DocCategory) => void;
   setDocTypeId: (id: string) => void;
@@ -67,6 +77,11 @@ interface DraftState {
   setQuality: (q: QualityResponse | null) => void;
   setCCRec: (cc: CCRecResponse | null) => void;
   setDiff: (d: DiffResponse | null) => void;
+
+  toggleFavorite: (id: string) => void;
+  setPrefsBaseVersion: (v: string) => void;
+  setDeptRecommendations: (ids: string[]) => void;
+  setPersonalPicks: (ids: string[]) => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -91,6 +106,11 @@ export const useDraftStore = create<DraftState>()(
       quality: null,
       ccRec: null,
       diff: null,
+
+      favoritedDocTypes: [],
+      prefsBaseVersion: '',
+      deptRecommendations: [],
+      personalPicks: [],
 
       setContext: (context) => set({ context }),
       setDocTypeId: (docTypeId) => set({ docTypeId }),
@@ -136,6 +156,16 @@ export const useDraftStore = create<DraftState>()(
       setQuality: (quality) => set({ quality }),
       setCCRec: (ccRec) => set({ ccRec }),
       setDiff: (diff) => set({ diff }),
+
+      toggleFavorite: (id) =>
+        set((s) => ({
+          favoritedDocTypes: s.favoritedDocTypes.includes(id)
+            ? s.favoritedDocTypes.filter((x) => x !== id)
+            : [...s.favoritedDocTypes, id],
+        })),
+      setPrefsBaseVersion: (prefsBaseVersion) => set({ prefsBaseVersion }),
+      setDeptRecommendations: (deptRecommendations) => set({ deptRecommendations }),
+      setPersonalPicks: (personalPicks) => set({ personalPicks }),
     }),
     {
       name: 'ajin-draft',
@@ -149,6 +179,7 @@ export const useDraftStore = create<DraftState>()(
         toneId: state.toneId,
         meta: state.meta,
         userRequest: state.userRequest,
+        favoritedDocTypes: state.favoritedDocTypes,
       }),
     },
   ),

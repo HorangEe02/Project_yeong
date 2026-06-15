@@ -23,10 +23,116 @@ OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 LLM_MODEL = os.environ.get("LLM_MODEL", "qwen3.5:9b")
 EMBEDDING_MODEL = os.environ.get("EMBEDDING_MODEL", "bge-m3")
 
+# ── Phase 2: LLM 풀 모델별 분리 ────────────────────────────
+# 미설정 시 OLLAMA_BASE_URL 로 폴백 → Phase 1 동작 유지 (backward-compatible).
+# NVIDIA 서버 컨테이너 분리 시: ollama-large(qwen3.5:9b) / ollama-fast(gemma4:e2b·qwen3.5:4b)
+OLLAMA_BASE_URL_LARGE = os.environ.get("OLLAMA_BASE_URL_LARGE", OLLAMA_BASE_URL)
+OLLAMA_BASE_URL_FAST  = os.environ.get("OLLAMA_BASE_URL_FAST",  OLLAMA_BASE_URL)
+
+# ── Phase B: Vertex AI Gemini 통합 ──────────────────────────
+# LLM_PROVIDER 로 ollama ↔ vertex 토글 (1줄 swap). 미설정 시 ollama (Stage 1 호환).
+LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "ollama").strip().lower()
+VERTEX_PROJECT_ID = os.environ.get("VERTEX_PROJECT_ID", "").strip()
+VERTEX_LOCATION   = os.environ.get("VERTEX_LOCATION", "asia-northeast1").strip()
+
+
+def _feature_default_tier(ollama_tier: str) -> str:
+    """LLM_PROVIDER 에 따라 기본 tier 자동 선택."""
+    return "vertex" if LLM_PROVIDER == "vertex" else ollama_tier
+
+
+def _feature_model(env_key: str, ollama_default: str, vertex_default: str) -> str:
+    """provider-aware 모델 선택.
+
+    LLM_PROVIDER=vertex 시 → `{env_key}_VERTEX` 우선 (없으면 vertex_default).
+                              `LLM_MODEL_*` ollama 용 hotfix env 는 무시.
+    LLM_PROVIDER=ollama 시 → `{env_key}` 우선 (없으면 ollama_default).
+    rollback 시 자동 복원.
+    """
+    if LLM_PROVIDER == "vertex":
+        return os.environ.get(f"{env_key}_VERTEX", vertex_default)
+    return os.environ.get(env_key, ollama_default)
+
+
+# Feature → (tier, model). tier: "large" | "fast" | "vertex"
+LLM_FEATURE_ROUTES: dict[str, tuple[str, str]] = {
+    "whatif_nl_route": (
+        _feature_default_tier("large"),
+        _feature_model("LLM_MODEL_WHATIF", "qwen3.5:9b", "gemini-3.5-flash"),
+    ),
+    "quiz_gen": (
+        _feature_default_tier("fast"),
+        _feature_model("LLM_MODEL_QUIZ", "gemma4:e2b", "gemini-3.5-flash"),
+    ),
+    "rag_answer": (
+        _feature_default_tier("fast"),
+        _feature_model("LLM_MODEL_RAG", "qwen3.5:4b", "gemini-3.5-flash"),
+    ),
+    "short_answer_grade": (
+        _feature_default_tier("fast"),
+        _feature_model("LLM_MODEL_GRADE", "qwen3.5:4b", "gemini-3.5-flash"),
+    ),
+}
+
+
+def resolve_llm_route(feature: str = "default") -> tuple[str, str, str]:
+    """feature → (provider, base_or_project, model). 미등록 feature 는 Phase 1 기본값으로 폴백.
+
+    provider: "ollama" | "vertex"
+    base_or_project: ollama 면 base URL, vertex 면 project_id
+    Vertex tier 인데 VERTEX_PROJECT_ID 미설정 시 → ollama 폴백 (backward-compat).
+    """
+    route = LLM_FEATURE_ROUTES.get(feature)
+    if route is None:
+        return ("ollama", OLLAMA_BASE_URL, LLM_MODEL)
+    tier, model = route
+    if tier == "vertex":
+        if not VERTEX_PROJECT_ID:
+            return ("ollama", OLLAMA_BASE_URL, LLM_MODEL)
+        return ("vertex", VERTEX_PROJECT_ID, model)
+    base = OLLAMA_BASE_URL_LARGE if tier == "large" else OLLAMA_BASE_URL_FAST
+    return ("ollama", base, model)
+
 # Plan A 변형 — Mac Ollama secret header 인증.
 # Cloud Run 에서 Caddy(:8434) reverse proxy 경유로 Mac Ollama 호출 시 부착할 secret.
 # 로컬 dev (localhost:11434 직접) 에서는 빈값 유지 (인증 불요).
 AJIN_OLLAMA_SECRET = os.environ.get("AJIN_OLLAMA_SECRET", "")
+
+# Phase 1 크롤러 — 외부 OpenAPI 인증키
+# 미설정 시 해당 크롤러는 source_type="curated" 로 폴백 (마스터 dict 사용).
+# Cloud Run 적용: gcloud run services update ajin-backend
+#   --update-secrets=LAW_GO_KR_OC=law-oc:latest,CUSTOMS_API_KEY=customs-key:latest
+LAW_GO_KR_OC = os.environ.get("LAW_GO_KR_OC", "").strip()      # open.law.go.kr 사용자 ID
+CUSTOMS_API_KEY = os.environ.get("CUSTOMS_API_KEY", "").strip()  # unipass.customs.go.kr 인증키
+
+# MVP 변경 감지 파이프라인 — Slack 알림 라우팅
+# Cloud Run 적용:
+#   gcloud run services update ajin-backend --update-secrets=SLACK_WEBHOOK_URL=slack-webhook:latest
+# 미설정 시 알림 단계는 로그만 남기고 graceful skip (파이프라인 자체는 계속).
+SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
+
+# P1 D3 — SMS / 모바일 푸시 직보 (CRITICAL 임원 알림)
+# Provider 선택: sens(기본, 한국 특화) | twilio(해외 fallback)
+# 미설정 시 SMS 단계 graceful skip — Slack 만 발송됨.
+SMS_PROVIDER = os.environ.get("SMS_PROVIDER", "sens").strip().lower()
+
+# Naver Cloud SENS — Korean SMS (~10원/건)
+SENS_ACCESS_KEY = os.environ.get("SENS_ACCESS_KEY", "").strip()
+SENS_SECRET_KEY = os.environ.get("SENS_SECRET_KEY", "").strip()
+SENS_SERVICE_ID = os.environ.get("SENS_SERVICE_ID", "").strip()
+SENS_FROM_NUMBER = os.environ.get("SENS_FROM_NUMBER", "").strip()
+
+# Twilio — 해외 임원 fallback (~$0.05/건)
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID", "").strip()
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN", "").strip()
+TWILIO_FROM = os.environ.get("TWILIO_FROM", "").strip()
+
+# P2 D6 — 공급망 자가진단 SMTP (협력사 메일 발송)
+# 미설정 시 send_self_assessment_email 은 'queued' 상태로 DB 적재만 (graceful skip).
+SMTP_HOST = os.environ.get("SMTP_HOST", "").strip()
+SMTP_PORT = int(os.environ.get("SMTP_PORT", "587") or 587)
+SMTP_USER = os.environ.get("SMTP_USER", "").strip()
+SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "").strip()
 
 
 def ollama_headers() -> dict:
@@ -70,6 +176,10 @@ MODEL_PROFILES = {
         "speed": "fast",
         "quality": "good",
         "best_for": ["onboarding", "search"],
+        "tags_ko": ["빠름", "경량", "다국어"],
+        "summary_ko": "가벼운 다국어 모델. 검색 요약·간단한 챗봇 응답에 적합.",
+        "use_when_ko": "응답 속도가 우선이고 짧은 질의응답이 많을 때. 저사양 환경.",
+        "avoid_when_ko": "긴 보고서·전문 문서. 한국어 격식·전문 용어 정밀도가 필요한 경우.",
     },
     "qwen3.5:9b": {
         "display": "Qwen 3.5 9B (기본값)",
@@ -79,6 +189,10 @@ MODEL_PROFILES = {
         "speed": "medium",
         "quality": "high",
         "best_for": ["draft", "onboarding", "search", "compliance"],
+        "tags_ko": ["균형", "다국어", "기본"],
+        "summary_ko": "다국어 균형형. 일상 업무 문서·검색·온보딩에 두루 활용.",
+        "use_when_ko": "한·영·중 혼합 문서, 8D/ECN 같은 일반 업무, 응답 속도와 품질 균형이 필요할 때.",
+        "avoid_when_ko": "이미지 입력(gemma4 추천), 한국어 미세 표현 정밀도(EXAONE 추천).",
     },
 
     # ── 2. EXAONE 시리즈 ──
@@ -90,6 +204,10 @@ MODEL_PROFILES = {
         "speed": "medium",
         "quality": "high",
         "best_for": ["draft", "onboarding", "compliance"],
+        "tags_ko": ["한국어", "격식", "고품질"],
+        "summary_ko": "LG AI 한국어 특화 모델. 격식 문서·사내 보고서에 최적.",
+        "use_when_ko": "초안 작성(8D/ECN/회의록), 사내 보고서, 한국어 격식 표현, 임원 보고용 문서.",
+        "avoid_when_ko": "영문 OEM 메일이 주류인 경우, 다국어 혼합, 이미지 입력.",
     },
     "exaone-deep:latest": {
         "display": "EXAONE Deep 7.8B (추론 강화)",
@@ -99,6 +217,10 @@ MODEL_PROFILES = {
         "speed": "slow",
         "quality": "very_high",
         "best_for": ["compliance", "draft"],
+        "tags_ko": ["한국어", "추론", "법규"],
+        "summary_ko": "추론 강화 한국어 모델. 법규 분석·복잡한 문서 검토에 우수.",
+        "use_when_ko": "산안법·REACH 등 법규 분석, 복잡한 추론, 정확도가 속도보다 중요한 경우.",
+        "avoid_when_ko": "실시간 챗봇, 짧은 응답이 많은 단순 질의응답.",
     },
 
     # ── 3. Nemotron Cascade 2 (향후 서버 업그레이드 대비) ──
@@ -110,6 +232,10 @@ MODEL_PROFILES = {
         "speed": "slow",
         "quality": "very_high",
         "best_for": ["draft", "compliance"],
+        "tags_ko": ["대형", "고급", "다국어"],
+        "summary_ko": "NVIDIA 대형 모델. 복잡한 다국어 문서와 심층 분석.",
+        "use_when_ko": "최고 품질이 필요한 임원 보고, 다국어 복합 분석, GPU 22GB 이상 환경.",
+        "avoid_when_ko": "응답 속도가 중요한 경우, 저사양 환경, 일상 단순 업무.",
     },
 
     # ── 4. Gemma 4 시리즈 (비전 지원) ──
@@ -121,6 +247,10 @@ MODEL_PROFILES = {
         "speed": "medium",
         "quality": "high",
         "best_for": ["onboarding", "draft"],
+        "tags_ko": ["비전", "다국어", "균형"],
+        "summary_ko": "이미지 입력 가능 다국어 모델. 도면·차트 해석에 적합.",
+        "use_when_ko": "이미지·도면 첨부 분석, 차트 해석, 멀티모달 챗봇.",
+        "avoid_when_ko": "텍스트만 다루는 단순 작업(qwen 추천), 한국어 격식 문서(EXAONE 추천).",
     },
     "gemma4:e2b": {
         "display": "Gemma 4 5.1B (경량 비전)",
@@ -130,6 +260,10 @@ MODEL_PROFILES = {
         "speed": "fast",
         "quality": "good",
         "best_for": ["onboarding"],
+        "tags_ko": ["비전", "빠름", "경량"],
+        "summary_ko": "경량 비전 모델. 빠른 이미지 응답이 필요할 때.",
+        "use_when_ko": "온보딩 챗봇 이미지 응답, 간단한 차트 설명, 모바일/저사양 환경.",
+        "avoid_when_ko": "긴 보고서, 정밀한 한국어 표현.",
     },
     "gemma4:26b": {
         "display": "Gemma 4 26B (대형 비전)",
@@ -139,6 +273,10 @@ MODEL_PROFILES = {
         "speed": "slow",
         "quality": "very_high",
         "best_for": ["onboarding", "draft", "compliance"],
+        "tags_ko": ["비전", "대형", "고품질"],
+        "summary_ko": "대형 비전 모델. 복잡한 도면·다중 이미지 정밀 분석.",
+        "use_when_ko": "도면 비교, 다중 이미지 분석, 정밀한 멀티모달 작업.",
+        "avoid_when_ko": "응답 속도가 중요한 경우, 16GB 이하 GPU 환경.",
     },
 
     # ── 5. GPT-OSS ──
@@ -150,6 +288,10 @@ MODEL_PROFILES = {
         "speed": "slow",
         "quality": "very_high",
         "best_for": ["draft", "compliance"],
+        "tags_ko": ["고품질", "다국어", "대형"],
+        "summary_ko": "오픈소스 GPT 계열 고품질 모델. 폭넓은 일반 지식.",
+        "use_when_ko": "다양한 분야의 일반 지식이 필요한 작업, 대안 모델로 비교 검증.",
+        "avoid_when_ko": "응답 속도가 중요한 경우, 한국어 특화 표현, 이미지 입력.",
     },
 }
 
@@ -185,6 +327,35 @@ RRF_K = 60
 USE_KIWI = True
 
 # ──────────────────────────────────────────────
+# RAG 강화 — Phase 1 (Reranker + CRAG) / Phase 2 (LongLLMLingua)
+# 출처: docs/RAG_ENHANCEMENT_PLAN.md §2.1, §2.2, §2.3
+# ──────────────────────────────────────────────
+
+# Reranker (Phase 1, P0) — BAAI/bge-reranker-v2-m3 cross-encoder
+RERANKER_ENABLED = os.getenv("RERANKER_ENABLED", "true").lower() == "true"
+RERANKER_MODEL = os.getenv("RERANKER_MODEL", "BAAI/bge-reranker-v2-m3")
+RERANKER_TOP_K_INPUT = int(os.getenv("RERANKER_TOP_K_INPUT", "20"))  # rerank 입력 후보 수 (TOP_K * 4)
+RERANKER_USE_FP16 = os.getenv("RERANKER_USE_FP16", "true").lower() == "true"
+
+# CRAG Retrieval Evaluator (Phase 1, P0) — 강제 차단 정책
+# verdict ∈ {correct (score ≥ upper), ambiguous (lower ≤ score < upper), incorrect (score < lower)}
+# incorrect → LLM 호출 우회 + 사내 자료 없음 안내 (강제 차단 확정 — RAG_ENHANCEMENT_PLAN §11 #3)
+CRAG_ENABLED = os.getenv("CRAG_ENABLED", "true").lower() == "true"
+CRAG_UPPER_THRESHOLD = float(os.getenv("CRAG_UPPER_THRESHOLD", "0.70"))
+CRAG_LOWER_THRESHOLD = float(os.getenv("CRAG_LOWER_THRESHOLD", "0.40"))
+CRAG_LLM_JUDGE_ENABLED = os.getenv("CRAG_LLM_JUDGE_ENABLED", "false").lower() == "true"  # Phase 2
+
+# LongLLMLingua (Phase 2, 본선 후 D+1 시작)
+# kb_context + ref_context + action_context 합산 길이 > threshold 일 때만 압축
+LLMLINGUA_ENABLED = os.getenv("LLMLINGUA_ENABLED", "false").lower() == "true"  # Phase 2 에서 true
+LLMLINGUA_MODEL = os.getenv(
+    "LLMLINGUA_MODEL",
+    "microsoft/llmlingua-2-xlm-roberta-large-meetingbank",  # 다국어 (한국어 포함)
+)
+LLMLINGUA_THRESHOLD_CHARS = int(os.getenv("LLMLINGUA_THRESHOLD_CHARS", "2000"))
+LLMLINGUA_TARGET_RATIO = float(os.getenv("LLMLINGUA_TARGET_RATIO", "0.5"))
+
+# ──────────────────────────────────────────────
 # 아진산업 조직 정보 (AJIN_ORGANIZATION_REFERENCE.md 기준)
 # ──────────────────────────────────────────────
 
@@ -204,6 +375,9 @@ COMPANY_INFO = {
     "main_customer": ["현대자동차", "기아자동차"],
     "certifications": ["IATF 16949", "ISO 14001", "ISO 45001", "AEO AAA등급"],
     # v1.6: 사업 현황 업데이트
+    # NOTE (Sprint 1 P0): 사내 실제 정원이며 KPI/검색용으로 사용하지 말 것.
+    # 동적 카운트는 core.directory.canonical.CanonicalDirectory.get_total_headcount() 사용.
+    # 3-way gap 진단은 CanonicalDirectory.reconcile() 의 config_total 필드로 비교.
     "total_employees": 649,
     "revenue_2025": "1조 886억원",
     "revenue_2025_billion_krw": 10886,

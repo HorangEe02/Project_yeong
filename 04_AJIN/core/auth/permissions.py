@@ -414,6 +414,35 @@ ALL_PERMISSIONS.update(ADMIN_PERMISSIONS)
 ALL_PERMISSIONS.update(EQUIPMENT_PERMISSIONS)
 
 
+# v4.7 PR-E7 — first-run seed only. v4.8+ 에서 제거 예정.
+# DB-first lookup (get_permission_def) 이 비어있는 환경에서 동작 유지를 위한 fallback.
+_CODE_DICT_PERMISSIONS: dict[str, Permission] = dict(ALL_PERMISSIONS)
+
+
+def get_permission_def(key: str) -> Optional[Permission]:
+    """v4.7 PR-E7: DB-first lookup. DB 에 없으면 코드 dict (first-run seed).
+
+    v4.8+ 에서는 코드 dict 제거 예정 — 그 시점부터 DB miss 는 None 반환.
+    """
+    try:
+        from core.auth.permissions_db import get_permission as _db_get
+
+        row = _db_get(key)
+        if row:
+            return Permission(
+                key=row["key"],
+                description=row["description"],
+                min_role=row["min_role"],
+                departments=row["departments"],
+                allow_same_division=row["allow_same_division"],
+                min_position_level=row["min_position_level"],
+            )
+    except Exception:  # pragma: no cover — DB 미존재/에러 시 dict fallback
+        pass
+    # first-run seed fallback
+    return _CODE_DICT_PERMISSIONS.get(key)
+
+
 # ═══════════════════════════════════════════════
 # 판정 함수
 # ═══════════════════════════════════════════════
@@ -437,7 +466,8 @@ def check_permission(
     if not user_ctx:
         return False
 
-    perm = ALL_PERMISSIONS.get(permission_key)
+    # v4.7 PR-E7: DB-first lookup, dict fallback.
+    perm = get_permission_def(permission_key)
     if not perm:
         return False
 

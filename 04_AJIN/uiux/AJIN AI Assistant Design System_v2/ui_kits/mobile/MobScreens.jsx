@@ -30,7 +30,7 @@ function MobShellTop({ greeting, name, ts, theme = 'dark' }) {
     <div style={{ padding: '64px 16px 0', position:'relative', zIndex:5 }}>
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div className="aj-brand">
-          <div className="mark">A</div>
+          <div className="mark"><img src="../../assets/ajin_symbol.svg" alt="AJIN"/></div>
           <div>
             <div className="word">AJ<i>·</i>IN</div>
             <div className="ko">아진산업</div>
@@ -59,12 +59,11 @@ function MobLogin({ theme = "dark" } = {}) {
         <div style={{position:'relative', zIndex:2, paddingTop: 100, height:'100%', display:'flex', flexDirection:'column'}}>
           <div style={{textAlign:'center', padding:'12px 16px 4px'}}>
             <div style={{
-              width:64, height:64, borderRadius:18, margin:'0 auto 14px',
-              background:'linear-gradient(135deg,#FCB132,#B57600)',
+              width:72, height:72, borderRadius:20, margin:'0 auto 14px',
+              backgroundImage:'radial-gradient(120% 120% at 30% 0%, rgba(255,255,255,0.55), rgba(255,255,255,0) 55%), linear-gradient(135deg,#FCB132,#B57600)',
               display:'flex', alignItems:'center', justifyContent:'center',
-              fontSize:32, fontWeight:800, color:'#07090C', letterSpacing:'-0.04em',
-              boxShadow:'0 12px 40px -10px rgba(252,177,50,0.6)',
-            }}>A</div>
+              boxShadow:'inset 0 0.5px 0 rgba(255,255,255,0.6), 0 16px 44px -10px rgba(252,177,50,0.6)',
+            }}><img src="../../assets/ajin_symbol.svg" alt="AJIN" style={{width:'72%', height:'72%', objectFit:'contain', filter:'drop-shadow(0 1px 0 rgba(0,0,0,0.2))'}}/></div>
             <div style={{fontWeight:800, fontSize:20, letterSpacing:'0.18em'}}>AJ·IN</div>
             <div className="aj-mono" style={{marginTop:6, color:'#FCB132'}}>AI ASSISTANT · v2.4</div>
           </div>
@@ -111,8 +110,28 @@ function MobDashboard({ theme = "dark" } = {}) {
       <div className={"aj-screen " + theme} style={{position:'relative'}}>
         <div className={"aj-bg-grad " + theme} />
         <MobNotificationDot />
-        <MobShellTop greeting="안녕하세요" name="김민수 책임" ts="화 14:23 · CST" theme="dark" />
+        <MobShellTop greeting="화요일, 5월 13" name="안녕하세요, 김민수 책임" ts="14:23 · CST" theme="dark" />
         <div className="aj-scroll" style={{position:'relative', zIndex:3, marginTop:18}}>
+          {/* App-Store-style HERO of the day */}
+          <div style={{padding:'4px 12px 16px'}}>
+            <div className="aj-as-hero">
+              <div className="bg" />
+              <div className="overlay" />
+              <div className="content">
+                <div className="overline">오늘의 인사이트 · STORY OF THE DAY</div>
+                <div className="ttl">사출 #03 라인을<br/>지금 점검해야 합니다</div>
+                <div className="sub">SPC Nelson R2 · Cpk 0.92 · 형틀 온도 +4.2°C drift</div>
+                <div className="cta">
+                  <div className="ico-tile"><Icons.Equipment size={20}/></div>
+                  <div className="meta">
+                    <div className="t">설비 AI · Equipment</div>
+                    <div className="s">실시간 분석 · 14ms p95</div>
+                  </div>
+                  <button className="get">열기</button>
+                </div>
+              </div>
+            </div>
+          </div>
           {/* KPI strip */}
           <div className="aj-grid-2" style={{paddingBottom:6}}>
             <div className="aj-glass aj-kpi">
@@ -137,7 +156,7 @@ function MobDashboard({ theme = "dark" } = {}) {
             </div>
           </div>
           {/* Modules */}
-          <div className="aj-sect-h"><h3>Modules · 모듈</h3><span className="more">All</span></div>
+          <div className="aj-as-sect"><div><div className="label">MODULES · 모듈</div><h2>업무에 필요한 모든 것</h2></div><span className="more">전체</span></div>
           <div className="aj-glass aj-divlist" style={{margin:'0 12px'}}>
             <ModRow icon={<Icons.Chat size={20}/>} ko="AI 채팅" en="CHAT · NLU" meta="Streaming" />
             <ModRow icon={<Icons.Search size={20}/>} ko="문서 검색" en="SEARCH · HYBRID" meta="14ms p95" />
@@ -146,7 +165,7 @@ function MobDashboard({ theme = "dark" } = {}) {
             <ModRow icon={<Icons.Equipment size={20}/>} ko="설비 AI" en="EQUIPMENT" meta="94/97" />
           </div>
           {/* Recent activity */}
-          <div className="aj-sect-h"><h3>Recent · 최근 활동</h3></div>
+          <div className="aj-as-sect"><div><div className="label">RECENT · 최근 활동</div><h2>오늘의 흐름</h2></div></div>
           <div className="aj-glass aj-divlist" style={{margin:'0 12px 14px'}}>
             <ActivityRow ts="14:18" who="설비 AI" what="사출 #03 SPC 알람 발신" tag="ALERT" />
             <ActivityRow ts="13:42" who="문서 작성" what="ECN-2024-0182 초안 완료" tag="DRAFT" />

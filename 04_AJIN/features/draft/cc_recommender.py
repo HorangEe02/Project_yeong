@@ -2,8 +2,16 @@
 CC (참조) 자동 추천 엔진
 - 문서유형별 필수/권장/선택 CC 추천
 - 부서 레지스트리의 cc_targets 활용
+- B5 v4.0: draft_versions.db 빈도 학습 — 과거 동일 doc_type+sender_dept
+  버전들의 template_vars.cc 빈출 인원을 frequent 티어로 추가.
 """
 
+from __future__ import annotations
+
+import json
+import sqlite3
+from collections import Counter
+from pathlib import Path
 from typing import Dict, List
 
 
@@ -115,6 +123,95 @@ def format_cc_display(cc_data: Dict[str, List[str]]) -> str:
         parts.append(f"**필수 CC**: {', '.join(cc_data['mandatory'])}")
     if cc_data["recommended"]:
         parts.append(f"**권장 CC**: {', '.join(cc_data['recommended'])}")
+    if cc_data.get("frequent"):
+        parts.append(f"**자주 함께 보낸 사람**: {', '.join(cc_data['frequent'])}")
     if cc_data["optional"]:
         parts.append(f"**선택 CC**: {', '.join(cc_data['optional'])}")
     return "\n\n".join(parts) if parts else "CC 추천 없음"
+
+
+# ─────────────────────────────────────────────────────────────
+# B5 v4.0 — 과거 버전 빈도 학습
+# ─────────────────────────────────────────────────────────────
+
+
+def learn_frequent_cc(
+    doc_type: str,
+    sender_department: str = "",
+    db_path: Path = Path("data/draft_versions.db"),
+    top_n: int = 3,
+    min_count: int = 2,
+) -> List[str]:
+    """draft_versions.db 의 template_vars.cc 필드에서 (doc_type, sender_dept) 매칭
+    버전들의 빈출 CC 항목 Top N 을 반환.
+
+    - cc 필드는 list[str] 또는 콤마 구분 문자열 가정 (둘 다 허용).
+    - min_count 이상 등장한 항목만 채택 (잡음 필터).
+    """
+    if not db_path.exists():
+        return []
+
+    try:
+        conn = sqlite3.connect(str(db_path))
+        conn.row_factory = sqlite3.Row
+        # documents JOIN 으로 doc_type + department 매칭
+        params: list = [doc_type]
+        query = """
+            SELECT v.template_vars_json
+            FROM versions v
+            JOIN documents d ON v.document_id = d.id
+            WHERE d.doc_type = ?
+        """
+        if sender_department:
+            query += " AND d.department = ?"
+            params.append(sender_department)
+        # 최근 200건만 학습 (과도한 과거 영향 차단)
+        query += " ORDER BY v.created_at DESC LIMIT 200"
+        rows = conn.execute(query, params).fetchall()
+        conn.close()
+    except Exception:
+        return []
+
+    counter: Counter[str] = Counter()
+    for row in rows:
+        try:
+            tv = json.loads(row["template_vars_json"] or "{}")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        cc = tv.get("cc")
+        if isinstance(cc, str):
+            items = [c.strip() for c in cc.split(",") if c.strip()]
+        elif isinstance(cc, list):
+            items = [str(c).strip() for c in cc if str(c).strip()]
+        else:
+            continue
+        for item in items:
+            counter[item] += 1
+
+    # min_count 이상 + Top N
+    return [name for name, count in counter.most_common(top_n) if count >= min_count]
+
+
+def recommend_cc_with_history(
+    doc_type: str,
+    sender_department: str = "",
+    sender_division: str = "",
+) -> Dict[str, List[str]]:
+    """B5 v4.0 — 정적 룰 + 과거 빈도 학습을 결합한 4-tier 추천.
+
+    Returns:
+        {"mandatory": [...], "recommended": [...], "frequent": [...], "optional": [...]}
+    """
+    base = recommend_cc(doc_type, sender_department, sender_division)
+
+    frequent = learn_frequent_cc(doc_type, sender_department)
+    # 중복 제거 — 이미 mandatory/recommended/optional 에 있으면 제외
+    existing = set(base["mandatory"]) | set(base["recommended"]) | set(base["optional"])
+    frequent = [f for f in frequent if f not in existing]
+
+    return {
+        "mandatory": base["mandatory"],
+        "recommended": base["recommended"],
+        "frequent": frequent,
+        "optional": base["optional"],
+    }

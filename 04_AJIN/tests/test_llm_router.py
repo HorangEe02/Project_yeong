@@ -199,6 +199,38 @@ async def test_scenario_1_gemini_primary_success(router_with_mocks: LLMRouter) -
     assert not errors
 
 
+@pytest.mark.asyncio
+async def test_ollama_primary_chat_starts_with_ollama(monkeypatch) -> None:
+    """LLM_ROUTER_PRIMARY=ollama 이면 일반 CHAT 체인이 Ollama 로 시작."""
+    monkeypatch.setenv("LLM_ROUTER_PRIMARY", "ollama")
+    router = LLMRouter(providers={
+        "gemini": MockProvider("gemini", tokens=("g",)),
+        "ollama": MockProvider("ollama", tokens=("o",)),
+    })
+
+    events = await _collect(router.stream("hello", mode=LLMMode.CHAT))
+    first_meta = next(e for e in events if e["type"] == "metadata")
+
+    assert first_meta["metadata"]["provider"] == "ollama"
+    assert first_meta["metadata"]["model"] == "qwen3.5:9b"
+
+
+@pytest.mark.asyncio
+async def test_ollama_primary_intent_starts_with_ollama(monkeypatch) -> None:
+    """INTENT 라우팅도 Ollama primary 운영값을 존중."""
+    monkeypatch.setenv("LLM_ROUTER_PRIMARY", "ollama")
+    router = LLMRouter(providers={
+        "gemini": MockProvider("gemini", tokens=("g",)),
+        "ollama": MockProvider("ollama", tokens=("o",)),
+    })
+
+    events = await _collect(router.stream("intent", mode=LLMMode.INTENT))
+    first_meta = next(e for e in events if e["type"] == "metadata")
+
+    assert first_meta["metadata"]["provider"] == "ollama"
+    assert first_meta["metadata"]["model"] == "qwen3.5:4b"
+
+
 # ============================================================
 # 시나리오 #2 — Gemini 실패 → Ollama 자동 폴백
 # ============================================================
