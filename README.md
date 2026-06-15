@@ -1,3 +1,5 @@
+**한국어** | [English](./README.en.md)
+
 # 박준영 · AI Engineering Project Portfolio
 
 > **기업 발주 · 경진대회 · 자기주도로 설계·구현한 실무급 AI 프로젝트 모음**
