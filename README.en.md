@@ -24,7 +24,7 @@
 |---|---------|----------|------|----------|
 | **[01](#-01_cad--cad-vision--ai-industrial-drawing-searchclassification-engine)** | **CAD Vision** | A multimodal-RAG full-stack engine that classifies, searches, and analyzes industrial CAD drawings with AI | Self-directed | YOLO · OpenCLIP · GNN · ChromaDB · Ollama · FastAPI · Next.js |
 | **[02](#-02_mediway--hospital-wayfinding--senior-accessibility-web-app)** | **MediWay** | In-hospital patient wayfinding + multi-tenant SaaS + senior-accessibility web app | Self-directed | React · TypeScript · Firebase · Dijkstra · WAI-ARIA |
-| **[03](#-03_lemon_healthcare--lemon-healthcare-gunganguisin)** | **Lemon Healthcare** | An AI healthcare platform delivering 5 integrated health analyses from a single supplement-label photo (OCR) | Client-commissioned | FastAPI · Flutter · PostgreSQL/TimescaleDB · Cloud Vision · Ollama |
+| **[03](#-03_lemon_healthcare--lemon-aid-food--supplement-ai-analysis-service-platform)** | **Lemon AID** | An AI service platform that analyzes food, supplement labels, and activity data together | Client-commissioned | FastAPI · Flutter · PostgreSQL/TimescaleDB · Cloud Vision · Ollama |
 | **[04](#-04_ajin--ajin-compliance--manufacturing-domain-ai-assistant)** | **AJIN Compliance** | An AI console that handles 6 business domains for 650 employees of a manufacturer in one screen · [static view](https://dist-two-omega-62.vercel.app/) | Competition (awarded) | FastAPI · React · Ollama/Vertex Gemini · ChromaDB RAG · Redis |
 
 ---
@@ -82,24 +82,29 @@
 
 ---
 
-## 🍋 03_lemon_healthcare — Lemon Healthcare (건강의신)
+## 🍋 03_lemon_healthcare — Lemon AID (Food · Supplement AI Analysis Service Platform)
 
-> **From a single supplement-label photo plus diet info, delivers 5 analyses at once: nutrient-gap recommendations, recommended intake, weight-change prediction, exercise guidance, and goal-specific (eye/liver/fatigue) analysis.**
+> **Analyzes food, supplement labels, and activity data together to deliver 5 integrated outputs: nutrient-gap recommendations, recommended intake, weight-change prediction, exercise guidance, and goal-specific (eye/liver/fatigue) analysis.**
 > *Commissioned by Lemon Healthcare Inc. · collaboration with the Kyungpook Nat'l Univ. AI/Big Data program*
 
 | Item | Detail |
 |------|------|
-| **Users** | Chronic-condition managers (primary) · prevention-stage office workers (secondary) — integrated supplement/diet/activity care |
+| **Users** | Chronic-condition managers (primary) · prevention-stage office workers (secondary) — integrated food/supplement/activity care |
 | **Core outputs** | ① nutrient-gap recommendation ② recommended intake ③ weight-change prediction ④ exercise guidance ⑤ goal-specific (eye/liver/fatigue) analysis — **5 integrated** |
-| **Differentiators** | LDB (130+ medical institutions) linkage potential · **chronic-disease v4 weighting algorithm** · official KDRIs / MFDS data · 7.7M+ user base (Cheonggu-uisin) |
+| **Differentiators** | Reduces barcode-registration and database-matching dependency by combining supplement-label OCR/LLM parsing with integrated food/activity analysis |
 | **Backend** | Python 3.11 · FastAPI · PostgreSQL 16 · **TimescaleDB** (time-series health data) · Redis · Docker Compose |
-| **AI / Data** | Google Cloud Vision OCR (supplement labels) · **Ollama local LLM** · KDRIs nutrient-intake data |
+| **AI / Data** | Google Cloud Vision OCR (supplement labels) · **Ollama local LLM** label parsing · KDRIs nutrient-intake data · MFDS data normalization |
 | **Mobile** | **Flutter 3.24** · Apple HealthKit · Google Health Connect |
 | **Status** | In development (Phase 0–4) · `yeong-Vision-Nutrition` is the active deliverable; `pr2`/`pr3` are placeholders for follow-on client tasks |
 
-**Highlights** — **real client-commissioned collaboration** · supplement-label **OCR → multimodal analysis pipeline** · chronic-disease-specific clinical weighting · full-stack mobile healthcare (FastAPI + Flutter + TimescaleDB)
+**Highlights** — **real client-commissioned collaboration** · supplement-label **OCR → LLM structuring → official-data validation** pipeline · integrated food/supplement/activity health-analysis UX · full-stack mobile healthcare (FastAPI + Flutter + TimescaleDB)
 
-📂 [03_lemon_healthcare](./03_lemon_healthcare) · 📄 [건강의신 README](./03_lemon_healthcare/yeong-Vision-Nutrition/README.md)
+- **Less barcode dependency**: extracts ingredient and dosage candidates from label images even when a barcode is missing or not recognized
+- **Less database dependency**: uses MFDS/KDRIs as validation and normalization references while structuring information directly from label text
+- **Supplement-label-specific parsing**: normalizes supplement-table context such as serving size and units (mg, μg, IU)
+- **Integrated information flow**: connects food, supplements, activity, and weight into 5 health-analysis outputs
+
+📂 [03_lemon_healthcare](./03_lemon_healthcare) · 📄 [Lemon AID README](./03_lemon_healthcare/yeong-Vision-Nutrition/README.md)
 
 ---
 
@@ -145,7 +150,7 @@
 
 | | |
 |------|------|
-| **This repo** | Client-commissioned, competition, and self-directed projects (CAD Vision · MediWay · Lemon Healthcare · AJIN) |
+| **This repo** | Client-commissioned, competition, and self-directed projects (CAD Vision · MediWay · Lemon AID · AJIN) |
 | **KDT Cohort 12 portfolio** | [HorangEe02/KNU_KDT_12th](https://github.com/HorangEe02/KNU_KDT_12th) — 13 course projects |
 | **Notion portfolio** | [Open](https://www.notion.so/31879104c6f38039a53cfaa4b64ef712) |
 | **Email** | catlife9029@gmail.com |

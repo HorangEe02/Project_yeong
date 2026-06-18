@@ -24,7 +24,7 @@
 |---|---------|----------|------|----------|
 | **[01](#-01_cad--cad-vision--ai-산업-도면-검색분류-엔진)** | **CAD Vision** | AI로 산업용 CAD 도면을 분류·검색·분석하는 멀티모달 RAG 풀스택 엔진 | 자기주도 심화 | YOLO · OpenCLIP · GNN · ChromaDB · Ollama · FastAPI · Next.js |
 | **[02](#-02_mediway--병원-동선-안내--고령자-접근성-웹앱)** | **MediWay** | 병원 내 환자 동선 안내 + 멀티테넌트 SaaS + 고령자 접근성 웹앱 | 자기주도 심화 | React · TypeScript · Firebase · Dijkstra · WAI-ARIA |
-| **[03](#-03_lemon_healthcare--lemon-healthcare-건강의신)** | **Lemon Healthcare (건강의신)** | 영양제 라벨 OCR 한 장으로 5종 통합 건강분석을 제공하는 AI 헬스케어 플랫폼 | 기업 발주 협업 | FastAPI · Flutter · PostgreSQL/TimescaleDB · Cloud Vision · Ollama |
+| **[03](#-03_lemon_healthcare--lemon-aid-음식--영양제-ai-분석-서비스-플랫폼)** | **Lemon AID** | 음식·영양제 라벨·활동 데이터를 통합 분석하는 AI 건강관리 서비스 플랫폼 | 기업 발주 협업 | FastAPI · Flutter · PostgreSQL/TimescaleDB · Cloud Vision · Ollama |
 | **[04](#-04_ajin--ajin-compliance--제조-도메인-ai-통합-어시스턴트)** | **AJIN Compliance** | 제조 대기업 650명의 6개 업무 도메인을 한 화면에서 처리하는 AI 통합 콘솔 · [정적 화면 보기](https://dist-two-omega-62.vercel.app/) | 경진대회 (수상) | FastAPI · React · Ollama/Vertex Gemini · ChromaDB RAG · Redis |
 
 ---
@@ -82,24 +82,29 @@
 
 ---
 
-## 🍋 03_lemon_healthcare — Lemon Healthcare (건강의신)
+## 🍋 03_lemon_healthcare — Lemon AID (음식 · 영양제 AI 분석 서비스 플랫폼)
 
-> **영양제 라벨 사진 한 장과 식단 정보로, 부족 영양소·권장량·체중 예측·운동 권고·목적별 분석 5가지를 한 번에 제공하는 AI 헬스케어 플랫폼.**
+> **음식·영양제 라벨·활동 데이터를 통합 분석해 부족 영양소·권장량·체중 예측·운동 권고·목적별 분석 5가지를 한 번에 제공하는 AI 건강관리 서비스 플랫폼.**
 > *(주)레몬헬스케어 발주 · 경북대학교 AI/빅데이터 전문가 양성 과정 협업 프로젝트*
 
 | 항목 | 내용 |
 |------|------|
-| **대상** | 만성질환 관리자(1차) · 예방 단계 직장인(2차) — 영양제·식단·활동 통합 맞춤 관리 |
+| **대상** | 만성질환 관리자(1차) · 예방 단계 직장인(2차) — 음식·영양제·활동 통합 맞춤 관리 |
 | **핵심 출력** | ① 부족 영양소 추천 ② 영양 권장량 ③ 체중 변화 예측 ④ 운동 권고 ⑤ 목적별(눈/간/피로) 분석 — **5종 통합** |
-| **차별점** | LDB(130여 의료기관) 연계 가능성 · **만성질환 v4 가중 알고리즘** · KDRIs·식약처 공식 데이터 · 770만+ 사용자 베이스(청구의신) |
+| **차별점** | 바코드 검색 중심 등록과 DB 매칭 의존도를 낮추고, 영양제 라벨 OCR·LLM 파싱과 음식/활동 데이터 통합 분석으로 건강관리 의사결정 흐름 연결 |
 | **백엔드** | Python 3.11 · FastAPI · PostgreSQL 16 · **TimescaleDB**(시계열 건강데이터) · Redis · Docker Compose |
-| **AI / 데이터** | Google Cloud Vision OCR(영양제 라벨) · **Ollama 로컬 LLM** · KDRIs 영양 권장량 데이터 |
+| **AI / 데이터** | Google Cloud Vision OCR(영양제 라벨) · **Ollama 로컬 LLM** 기반 라벨 파싱 · KDRIs 영양 권장량 · 식약처 데이터 표준화 |
 | **모바일** | **Flutter 3.24** · Apple HealthKit · Google Health Connect 연동 |
 | **상태** | 개발 진행 중 (Phase 0~4) · `yeong-Vision-Nutrition`이 활성 산출물, `pr2`·`pr3`는 후속 기업 과제 placeholder |
 
-**포트폴리오 포인트** — **기업 발주 실무 협업** · 영양제 라벨 **OCR → 멀티모달 분석 파이프라인** · 임상 가중 알고리즘 기반 만성질환 특화 · FastAPI + Flutter + TimescaleDB **풀스택 모바일 헬스케어**
+**포트폴리오 포인트** — **기업 발주 실무 협업** · 영양제 라벨 **OCR → LLM 구조화 → 공식 데이터 검증** 파이프라인 · 음식·영양제·활동 정보를 연결하는 통합 건강분석 UX · FastAPI + Flutter + TimescaleDB **풀스택 모바일 헬스케어**
 
-📂 [03_lemon_healthcare](./03_lemon_healthcare) · 📄 [건강의신 README](./03_lemon_healthcare/yeong-Vision-Nutrition/README.md)
+- **바코드 의존도 완화**: 바코드가 없거나 인식되지 않는 제품도 라벨 이미지 기반으로 성분·함량 후보 추출
+- **데이터베이스 의존도 완화**: 식약처·KDRIs 데이터는 표준화/검증 기준으로 쓰고, 라벨 원문에서 직접 정보를 구조화
+- **영양제 라벨 비특화 보완**: 영양성분표·섭취량·단위(mg, μg, IU 등)를 영양제 라벨 문맥에 맞게 정규화
+- **정보 통합 어려움 해결**: 음식·영양제·활동·체중 정보를 5종 분석 결과로 연결
+
+📂 [03_lemon_healthcare](./03_lemon_healthcare) · 📄 [Lemon AID README](./03_lemon_healthcare/yeong-Vision-Nutrition/README.md)
 
 ---
 
@@ -145,7 +150,7 @@
 
 | | |
 |------|------|
-| **이 레포** | 기업 발주·경진대회·자기주도 심화 프로젝트 (CAD Vision · MediWay · Lemon Healthcare · AJIN) |
+| **이 레포** | 기업 발주·경진대회·자기주도 심화 프로젝트 (CAD Vision · MediWay · Lemon AID · AJIN) |
 | **KDT 12기 포트폴리오** | [HorangEe02/KNU_KDT_12th](https://github.com/HorangEe02/KNU_KDT_12th) — 13개 과정 프로젝트 |
 | **Notion 포트폴리오** | [바로가기](https://www.notion.so/31879104c6f38039a53cfaa4b64ef712) |
 | **Email** | catlife9029@gmail.com |
