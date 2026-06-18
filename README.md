@@ -14,6 +14,7 @@
 | **작성자** | 박준영 (Junyeong Park) · 계명대학교 통계학과 졸업 |
 | **GitHub** | [github.com/HorangEe02](https://github.com/HorangEe02) |
 | **연관 포트폴리오** | [KDT 12기 프로젝트 (13선)](https://github.com/HorangEe02/KNU_KDT_12th) · [Notion 포트폴리오](https://www.notion.so/31879104c6f38039a53cfaa4b64ef712) |
+| **AJIN 정적 화면** | [Vercel 화면 열람](https://dist-two-omega-62.vercel.app/) — 운영 백엔드 없이 포트폴리오 화면만 확인 |
 
 ---
 
@@ -24,7 +25,7 @@
 | **[01](#-01_cad--cad-vision--ai-산업-도면-검색분류-엔진)** | **CAD Vision** | AI로 산업용 CAD 도면을 분류·검색·분석하는 멀티모달 RAG 풀스택 엔진 | 자기주도 심화 | YOLO · OpenCLIP · GNN · ChromaDB · Ollama · FastAPI · Next.js |
 | **[02](#-02_mediway--병원-동선-안내--고령자-접근성-웹앱)** | **MediWay** | 병원 내 환자 동선 안내 + 멀티테넌트 SaaS + 고령자 접근성 웹앱 | 자기주도 심화 | React · TypeScript · Firebase · Dijkstra · WAI-ARIA |
 | **[03](#-03_lemon_healthcare--lemon-healthcare-건강의신)** | **Lemon Healthcare (건강의신)** | 영양제 라벨 OCR 한 장으로 5종 통합 건강분석을 제공하는 AI 헬스케어 플랫폼 | 기업 발주 협업 | FastAPI · Flutter · PostgreSQL/TimescaleDB · Cloud Vision · Ollama |
-| **[04](#-04_ajin--ajin-compliance--제조-도메인-ai-통합-어시스턴트)** | **AJIN Compliance** | 제조 대기업 650명의 6개 업무 도메인을 한 화면에서 처리하는 AI 통합 콘솔 | 경진대회 (수상) | FastAPI · React · Ollama/Vertex Gemini · ChromaDB RAG · Redis |
+| **[04](#-04_ajin--ajin-compliance--제조-도메인-ai-통합-어시스턴트)** | **AJIN Compliance** | 제조 대기업 650명의 6개 업무 도메인을 한 화면에서 처리하는 AI 통합 콘솔 · [정적 화면 보기](https://dist-two-omega-62.vercel.app/) | 경진대회 (수상) | FastAPI · React · Ollama/Vertex Gemini · ChromaDB RAG · Redis |
 
 ---
 
@@ -117,11 +118,11 @@
 | **데이터** | SQLite 15+ DB(도메인별) · **ChromaDB RAG**(규제 본문·매뉴얼·판례·계약 인덱싱) · Redis(LLM 응답 캐시) |
 | **프론트엔드** | React + Vite + TypeScript + Zustand + Plotly (6 Feature 라우트) |
 | **인프라** | Cloud Run · Firebase Hosting · Supabase · Docker (Celery/Postgres/Supabase compose 구성) |
-| **상태** | 포트폴리오 아카이브 — 대회 종료 후 운영 환경 정리(라이브 비활성), 화면은 [`uiux/`](./04_AJIN/uiux) 스크린샷·디자인 시스템으로 확인 |
+| **상태** | 포트폴리오 아카이브 — 비용이 발생하는 운영 백엔드(Cloud Run/Firebase rewrite/DB/Storage/LLM)는 정리, 화면은 [정적 Vercel 배포](https://dist-two-omega-62.vercel.app/)와 [`uiux/`](./04_AJIN/uiux) 스크린샷·디자인 시스템으로 확인 |
 
 **포트폴리오 포인트** — **6개 도메인 215 엔드포인트** 대규모 API surface 설계 · **로컬 LLM ↔ 클라우드 Gemini 하이브리드 라우터** · 법규 RAG 자동 모니터링 · 실제 제조 대기업 도메인 기반 경진대회 **수상작**
 
-📂 [04_AJIN](./04_AJIN) · 📄 [상세 README](./04_AJIN/README.md) · 🎬 [데모 스크립트](./04_AJIN/DEMO_SCRIPT.md)
+📂 [04_AJIN](./04_AJIN) · 🌐 [정적 화면 보기](https://dist-two-omega-62.vercel.app/) · 📄 [상세 README](./04_AJIN/README.md) · 🎬 [데모 스크립트](./04_AJIN/DEMO_SCRIPT.md)
 
 ---
 

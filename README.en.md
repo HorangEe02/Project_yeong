@@ -14,6 +14,7 @@
 | **Author** | Junyeong Park (박준영) · B.S. in Statistics, Keimyung University |
 | **GitHub** | [github.com/HorangEe02](https://github.com/HorangEe02) |
 | **Related portfolios** | [KDT Cohort 12 projects (13)](https://github.com/HorangEe02/KNU_KDT_12th) · [Notion Portfolio](https://www.notion.so/31879104c6f38039a53cfaa4b64ef712) |
+| **AJIN static view** | [Vercel screen preview](https://dist-two-omega-62.vercel.app/) — frontend-only portfolio view without the production backend |
 
 ---
 
@@ -24,7 +25,7 @@
 | **[01](#-01_cad--cad-vision--ai-industrial-drawing-searchclassification-engine)** | **CAD Vision** | A multimodal-RAG full-stack engine that classifies, searches, and analyzes industrial CAD drawings with AI | Self-directed | YOLO · OpenCLIP · GNN · ChromaDB · Ollama · FastAPI · Next.js |
 | **[02](#-02_mediway--hospital-wayfinding--senior-accessibility-web-app)** | **MediWay** | In-hospital patient wayfinding + multi-tenant SaaS + senior-accessibility web app | Self-directed | React · TypeScript · Firebase · Dijkstra · WAI-ARIA |
 | **[03](#-03_lemon_healthcare--lemon-healthcare-gunganguisin)** | **Lemon Healthcare** | An AI healthcare platform delivering 5 integrated health analyses from a single supplement-label photo (OCR) | Client-commissioned | FastAPI · Flutter · PostgreSQL/TimescaleDB · Cloud Vision · Ollama |
-| **[04](#-04_ajin--ajin-compliance--manufacturing-domain-ai-assistant)** | **AJIN Compliance** | An AI console that handles 6 business domains for 650 employees of a manufacturer in one screen | Competition (awarded) | FastAPI · React · Ollama/Vertex Gemini · ChromaDB RAG · Redis |
+| **[04](#-04_ajin--ajin-compliance--manufacturing-domain-ai-assistant)** | **AJIN Compliance** | An AI console that handles 6 business domains for 650 employees of a manufacturer in one screen · [static view](https://dist-two-omega-62.vercel.app/) | Competition (awarded) | FastAPI · React · Ollama/Vertex Gemini · ChromaDB RAG · Redis |
 
 ---
 
@@ -117,11 +118,11 @@
 | **Data** | 15+ SQLite DBs (per domain) · **ChromaDB RAG** (regulations·manuals·precedents·contracts) · Redis (LLM cache) |
 | **Frontend** | React + Vite + TypeScript + Zustand + Plotly (6 feature routes) |
 | **Infra** | Cloud Run · Firebase Hosting · Supabase · Docker (Celery/Postgres/Supabase compose) |
-| **Status** | Portfolio archive — live env decommissioned after the competition; UI previewable via [`uiux/`](./04_AJIN/uiux) screenshots & design system |
+| **Status** | Portfolio archive — cost-incurring production backend resources (Cloud Run/Firebase rewrites/DB/Storage/LLM) are decommissioned; UI is previewable through the [static Vercel deployment](https://dist-two-omega-62.vercel.app/) and [`uiux/`](./04_AJIN/uiux) screenshots/design system |
 
 **Highlights** — large **215-endpoint API surface** across 6 domains · **local-LLM ↔ cloud-Gemini hybrid router** · regulatory RAG auto-monitoring · **award-winning** entry grounded in a real manufacturing enterprise
 
-📂 [04_AJIN](./04_AJIN) · 📄 [Detailed README](./04_AJIN/README.md) · 🎬 [Demo script](./04_AJIN/DEMO_SCRIPT.md)
+📂 [04_AJIN](./04_AJIN) · 🌐 [Static view](https://dist-two-omega-62.vercel.app/) · 📄 [Detailed README](./04_AJIN/README.md) · 🎬 [Demo script](./04_AJIN/DEMO_SCRIPT.md)
 
 ---
 

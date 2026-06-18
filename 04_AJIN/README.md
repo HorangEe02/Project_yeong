@@ -8,10 +8,12 @@
 ![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite%20%2B%20TS-61dafb)
 ![LLM](https://img.shields.io/badge/LLM-Ollama%20qwen3.5%2Fexaone%20%7C%20Vertex%20Gemini-FF6B6B)
 ![API](https://img.shields.io/badge/OpenAPI-215%20paths%20%2F%20229%20endpoints-6BA539)
+[![Static View](https://img.shields.io/badge/Static%20View-Vercel-000000)](https://dist-two-omega-62.vercel.app/)
 
 > 📦 **포트폴리오 아카이브** — 2026 KNU × 아진산업 SILLI 경진대회(DX 부문) 제출작.
-> 운영 배포 환경(Cloud Run · Vercel · Supabase)은 대회 종료 후 정리되어 라이브 링크는 비활성 상태이며,
-> 화면 미리보기는 [`uiux/`](uiux/) 의 스크린샷·디자인 시스템으로 확인할 수 있습니다.
+> 비용이 발생하는 운영 백엔드(Cloud Run · Firebase backend rewrite · DB · Storage · LLM)는 정리된 상태입니다.
+> 현재 웹 화면은 정적 열람 전용 Vercel 배포인 <https://dist-two-omega-62.vercel.app/> 에서 확인할 수 있습니다.
+> 이 링크는 실제 기능 호출이 아닌 화면 검토용이며, 상세 UI 자산은 [`uiux/`](uiux/) 에도 보존되어 있습니다.
 
 ---
 
@@ -181,11 +183,13 @@ make test
 ### Frontend
 - **TypeScript** + React + Vite + Zustand
 - **Plotly.js** + MarkdownRenderer + lucide-react
-- **호스팅**: Vercel (https://ajin-ai-assistant-frontend.vercel.app/)
+- **정적 화면 열람**: Vercel (https://dist-two-omega-62.vercel.app/)
+- **운영 기능 호출**: 비용 절감을 위해 비활성화 (Cloud Run / Firebase backend rewrite 미사용)
 
 ### 인프라
 - **Docker Compose** — backend / frontend / redis / nginx-rp 4 컨테이너
-- **Cloud Run** + Vercel Hosting (배포 대상)
+- **정적 포트폴리오 배포** — Vercel static assets only
+- **운영 배포 구성** — Cloud Run + Vercel Hosting 설계 보존, 현재는 비용 절감을 위해 중지
 - **GCP** 프로젝트 `ajin-compliance` (Phase B)
 
 ---
