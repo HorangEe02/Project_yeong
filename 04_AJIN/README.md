@@ -11,7 +11,8 @@
 [![Static View](https://img.shields.io/badge/Static%20View-Vercel-000000)](https://dist-two-omega-62.vercel.app/)
 
 > 📦 **포트폴리오 아카이브** — 2026 KNU × 아진산업 SILLI 경진대회(DX 부문) 제출작.
-> 비용이 발생하는 운영 백엔드(Cloud Run · Firebase backend rewrite · DB · Storage · LLM)는 정리된 상태입니다.
+> 대회·검증 기간에는 Firebase Hosting, Cloud Run backend, Supabase(Postgres/Storage), Vercel frontend 배포를 모두 진행했습니다.
+> 현재는 비용이 발생하는 운영 백엔드(Cloud Run · Firebase backend rewrite · DB · Storage · LLM)를 정리한 상태입니다.
 > 현재 웹 화면은 정적 열람 전용 Vercel 배포인 <https://dist-two-omega-62.vercel.app/> 에서 확인할 수 있습니다.
 > 이 링크는 실제 기능 호출이 아닌 화면 검토용이며, 상세 UI 자산은 [`uiux/`](uiux/) 에도 보존되어 있습니다.
 
@@ -29,7 +30,7 @@
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│                      Frontend (Firebase Hosting)                      │
+│             Frontend (Firebase Hosting → Vercel)                      │
 │                                                                       │
 │  React + Vite + TypeScript + Zustand + Plotly                         │
 │  ┌──────┬──────┬──────┬──────┬──────┬──────┐                          │
@@ -184,12 +185,14 @@ make test
 - **TypeScript** + React + Vite + Zustand
 - **Plotly.js** + MarkdownRenderer + lucide-react
 - **정적 화면 열람**: Vercel (https://dist-two-omega-62.vercel.app/)
+- **배포 이력**: Firebase Hosting 배포 후 Vercel frontend 배포/전환 검토까지 진행
 - **운영 기능 호출**: 비용 절감을 위해 비활성화 (Cloud Run / Firebase backend rewrite 미사용)
 
 ### 인프라
 - **Docker Compose** — backend / frontend / redis / nginx-rp 4 컨테이너
-- **정적 포트폴리오 배포** — Vercel static assets only
-- **운영 배포 구성** — Cloud Run + Vercel Hosting 설계 보존, 현재는 비용 절감을 위해 중지
+- **배포 이력** — Firebase Hosting + Cloud Run backend, Supabase(Postgres/Storage), Vercel frontend
+- **현재 포트폴리오 배포** — Vercel static assets only
+- **운영 배포 구성** — Cloud Run + Supabase + Vercel 설계와 검증 산출물 보존, 현재는 비용 절감을 위해 중지
 - **GCP** 프로젝트 `ajin-compliance` (Phase B)
 
 ---
@@ -200,9 +203,11 @@ make test
 |---|---|---|
 | **Phase 1** | ✅ 완료 | 통합 docker-compose + 호스트 Ollama (Mac M4 Pro Metal) |
 | **Phase 2** | ✅ 완료 | LLM 풀 feature 별 라우팅 (`LLM_FEATURE_ROUTES`) — 4 feature 분리 |
-| **Stage 1 dry-run** | 🔄 진행 중 | Mac offline 1주 관측 |
-| **Phase B** | 🔜 대기 | Vertex AI Gemini 일원화 (`LLM_PROVIDER=vertex` 1줄 swap) |
-| **Stage 2** | 📅 예정 | Firebase Hosting + Cloud Run 배포 |
+| **Stage 1 dry-run** | ✅ 완료 | Mac offline / host Ollama 관측 및 Stage 1 hotfix 반영 |
+| **Phase B** | ✅ 코드 완료 | Vertex AI Gemini dispatcher와 `LLM_PROVIDER=vertex` 전환 경로 구현 |
+| **Stage 2 · Firebase/Cloud Run** | ✅ 배포 완료 → 정리 | Firebase Hosting + Cloud Run backend 배포/검증 후 비용 관리를 위해 운영 리소스 정리 |
+| **Stage 3 · Supabase 전환** | ✅ 검증 완료 | Supabase(Postgres/Storage) remote release gate PASS, Firebase read/write fallback 비활성화, Cloud Run no-traffic tag smoke PASS |
+| **Stage 4 · Vercel 전환** | ✅ 배포 완료 → 정적화 | Vercel frontend 배포/전환 검토 완료, 현재는 비용 없는 정적 화면 열람용 Vercel 배포만 유지 |
 | **Phase 3** | 📅 장기 | Feature 마이크로서비스 분해 (D11 / D17 / D6 / D9 / D14·D15 순) |
 
 ---
