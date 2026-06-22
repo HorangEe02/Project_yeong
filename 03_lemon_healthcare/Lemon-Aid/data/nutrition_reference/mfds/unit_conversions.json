@@ -1,0 +1,14 @@
+{
+  "mass": {
+    "g_to_mg": 1000,
+    "mg_to_g": 0.001,
+    "mg_to_ug": 1000,
+    "ug_to_mg": 0.001,
+    "g_to_ug": 1000000,
+    "ug_to_g": 0.000001
+  },
+  "iu": {
+    "vitamin_d_iu_to_ug": 0.025
+  },
+  "note": "Phase 1 unit conversion fixture. IU conversion is intentionally limited to vitamin D until ingredient-specific official conversions are reviewed."
+}

@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-05-20T14:47:19.953862+00:00",
+  "manifest": "/Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/outputs/generated/ocr-eval/observations-stage0/supplement-ocr-observations.jsonl",
+  "fixture_count": 50,
+  "missing_image_count": 0,
+  "observation_count": 0,
+  "providers": {},
+  "raw_artifacts_stored": false,
+  "raw_ocr_text_stored": false
+}

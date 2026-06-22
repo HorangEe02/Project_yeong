@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-05-20T15:47:47.312158+00:00",
+  "manifest": "/Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/data/supplement_images/private_workspace/stage0_naver/manifest-three-tier.jsonl",
+  "fixture_count": 50,
+  "missing_image_count": 0,
+  "observation_count": 50,
+  "providers": {
+    "paddleocr_local": {
+      "calls": 50,
+      "text_non_empty_rate": 0.92,
+      "parser_success_rate": 0.92,
+      "average_latency_ms": 9140.4,
+      "ingredient_name_exact_rate": 0.0,
+      "errors": 0
+    }
+  },
+  "raw_artifacts_stored": false,
+  "raw_ocr_text_stored": false
+}

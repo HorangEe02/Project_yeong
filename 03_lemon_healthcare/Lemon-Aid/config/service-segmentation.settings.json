@@ -1,0 +1,449 @@
+{
+  "metadata": {
+    "service_name": "Lemon Aid",
+    "settings_name": "service-segmentation",
+    "version": "0.2.0",
+    "status": "implementation_baseline",
+    "generated_from": "dev-planning-review-report.html",
+    "updated_at": "2026-05-11",
+    "owner_note": "상세 구현 전 제품 범위, 사용자 우선순위, 안전 규칙, 규제 게이트 적용 기능을 고정하기 위한 설정값입니다."
+  },
+  "service_strategy": {
+    "business_model": "b2c",
+    "primary_segment": "chronic_disease_patient",
+    "secondary_segment": "general_b2c_prevention",
+    "priority_order": [
+      "chronic_disease_patient",
+      "general_b2c_prevention"
+    ],
+    "decision_rule": "기능, 화면, 알고리즘 우선순위가 충돌할 경우 만성질환 환자의 안전성과 설명 가능성을 일반 사용자 편의성보다 우선합니다.",
+    "medical_positioning": "B2C 공개 버전은 진단, 처방, 치료가 아닌 영양, 복약, 생활습관 관리 보조 서비스로 제한합니다. 병원 데이터, 처방전, 검사표, 복용량 관련 기능은 규제 게이트를 통과한 범위에서 단계적으로 노출합니다."
+  },
+  "personas": {
+    "chronic_disease_patient": {
+      "priority": 1,
+      "enabled": true,
+      "default_mode": true,
+      "risk_tier": "high",
+      "target_description": "고혈압, 당뇨, 고지혈증 등 지속적인 식단, 영양제, 복약 관리가 필요한 사용자",
+      "primary_needs": [
+        "복용 중인 약과 영양제의 주의 성분 확인",
+        "질환별로 과하거나 부족할 수 있는 영양 요소 확인",
+        "식단과 활동량이 체중 변화에 미치는 영향 확인",
+        "의료 행위가 아닌 참고용 건강 관리 리포트 확인"
+      ],
+      "required_onboarding_fields": [
+        "age_range",
+        "sex",
+        "height_cm",
+        "weight_kg",
+        "chronic_conditions",
+        "current_medications",
+        "sensitive_health_data_consent",
+        "medical_disclaimer_acknowledgement"
+      ],
+      "optional_onboarding_fields": [
+        "recent_lab_summary",
+        "supplement_list",
+        "activity_data_permission",
+        "weight_history_permission"
+      ],
+      "ui_mode_label": "만성질환 관리 보조 모드",
+      "output_guardrail_level": "strict"
+    },
+    "general_b2c_prevention": {
+      "priority": 2,
+      "enabled": true,
+      "default_mode": false,
+      "risk_tier": "medium",
+      "target_description": "질환 진단 여부와 무관하게 영양, 식단, 체중, 활동 습관을 관리하려는 일반 사용자",
+      "primary_needs": [
+        "영양제 성분과 권장 섭취 기준 확인",
+        "식단 입력 기반 영양 균형 확인",
+        "활동량과 체중 변화 예측 참고",
+        "건강 목표 기반 생활습관 피드백 확인"
+      ],
+      "required_onboarding_fields": [
+        "age_range",
+        "sex",
+        "height_cm",
+        "weight_kg",
+        "health_goals",
+        "medical_disclaimer_acknowledgement"
+      ],
+      "optional_onboarding_fields": [
+        "chronic_conditions",
+        "current_medications",
+        "supplement_list",
+        "activity_data_permission",
+        "weight_history_permission"
+      ],
+      "ui_mode_label": "일반 건강 관리 모드",
+      "output_guardrail_level": "standard"
+    }
+  },
+  "segment_routing": {
+    "chronic_mode_conditions": [
+      "사용자가 만성질환 정보를 입력한 경우",
+      "사용자가 복용 중인 약 정보를 입력한 경우",
+      "사용자가 민감 건강정보 기반 분석에 명시적으로 동의한 경우"
+    ],
+    "general_mode_conditions": [
+      "사용자가 만성질환 정보를 입력하지 않은 경우",
+      "사용자가 질환 기반 분석을 원하지 않는 경우",
+      "사용자가 건강 목표 중심의 예방 관리만 선택한 경우"
+    ],
+    "unknown_or_partial_profile_default": "general_b2c_prevention",
+    "manual_mode_switch_allowed": true,
+    "mode_switch_requires_disclaimer": true
+  },
+  "mvp_scope": {
+    "included_features": [
+      "supplement_label_ocr_analysis",
+      "supplement_ingredient_matching",
+      "manual_or_text_food_input",
+      "nutrition_balance_summary",
+      "five_output_dashboard",
+      "weight_change_projection",
+      "activity_recommendation",
+      "ollama_local_llm_structured_summary",
+      "rules_first_health_safety_validation",
+      "user_confirmation_before_saving_ai_results",
+      "source_display_for_health_claims",
+      "forbidden_medical_expression_filter"
+    ],
+    "limited_or_demo_features": [
+      "food_photo_analysis_demo",
+      "future_hospital_data_mock_profile",
+      "ldb_or_fhir_reference_interface_document",
+      "patient_uploaded_prescription_ocr_intake",
+      "patient_uploaded_lab_result_ocr_intake",
+      "hospital_data_fhir_adapter_sandbox"
+    ],
+    "excluded_features": [
+      "diagnosis_or_treatment_recommendation",
+      "drug_dose_change_recommendation",
+      "guaranteed_health_outcome_prediction",
+      "cloud_llm_processing_for_identifiable_health_data"
+    ],
+    "mvp_priority": [
+      "supplement_label_analysis",
+      "chronic_patient_safety_dashboard",
+      "manual_food_and_activity_input",
+      "general_b2c_prevention_mode"
+    ]
+  },
+  "image_policy": {
+    "primary_image_target": "supplement_label",
+    "secondary_image_target": "food_photo_demo_only",
+    "excluded_sensitive_image_targets": [
+      "insurance_document"
+    ],
+    "restricted_sensitive_image_targets": [
+      "prescription",
+      "clinical_test_sheet",
+      "hospital_document"
+    ],
+    "restricted_target_rules": {
+      "prescription": {
+        "allowed_processing_scope": "ocr_extract_and_user_confirm_only",
+        "blocked_processing_scope": [
+          "new_prescription",
+          "dose_change_recommendation",
+          "drug_discontinuation_instruction"
+        ],
+        "requires": [
+          "separate_sensitive_data_consent",
+          "original_image_auto_delete",
+          "manual_user_confirmation",
+          "pharmacist_or_physician_review_for_any_actionable_change"
+        ]
+      },
+      "clinical_test_sheet": {
+        "allowed_processing_scope": "ocr_extract_reference_range_and_trend_only",
+        "blocked_processing_scope": [
+          "diagnosis",
+          "disease_probability_prediction",
+          "treatment_recommendation"
+        ],
+        "requires": [
+          "separate_sensitive_data_consent",
+          "original_image_auto_delete",
+          "manual_user_confirmation",
+          "medical_professional_review_for_personalized_interpretation"
+        ]
+      },
+      "hospital_document": {
+        "allowed_processing_scope": "user_uploaded_summary_or_fhir_import_only",
+        "blocked_processing_scope": [
+          "direct_hospital_scraping",
+          "third_party_record_access_without_authorization"
+        ],
+        "requires": [
+          "patient_authorization",
+          "data_minimization",
+          "access_audit_log",
+          "retention_period_control"
+        ]
+      }
+    },
+    "input_sources": [
+      "camera",
+      "gallery",
+      "sample_image"
+    ],
+    "preprocessing_rules": {
+      "max_file_size_mb": 10,
+      "max_dimension_px": 2048,
+      "auto_rotate": true,
+      "blur_detection": true,
+      "manual_correction_required_after_ocr": true
+    },
+    "storage_rules": {
+      "original_image_default": "delete_after_analysis",
+      "store_original_requires_explicit_consent": true,
+      "store_sensitive_medical_document": false,
+      "derived_text_storage_allowed_after_user_confirmation": true,
+      "duplicate_detection": "sha256_hash"
+    }
+  },
+  "regulated_feature_roadmap": {
+    "real_hospital_data_integration": {
+      "desired": true,
+      "implementation_status": "phase_2_or_partner_pilot",
+      "public_b2c_default": false,
+      "compliant_path": [
+        "건강정보 고속도로 또는 병원/공공기관 공식 API 기반 연동을 우선 검토합니다.",
+        "환자 본인 동의, 동적 동의, 제공 범위 선택, 철회 기능을 필수로 둡니다.",
+        "KR Core FHIR 리소스 기준으로 Patient, Condition, MedicationRequest, Observation, DiagnosticReport를 매핑합니다.",
+        "병원 원본 시스템 직접 스크래핑이나 제3자 무단 조회는 금지합니다."
+      ],
+      "minimum_buildable_scope": [
+        "mock_fhir_server",
+        "manual_user_upload",
+        "patient_authorized_api_import_adapter",
+        "audit_log",
+        "consent_receipt"
+      ],
+      "release_gate": [
+        "legal_review",
+        "privacy_impact_review",
+        "partner_or_platform_access_approval",
+        "security_review"
+      ]
+    },
+    "prescription_image_processing": {
+      "desired": true,
+      "implementation_status": "phase_1_sensitive_ocr_intake",
+      "public_b2c_default": true,
+      "compliant_path": [
+        "처방전 이미지는 처방 생성이나 변경이 아니라 사용자가 보유한 처방 정보를 구조화하는 OCR 입력으로 제한합니다.",
+        "약품명, 용법, 용량, 기간, 처방일자 추출 후 사용자가 직접 확인해야 저장합니다.",
+        "복용량 변경, 중단, 대체 약 추천은 차단하고 의사 또는 약사 상담으로 연결합니다."
+      ],
+      "minimum_buildable_scope": [
+        "prescription_ocr",
+        "field_confidence_score",
+        "manual_correction_ui",
+        "drug_name_normalization",
+        "dose_change_blocker",
+        "consult_professional_cta"
+      ],
+      "release_gate": [
+        "separate_sensitive_data_consent",
+        "medical_expression_filter",
+        "pharmacist_or_physician_review_policy",
+        "ocr_error_handling_policy"
+      ]
+    },
+    "clinical_test_sheet_image_processing": {
+      "desired": true,
+      "implementation_status": "phase_1_sensitive_ocr_intake",
+      "public_b2c_default": true,
+      "compliant_path": [
+        "검사표 이미지는 검사명, 수치, 단위, 참고범위, 검사일자 추출과 추세 표시로 제한합니다.",
+        "개별 수치를 특정 질환 진단으로 연결하지 않습니다.",
+        "위험 수치로 보일 때는 응급 또는 의료기관 상담 안내만 제공합니다."
+      ],
+      "minimum_buildable_scope": [
+        "lab_result_ocr",
+        "unit_normalization",
+        "reference_range_display",
+        "trend_visualization",
+        "abnormal_value_notice_without_diagnosis",
+        "consult_professional_cta"
+      ],
+      "release_gate": [
+        "separate_sensitive_data_consent",
+        "clinical_interpretation_blocker",
+        "unit_conversion_validation",
+        "medical_review_for_threshold_text"
+      ]
+    },
+    "dosage_change_guidance": {
+      "desired": true,
+      "implementation_status": "restricted_to_safety_alert_and_professional_review",
+      "public_b2c_default": false,
+      "compliant_path": [
+        "일반 B2C 기능에서는 복용량 변경을 직접 지시하지 않습니다.",
+        "사용자가 입력한 처방과 건강기능식품, 식단, 증상을 바탕으로 주의 가능성만 알립니다.",
+        "복용량 변경이 필요한 상황으로 보이면 의료인 또는 약사 상담 연결 워크플로를 제공합니다.",
+        "실제 복용량 변경 결정 기능은 의료기관 또는 약국 파트너, 의료인 검토, 인허가 검토 이후 별도 모듈로 분리합니다."
+      ],
+      "minimum_buildable_scope": [
+        "dose_change_request_detector",
+        "dose_change_refusal_template",
+        "medication_safety_alert",
+        "professional_consultation_referral",
+        "clinician_review_queue_for_partner_pilot"
+      ],
+      "release_gate": [
+        "medical_legal_review",
+        "licensed_professional_workflow",
+        "liability_policy",
+        "mfds_medical_device_applicability_review"
+      ]
+    }
+  },
+  "ai_policy": {
+    "llm_runtime": "ollama_local",
+    "ollama_endpoint": "http://127.0.0.1:11434",
+    "planned_text_model_families": [
+      "qwen3.5",
+      "qwen3.6",
+      "deepseek_v4_pro"
+    ],
+    "planned_vision_model_families": [
+      "gemma4"
+    ],
+    "model_tag_verification_required": true,
+    "mvp_agent_runtime_mode": "modular_pipeline",
+    "agent_contracts": {
+      "intake_analysis_agent": {
+        "enabled": true,
+        "role": "OCR, 입력값 정규화, 영양제 성분 추출"
+      },
+      "personalization_agent": {
+        "enabled": true,
+        "role": "사용자 프로필, 만성질환, 복약 정보 기반 개인화 규칙 적용"
+      },
+      "safety_evaluation_agent": {
+        "enabled": true,
+        "role": "금지 표현, 과잉 의학 표현, 위험 문구 검증"
+      },
+      "chat_explanation_agent": {
+        "enabled": true,
+        "role": "검증된 결과를 비전공자도 이해 가능한 문장으로 설명"
+      }
+    },
+    "llm_usage_rules": [
+      "LLM은 최종 의학 판단자가 아니라 설명 생성 및 구조화 보조 역할로 제한합니다.",
+      "영양 기준, 주의 성분, 위험 알림은 규칙 기반 검증과 출처 기반 데이터로 먼저 계산합니다.",
+      "사용자 식별 가능 건강정보는 기본적으로 외부 클라우드 LLM으로 전송하지 않습니다.",
+      "LLM 출력은 저장 전에 사용자 확인과 안전 필터를 통과해야 합니다."
+    ]
+  },
+  "safety_and_compliance_policy": {
+    "forbidden_claim_types": [
+      "diagnosis",
+      "prescription",
+      "treatment_instruction",
+      "cure_guarantee",
+      "drug_dose_change",
+      "doctor_replacement"
+    ],
+    "blocked_korean_expressions": [
+      "진단합니다",
+      "처방합니다",
+      "치료됩니다",
+      "완치됩니다",
+      "질환입니다",
+      "약을 끊으세요",
+      "복용량을 바꾸세요",
+      "의사 대신 판단합니다"
+    ],
+    "required_disclaimer": "본 서비스는 건강 관리 참고 정보를 제공하며 진단, 처방, 치료를 대신하지 않습니다. 증상이나 복약 변경은 의료 전문가와 상담해야 합니다.",
+    "emergency_guidance": "응급 증상, 급격한 악화, 심각한 부작용 의심 시 서비스 안내보다 119 또는 의료기관 상담을 우선 안내합니다.",
+    "consent_requirements": [
+      "만성질환 정보 동의",
+      "복약 정보 동의",
+      "건강검진 또는 검사 요약 정보 동의",
+      "처방전 OCR 처리 동의",
+      "검사표 OCR 처리 동의",
+      "병원 데이터 API 연동 동의",
+      "활동량 및 체중 데이터 동의",
+      "AI 분석 결과 저장 동의"
+    ],
+    "data_minimization_rules": [
+      "MVP 공개 버전에서는 실제 병원 원본 데이터 직접 연동을 하지 않고, mock FHIR 또는 사용자 제공 데이터로 먼저 검증합니다.",
+      "처방전, 검사표, 병원 문서는 별도 동의와 규제 게이트가 있는 제한 입력으로만 처리합니다.",
+      "처방전과 검사표 원본 이미지는 기본 저장하지 않고 OCR 추출 후 삭제합니다.",
+      "분석에 필요한 최소 필드만 저장합니다.",
+      "사용자 요청 시 프로필, 입력값, AI 분석 결과를 삭제할 수 있어야 합니다."
+    ],
+    "professional_review_required_for": [
+      "drug_dose_change",
+      "drug_discontinuation",
+      "drug_substitution",
+      "disease_diagnosis",
+      "treatment_plan",
+      "personalized_lab_result_interpretation"
+    ],
+    "regulated_feature_output_rules": [
+      "처방전 OCR 결과는 원 처방의 구조화와 복약 알림 설정까지만 허용합니다.",
+      "검사표 OCR 결과는 수치, 단위, 참고범위, 추세 표시까지만 허용합니다.",
+      "병원 데이터 연동 결과는 사용자가 동의한 범위의 조회와 건강관리 참고 요약까지만 허용합니다.",
+      "복용량 변경 질문에는 직접 변경 지시를 제공하지 않고 의료인 또는 약사 상담을 안내합니다."
+    ]
+  },
+  "feature_flags": {
+    "chronic_patient_mode_default": true,
+    "general_b2c_mode_enabled": true,
+    "supplement_label_ocr_enabled": true,
+    "manual_food_input_enabled": true,
+    "food_photo_analysis_demo_enabled": true,
+    "food_photo_analysis_production_enabled": false,
+    "real_hospital_data_integration_enabled": false,
+    "hospital_data_integration_design_enabled": true,
+    "healthway_fhir_integration_pilot_enabled": false,
+    "manual_hospital_record_upload_enabled": true,
+    "mock_hospital_profile_enabled": true,
+    "prescription_image_processing_enabled": false,
+    "prescription_ocr_intake_enabled": true,
+    "prescription_original_image_storage_enabled": false,
+    "clinical_test_sheet_processing_enabled": false,
+    "clinical_test_sheet_ocr_intake_enabled": true,
+    "clinical_test_sheet_original_image_storage_enabled": false,
+    "dosage_change_recommendation_enabled": false,
+    "medication_safety_alert_enabled": true,
+    "clinician_review_queue_enabled": false,
+    "external_cloud_llm_for_phi_enabled": false,
+    "ollama_local_llm_enabled": true,
+    "medical_expression_filter_enabled": true,
+    "source_citation_required": true,
+    "user_confirmation_before_save_required": true
+  },
+  "implementation_readiness_checks": [
+    "서비스가 진단, 처방, 치료가 아닌 건강 관리 보조 서비스임을 모든 화면과 API 응답에서 유지한다.",
+    "만성질환 환자 모드와 일반 사용자 모드의 온보딩 필드를 분리한다.",
+    "영양 기준, 주의 성분, 계산식은 LLM이 아니라 출처 기반 데이터와 규칙으로 검증한다.",
+    "Ollama 모델 태그는 개발 환경에서 ollama list와 ollama run으로 확인한 뒤 환경 변수에 반영한다.",
+    "병원 데이터는 mock FHIR, 사용자 수동 업로드, 공식 API 연동 후보 순서로 구현한다.",
+    "처방전과 검사표 이미지는 OCR 추출, 사용자 확인, 원본 삭제, 저장 최소화 흐름을 통과해야 한다.",
+    "복용량 변경 요청은 직접 변경 안내가 아니라 안전 알림과 전문가 상담 연결로 처리한다.",
+    "AI 분석 결과 저장 전 사용자 확인, 출처 표시, 금지 표현 필터를 통과시킨다."
+  ],
+  "regulatory_reference_urls": {
+    "personal_information_collection": "https://law.go.kr/LSW/lsLawLinkInfo.do?chrClsCd=010202&lsId=011357&lsJoLnkSeq=900078940&print=print",
+    "sensitive_health_information": "https://www.law.go.kr/lsLawLinkInfo.do?chrClsCd=010202&lsJoLnkSeq=1000575255",
+    "medical_record_access": "https://www.law.go.kr/LSW/lsLinkCommonInfo.do?ancYnChk=&chrClsCd=010202&lsJoLnkSeq=1007235937",
+    "unauthorized_medical_practice": "https://www.law.go.kr/lsLawLinkInfo.do?chrClsCd=010202&lsJoLnkSeq=900700904",
+    "remote_medical_care": "https://www.law.go.kr/lsLawLinkInfo.do?chrClsCd=010202&lsJoLnkSeq=900519517",
+    "medical_device_definition": "https://www.law.go.kr/lsLawLinkInfo.do?chrClsCd=010202&lsJoLnkSeq=900516573",
+    "digital_medical_product_definition": "https://www.law.go.kr/LSW/lsSideInfoP.do?chrClsCd=010202&docCls=jo&joBrNo=00&joNo=0002&lsId=&lsiSeq=259299&urlMode=lsScJoRltInfoR",
+    "healthway_api": "https://www.myhealthway.go.kr/portal/index?page=Organization%2FPortal%2FMediMyData%2FMydataApi",
+    "healthway_data_types": "https://www.myhealthway.go.kr/portal/index?page=Organization%2FPortal%2FMediMyData%2FMydataType",
+    "healthcare_data_guideline": "https://www.pipc.go.kr/np/cop/bbs/selectBoardArticle.do?bbsId=BS217&mCode=G010030000&nttId=9901",
+    "generative_ai_medical_device_guideline": "https://www.mfds.go.kr/brd/m_1060/view.do?seq=15628"
+  }
+}

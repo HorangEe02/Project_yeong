@@ -1,0 +1,19 @@
+# YOLOv8 fine-tuning dataset 설정 (Beta v1 placeholder)
+#
+# 이 파일은 Phase B에서 AI Hub 데이터를 YOLO format으로 변환한 뒤 실제 경로와
+# 클래스 목록으로 채운다. MVP에서는 골격만 유지.
+#
+# Reference: docs/dev-guides/16-meal-recognition.md §"Beta fine-tuning 데이터"
+
+# 데이터 경로 — Phase B에서 실 경로로 교체
+path: ./ml/data/processed
+train: images/train
+val: images/val
+test: images/test
+
+# Beta v1 클래스 수 — 50종 목표 (현 MVP 20종에서 확장)
+nc: 50
+
+# names는 Phase B에서 classes.yaml의 확장본과 동기화한다.
+# MVP 단계의 names는 classes.yaml만 진실 소스로 사용한다.
+names: []

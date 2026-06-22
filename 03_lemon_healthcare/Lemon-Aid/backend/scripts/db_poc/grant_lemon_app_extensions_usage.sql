@@ -1,0 +1,21 @@
+-- Grant the RLS request role (lemon_app) USAGE on the `extensions` schema so it can
+-- use pgvector's `vector` type and `<=>` operator. This is required for the chatbot
+-- LLM-WIKI RAG: the wiki vector search (wiki_chunk_embeddings) runs as lemon_app, and
+-- pgvector lives in the `extensions` schema.
+--
+-- Without this grant the vector query fails with
+--   asyncpg.exceptions.InsufficientPrivilegeError: permission denied for schema extensions
+-- and retrieve_llm_wiki_context_db fails open to an empty result, so the chatbot
+-- silently degrades every answer to an ungrounded general fallback (no citations).
+--
+-- lemon_app is an ops-managed role (see the DATABASE_URL Stage-2 flip in
+-- docker-compose.yml), NOT alembic-managed, so this grant is applied out-of-band like
+-- the rest of the lemon_app setup. It is idempotent — re-run after any DB volume reset.
+--
+-- Apply as the privileged superuser role (lemon):
+--   docker exec -e PGPASSWORD=lemon lemon-aid-db-1 \
+--     psql -U lemon -d lemon -f /path/to/grant_lemon_app_extensions_usage.sql
+-- or inline:
+--   GRANT USAGE ON SCHEMA extensions TO lemon_app;
+
+GRANT USAGE ON SCHEMA extensions TO lemon_app;

@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-05-20T13:54:54.959085+00:00",
+  "manifest": "../data/supplement_images/manifests/fixtures/supplement_labels/manifest.example.jsonl",
+  "fixture_count": 1,
+  "missing_image_count": 1,
+  "observation_count": 1,
+  "providers": {
+    "google_vision_document": {
+      "calls": 1,
+      "text_non_empty_rate": 1.0,
+      "parser_success_rate": 1.0,
+      "average_latency_ms": 720.0,
+      "ingredient_name_exact_rate": 1.0,
+      "errors": 0
+    }
+  },
+  "raw_artifacts_stored": false,
+  "raw_ocr_text_stored": false
+}

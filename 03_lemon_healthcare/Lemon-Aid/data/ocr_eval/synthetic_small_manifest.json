@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "kind": "synthetic",
+  "seed": 42,
+  "count": 6,
+  "items": [
+    {
+      "id": "synth_0001",
+      "image_path": "synthetic/synth_0001.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n비타민 E 종합 영양제\n\n성분\n- 비타민 E: 200mg α-TE\n- 비타민 A: 25μg RAE\n- 인: 2000mg\n- 판토텐산: 100mg\n- 나이아신: 2000mg NE",
+      "gt_fields": {
+        "product_name": "비타민 E 종합 영양제",
+        "ingredients": [
+          "비타민 E",
+          "비타민 A",
+          "인",
+          "판토텐산",
+          "나이아신"
+        ],
+        "dosage": "200mg α-TE"
+      }
+    },
+    {
+      "id": "synth_0002",
+      "image_path": "synthetic/synth_0002.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nMilk Thistle Complex\n\nIngredients\n- Milk Thistle: 100mg\n- Selenium: 10μg\n- Vitamin D: 10μg\n- Iodine: 25μg\n- Calcium: 200mg",
+      "gt_fields": {
+        "product_name": "Milk Thistle Complex",
+        "ingredients": [
+          "Milk Thistle",
+          "Selenium",
+          "Vitamin D",
+          "Iodine",
+          "Calcium"
+        ],
+        "dosage": "100mg"
+      }
+    },
+    {
+      "id": "synth_0003",
+      "image_path": "synthetic/synth_0003.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n구리 / Copper\n\n성분 Ingredients\n- 구리 (Copper): 2000mg\n- 비타민 A (Vitamin A): 400μg RAE\n- 셀레늄 (Selenium): 200μg\n- 비타민 B2 (Riboflavin): 1000mg\n- 몰리브덴 (Molybdenum): 25μg",
+      "gt_fields": {
+        "product_name": "구리 / Copper",
+        "ingredients": [
+          "구리 (Copper)",
+          "비타민 A (Vitamin A)",
+          "셀레늄 (Selenium)",
+          "비타민 B2 (Riboflavin)",
+          "몰리브덴 (Molybdenum)"
+        ],
+        "dosage": "2000mg"
+      }
+    },
+    {
+      "id": "synth_0004",
+      "image_path": "synthetic/synth_0004.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n요오드 종합 영양제\n\n성분\n- 요오드: 10μg\n- 판토텐산: 200mg\n- 오메가-3 DHA: 2000mg\n- 루테인+지아잔틴: 1000mg",
+      "gt_fields": {
+        "product_name": "요오드 종합 영양제",
+        "ingredients": [
+          "요오드",
+          "판토텐산",
+          "오메가-3 DHA",
+          "루테인+지아잔틴"
+        ],
+        "dosage": "10μg"
+      }
+    },
+    {
+      "id": "synth_0005",
+      "image_path": "synthetic/synth_0005.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nPantothenic Acid Complex\n\nIngredients\n- Pantothenic Acid: 500mg\n- Vitamin K: 10μg\n- Riboflavin: 100mg\n- Potassium: 1000mg",
+      "gt_fields": {
+        "product_name": "Pantothenic Acid Complex",
+        "ingredients": [
+          "Pantothenic Acid",
+          "Vitamin K",
+          "Riboflavin",
+          "Potassium"
+        ],
+        "dosage": "500mg"
+      }
+    },
+    {
+      "id": "synth_0006",
+      "image_path": "synthetic/synth_0006.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n엽산 / Folate (DFE)\n\n성분 Ingredients\n- 엽산 (Folate (DFE)): 50μg DFE\n- 루테인+지아잔틴 (Lutein + Zeaxanthin): 100mg\n- 구리 (Copper): 2000mg",
+      "gt_fields": {
+        "product_name": "엽산 / Folate (DFE)",
+        "ingredients": [
+          "엽산 (Folate (DFE))",
+          "루테인+지아잔틴 (Lutein + Zeaxanthin)",
+          "구리 (Copper)"
+        ],
+        "dosage": "50μg DFE"
+      }
+    }
+  ]
+}

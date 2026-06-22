@@ -1,0 +1,19 @@
+-r requirements.txt
+
+# Code quality
+# Pinned so CI's `black --check` / `ruff check` match local formatting exactly —
+# unpinned ranges let CI pull a newer style year and reformat the whole tree.
+black==26.5.1
+ruff==0.15.15
+mypy>=1.10
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.23
+pytest-cov>=4.1
+pytest-mock>=3.12
+PyYAML>=6.0,<7.0
+pip-audit>=2.10,<3.0
+
+# Dev tools
+ipython>=8.0

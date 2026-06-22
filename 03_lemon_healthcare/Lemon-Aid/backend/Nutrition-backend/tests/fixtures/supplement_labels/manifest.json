@@ -1,0 +1,8 @@
+{
+  "cases": [
+    {
+      "case_id": "ko_dense_table_001",
+      "expected_snapshot_path": "expected/ko_dense_table_001.snapshot_v2.json"
+    }
+  ]
+}

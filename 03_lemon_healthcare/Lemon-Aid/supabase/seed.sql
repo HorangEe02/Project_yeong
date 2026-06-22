@@ -1,0 +1,3 @@
+-- Intentionally empty.
+-- Local Supabase starts without fixture seed data so private learning images
+-- and OCR-derived labels are never committed through seed scripts.

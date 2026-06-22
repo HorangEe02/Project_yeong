@@ -1,0 +1,128 @@
+[project]
+name = "lemon-healthcare-backend"
+version = "0.1.0"
+description = "Lemon Healthcare AI - Backend API"
+requires-python = ">=3.13"
+authors = [{ name = "TBD Team" }]
+license = { text = "MIT" }
+
+[project.optional-dependencies]
+# Phase 3 게이트 #2 통과 시에만 설치 (docs/17 §9, docs/06 §2.3)
+vision = [
+    "torch>=2.2",
+    "transformers<5",
+    "ultralytics>=8.1",
+]
+# Phase 4 게이트 #3 통과 시에만 설치
+learning = [
+    "boto3>=1.34",
+    "pgvector>=0.2",
+    "sentence-transformers>=2.5",
+]
+# Optional local OCR fallback. Keep out of default CI/runtime until docs/40 fixture
+# evaluation and review gate pass.
+ocr-local = [
+    "paddlepaddle==3.2.0",
+    "paddleocr>=3.6,<3.7",
+]
+
+[tool.setuptools.packages.find]
+where = ["Nutrition-backend"]
+include = ["src*"]
+namespaces = false
+
+[tool.black]
+line-length = 100
+target-version = ["py313"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "N",
+    "W",
+    "UP",
+    "B",
+    "C4",
+    "SIM",
+    "RET",
+    "ARG",
+    "PTH",
+    "ERA",
+    "PL",
+    "RUF",
+]
+ignore = [
+    "E501",
+    "PLR0913",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-third-party = ["alembic"]
+
+[tool.ruff.lint.per-file-ignores]
+"Nutrition-backend/src/ocr/field_extractor.py" = ["RUF001"]
+"Nutrition-backend/src/ocr/text_normalizer.py" = ["RUF001", "RUF002", "RUF003"]
+# PaddleOCR adaptive structured-eval harness (dev/eval tooling, not service runtime):
+# fullwidth CJK punctuation (RUF001, mirrors the OCR-module precedent above) plus
+# relaxed magic-value / branch-count limits for the large eval script.
+"scripts/run_paddleocr_adaptive_structured_eval.py" = ["RUF001", "PLR2004", "PLR0912"]
+"Nutrition-backend/tests/**/*.py" = ["PLR2004"]
+"Nutrition-backend/tests/unit/ocr/test_field_extractor.py" = ["PLR2004", "RUF001"]
+"Nutrition-backend/tests/unit/ocr/test_text_normalizer.py" = ["PLR2004", "RUF001", "RUF002"]
+"ai_agent_chat/tests/**/*.py" = ["PLR2004"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+# "."은 신규 `from scripts import ...` 테스트(merge smoke·backlog report)의 수집 안정성용 (PR#4).
+pythonpath = [".", "Nutrition-backend", "ai_agent_chat/src"]
+testpaths = [
+    "Nutrition-backend/tests",
+    "ai_agent_chat/tests",
+]
+python_files = "test_*.py"
+markers = [
+    "timescaledb: requires a PostgreSQL instance with the timescaledb extension installed",
+]
+addopts = """
+    -v
+    --cov=src
+    --cov-report=term-missing
+    --cov-report=html
+    --cov-fail-under=80
+    --strict-markers
+    -m "not timescaledb"
+"""
+asyncio_mode = "auto"
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true

@@ -1,0 +1,593 @@
+{
+  "artifact_summaries": [
+    {
+      "content_sha256": "d8526f4b92681f3a75a41340a2e81a0b28739b813b478b832ba382052db49178",
+      "description": "local HTML and decision-template bundle for brand and product review",
+      "path_hash": "073c393107ca25d26dcb915d790de4d1bc668dd4e5fe2e455d4f65ff110fc968",
+      "record_count": 1,
+      "role": "brand_review_bundle",
+      "schema_versions": [
+        "supplement-brand-review-bundle-v1"
+      ]
+    },
+    {
+      "content_sha256": "47d46d7a2f9a0875d69440e37e56610a61ee9610b43bc66c868a7cf37afedf5f",
+      "description": "redacted preflight summary for brand/product review decisions",
+      "path_hash": "43b78424b8ee2729d4a404d25d9b4675eecc5f92829a5eeb14dda5f91a858aa1",
+      "record_count": 1,
+      "role": "brand_review_decision_preflight",
+      "schema_versions": [
+        "supplement-brand-review-decision-preflight-v1"
+      ]
+    },
+    {
+      "content_sha256": "7030bcf87dc4bcacaffe585eaeafab6ec901f6a46e97e1b7be75a1c674c02c2f",
+      "description": "operator template for brand and product review",
+      "path_hash": "9bcb1bb707d0ba32dbd74813ee8de16bfb65b8741694a03d262243fea3500e02",
+      "record_count": 1,
+      "role": "brand_review_template",
+      "schema_versions": [
+        "supplement-brand-review-template-v1"
+      ]
+    },
+    {
+      "content_sha256": "ad40d27546d2f7bc914ea186ebe072b9d023da512a915ff1ef4e7b43b334ba47",
+      "db_import_verified": true,
+      "db_write_performed": false,
+      "description": "read-only DB verification for category seed rows only",
+      "expected_category_count": 43,
+      "expected_product_category_count": 0,
+      "expected_product_count": 0,
+      "matched_category_count": 43,
+      "matched_product_category_count": 0,
+      "matched_product_count": 0,
+      "missing_category_count": 0,
+      "path_hash": "1174ba9cb85269d92d8384edd92c2cf5b8550dea859408a2f85a0c39fbdf6330",
+      "record_count": 1,
+      "role": "category_seed_db_verification",
+      "schema_versions": [
+        "supplement-taxonomy-db-import-verification-v1"
+      ]
+    },
+    {
+      "content_sha256": "3d2f388fbe8f76dede0a0c474ef112d2797b70c7a8e7ad3ad23c120e80f9eca7",
+      "description": "review OCR and detail-page YOLO candidate summary",
+      "path_hash": "1e95028e114f10dab116d0a141a7ff80b2060b37de9b097ff0f1b666b830a2ed",
+      "record_count": 1,
+      "role": "learning_candidate_summary",
+      "schema_versions": [
+        "supplement-learning-candidate-manifests-v1"
+      ]
+    },
+    {
+      "content_sha256": "7bd3b21a5f2dfb372282cf8e6a6cf8e5934e8d47aa8da5d00dc927e804da678e",
+      "description": "redacted queue-specific gate order after an operator batch is completed",
+      "path_hash": "f30b1db4dc8ec3a9b2fe0756ecc0945cce33ee630ecf7d2a2b755fb566bea54d",
+      "record_count": 1,
+      "role": "operator_post_completion_command_plan",
+      "schema_versions": [
+        "supplement-operator-post-completion-command-plan-v1"
+      ]
+    },
+    {
+      "all_batches_complete": false,
+      "batch_count": 18,
+      "complete_batch_count": 0,
+      "content_sha256": "26d7de30bf9483367278eb61fc3826e05ec54a37dcdc0914268ca6a080f25a75",
+      "description": "redacted aggregate progress preflight for operator review batches",
+      "invalid_batch_count": 0,
+      "next_incomplete_batch_key": "brand_product_review:001",
+      "path_hash": "763f936a2d57550c16154b645ca16ef5c0d960e946680565909d8bfb5c83e497",
+      "pending_batch_count": 18,
+      "record_count": 1,
+      "role": "operator_review_batch_progress",
+      "schema_versions": [
+        "supplement-operator-review-batch-progress-preflight-v1"
+      ],
+      "total_blank_row_count": 808,
+      "total_expected_row_count": 808,
+      "total_invalid_row_count": 0,
+      "total_missing_row_count": 0,
+      "total_pending_row_count": 0,
+      "total_valid_row_count": 0
+    },
+    {
+      "batch_count": 18,
+      "content_sha256": "2f26afb28304449cc10bbb3acbf24b341ada5872e4c145f14ef64f27678a1ac8",
+      "description": "redacted batch-by-batch operator workpack for pending human review",
+      "next_batch_key": "brand_product_review:001",
+      "path_hash": "1e52839a6e291459a6bd5458d51fdbf96f45d1fd237aa78488f63f7b9a10a3b4",
+      "record_count": 1,
+      "role": "operator_review_workpack",
+      "schema_versions": [
+        "supplement-operator-review-workpack-v1"
+      ],
+      "status": "ok",
+      "workpack_file_count": 19
+    },
+    {
+      "content_sha256": "f93a83023f801430f274b7b3d6d22d74fcb32e7e4e57a31e7aaf58b1c37f1fd5",
+      "description": "redacted preflight summary for operator PII screening decisions",
+      "path_hash": "51366e894d2ab6d494b601ad04790d0561a7f91c2e877501d98d92a5706cf6d4",
+      "record_count": 1,
+      "role": "pii_screening_decision_preflight",
+      "schema_versions": [
+        "supplement-review-pii-screening-decision-preflight-v1"
+      ]
+    },
+    {
+      "content_sha256": "23e5807d2e460f2d5dee817afa59ca7f40a12ee29a65c6d286101091f02a29e2",
+      "description": "local HTML and decision-template bundle for review-image PII screening",
+      "path_hash": "346ad2339b00bd58eab80b57ed7c522b8f0fb380b3748c098db5856b64476221",
+      "record_count": 1,
+      "role": "pii_screening_review_bundle",
+      "schema_versions": [
+        "supplement-review-pii-screening-review-bundle-v1"
+      ]
+    },
+    {
+      "content_sha256": "c946d6805056334233588df20234cfc1c678aa394a96482016b626fcd9c9090c",
+      "description": "operator PII screening template for review OCR images",
+      "path_hash": "bfa23f130da2933f9667595f0bad6a67ffeb0d8983a1804fe2e854f5d1b45461",
+      "record_count": 1,
+      "role": "pii_screening_template",
+      "schema_versions": [
+        "supplement-review-pii-screening-template-v1"
+      ]
+    },
+    {
+      "content_sha256": "7a477ef22fcf241764c434ffc51fab6387f277d018b018c0af3e1eccc875f206",
+      "description": "read-only crawling-image structure audit",
+      "path_hash": "681ba68656d029061c1e359a4c2bd2f1c7123e92e76602b69d19d0cb7fffdb12",
+      "record_count": 1,
+      "role": "taxonomy_audit",
+      "schema_versions": [
+        "supplement-crawling-image-taxonomy-audit-v1"
+      ]
+    },
+    {
+      "content_sha256": "fc0a731e16fbcded535d6dd5128f7541f80231aa4b4117baa7fe46e0ee91e74d",
+      "description": "category seed and brand-candidate DB staging rows",
+      "path_hash": "a6e73b0d15a166efe5f0a85a540ac38db3b8fe0e2b0b47b9b979af35f0bbf9a6",
+      "record_count": 431,
+      "role": "taxonomy_staging",
+      "schema_versions": [
+        "supplement-taxonomy-db-staging-v1"
+      ]
+    },
+    {
+      "content_sha256": "b246cda872680c4bbbd0d7bac2ee6a43307ed27a05ba9a494ebcff9fd4f344db",
+      "description": "redacted preflight summary for operator bbox annotation decisions",
+      "path_hash": "52d32874998f30ad6f27983e3e25b70016b433f541775c6e34c83d7288bcc8f8",
+      "record_count": 1,
+      "role": "yolo_annotation_decision_preflight",
+      "schema_versions": [
+        "supplement-yolo-annotation-decision-preflight-v1"
+      ]
+    },
+    {
+      "content_sha256": "14376abdf6106c33a518ce68b9f0571b5c8915c7243767eb047d79ab7f582f3f",
+      "description": "local HTML/task bundle for supplement-section bbox annotation",
+      "path_hash": "84fe1060241876984d3439f570d47ea6f65e64ce476507712b8a948732fb90df",
+      "record_count": 1,
+      "role": "yolo_annotation_review_bundle",
+      "schema_versions": [
+        "supplement-yolo-annotation-review-bundle-v1"
+      ]
+    },
+    {
+      "content_sha256": "bf656db132a1ae79c1a71b05e6f0687408bca0f81671e40f5e52cbf89dac8680",
+      "description": "operator template for supplement-section bbox labels",
+      "path_hash": "e20697dfce4c6de8ad12bcfefb566f0b20e02e12c142fd2ae9e1ed63d2980ca4",
+      "record_count": 1,
+      "role": "yolo_annotation_template",
+      "schema_versions": [
+        "supplement-yolo-annotation-template-summary-v1"
+      ]
+    }
+  ],
+  "blocked_stage_count": 9,
+  "db_write_performed": false,
+  "external_provider_call_performed": false,
+  "generated_at": "2026-06-04T15:42:20.376656+00:00",
+  "llm_call_performed": false,
+  "local_absolute_path_printed": false,
+  "overall_status": "in_progress_blocked_by_missing_or_invalid_artifacts",
+  "pending_operator_review_stage_count": 3,
+  "product_literal_printed": false,
+  "provided_artifact_count": 16,
+  "provided_artifact_roles": [
+    "brand_review_bundle",
+    "brand_review_decision_preflight",
+    "brand_review_template",
+    "category_seed_db_verification",
+    "learning_candidate_summary",
+    "operator_post_completion_command_plan",
+    "operator_review_batch_progress",
+    "operator_review_workpack",
+    "pii_screening_decision_preflight",
+    "pii_screening_review_bundle",
+    "pii_screening_template",
+    "taxonomy_audit",
+    "taxonomy_staging",
+    "yolo_annotation_decision_preflight",
+    "yolo_annotation_review_bundle",
+    "yolo_annotation_template"
+  ],
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "schema_version": "supplement-learning-pipeline-readiness-v1",
+  "source_doc_urls": [
+    "https://docs.ultralytics.com/datasets/detect/",
+    "https://docs.ultralytics.com/tasks/detect/",
+    "https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/OCR.html",
+    "https://cloud.google.com/vision/docs/ocr",
+    "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr",
+    "https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html"
+  ],
+  "source_image_read_performed": false,
+  "stage_count": 16,
+  "stages": [
+    {
+      "blocker_codes": [],
+      "missing_required_roles": [],
+      "next_operator_action": "inspect_structure_issues_before_staging",
+      "pending_roles": [],
+      "phase": "taxonomy_db",
+      "present_pending_roles": [],
+      "present_required_roles": [
+        "taxonomy_audit"
+      ],
+      "required_roles": [
+        "taxonomy_audit"
+      ],
+      "stage_key": "taxonomy_structure_audit",
+      "status": "verified"
+    },
+    {
+      "blocker_codes": [],
+      "missing_required_roles": [],
+      "next_operator_action": "export_brand_review_template",
+      "pending_roles": [],
+      "phase": "taxonomy_db",
+      "present_pending_roles": [],
+      "present_required_roles": [
+        "taxonomy_staging"
+      ],
+      "required_roles": [
+        "taxonomy_staging"
+      ],
+      "stage_key": "taxonomy_db_staging",
+      "status": "verified"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:approved_product_import"
+      ],
+      "missing_required_roles": [
+        "approved_product_import"
+      ],
+      "next_operator_action": "complete_brand_product_human_review",
+      "pending_roles": [
+        "brand_review_template",
+        "brand_review_bundle",
+        "brand_review_decision_preflight",
+        "operator_review_workpack",
+        "operator_review_batch_progress",
+        "operator_post_completion_command_plan"
+      ],
+      "phase": "taxonomy_db",
+      "present_pending_roles": [
+        "brand_review_template",
+        "brand_review_bundle",
+        "brand_review_decision_preflight",
+        "operator_review_workpack",
+        "operator_review_batch_progress",
+        "operator_post_completion_command_plan"
+      ],
+      "present_required_roles": [],
+      "required_roles": [
+        "approved_product_import"
+      ],
+      "stage_key": "brand_product_review",
+      "status": "pending_operator_review"
+    },
+    {
+      "blocker_codes": [],
+      "missing_required_roles": [],
+      "next_operator_action": "run_category_seed_db_apply_and_read_only_verification",
+      "pending_roles": [
+        "taxonomy_staging"
+      ],
+      "phase": "taxonomy_db",
+      "present_pending_roles": [
+        "taxonomy_staging"
+      ],
+      "present_required_roles": [
+        "category_seed_db_verification"
+      ],
+      "required_roles": [
+        "category_seed_db_verification"
+      ],
+      "stage_key": "category_seed_db_verification",
+      "status": "verified"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:approved_product_import",
+        "missing_required:taxonomy_db_verification"
+      ],
+      "missing_required_roles": [
+        "approved_product_import",
+        "taxonomy_db_verification"
+      ],
+      "next_operator_action": "run_read_only_db_import_verification",
+      "pending_roles": [
+        "approved_product_import"
+      ],
+      "phase": "taxonomy_db",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "approved_product_import",
+        "taxonomy_db_verification"
+      ],
+      "stage_key": "taxonomy_db_import_verification",
+      "status": "blocked_missing_artifact"
+    },
+    {
+      "blocker_codes": [],
+      "missing_required_roles": [],
+      "next_operator_action": "screen_review_images_for_pii_and_prepare_yolo_templates",
+      "pending_roles": [],
+      "phase": "ocr_yolo_candidates",
+      "present_pending_roles": [],
+      "present_required_roles": [
+        "learning_candidate_summary"
+      ],
+      "required_roles": [
+        "learning_candidate_summary"
+      ],
+      "stage_key": "learning_candidate_split",
+      "status": "verified"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:pii_screening_apply"
+      ],
+      "missing_required_roles": [
+        "pii_screening_apply"
+      ],
+      "next_operator_action": "apply_pii_screening_decisions",
+      "pending_roles": [
+        "pii_screening_template",
+        "pii_screening_review_bundle",
+        "pii_screening_decision_preflight",
+        "operator_review_workpack",
+        "operator_review_batch_progress",
+        "operator_post_completion_command_plan"
+      ],
+      "phase": "ocr_ground_truth",
+      "present_pending_roles": [
+        "pii_screening_template",
+        "pii_screening_review_bundle",
+        "pii_screening_decision_preflight",
+        "operator_review_workpack",
+        "operator_review_batch_progress",
+        "operator_post_completion_command_plan"
+      ],
+      "present_required_roles": [],
+      "required_roles": [
+        "pii_screening_apply"
+      ],
+      "stage_key": "review_pii_screening",
+      "status": "pending_operator_review"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:ocr_benchmark_manifest"
+      ],
+      "missing_required_roles": [
+        "ocr_benchmark_manifest"
+      ],
+      "next_operator_action": "complete_human_reviewed_ocr_ground_truth",
+      "pending_roles": [
+        "ocr_ground_truth_template",
+        "ocr_ground_truth_review_bundle"
+      ],
+      "phase": "ocr_ground_truth",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "ocr_benchmark_manifest"
+      ],
+      "stage_key": "manual_ocr_ground_truth",
+      "status": "blocked_missing_artifact"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:ocr_three_tier_eval"
+      ],
+      "missing_required_roles": [
+        "ocr_three_tier_eval"
+      ],
+      "next_operator_action": "run_clova_google_vision_paddleocr_comparison",
+      "pending_roles": [
+        "ocr_benchmark_manifest"
+      ],
+      "phase": "ocr_provider_eval",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "ocr_three_tier_eval"
+      ],
+      "stage_key": "teacher_ocr_comparison",
+      "status": "blocked_missing_artifact"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:yolo_template_promotion"
+      ],
+      "missing_required_roles": [
+        "yolo_template_promotion"
+      ],
+      "next_operator_action": "complete_supplement_section_bbox_review",
+      "pending_roles": [
+        "yolo_annotation_template",
+        "yolo_annotation_review_bundle",
+        "yolo_annotation_decision_preflight",
+        "operator_review_workpack",
+        "operator_review_batch_progress",
+        "operator_post_completion_command_plan"
+      ],
+      "phase": "supplement_section_yolo",
+      "present_pending_roles": [
+        "yolo_annotation_template",
+        "yolo_annotation_review_bundle",
+        "yolo_annotation_decision_preflight",
+        "operator_review_workpack",
+        "operator_review_batch_progress",
+        "operator_post_completion_command_plan"
+      ],
+      "present_required_roles": [],
+      "required_roles": [
+        "yolo_template_promotion"
+      ],
+      "stage_key": "yolo_section_annotation",
+      "status": "pending_operator_review"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:yolo_dataset"
+      ],
+      "missing_required_roles": [
+        "yolo_dataset"
+      ],
+      "next_operator_action": "materialize_section_yolo_dataset",
+      "pending_roles": [
+        "yolo_template_promotion"
+      ],
+      "phase": "supplement_section_yolo",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "yolo_dataset"
+      ],
+      "stage_key": "yolo_section_dataset",
+      "status": "blocked_missing_artifact"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:paddleocr_improvement_candidates"
+      ],
+      "missing_required_roles": [
+        "paddleocr_improvement_candidates"
+      ],
+      "next_operator_action": "create_or_review_paddleocr_annotation_tasks",
+      "pending_roles": [
+        "ocr_three_tier_eval"
+      ],
+      "phase": "paddleocr_training",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "paddleocr_improvement_candidates"
+      ],
+      "stage_key": "paddleocr_improvement_triage",
+      "status": "blocked_missing_artifact"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:paddleocr_dataset"
+      ],
+      "missing_required_roles": [
+        "paddleocr_dataset"
+      ],
+      "next_operator_action": "accept_annotation_tasks_and_materialize_dataset",
+      "pending_roles": [
+        "paddleocr_annotation_tasks"
+      ],
+      "phase": "paddleocr_training",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "paddleocr_dataset"
+      ],
+      "stage_key": "paddleocr_annotation_tasks",
+      "status": "blocked_missing_artifact"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:paddleocr_finetune_plan"
+      ],
+      "missing_required_roles": [
+        "paddleocr_finetune_plan"
+      ],
+      "next_operator_action": "review_finetune_plan_before_trusted_worker_execution",
+      "pending_roles": [
+        "paddleocr_dataset"
+      ],
+      "phase": "paddleocr_training",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "paddleocr_finetune_plan"
+      ],
+      "stage_key": "paddleocr_finetune_plan",
+      "status": "blocked_missing_artifact"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:paddleocr_finetune_eval",
+        "missing_required:paddleocr_baseline_eval",
+        "missing_required:paddleocr_baseline_gate"
+      ],
+      "missing_required_roles": [
+        "paddleocr_finetune_eval",
+        "paddleocr_baseline_eval",
+        "paddleocr_baseline_gate"
+      ],
+      "next_operator_action": "run_finetune_and_baseline_metric_gate",
+      "pending_roles": [
+        "paddleocr_finetune_plan"
+      ],
+      "phase": "paddleocr_training",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "paddleocr_finetune_eval",
+        "paddleocr_baseline_eval",
+        "paddleocr_baseline_gate"
+      ],
+      "stage_key": "paddleocr_metric_gate",
+      "status": "blocked_missing_artifact"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:paddleocr_promotion_runbook"
+      ],
+      "missing_required_roles": [
+        "paddleocr_promotion_runbook"
+      ],
+      "next_operator_action": "operator_review_before_model_promotion",
+      "pending_roles": [
+        "paddleocr_baseline_gate"
+      ],
+      "phase": "paddleocr_training",
+      "present_pending_roles": [],
+      "present_required_roles": [],
+      "required_roles": [
+        "paddleocr_promotion_runbook"
+      ],
+      "stage_key": "paddleocr_promotion_runbook",
+      "status": "blocked_missing_artifact"
+    }
+  ],
+  "status_counts": {
+    "blocked_missing_artifact": 9,
+    "pending_operator_review": 3,
+    "verified": 4
+  },
+  "training_execution_performed_by_script": false,
+  "verified_stage_count": 4
+}

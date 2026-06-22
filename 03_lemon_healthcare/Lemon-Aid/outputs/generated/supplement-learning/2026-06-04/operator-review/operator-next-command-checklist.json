@@ -1,0 +1,95 @@
+{
+  "absolute_paths_stored": false,
+  "batch_file_name": "brand_product_review-001.jsonl",
+  "batch_key": "brand_product_review:001",
+  "blocked_until": [
+    "operator_edits_current_batch",
+    "batch_file_preflight_ready_for_reconcile"
+  ],
+  "command_count": 7,
+  "commands": [
+    {
+      "command": "backend/.venv/bin/python backend/scripts/preflight_supplement_operator_review_batch_file.py --batch-plan outputs/generated/supplement-learning/2026-06-04/operator-review/operator-review-batch-plan.json --batch-key brand_product_review:001 --batch-file outputs/generated/supplement-learning/2026-06-04/operator-review/batches/brand_product_review-001.jsonl --output outputs/generated/supplement-learning/2026-06-04/operator-review/batches/brand_product_review-001.jsonl.preflight.json --markdown-output outputs/generated/supplement-learning/2026-06-04/operator-review/batches/brand_product_review-001.jsonl.preflight.md",
+      "gate_policy": "must_pass_before_reconcile",
+      "order": 1,
+      "purpose": "Confirm the edited local batch is complete before reconcile.",
+      "script_key": "preflight_supplement_operator_review_batch_file"
+    },
+    {
+      "command": "backend/.venv/bin/python backend/scripts/reconcile_supplement_operator_review_batch_files.py --batch-plan outputs/generated/supplement-learning/2026-06-04/operator-review/operator-review-batch-plan.json --brand-decisions outputs/generated/supplement-learning/2026-06-04/operator-review/brand-product-review-bundle/decisions.todo.jsonl --pii-decisions outputs/generated/supplement-learning/2026-06-04/operator-review/review-pii-screening-bundle/decisions.todo.jsonl --yolo-annotations outputs/generated/supplement-learning/2026-06-04/operator-review/yolo-section-annotation-bundle/annotation.todo.jsonl --batch-dir outputs/generated/supplement-learning/2026-06-04/operator-review/batches --output-dir outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled --summary-output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/reconcile.summary.json --markdown-output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/reconcile.summary.md",
+      "gate_policy": "no_source_overwrite",
+      "order": 2,
+      "purpose": "Merge completed batch files into reconciled queue copies without overwriting sources.",
+      "script_key": "reconcile_supplement_operator_review_batch_files"
+    },
+    {
+      "command": "backend/.venv/bin/python backend/scripts/preflight_supplement_operator_review_batch_progress.py --batch-plan outputs/generated/supplement-learning/2026-06-04/operator-review/operator-review-batch-plan.json --brand-decisions outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand_product_review.reconciled.jsonl --pii-decisions outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/review_pii_screening.reconciled.jsonl --yolo-annotations outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/yolo_section_annotation.reconciled.jsonl --output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/operator-review-batch-progress.json --markdown-output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/operator-review-batch-progress.md",
+      "gate_policy": "must_pass_before_queue_preflight",
+      "order": 3,
+      "purpose": "Confirm queue-level progress after reconcile.",
+      "script_key": "preflight_supplement_operator_review_batch_progress"
+    },
+    {
+      "command": "backend/.venv/bin/python backend/scripts/extract_supplement_brand_reviewed_decisions.py --taxonomy-staging outputs/todo-list/2026-06-04/2026-06-04-supplement-taxonomy-db-staging.jsonl --decisions outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand_product_review.reconciled.jsonl --output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand-product-reviewed.decisions.jsonl --summary outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand-product-reviewed.summary.json",
+      "gate_policy": "partial_preview_only",
+      "order": 4,
+      "purpose": "Separate reviewed brand decisions from blank queue stubs for preview-only gating.",
+      "script_key": "extract_supplement_brand_reviewed_decisions"
+    },
+    {
+      "command": "backend/.venv/bin/python backend/scripts/preflight_supplement_brand_review_decisions.py --taxonomy-staging outputs/todo-list/2026-06-04/2026-06-04-supplement-taxonomy-db-staging.jsonl --decisions outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand_product_review.reconciled.jsonl --output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand-product-review-preflight.json --require-all-reviewed",
+      "gate_policy": "strict_zero_blank_pending_invalid_required",
+      "order": 5,
+      "purpose": "Run strict brand review preflight; this must reach zero blank rows before DB import.",
+      "script_key": "preflight_supplement_brand_review_decisions"
+    },
+    {
+      "command": "backend/.venv/bin/python backend/scripts/gate_supplement_brand_db_import.py --brand-decision-preflight outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand-product-review-preflight.json --output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand-db-import-gate.json --markdown-output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand-db-import-gate.md",
+      "gate_policy": "must_pass_before_product_manifest",
+      "order": 6,
+      "purpose": "Gate approved product import manifest creation after strict brand preflight.",
+      "script_key": "gate_supplement_brand_db_import"
+    },
+    {
+      "command": "backend/.venv/bin/python backend/scripts/apply_supplement_brand_review_decisions.py --taxonomy-staging outputs/todo-list/2026-06-04/2026-06-04-supplement-taxonomy-db-staging.jsonl --decisions outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/brand_product_review.reconciled.jsonl --output outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/approved-product-import-manifest.jsonl --summary outputs/generated/supplement-learning/2026-06-04/operator-review/reconciled/approved-product-import-manifest.summary.json --require-all-reviewed",
+      "gate_policy": "manifest_only_no_db_write",
+      "order": 7,
+      "purpose": "Create the approved product import manifest after all brand rows are reviewed.",
+      "script_key": "apply_supplement_brand_review_decisions"
+    }
+  ],
+  "db_write_performed": false,
+  "external_provider_call_performed": false,
+  "generated_at": "2026-06-04T09:46:30.485344+00:00",
+  "input_names": {
+    "next_work_order": "operator-next-batch-work-order.json",
+    "post_completion_plan": "operator-post-completion-command-plan.json"
+  },
+  "input_path_hashes": {
+    "next_work_order": "e4297aa545c66e9d90a1ea1e936fd47e208efdebe5fdbe19609c6d273b0a4169",
+    "post_completion_plan": "f30b1db4dc8ec3a9b2fe0756ecc0945cce33ee630ecf7d2a2b755fb566bea54d"
+  },
+  "llm_call_performed": false,
+  "local_path_literals_stored": false,
+  "post_completion_blocker_codes": [
+    "batch_not_complete",
+    "blank_rows_remaining"
+  ],
+  "post_completion_execution_allowed_now": false,
+  "product_dir_literals_stored": false,
+  "queue_key": "brand_product_review",
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "schema_version": "supplement-operator-next-command-checklist-v1",
+  "source_doc_urls": [
+    "https://docs.python.org/3/library/argparse.html",
+    "https://docs.python.org/3/library/json.html",
+    "https://www.postgresql.org/docs/current/ddl-constraints.html",
+    "https://supabase.com/docs/guides/database/postgres/row-level-security"
+  ],
+  "source_editable_file_name": "decisions.todo.jsonl",
+  "source_image_read_performed": false,
+  "source_rows_read": false,
+  "status": "ready_after_operator_edits",
+  "training_execution_performed_by_script": false
+}

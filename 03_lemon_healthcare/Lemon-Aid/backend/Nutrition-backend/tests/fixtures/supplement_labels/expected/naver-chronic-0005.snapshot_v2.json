@@ -1,0 +1,45 @@
+{
+  "schema_version": "supplement-parsed-snapshot-v2",
+  "requires_user_confirmation": true,
+  "source": {
+    "analysis_id": "7492437b-52b7-5521-a90e-04a2de526d98",
+    "ocr_provider": "manual",
+    "ocr_confidence": null,
+    "layout_available": false,
+    "raw_image_stored": false,
+    "raw_ocr_text_stored": false,
+    "raw_provider_payload_stored": false
+  },
+  "product": {
+    "product_name": "TBD",
+    "manufacturer": null,
+    "barcode_text": null,
+    "barcode_format": null
+  },
+  "serving": {
+    "serving_size_text": "TBD",
+    "serving_amount": null,
+    "serving_unit": null,
+    "daily_servings": null,
+    "evidence_refs": []
+  },
+  "label_sections": [],
+  "ingredient_candidates": [],
+  "intake_method": {
+    "text": null,
+    "structured": {
+      "frequency": "unknown",
+      "time_of_day": [],
+      "with_food": "unknown"
+    },
+    "evidence_refs": []
+  },
+  "precautions": [],
+  "functional_claims": [],
+  "low_confidence_fields": [],
+  "warnings": [
+    "ground_truth_pending_human_review",
+    "category:식이섬유",
+    "labels:live_naver,detail_page"
+  ]
+}

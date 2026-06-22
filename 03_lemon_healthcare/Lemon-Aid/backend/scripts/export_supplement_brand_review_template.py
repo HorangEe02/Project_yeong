@@ -1,0 +1,503 @@
+"""Export a review template for supplement brand/product DB import candidates.
+
+The crawling-image folder layout provides useful category and product-folder
+signals, but product-folder prefixes are not authoritative manufacturer names.
+This script exports only review-gated ``product_brand_candidate`` staging rows
+to an operator template. It does not write to the database and does not emit
+local absolute paths, product directory literals, raw OCR text, provider
+payloads, or image bytes.
+
+References:
+    https://www.postgresql.org/docs/current/ddl-constraints.html
+    https://supabase.com/docs/guides/database/postgres/row-level-security
+    https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from collections import Counter
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
+
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+if str(BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(BACKEND_ROOT))
+
+from scripts import build_supplement_taxonomy_db_staging as staging  # noqa: E402
+
+SCHEMA_VERSION = "supplement-brand-review-template-v1"
+ROW_SCHEMA_VERSION = "supplement-brand-review-template-row-v1"
+DECISION_SCHEMA_VERSION = "supplement-brand-review-decision-v1"
+EXPECTED_STAGING_SCHEMA_VERSION = staging.SCHEMA_VERSION
+SAFE_TOKEN_PATTERN = re.compile(r"^[0-9A-Za-z가-힣_.:-]{1,160}$")
+SHA256_HEX_LENGTH = 64
+LOCAL_PATH_OR_URL_MARKERS = (
+    "/private/",
+    "/Users/",
+    "/Volumes/",
+    "file://",
+    "http://",
+    "https://",
+    "\\Users\\",
+    "\\Volumes\\",
+)
+LOCAL_PATH_MARKERS = tuple(
+    marker for marker in LOCAL_PATH_OR_URL_MARKERS if marker not in {"http://", "https://"}
+)
+SOURCE_DOC_URLS = (
+    "https://www.postgresql.org/docs/current/ddl-constraints.html",
+    "https://supabase.com/docs/guides/database/postgres/row-level-security",
+    "https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html",
+)
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse command-line arguments.
+
+    Args:
+        argv: Optional argument list for tests.
+
+    Returns:
+        Parsed CLI namespace.
+    """
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--taxonomy-staging", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--summary",
+        type=Path,
+        default=None,
+        help="Optional summary JSON path. Defaults to <output>.summary.json.",
+    )
+    parser.add_argument("--source-run-id", default=None)
+    parser.add_argument("--limit", type=int, default=None)
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
+    """Write a brand/product review template and redacted summary.
+
+    Args:
+        argv: Optional argument list for tests.
+    """
+    args = parse_args(argv)
+    output_path = args.output.expanduser().resolve()
+    summary_path = (
+        args.summary.expanduser().resolve()
+        if args.summary is not None
+        else output_path.with_suffix(output_path.suffix + ".summary.json")
+    )
+    try:
+        rows, summary = export_brand_review_template(
+            taxonomy_staging=args.taxonomy_staging,
+            source_run_id=args.source_run_id,
+            limit=args.limit,
+        )
+        _reject_unsafe_payload({"rows": rows, "summary": summary})
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(
+            "".join(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in rows),
+            encoding="utf-8",
+        )
+        summary_path.parent.mkdir(parents=True, exist_ok=True)
+        summary_path.write_text(
+            json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        failure = _failure_summary(
+            taxonomy_staging=args.taxonomy_staging,
+            output_path=output_path,
+            error=exc,
+        )
+        try:
+            summary_path.parent.mkdir(parents=True, exist_ok=True)
+            summary_path.write_text(
+                json.dumps(failure, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+        except OSError:
+            pass
+        print(json.dumps(failure, ensure_ascii=False, indent=2, sort_keys=True))
+        raise SystemExit(1) from None
+
+
+def export_brand_review_template(
+    *,
+    taxonomy_staging: Path,
+    source_run_id: str | None = None,
+    limit: int | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Export review rows for product brand candidates.
+
+    Args:
+        taxonomy_staging: JSONL generated by
+            ``build_supplement_taxonomy_db_staging.py``.
+        source_run_id: Optional operator run id.
+        limit: Optional maximum number of exported rows.
+
+    Returns:
+        Template rows and redacted summary.
+
+    Raises:
+        ValueError: If rows are unsafe, malformed, or options are invalid.
+    """
+    if limit is not None and limit < 0:
+        raise ValueError("limit must be nonnegative.")
+    staging_rows = _read_jsonl_objects(taxonomy_staging)
+    rows: list[dict[str, Any]] = []
+    skip_reasons: Counter[str] = Counter()
+    seen_fixture_ids: set[str] = set()
+
+    for row in staging_rows:
+        _reject_unsafe_payload(row)
+        if row.get("schema_version") != EXPECTED_STAGING_SCHEMA_VERSION:
+            raise ValueError("Supplement taxonomy staging row uses an unsupported schema.")
+        if row.get("row_type") != staging.ROW_TYPE_BRAND_CANDIDATE:
+            skip_reasons["not_product_brand_candidate"] += 1
+            continue
+        if row.get("approved_for_db_write") is True:
+            skip_reasons["already_approved_for_db_write"] += 1
+            continue
+        if limit is not None and len(rows) >= limit:
+            skip_reasons["limit_reached"] += 1
+            continue
+        template_row = _template_row(row, source_run_id=source_run_id)
+        fixture_id = _required_safe_token(template_row["fixture_id"], field_name="fixture_id")
+        if fixture_id in seen_fixture_ids:
+            raise ValueError(f"Duplicate supplement brand review fixture_id: {fixture_id}")
+        seen_fixture_ids.add(fixture_id)
+        rows.append(template_row)
+
+    summary = {
+        "schema_version": SCHEMA_VERSION,
+        "source_run_id": source_run_id,
+        "generated_at": datetime.now(UTC).isoformat(),
+        "taxonomy_staging_name": taxonomy_staging.name,
+        "taxonomy_staging_hash": staging.audit._sha256_text(str(taxonomy_staging.expanduser())),
+        "staging_row_count": len(staging_rows),
+        "template_row_count": len(rows),
+        "operator_decision_required_count": len(rows),
+        "skip_reason_counts": dict(sorted(skip_reasons.items())),
+        "limit": limit,
+        "db_write_performed": False,
+        "approved_for_db_write_rows": 0,
+        "raw_ocr_text_stored": False,
+        "raw_provider_payload_stored": False,
+        "absolute_paths_stored": False,
+        "product_dir_literals_stored": False,
+        "source_doc_urls": list(SOURCE_DOC_URLS),
+    }
+    _reject_unsafe_payload({"rows": rows, "summary": summary})
+    return rows, summary
+
+
+def _template_row(row: dict[str, Any], *, source_run_id: str | None) -> dict[str, Any]:
+    """Return one operator-facing brand review row.
+
+    Args:
+        row: Product brand candidate staging row.
+        source_run_id: Optional operator run id.
+
+    Returns:
+        JSON-safe review template row.
+    """
+    brand_candidate = row.get("brand_candidate")
+    if not isinstance(brand_candidate, dict):
+        raise ValueError("Brand candidate staging rows require brand_candidate object.")
+    product_dir_hash = _required_sha256(row.get("product_dir_hash"), field_name="product_dir_hash")
+    template: dict[str, Any] = {
+        "schema_version": ROW_SCHEMA_VERSION,
+        "source_run_id": source_run_id,
+        "fixture_id": _fixture_id(product_dir_hash),
+        "category_key": _required_safe_token(row.get("category_key"), field_name="category_key"),
+        "category_display_name": _safe_display_text(row.get("category_display_name")),
+        "source_product_id": _safe_optional_token(row.get("source_product_id")),
+        "product_dir_hash": product_dir_hash,
+        "source_folder_hash": _required_sha256(
+            row.get("source_folder_hash"),
+            field_name="source_folder_hash",
+        ),
+        "brand_candidate": {
+            "brand_key": _required_safe_token(
+                brand_candidate.get("brand_key"),
+                field_name="brand_candidate.brand_key",
+            ),
+            "display_name": _safe_display_text(brand_candidate.get("display_name")),
+            "verification_status": _required_safe_token(
+                brand_candidate.get("verification_status"),
+                field_name="brand_candidate.verification_status",
+            ),
+            "needs_human_review": True,
+        },
+        "image_count": _safe_nonnegative_int(row.get("image_count")),
+        "source_kind_counts": _safe_counter(row.get("source_kind_counts")),
+        "issue_counts": _safe_counter(row.get("issue_counts")),
+        "db_target_table": "supplement_products",
+        "db_target_field": "manufacturer",
+        "db_target_relation": "supplement_product_categories",
+        "operator_decision_required": True,
+        "approved_for_db_write": False,
+        "decision_stub": _decision_stub(product_dir_hash),
+        "review_instructions": [
+            "verify_manufacturer_and_product_name_from_safe_label_or_catalog_context",
+            "do_not_use_product_folder_literal_as_confirmed_manufacturer_without_review",
+            "do_not_copy_raw_ocr_text_provider_payload_or_local_paths_into_decision",
+            "use_apply_supplement_brand_review_decisions_to_build_import_manifest",
+        ],
+        "db_write_performed": False,
+        "raw_ocr_text_stored": False,
+        "raw_provider_payload_stored": False,
+        "absolute_paths_stored": False,
+        "product_dir_literals_stored": False,
+    }
+    _reject_unsafe_payload(template)
+    return template
+
+
+def _decision_stub(product_dir_hash: str) -> dict[str, Any]:
+    """Return a fill-in-place brand review decision object skeleton.
+
+    Args:
+        product_dir_hash: Source product folder hash.
+
+    Returns:
+        Decision skeleton accepted by the apply script after review.
+    """
+    return {
+        "schema_version": DECISION_SCHEMA_VERSION,
+        "fixture_id": _fixture_id(product_dir_hash),
+        "brand_review_decision": {
+            "decision": "",
+            "reviewer_id": "",
+            "reviewed_at": "",
+            "reviewed_manufacturer": "",
+            "reviewed_product_name": "",
+            "reason_codes": [],
+            "attest_brand_product_review_completed": False,
+            "attest_not_using_product_folder_literal_as_manufacturer": False,
+            "attest_product_name_reviewed_from_label_or_safe_catalog": False,
+            "attest_no_raw_ocr_or_provider_payload_copied": False,
+            "attest_db_import_allowed": False,
+        },
+    }
+
+
+def _fixture_id(product_dir_hash: str) -> str:
+    """Return a stable review fixture id for a product folder hash.
+
+    Args:
+        product_dir_hash: SHA-256 product folder hash.
+
+    Returns:
+        Safe fixture id.
+    """
+    return f"brand_{product_dir_hash[:24]}"
+
+
+def _read_jsonl_objects(path: Path) -> list[dict[str, Any]]:
+    """Read JSONL object rows.
+
+    Args:
+        path: JSONL path.
+
+    Returns:
+        JSON object rows.
+
+    Raises:
+        ValueError: If any row is not an object or contains unsafe data.
+    """
+    rows: list[dict[str, Any]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.strip().startswith("#"):
+            continue
+        row = json.loads(line)
+        if not isinstance(row, dict):
+            raise ValueError("JSONL rows must be objects.")
+        _reject_unsafe_payload(row)
+        rows.append(row)
+    return rows
+
+
+def _required_safe_token(value: Any, *, field_name: str) -> str:
+    """Return a required bounded token.
+
+    Args:
+        value: Raw value.
+        field_name: Field name used in validation errors.
+
+    Returns:
+        Safe token.
+
+    Raises:
+        ValueError: If the value is missing or unsafe.
+    """
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"Row requires safe token field: {field_name}")
+    stripped = value.strip()
+    if any(marker in stripped for marker in LOCAL_PATH_OR_URL_MARKERS):
+        raise ValueError("Payload contains local path or URL literal.")
+    if not SAFE_TOKEN_PATTERN.fullmatch(stripped):
+        raise ValueError(f"Unsafe token field: {field_name}")
+    return stripped
+
+
+def _safe_optional_token(value: Any) -> str | None:
+    """Return an optional bounded token.
+
+    Args:
+        value: Raw value.
+
+    Returns:
+        Safe token or ``None``.
+    """
+    if value is None:
+        return None
+    return _required_safe_token(value, field_name="optional_token")
+
+
+def _required_sha256(value: Any, *, field_name: str) -> str:
+    """Return a required SHA-256 hex value.
+
+    Args:
+        value: Raw value.
+        field_name: Field name used in validation errors.
+
+    Returns:
+        SHA-256 hex string.
+
+    Raises:
+        ValueError: If the value is not a SHA-256 hex digest.
+    """
+    token = _required_safe_token(value, field_name=field_name)
+    if len(token) != SHA256_HEX_LENGTH or any(char not in "0123456789abcdef" for char in token):
+        raise ValueError(f"Row requires sha256 field: {field_name}")
+    return token
+
+
+def _safe_display_text(value: Any, *, max_length: int = 180) -> str | None:
+    """Return bounded display text with local paths and URLs rejected.
+
+    Args:
+        value: Raw value.
+        max_length: Maximum output length.
+
+    Returns:
+        Sanitized text or ``None``.
+
+    Raises:
+        ValueError: If the value contains path/URL markers.
+    """
+    if value is None:
+        return None
+    if not isinstance(value, str):
+        raise ValueError("Display text must be a string.")
+    stripped = " ".join(value.strip().split())
+    if not stripped:
+        return None
+    if any(marker in stripped for marker in LOCAL_PATH_OR_URL_MARKERS):
+        raise ValueError("Payload contains local path or URL literal.")
+    if "/" in stripped or "\\" in stripped:
+        raise ValueError("Display text must not contain path separators.")
+    return stripped[:max_length]
+
+
+def _safe_nonnegative_int(value: Any) -> int:
+    """Return a nonnegative integer.
+
+    Args:
+        value: Raw value.
+
+    Returns:
+        Nonnegative integer.
+
+    Raises:
+        ValueError: If the value is negative or not an integer.
+    """
+    if not isinstance(value, int) or value < 0:
+        raise ValueError("Expected a nonnegative integer.")
+    return value
+
+
+def _safe_counter(value: Any) -> dict[str, int]:
+    """Return a sanitized counter mapping.
+
+    Args:
+        value: Raw mapping.
+
+    Returns:
+        Safe mapping from token to nonnegative integer.
+
+    Raises:
+        ValueError: If the mapping is malformed.
+    """
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ValueError("Counter field must be an object.")
+    return {
+        _required_safe_token(key, field_name="counter_key"): _safe_nonnegative_int(count)
+        for key, count in sorted(value.items())
+    }
+
+
+def _reject_unsafe_payload(value: Any) -> None:
+    """Reject raw fields, local paths, URLs, and product directory literals.
+
+    Args:
+        value: Candidate JSON-like payload.
+
+    Raises:
+        ValueError: If unsafe content is present.
+    """
+    staging._reject_unsafe_payload(value)
+    serialized = json.dumps(value, ensure_ascii=False, sort_keys=True)
+    if any(marker in serialized for marker in LOCAL_PATH_MARKERS):
+        raise ValueError("Payload contains local path or URL literal.")
+
+
+def _failure_summary(
+    *,
+    taxonomy_staging: Path,
+    output_path: Path,
+    error: Exception,
+) -> dict[str, Any]:
+    """Return a redacted failure summary.
+
+    Args:
+        taxonomy_staging: Staging JSONL path.
+        output_path: Planned output path.
+        error: Raised exception.
+
+    Returns:
+        JSON-safe failure payload.
+    """
+    summary = {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": datetime.now(UTC).isoformat(),
+        "status": "error",
+        "taxonomy_staging_name": taxonomy_staging.name,
+        "taxonomy_staging_hash": staging.audit._sha256_text(str(taxonomy_staging.expanduser())),
+        "output_name": output_path.name,
+        "output_hash": staging.audit._sha256_text(str(output_path.expanduser())),
+        "error_code": type(error).__name__,
+        "error_message": "Supplement brand review template export failed.",
+        "template_row_count": 0,
+        "db_write_performed": False,
+        "raw_ocr_text_stored": False,
+        "raw_provider_payload_stored": False,
+        "absolute_paths_stored": False,
+        "product_dir_literals_stored": False,
+    }
+    _reject_unsafe_payload(summary)
+    return summary
+
+
+if __name__ == "__main__":
+    main()

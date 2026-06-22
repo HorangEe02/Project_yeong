@@ -1,0 +1,161 @@
+# 2026-06-04 Todo / Work Log
+
+## Supplement Learning Pipeline
+
+- 48차 operator next-batch work order 구현
+  - readiness report, operator batch progress, operator workpack summary를 결합해 다음 수동 검수 batch 1개를 redacted 작업 지시서로 출력하는 도구를 추가했습니다.
+  - 실제 next batch는 `brand_product_review:001`입니다.
+  - 현재 해당 batch는 50개 row 모두 blank decision이며, 전체 queue 기준 blank row는 808개입니다.
+  - preflight 통과 전 DB apply, teacher OCR transfer, YOLO dataset promotion, PaddleOCR 학습을 진행하지 않도록 post-completion gate를 명시했습니다.
+- 49차 brand DB import gate 구현
+  - brand decision preflight가 strict하게 완료되기 전 product import manifest 생성과 DB apply를 차단하는 gate report 도구를 추가했습니다.
+  - 현재 실제 brand decision preflight 기준 `brand_candidate_count=388`, `blank_decision_count=388`, `approved_decision_count=0`입니다.
+  - gate 결과는 `blocked_by_operator_review`이며, `product_import_manifest_allowed=false`, `db_import_apply_allowed_now=false`입니다.
+- 50차 OCR benchmark gate 구현
+  - PII strict review, manual GT review, benchmark fixture 준비 상태를 redacted summary만으로 검사하는 gate report 도구를 추가했습니다.
+  - 현재 실제 PII decision preflight 기준 `candidate_row_count=215`, `blank_decision_count=215`, `cleared_no_personal_data_count=0`입니다.
+  - gate 결과는 `blocked_by_pii_screening`이며, `ground_truth_template_allowed=false`, `teacher_ocr_benchmark_allowed=false`, `paddleocr_training_allowed_now=false`입니다.
+- 51차 learning dependency audit 구현
+  - DB import, OCR benchmark, YOLO section dataset 목표를 각각 현재 gate와 operator review batch에 연결하는 redacted audit 도구를 추가했습니다.
+  - 현재 전체 batch는 18개 모두 pending이며, 전체 blank row는 808개입니다.
+  - 목표별 다음 batch는 `product_catalog_db_import -> brand_product_review:001`, `ocr_teacher_benchmark -> review_pii_screening:001`, `yolo_section_dataset -> yolo_section_annotation:001`입니다.
+- 52차 taxonomy persistence contract audit 구현
+  - 영양제 카테고리, 제품/브랜드, 제품-카테고리 매핑이 DB에 저장될 수 있는 구조인지 ORM metadata, migration, staging/import/verifier script, focused test 기준으로 확인하는 read-only 감사 도구를 추가했습니다.
+  - 실제 감사 결과는 `ready_for_reviewed_import_dry_run`이며, 필수 column, foreign key, unique constraint, index, migration/RLS/sanitization, focused test 계약이 모두 통과했습니다.
+  - DB apply는 여전히 `false`입니다. 브랜드/제품 operator review 완료, approved product import manifest 생성, taxonomy import dry-run 통과 후에만 실제 DB apply를 진행합니다.
+- 53차 taxonomy staging 및 category-only import dry-run 실행
+  - 실제 source folder 구조 기준 taxonomy staging을 다시 생성했습니다.
+  - 결과는 category seed 43개, brand candidate 388개, 전체 row 431개입니다.
+  - category-only importer dry-run은 `ready_for_db_write=true`, `planned_category_upsert_count=43`, `db_write_performed=false`입니다.
+  - brand/product DB 저장은 388개 brand candidate review 완료 전까지 진행하지 않습니다.
+- 54차 category seed DB apply gate 구현
+  - category seed DB apply 가능 여부를 제품/브랜드/product-category DB write와 분리해서 판단하는 gate를 추가했습니다.
+  - 실제 gate 결과는 `ready_for_category_seed_db_apply`입니다.
+  - `category_seed_db_apply_allowed=true`, `planned_category_upsert_count=43`이며, `product_db_apply_allowed=false`, `product_category_db_apply_allowed=false`입니다.
+  - 이 gate는 DB 접속/DB write/source row 읽기/OCR/LLM 호출을 수행하지 않습니다.
+- 55차 category seed DB target preflight 구현
+  - category seed DB apply 직전 연결 대상이 로컬 개발 DB인지 확인하는 no-connect preflight를 추가했습니다.
+  - 실제 preflight 결과는 `ready_for_local_category_seed_apply`입니다.
+  - `runtime_environment=development`, `database_host_class=local`, `database_target_kind=local_postgres`입니다.
+  - DB URL 원문, 사용자명, 비밀번호, DB 이름은 출력하지 않으며, DB connection/write도 수행하지 않습니다.
+  - 이 결과가 통과해도 제품/브랜드/product-category DB write는 계속 차단합니다.
+- 56차 category seed DB apply 및 verifier 실행
+  - Docker Compose 로컬 개발 DB에서 Alembic migration을 head까지 적용한 뒤 category seed만 upsert했습니다.
+  - apply 결과는 category seed 43개, inserted 10개, updated 33개입니다.
+  - 제품/브랜드/product-category rows는 0개로 유지했습니다.
+  - verifier 결과는 `db_import_verified=true`, expected category 43개, matched category 43개, missing category 0개입니다.
+  - Docker compose `db`는 host port를 publish하지 않으므로 backend container network 안에서 최신 worktree script를 read-only mount해 실행했습니다.
+- 57차 product DB apply gate 구현 및 현재 상태 검증
+  - reviewed product/product-category DB apply 직전 조건을 확인하는 gate를 추가했습니다.
+  - 실제 gate 결과는 `blocked_by_product_db_apply_preflight`입니다.
+  - `product_db_apply_allowed=false`, `product_category_db_apply_allowed=false`입니다.
+  - category seed verifier와 local DB target preflight는 통과했지만, brand review가 blank 상태이고 approved product manifest가 없어서 제품/브랜드 저장은 계속 차단합니다.
+  - 이 gate는 source image, product folder, raw OCR, provider payload, approved product manifest row payload를 읽지 않으며 DB connection/write를 수행하지 않습니다.
+- 58차 operator-local batch file preflight 구현
+  - operator가 작은 batch JSONL 하나를 채운 직후 queue-level reconcile 전에 완료 여부를 확인하는 preflight를 추가했습니다.
+  - 실제 `brand_product_review:001` batch 결과는 `pending`입니다.
+  - expected rows 50개, actual rows 50개, valid rows 0개, blank rows 50개, invalid/missing/extra rows 0개입니다.
+  - `ready_for_reconcile=false`이며, batch decision을 채운 뒤 같은 preflight를 다시 실행해야 합니다.
+  - 이 preflight는 fixture id, 제품명, OCR 원문, provider payload, 이미지 경로, source ref, 로컬 경로를 출력하지 않습니다.
+- 59차 operator workpack decision guide 보강
+  - batch Markdown guide에 queue별 decision schema guide를 추가했습니다.
+  - `brand_product_review` workpack에는 `brand_review_decision`, allowed decisions, required fields, required approval attestations, allowed reason codes, invalid 조건을 표시합니다.
+  - 실제 workpack을 재생성했으며 next batch는 여전히 `brand_product_review:001`입니다.
+  - workpack 재생성은 source row/image 읽기, DB write, OCR/LLM 호출을 수행하지 않았습니다.
+- 60차 brand reviewed-only decision extract 구현
+  - operator batch reconcile 이후 전체 brand queue에 blank stub이 남아 있어도 reviewed row만 별도로 추출하는 도구를 추가했습니다.
+  - 실제 `brand_product_review.reconciled.jsonl` 기준 brand candidate 388개, input decision row 388개, reviewed decision 0개, ignored blank decision 388개입니다.
+  - reviewed-only output은 brand preflight/apply에서 controlled pending state로 처리되며, empty product import manifest summary는 `pending_count=388`입니다.
+  - strict DB import gate는 변경하지 않았고, 제품/브랜드/product-category DB 저장은 계속 차단됩니다.
+- 61차 operator post-completion reviewed extract flow 반영
+  - `brand_product_review` batch 완료 후 post-completion gates에 reviewed-only extract 단계를 추가했습니다.
+  - 실제 next batch work order와 workpack을 재생성했으며 next batch는 여전히 `brand_product_review:001`입니다.
+  - work order의 brand post-completion gates는 reconcile, batch progress preflight, reviewed-only extract, brand decision preflight, strict import gate 순서로 정리됐습니다.
+  - 이 변경은 부분 manifest preview 입력을 분리하기 위한 것이며 strict DB import gate를 완화하지 않습니다.
+- 62차 PII reviewed-only decision extract 구현
+  - `review_pii_screening` queue도 blank stub이 섞인 reconciled queue에서 reviewed row만 분리할 수 있도록 도구를 추가했습니다.
+  - 실제 PII candidate 215개, input decision row 215개, reviewed decision 0개, ignored blank decision 215개입니다.
+  - reviewed-only output은 PII preflight/apply에서 controlled pending state로 처리되며 teacher OCR allowed row는 0개입니다.
+  - workpack과 next-batch work order의 PII post-completion gates에 reviewed-only extract와 partial teacher OCR preview 분리 단계를 추가했습니다.
+- 63차 YOLO section dataset gate 구현
+  - `supplement-yolo-section-dataset-gate-v1` gate를 추가해 bbox annotation, reviewed template promotion, materialized YOLO dataset, optional require-files validation summary를 한 번에 연결했습니다.
+  - 실제 YOLO annotation preflight 기준 template row 205개, valid accepted row 0개, blank bbox row 205개입니다.
+  - gate 결과는 `blocked_by_annotation_review`이며, `section_yolo_training_allowed_now=false`, `model_promotion_allowed_now=false`입니다.
+  - dependency audit에 새 gate를 optional 입력으로 연결했고, 실제 audit의 YOLO outcome은 `blocked_by_annotation_review -> yolo_section_annotation:001`로 갱신됐습니다.
+- 64차 YOLO reviewed-only annotation extract 구현
+  - `supplement-yolo-reviewed-annotation-extract-v1` 도구를 추가해 blank bbox stub이 섞인 전체 YOLO queue에서 accepted annotation row만 분리할 수 있게 했습니다.
+  - 실제 extraction 결과는 template row 205개, input annotation row 205개, reviewed annotation 0개, blank ignored 205개입니다.
+  - partial promotion ready와 strict promotion ready는 모두 `false`입니다.
+  - `yolo_section_annotation` post-completion gates와 workpack completion rule에 reviewed-only extract 및 partial YOLO dataset preview 분리 단계를 추가했습니다.
+  - strict YOLO section dataset gate와 model promotion gate는 완화하지 않았고, source ref/image path/label/OCR/provider payload/local path는 summary/stdout에 출력하지 않습니다.
+- 65차 supplement taxonomy/OCR/YOLO/PaddleOCR 상세 구현 플랜 작성
+  - 실제 `crawling-image` 구조를 다시 audit했으며, 구조는 `카테고리 -> 제품 후보 -> 리뷰/상세페이지`입니다.
+  - 브랜드 전용 폴더 계층은 없고, 제품 폴더 prefix에서 추정한 `brand_candidate`만 존재하므로 브랜드 DB 저장은 operator review 전까지 금지합니다.
+  - 새 sanitized audit 결과는 category 43개, product candidate 388개, review image 132,520장, detail page image 5,289장입니다.
+  - 새 taxonomy staging 결과는 row 431개, category seed 43개, review-required brand candidate 388개입니다.
+  - 상세 구현/보안 self-review 플랜은 `2026-06-04-supplement-taxonomy-ocr-yolo-paddleocr-implementation-plan.md`에 작성했습니다.
+  - 새 산출물은 `2026-06-04-crawling-image-taxonomy-audit.json`, `2026-06-04-supplement-taxonomy-db-staging.jsonl`, `2026-06-04-supplement-taxonomy-db-staging.summary.json`입니다.
+- 66차 supplement learning readiness/progress/work-order 갱신
+  - taxonomy audit, taxonomy staging, brand review bundle, PII screening bundle, YOLO annotation bundle, operator workpack, batch progress를 하나의 readiness report로 연결했습니다.
+  - 현재 readiness 결과는 15개 stage 중 verified 3개, pending operator review 3개, blocked missing artifact 9개입니다.
+  - operator batch progress 결과는 batch 18개 모두 pending이며, 전체 expected row 808개, blank row 808개, valid row 0개입니다.
+  - 다음 작업 지시서는 `brand_product_review:001`이며, row range 1-50 모두 blank decision입니다.
+  - 새 산출물은 `supplement-learning-pipeline-readiness.json`, `operator-review-batch-progress.json`, `operator-review-batch-progress.md`, `operator-next-batch-work-order.json`, `operator-next-batch-work-order.md`입니다.
+  - 모든 새 산출물은 source image read, DB write, OCR provider call, LLM call, PaddleOCR training을 수행하지 않았고 로컬 절대경로를 출력하지 않습니다.
+- 67차 operator post-completion command plan 구현
+  - `operator-next-batch-work-order.json`을 입력으로 batch 완료 후 실행해야 할 script key와 gate 순서를 redacted plan으로 출력하는 도구를 추가했습니다.
+  - 현재 실제 plan은 `brand_product_review:001` 기준이며, batch status가 `pending`이고 blank row 50개가 남아 있어 `post_completion_execution_allowed=false`입니다.
+  - brand review 완료 후 순서는 batch-file preflight, reconcile, batch progress preflight, reviewed-only extract, strict brand preflight, brand DB import gate, approved manifest 생성, taxonomy import dry-run, product DB apply gate, read-only verification입니다.
+  - readiness report에 `operator_post_completion_command_plan` artifact role을 추가해 brand/PII/YOLO operator pending stage의 공유 pending evidence로 연결했습니다.
+  - 새 산출물은 `operator-post-completion-command-plan.json`, `operator-post-completion-command-plan.md`입니다.
+  - 새 스크립트와 readiness 연결 테스트를 추가했고, 모든 post-completion 산출물은 shell path, row payload, OCR text, provider payload, source ref, label을 출력하지 않습니다.
+- 68차 supplement learning completion audit 구현
+  - 원래 목표를 11개 requirement로 분해하는 redacted completion audit 도구와 단위 테스트를 추가했습니다.
+  - 실제 audit 결과는 `objective_completion_allowed=false`, `overall_status=in_progress_blocked_by_missing_evidence`입니다.
+  - requirement 기준 verified 3개, pending 3개, blocked 5개입니다.
+  - 현재 blocker는 `brand_product_review:001`이며 현재 batch blank row 50개, 전체 blank row 808개가 남아 있습니다.
+  - post-completion execution은 `batch_not_complete`, `blank_rows_remaining` 때문에 false입니다.
+  - 새 산출물은 `supplement-learning-completion-audit.json`, `supplement-learning-completion-audit.md`입니다.
+  - audit은 source image, raw OCR, provider payload, DB write, OCR/LLM call, training execution, local path 출력 없이 redacted summary만 읽습니다.
+- 69차 operator unblock runbook 구현
+  - 전체 operator queue를 한눈에 보는 `supplement-operator-unblock-runbook-v1` 스크립트와 단위 테스트를 추가했습니다.
+  - 실제 runbook 결과는 `status=blocked_by_operator_review`, `objective_completion_allowed=false`입니다.
+  - 전체 queue 기준 blank row는 brand/product review 388개, review PII screening 215개, YOLO section annotation 205개입니다.
+  - 바로 처리할 batch는 `brand_product_review:001`이며, 완료 후 실행해야 할 brand post-completion gate 10개를 순서대로 표시했습니다.
+  - 새 산출물은 `operator-unblock-runbook.json`, `operator-unblock-runbook.md`입니다.
+  - runbook은 row payload, 제품명, source image, raw OCR, provider payload, DB write, OCR/LLM call, training execution, local path 출력 없이 redacted progress/audit만 읽습니다.
+- 70차 operator next command checklist 구현
+  - `brand_product_review:001`을 operator가 채운 뒤 실행할 repo-relative command checklist를 생성하는 스크립트와 단위 테스트를 추가했습니다.
+  - 실제 checklist는 `status=ready_after_operator_edits`, `queue_key=brand_product_review`, `batch_key=brand_product_review:001`, command 7개입니다.
+  - 포함된 command는 batch-file preflight, reconcile, batch progress preflight, reviewed-only brand decision extract, strict brand preflight, brand DB import gate, approved product import manifest 생성까지입니다.
+  - DB apply는 포함하지 않았고, approved manifest와 strict gate가 생긴 뒤 별도 gate로만 진행합니다.
+  - 새 산출물은 `operator-next-command-checklist.json`, `operator-next-command-checklist.md`입니다.
+  - checklist는 command를 실행하지 않고, repo-relative paths만 출력하며 row payload, 제품명, source image, raw OCR, provider payload, local path를 출력하지 않습니다.
+- 71차 operator next command checklist 큐 확장
+  - next command checklist 생성기를 `brand_product_review` 전용에서 `brand_product_review`, `review_pii_screening`, `yolo_section_annotation` 3개 큐 지원으로 확장했습니다.
+  - `review_pii_screening` 큐는 reviewed-only PII extract, strict PII preflight, teacher-safe OCR candidate manifest 생성, OCR benchmark gate command를 생성합니다.
+  - `yolo_section_annotation` 큐는 reviewed-only YOLO annotation extract, strict annotation preflight, template promotion, YOLO dataset materialization, dataset validation, YOLO section dataset gate command를 생성합니다.
+  - 실제 현재 work order는 여전히 `brand_product_review:001`이므로 재생성된 실제 checklist는 command 7개를 유지합니다.
+  - 새 단위 테스트는 brand/PII/YOLO 3개 큐 command 생성과 repo-relative redaction을 검증합니다.
+  - 확장된 checklist도 command를 실행하지 않고 DB write, OCR provider call, LLM call, training execution, source image read를 수행하지 않습니다.
+
+## Current Blocker
+
+- operator decision/annotation rows가 아직 채워지지 않았습니다.
+- DB import는 `brand_product_review:001`, OCR benchmark는 `review_pii_screening:001`, YOLO dataset은 `yolo_section_annotation:001`이 각각 직접 blocker입니다.
+- DB 저장 구조 자체는 현재 재설계가 필요하지 않은 것으로 확인됐지만, operator review blank row가 해소되기 전에는 product/brand DB import를 진행하지 않습니다.
+- 카테고리 seed는 dry-run 기준 유효하지만, 제품/브랜드 매핑은 approved product manifest가 아직 없으므로 보류합니다.
+- category seed는 로컬 개발 DB에 저장 및 verifier 통과까지 완료됐습니다.
+- 제품/브랜드/product-category 저장은 product DB apply gate 기준 `blocked_by_product_db_apply_preflight`이며, approved product manifest가 아직 없으므로 계속 보류합니다.
+- `brand_product_review:001`은 batch-file preflight 기준 `pending`이고 blank decision 50개이므로 아직 reconcile할 수 없습니다.
+- `brand_product_review:001` workpack에는 decision schema guide가 추가됐지만, 실제 decision row는 아직 blank입니다.
+- 전체 brand queue는 reviewed-only extract 기준 reviewed decision 0개, blank ignored 388개입니다. operator가 batch를 채운 뒤 reviewed-only extract, brand preflight, product import manifest preview를 순서대로 다시 실행해야 합니다.
+- next batch work order와 workpack은 이제 brand batch 완료 후 reviewed-only extract를 명시합니다.
+- 전체 PII queue는 reviewed-only extract 기준 reviewed decision 0개, blank ignored 215개입니다. operator가 PII batch를 채운 뒤 reviewed-only extract, PII preflight, PII apply, OCR benchmark gate를 순서대로 다시 실행해야 합니다.
+- 전체 YOLO section annotation queue는 strict preflight 기준 valid accepted row 0개, blank bbox row 205개입니다. operator가 bbox를 채운 뒤 strict preflight, YOLO section dataset gate, promotion/materialization/validation을 순서대로 다시 실행해야 합니다.
+- 전체 YOLO section annotation queue는 reviewed-only extract 기준 reviewed annotation 0개, blank ignored 205개입니다. operator가 bbox를 채운 뒤 reviewed-only extract, YOLO preflight, template promotion, materialization, dataset validation, YOLO section dataset gate를 순서대로 다시 실행해야 합니다.
+- 최신 readiness/progress 기준 verified stage는 taxonomy structure audit, taxonomy DB staging, learning candidate split 3개뿐입니다. brand/product review, review PII screening, YOLO section annotation은 operator review pending이고, 이후 OCR benchmark, YOLO dataset, PaddleOCR fine-tune/promotion 단계는 필수 artifact가 없어서 차단 상태입니다.
+- 최신 next work order 기준 바로 처리할 batch는 `brand_product_review:001`입니다. 이 batch를 채우기 전에는 `review_pii_screening:001`, `yolo_section_annotation:001`, teacher OCR benchmark, YOLO dataset materialization, PaddleOCR 학습으로 넘어가지 않습니다.
+- 최신 post-completion command plan도 `brand_product_review:001`의 `batch_not_complete`, `blank_rows_remaining` 때문에 실행 차단 상태입니다. operator batch-file preflight가 complete가 되기 전에는 reconcile 이후 단계로 넘어가지 않습니다.
+- next command checklist 생성기는 이제 PII/YOLO 큐까지 명령 생성이 가능하지만, 실제 다음 batch 순서는 `brand_product_review:001`이므로 operator brand review 완료가 먼저입니다.
+- 다음 실작업은 위 batch들을 사람이 검수한 뒤 reconcile, batch progress preflight, brand/PII/YOLO queue-level preflight, 각 gate를 다시 실행하는 것입니다.

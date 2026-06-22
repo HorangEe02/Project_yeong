@@ -1,0 +1,190 @@
+name: CI
+
+# develop/main 으로 가는 모든 PR과 푸시에서 자동 게이트를 실행한다.
+# (CI_CD_GATES.md §3 설계를 실제 리포 경로/버전에 맞춰 구체화.)
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  # 의존성 보안 감사는 주간으로도 실행한다(CI_CD_GATES.md §10: 분기 → 상시화).
+  schedule:
+    - cron: "0 0 * * 1" # 매주 월요일 00:00 UTC
+  workflow_dispatch: {}
+
+# 같은 ref의 이전 실행은 취소해 러너 시간을 아낀다.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.13"
+  FLUTTER_VERSION: "3.41.9"
+
+jobs:
+  lint:
+    name: Lint (black + ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install lint tools
+        # Pinned to match backend/requirements-dev.txt so CI never pulls a newer
+        # black style year that would reformat the whole tree. Keep both in sync.
+        run: pip install "black==26.5.1" "ruff==0.15.15"
+      - name: black --check
+        run: black --line-length=100 --check backend
+      - name: ruff check
+        run: ruff check backend
+
+  backend-test:
+    name: Backend tests (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install backend deps
+        working-directory: backend
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+      # OCR/Vision/learning extras stay out of CI by design (default-off gates):
+      # the unit suite mocks them, so a clean install exercises the request path.
+      - name: Run unit tests
+        working-directory: backend
+        # No compose runtime env is injected here, so production-fail-closed
+        # validators and parents[N] data paths resolve against the checkout —
+        # the layout the tests assume.
+        run: >-
+          python -m pytest Nutrition-backend/tests/unit
+          -o addopts=""
+          -p no:cacheprovider
+          -q
+
+  mobile-build:
+    name: Mobile (analyze + test)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: flutter pub get
+        working-directory: mobile
+        run: flutter pub get
+      - name: flutter analyze
+        working-directory: mobile
+        run: flutter analyze
+      - name: flutter test
+        working-directory: mobile
+        run: flutter test
+
+  security:
+    name: Security (gitleaks + detect-secrets)
+    runs-on: ubuntu-latest
+    env:
+      # gitleaks-action@v2 requires a paid license key for org-owned repos. Gate the
+      # step on the secret so it runs when the org provisions GITLEAKS_LICENSE and is
+      # skipped (not failed) otherwise — detect-secrets below remains the blocking gate.
+      GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        if: env.GITLEAKS_LICENSE != ''
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: detect-secrets audit against baseline
+        run: |
+          pip install "detect-secrets==1.5.0"
+          # Fail if a tracked file has a NEW secret not present in the audited
+          # baseline. mobile/uiux design exports are excluded (P2-6).
+          git ls-files \
+            | grep -vE '^(mobile/uiux/)' \
+            | tr '\n' '\0' \
+            | xargs -0 detect-secrets-hook --baseline .secrets.baseline
+
+  dependency-audit:
+    name: Dependency audit (pip-audit + flutter)
+    runs-on: ubuntu-latest
+    # Advisory: report known CVEs / outdated deps without blocking merges, since
+    # upstream advisories can appear at any time independent of a code change.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: pip-audit (backend runtime deps)
+        run: |
+          pip install "pip-audit>=2.10,<3.0"
+          pip-audit -r backend/requirements.txt --desc on
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - name: flutter pub outdated
+        working-directory: mobile
+        run: |
+          flutter pub get
+          flutter pub outdated || true
+
+  docker-build:
+    name: Backend Docker image build
+    runs-on: ubuntu-latest
+    # Validates the Dockerfile + core dependency resolution on every PR (the audit
+    # found CI never built the image). Built with the CLOVA-only phase build args
+    # (local OCR + vision off) so the gate stays fast; the heavy PaddleOCR/torch
+    # layers are exercised by a local `docker compose build` when local OCR returns.
+    steps:
+      - uses: actions/checkout@v4
+      - name: docker build (backend)
+        run: >-
+          docker build
+          --build-arg INSTALL_LOCAL_OCR=false
+          --build-arg INSTALL_VISION=false
+          -t lemon-aid-backend:ci
+          backend
+
+  frontend-build:
+    name: Frontend (typecheck + next build)
+    runs-on: ubuntu-latest
+    # The audit found CI never typechecked or built the Next.js frontend (it was
+    # only validated by Vercel on deploy). Catch TypeScript/build regressions here.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: npm ci
+        working-directory: frontend
+        run: npm ci
+      - name: typecheck (tsc --noEmit)
+        working-directory: frontend
+        run: npm run typecheck
+      - name: next build
+        working-directory: frontend
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm run build

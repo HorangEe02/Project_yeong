@@ -1,0 +1,1150 @@
+{
+  "version": 1,
+  "kind": "real",
+  "seed": 42,
+  "source_root": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver",
+  "per_category": 2,
+  "count": 86,
+  "labeled_count": 7,
+  "items": [
+    {
+      "id": "real_BCAA_EAA_001",
+      "image_path": "real_samples/BCAA_EAA/real_BCAA_EAA_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[BCAA_EAA]/나우푸드 아르지닌 & BCAA 자몽맛 아르기닌 30포, 6개_10356752201/리뷰/r_1778993345777_232.jpg",
+      "category": "[BCAA_EAA]",
+      "gt_text": "AoU\nSPORTS\n아르지닌\nB BCAA\nRGININE &BCAA\nL-마르지닌 1,300 mg 함유(1포당)\n3CAA(L-로이신,L-이소로이신,L-발린)2:1:11,000mg\n타우린1\n!1,000mg\n;함유(1포당)\nL-\nBCAA\nENERGY\nARGININE\n2:1:1\nSUPPORT\n1300\nRATID\n페인 함유/총카페인 함량 114mg(1포당 3.8 mg)\n가르지닌 6.1033%,혼합제제(L-로이신 49.5%,\n이소로이신 25%,L-발린 24.9%)4.6949%\n받음료118mlx30포(540ml/1.530kcal)",
+      "gt_fields": {
+        "product_name": "AoU",
+        "ingredients": [
+          "3CAA(L-로이신,L-이소로이신,L-발린)2",
+          "2"
+        ],
+        "dosage": "300mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9215175834569064
+    },
+    {
+      "id": "real_BCAA_EAA_002",
+      "image_path": "real_samples/BCAA_EAA/real_BCAA_EAA_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[BCAA_EAA]/나우푸드 아르지닌 & BCAA 자몽맛 아르기닌 30포, 6개_10356752201/리뷰/r_1778993345278_55.jpg",
+      "category": "[BCAA_EAA]",
+      "gt_text": "NOu.\nSPORTS\n마르지닌\nG BCAA\nARGININE GBCAA\nL-마르지닌 1,300mg 함유(1포당)\nBCAA(L-로이신,L-이소로이신,ㄴ-발린)2:1:11,000 mg\n타우린 1,000mg함유(1포당)\nBCAA\nENERGY\nARGININE\n2=1=1\nSUPPORT\n1300\nRATIO\n고카페인 함유/총카페인 함량 114 mg(1포당 3.8 mg)\nL-아르지닌 6,1033%, 혼합제제(L-로이신 49.5%,\nL-이소로이신 25%,L-발린 24.9%) 4.6949%\n(10a1000)n0l",
+      "gt_fields": {
+        "product_name": "NOu.",
+        "ingredients": [
+          "BCAA(L-로이신,L-이소로이신,ㄴ-발린)2"
+        ],
+        "dosage": "300mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.889960400368038
+    },
+    {
+      "id": "real_HMB_타우린_001",
+      "image_path": "real_samples/HMB_타우린/real_HMB_타우린_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[HMB_타우린]/뉴트리코스트 고함량 대용량 타우린 효능 1,000mg 400캡슐 400일분_736016173/리뷰/r_1779009771965_207.jpg",
+      "category": "[HMB_타우린]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_HMB_타우린_002",
+      "image_path": "real_samples/HMB_타우린/real_HMB_타우린_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[HMB_타우린]/뉴트리코스트 고함량 대용량 타우린 효능 1,000mg 400캡슐 400일분_736016173/리뷰/r_1779009771336_176.jpg",
+      "category": "[HMB_타우린]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_강황_커큐민_001",
+      "image_path": "real_samples/강황_커큐민/real_강황_커큐민_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[강황_커큐민]/수용성 파워 커큐민_5383085718/리뷰/r_1779081533972_396.jpg",
+      "category": "[강황_커큐민]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_강황_커큐민_002",
+      "image_path": "real_samples/강황_커큐민/real_강황_커큐민_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[강황_커큐민]/수용성 파워 커큐민_5383085718/리뷰/r_1779081531121_53.jpg",
+      "category": "[강황_커큐민]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_관절_MSM_콘드로이친_001",
+      "image_path": "real_samples/관절_MSM_콘드로이친/real_관절_MSM_콘드로이친_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[관절_MSM_콘드로이친]/내츄럴플러스 관절엔 뮤코다당단백 콘드로이친 1200 60정_9239168849/리뷰/r_1779078973782_496.jpg",
+      "category": "[관절_MSM_콘드로이친]",
+      "gt_text": "na uralplus\n능괜한\n간건장\n관절엔\n유코다당단백\n(콘드로이친)\n1200\nMCODKSACDHC\n200",
+      "gt_fields": {
+        "product_name": "na uralplus",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.8559040427207947
+    },
+    {
+      "id": "real_관절_MSM_콘드로이친_002",
+      "image_path": "real_samples/관절_MSM_콘드로이친/real_관절_MSM_콘드로이친_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[관절_MSM_콘드로이친]/(아이허브) 닥터스베스트 글루코사민 콘드로이친 OptiMSM 베지캡슐 360정_8670233351/리뷰/r_1779020255958_122.jpg",
+      "category": "[관절_MSM_콘드로이친]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_글루코사민_001",
+      "image_path": "real_samples/글루코사민/real_글루코사민_001.jpg",
+      "language": "mixed",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[글루코사민]/내츄럴플러스 관절연골엔 글루코사민 비타민D 망간 120정 3병 (6개월분)_9925196160/리뷰/r_1779089130582_122.jpg",
+      "category": "[글루코사민]",
+      "gt_text": "natural plus\nSOMETHING SPECIAL FOR YOUR HEALTH!\nARTICULAR CARTILAGE N GLUCOSAMINE\nVITAMIN D MANGANESE\n관절연골엔 글루코사민 비타민D 망간\nGLUCOSAMINE SULFATE\n1500mg per day\n건강기능식품\n관절 및 연골 건강에 도움을 줄 수 있음\n1일 섭취량 당 글루코사민 황산염 1,500 mg 함유\n글루코사민, 비타민D, 망간\n1,350 mg x 120정 (162 g)",
+      "gt_fields": {
+        "product_name": "관절연골엔 글루코사민 비타민D 망간",
+        "ingredients": [
+          "글루코사민",
+          "비타민D",
+          "망간"
+        ],
+        "dosage": "1500mg"
+      },
+      "labeled": true,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9639824661943648,
+      "reviewer": "claude-multimodal"
+    },
+    {
+      "id": "real_글루코사민_002",
+      "image_path": "real_samples/글루코사민/real_글루코사민_002.webp",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[글루코사민]/내츄럴플러스 관절연골엔 글루코사민 비타민D 망간 120정 3병 (6개월분)_9925196160/상세페이지/d_1779089119621_6.webp",
+      "category": "[글루코사민]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_기타_001",
+      "image_path": "real_samples/기타/real_기타_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[기타]/유기농 컬리케일 100_11956944700/리뷰/r_1779075367005_176.jpg",
+      "category": "[기타]",
+      "gt_text": "na+uralplus\nna+uralplus\nHACCP\nHACCP\n내 몸을 깨우분\n내 몸을 깨우는\n컬리케\n유기농\n유\n컬리케열\n컬리케일\n100\nna+uralplus\n식품인전관리인증\nna+uralplus\nHACCP\n식품인전관리인증\nHACCP\nNR9O1\n1020\nN영이의인편지\n내\n몸을\n깨우는\n컬리케일\n내\n몸을\n깨우는\n컬리케일\n유기농\n유기농\n컬리케일\n컬리케일\n100\neey\n100\n유기농\n동결건조\n컬리케일\n유기농\n동결건조\n컬리케일\n(ㅜ크그륨\n100\n%\n(ㅜ크그륨)\n100\n%\n동결건조\n공법의\n곱슬케일\nnu nli\n동결건조\n공법의\n곱슬케일\n유기가공식품\n유기가공식품\n(ORGANIC)\n(ORGANC)\n과·채가공품\n농림속산식품부\n과·채가공품\n농성육산식품부\n제12800348호\n제12800348호\n2gx15포(30\nOg/118 kcal)\n2gx15포(30 g/118 kcal)\nnCcuen\nSluebl\n유기가공식을\n과·채가공품\n과·채가공품\n신시통\n제12800348호\n제12800348호",
+      "gt_fields": {
+        "product_name": "na+uralplus",
+        "ingredients": [],
+        "dosage": "2g"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9060786052754051
+    },
+    {
+      "id": "real_기타_002",
+      "image_path": "real_samples/기타/real_기타_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[기타]/내츄럴플러스 전해질 밸런스 칼륨_6493521908/리뷰/r_1779075241338_374.jpg",
+      "category": "[기타]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_남성_쏘팔메토_001",
+      "image_path": "real_samples/남성_쏘팔메토/real_남성_쏘팔메토_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[남성_쏘팔메토]/고려은단 쏘팔메토 옥타코사놀 30캡슐_10764662775/리뷰/r_1779015229241_184.jpg",
+      "category": "[남성_쏘팔메토]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_남성_쏘팔메토_002",
+      "image_path": "real_samples/남성_쏘팔메토/real_남성_쏘팔메토_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[남성_쏘팔메토]/내츄럴플러스 초임계 쏘팔메토 옥타코사놀 파워_9417314501/리뷰/r_1779089041221_222.jpg",
+      "category": "[남성_쏘팔메토]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_뇌_은행잎_001",
+      "image_path": "real_samples/뇌_은행잎/real_뇌_은행잎_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[뇌_은행잎]/종근당 인지력&기억력건강 프로젝트365 포스파티딜세린 앤 징코 60캡슐, 4개_10663290383/리뷰/r_1779007983687_53.jpg",
+      "category": "[뇌_은행잎]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_뇌_은행잎_002",
+      "image_path": "real_samples/뇌_은행잎/real_뇌_은행잎_002.jpg",
+      "language": "mixed",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[뇌_은행잎]/[4개월] 닥터린 이노시톨 401 미오 D카이로 콜린 엽산 배합 30포, 4개_8490007771/리뷰/r_1779016976752_136.jpg",
+      "category": "[뇌_은행잎]",
+      "gt_text": "Dr.Lean\nWCS\n닥터린\n이노시톨 40:1\nInositol\n이노시톨 4,000 mg (1포당)\n캐롭추출분말 100 mg (1포당)\nNOCHESTEM\n4.5 g x 30포 (135 g / 540 kcal)",
+      "gt_fields": {
+        "product_name": "닥터린 이노시톨 40:1",
+        "ingredients": [
+          "이노시톨",
+          "캐롭추출분말"
+        ],
+        "dosage": "4000mg"
+      },
+      "labeled": true,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9854132641445507,
+      "reviewer": "claude-multimodal"
+    },
+    {
+      "id": "real_다이어트_체지방_001",
+      "image_path": "real_samples/다이어트_체지방/real_다이어트_체지방_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[다이어트_체지방]/나우푸드 녹차추출물 EGCG 비타민C 카테킨 다이어트 90정, 1개_4981986511/리뷰/r_1778994083750_64.jpg",
+      "category": "[다이어트_체지방]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_다이어트_체지방_002",
+      "image_path": "real_samples/다이어트_체지방/real_다이어트_체지방_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[다이어트_체지방]/나우푸드 녹차추출물 EGCG 비타민C 카테킨 다이어트 90정, 1개_4981986511/리뷰/r_1778994084075_194.jpg",
+      "category": "[다이어트_체지방]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_단백질_프로틴_001",
+      "image_path": "real_samples/단백질_프로틴/real_단백질_프로틴_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[단백질_프로틴]/뉴트리코스트 농축유청단백질 WPC 프로틴 25g 밀크 초콜렛맛 2,268g 66일분_2936151136/상세페이지/d_1779011066866_5.jpg",
+      "category": "[단백질_프로틴]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_단백질_프로틴_002",
+      "image_path": "real_samples/단백질_프로틴/real_단백질_프로틴_002.webp",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[단백질_프로틴]/뉴트리코스트 농축유청단백질 WPC 프로틴 25g 밀크 초콜렛맛 2,268g 66일분_2936151136/상세페이지/d_1779011093678_9.webp",
+      "category": "[단백질_프로틴]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_루테인_눈_001",
+      "image_path": "real_samples/루테인_눈/real_루테인_눈_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[루테인_눈]/유한양행 유한 루테인 지아잔틴 8개월 눈건강 케어_9496588832/리뷰/r_1779017336392_109.jpg",
+      "category": "[루테인_눈]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_루테인_눈_002",
+      "image_path": "real_samples/루테인_눈/real_루테인_눈_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[루테인_눈]/유한양행 유한 루테인 지아잔틴 8개월 눈건강 케어_9496588832/상세페이지/d_1779017326956_2.jpg",
+      "category": "[루테인_눈]",
+      "gt_text": "피리이이\nC.\nDAILY CARE\n유한\n루테인지아잔틴\nYUHAN Lutein Zeaxanthin\n년루 기연면리이면병위\n공정연롤링몽위위국\n이연\n이\n건강\n기능식품\n건강기능식품\n7.2g(120mgX60캡)\n식품약약품인전처",
+      "gt_fields": {
+        "product_name": "피리이이",
+        "ingredients": [],
+        "dosage": "7.2g"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.7277905911207199
+    },
+    {
+      "id": "real_마그네슘_001",
+      "image_path": "real_samples/마그네슘/real_마그네슘_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[마그네슘]/(아이허브) 닥터스베스트 마그네슘 고흡수 200mg 120정 3개 [원산지상세설명에 표시]_8735610330/리뷰/r_1779018864031_251.jpg",
+      "category": "[마그네슘]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_마그네슘_002",
+      "image_path": "real_samples/마그네슘/real_마그네슘_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[마그네슘]/쏜리서치 마그네슘 시트라메이트 90캡슐_말산 말레이트_12167072327/리뷰/r_1778994865359_222.jpg",
+      "category": "[마그네슘]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_멀티비타민_001",
+      "image_path": "real_samples/멀티비타민/real_멀티비타민_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[멀티비타민]/나우푸드 아담 맨스 멀티비타민 60정, 3개_5889948357/리뷰/r_1778993595963_156.jpg",
+      "category": "[멀티비타민]",
+      "gt_text": "LU\nADAM\nMen's Multiple\n아담\n맨스\n멀티플\nSuperior\nMen's Multi\n비타민·미네랄보충용\n건망\n가능식품\n건강기능식품/1,600 mg x60 (6g)\n성액인지",
+      "gt_fields": {
+        "product_name": "LU",
+        "ingredients": [],
+        "dosage": "600mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.8591778026177332
+    },
+    {
+      "id": "real_멀티비타민_002",
+      "image_path": "real_samples/멀티비타민/real_멀티비타민_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[멀티비타민]/유통기한 26년 10월 멀티비타민 오쏘몰 이뮨 비타민 30일분 + 쇼핑백  이뮨샷_5684175077/리뷰/r_1779012487432_370.jpg",
+      "category": "[멀티비타민]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_밀크씨슬_간_001",
+      "image_path": "real_samples/밀크씨슬_간/real_밀크씨슬_간_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[밀크씨슬_간]/세노비스 밀크씨슬+비타민B 60캡슐, 2개_724480604/리뷰/r_1779013706390_417.jpg",
+      "category": "[밀크씨슬_간]",
+      "gt_text": "CENOVIS\nCENOVIS'\n콜라겐 히알루론산 앨플샷\n밀크씨슬+\n밀크씨슬+\nMILK THISTLE+\nMILK\nTHISTLE+\nCENOVIS'\nLIVER HEALTH\nLIVER HEALTH\n간건강에 도움을줄수있음\n간건강에도움을줄수있음\n에너지 대사 및 생성에 필요\n에너지대사및생성에필요\n왕고맛\n밀크씨슬추출물\n밀크씨슬추출물\n88\n+비타민B군6종\n+비타민B군6종\n900mgx60캡술(\n00mgx0술 (54g)건강기능식품\n(54g)\n)건강기능식품",
+      "gt_fields": {
+        "product_name": "CENOVIS",
+        "ingredients": [],
+        "dosage": "900mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9203745341300964
+    },
+    {
+      "id": "real_밀크씨슬_간_002",
+      "image_path": "real_samples/밀크씨슬_간/real_밀크씨슬_간_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[밀크씨슬_간]/나우푸드 실리마린 스트렝스 간건강 밀크씨슬 비타민B 90캡슐, 1개_5294195292/리뷰/r_1778993780121_488.jpg",
+      "category": "[밀크씨슬_간]",
+      "gt_text": "IGR\nPU\nSilymarin\nStrength\n실리마린\n스트렁렝\nSupport Liver Function\n밀크씨슬 추출물,비타민B\n건강기능식품/1.000mg×90\n나이아신,판트\n[Unabl]\n0",
+      "gt_fields": {
+        "product_name": "IGR",
+        "ingredients": [],
+        "dosage": "1.000mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.7369818215568861
+    },
+    {
+      "id": "real_비타민A_001",
+      "image_path": "real_samples/비타민A/real_비타민A_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민A]/뉴트리코스트 비타민 A 25,000 IU 500 소프트젤 500일분_10141939999/리뷰/r_1779012856887_17.jpg",
+      "category": "[비타민A]",
+      "gt_text": "{\n④\ntsou\nv uupr!!\n00S\nOOS\n25,000Iu\nServings\nSoftgels\nrer Serving\nCH{}",
+      "gt_fields": {
+        "product_name": "{",
+        "ingredients": [],
+        "dosage": "000Iu"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.6771518303589388
+    },
+    {
+      "id": "real_비타민A_002",
+      "image_path": "real_samples/비타민A/real_비타민A_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민A]/뉴트리코스트 비타민 A 25,000 IU 500 소프트젤 500일분_10141939999/리뷰/r_1779012856876_11.jpg",
+      "category": "[비타민A]",
+      "gt_text": "nutricost\nVitamin\nA\n25,000u\n500\n500\nPer Serving\nSoftgels\nServings\nCM\n연\nC\n500 SOFTGELS\nDIETARY SUPPLEMENT",
+      "gt_fields": {
+        "product_name": "nutricost",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.849688110607011
+    },
+    {
+      "id": "real_비타민B_001",
+      "image_path": "real_samples/비타민B/real_비타민B_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민B]/뉴트리코스트 ZMA 마그네슘 450mg 아연 30mg 비타민B610.5mg 180캡슐 60일분_2936151138/리뷰/r_1779011220526_187.jpg",
+      "category": "[비타민B]",
+      "gt_text": "nutricost\nZMA\nR\n180\nSUP\nn\n60\n1\nutricost\nSERVINGS\nORMA\n[Un]\nMA\n60",
+      "gt_fields": {
+        "product_name": "nutricost",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.8322694823145866
+    },
+    {
+      "id": "real_비타민B_002",
+      "image_path": "real_samples/비타민B/real_비타민B_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민B]/뉴트리코스트 활성형 비타민 B12 2,000mcg 240캡슐 8개월분 메틸코발라민_9568876183/리뷰/r_1779009726315_123.jpg",
+      "category": "[비타민B]",
+      "gt_text": "nutricost\nVitamin\nB12\nMethylcobalamin\n2,00OMCG\n240\n240\nPer Serving\nCapsules\nServings\nTHN\nTHN\nCH\n9HS\nC\nCIT\nFH3\n3\nH2\n92\nGHO\nH\nNH\nHN\n240 CAPSULES\nNH\nDIETARY SUPPLEMENT",
+      "gt_fields": {
+        "product_name": "nutricost",
+        "ingredients": [],
+        "dosage": "92G"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.7701797915829552
+    },
+    {
+      "id": "real_비타민C_001",
+      "image_path": "real_samples/비타민C/real_비타민C_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민C]/굿앤키즈 어린이 눈케어 베타카로틴 90정 3박스(9개월분)+비타민C 구미 1봉 [원산지상세설명에 표시]_7184821147/리뷰/r_1779089108603_96.jpg",
+      "category": "[비타민C]",
+      "gt_text": "Good&kids\nGood&Kids\nbooood&kids\n칼슘\n칼슘\n맛있는\n맛있는\n마그네슘\n마그네슘\n비라민D아연\n비타민D아연\n1지I\n맛있는\n츄어블\n츄어블\nEH가3\n어블\n칼슘+마그네슘\n칼슘+마그네슘\n+비타민D+아연+망간\n+비타민D+아연+망간\n건강\nHODHA함유유지\n가능식품\n건강\n1020\nO!ID+비타민E+아연\n가능식품\n건강기능식품\n건강기능식품\n지\n온터로틴\n1,500 mg x 90정(135 g)\n건강\n1,500 mg × 90정(135 g)\n가능식품\n×90캡술(90 g)\n38\n가능식품\n건강기능식품\nGood&Kids\n건강\n1,.000 mg × 90정(90 g)\nNRUE\n가능식품\n건강기능식품\n1,000mg x90정(90 g)\n맛있는\n알티지\nA\n오메가3\n몸의\nio\n주\n추어블\n에어\n시\n음\n신\n어어\nEPA및DHA 함유 유지\n+비타민D+비타민E+아연\n간\n+베타카로틴\n이터\n건강\nHk0\n가능식품\n억\nDEOT\n건강기능식품\n1,000 mg × 90캡(90 g)\nna+uralplus\nna+uralplus\nGood&Kids\n이노시톨\n이노시톨\n포우먼\n파으z\nNOSITOL FOR\nrBD\n0\n이노시를\n비타민C\n아면\nOH\nH\nOKO\n저의해\nOJF\n시rKO\nIOHOROO\n(d)이]\n이을\n산H\n0\n등\nO/0\nD\n[VIEO어A피\n(82)\n/\n이\nO융Y\n중O\n1:\n(00)80\n00\n/\nY\nKO\n0",
+      "gt_fields": {
+        "product_name": "Good&kids",
+        "ingredients": [],
+        "dosage": "500mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.7540151888637671
+    },
+    {
+      "id": "real_비타민C_002",
+      "image_path": "real_samples/비타민C/real_비타민C_002.jpg",
+      "language": "mixed",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민C]/[600일분] 내츄럴플러스 비타민C 1000 플러스 고함량 대용량 항산화 비타민씨 300정, 2개_13021262756/리뷰/r_1779073298048_56.jpg",
+      "category": "[비타민C]",
+      "gt_text": "natural plus\n비타민C 1000 플러스\nVITAMIN C 1000 PLUS\n1일 섭취량 당 비타민C 1,000 mg 함유\n건강기능식품 1,100 mg x 300정 (330 g)",
+      "gt_fields": {
+        "product_name": "비타민C 1000 플러스",
+        "ingredients": [
+          "비타민C"
+        ],
+        "dosage": "1000mg"
+      },
+      "labeled": true,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9781828143379905,
+      "reviewer": "claude-multimodal"
+    },
+    {
+      "id": "real_비타민D_001",
+      "image_path": "real_samples/비타민D/real_비타민D_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민D]/굿앤키즈 어린이 칼슘 마그네슘 비타민D 아연 츄어블 90정 1통(45일분)_5834947723/리뷰/r_1779076311186_358.jpg",
+      "category": "[비타민D]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_비타민D_002",
+      "image_path": "real_samples/비타민D/real_비타민D_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민D]/락티브 우리아이 액상 비타민D 드롭 오은영 성분배합 10ml, 1개_5419321788/리뷰/r_1779065192051_111.jpg",
+      "category": "[비타민D]",
+      "gt_text": "LACTIV\n도이천시\n락티브\n우리아이\n27-16\n드롭\n비타민D\n역시건\n건3\n10ml\n까지\n건강기능식품\n(비타민D)",
+      "gt_fields": {
+        "product_name": "LACTIV",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9260801581236032
+    },
+    {
+      "id": "real_비타민E_001",
+      "image_path": "real_samples/비타민E/real_비타민E_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민E]/세노비스 달맞이꽃 종자유(감마리놀렌산+비타민E) 90캡슐, 1개_585419668/리뷰/r_1779014009014_179.jpg",
+      "category": "[비타민E]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_비타민E_002",
+      "image_path": "real_samples/비타민E/real_비타민E_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민E]/세노비스 달맞이꽃 종자유(감마리놀렌산+비타민E) 90캡슐, 1개_585419668/리뷰/r_1779014008723_147.jpg",
+      "category": "[비타민E]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_비타민K_001",
+      "image_path": "real_samples/비타민K/real_비타민K_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민K]/(아이허브) 라이프익스텐션 비타민K2 본리스토어 캡슐 120정 2개_9925380423/리뷰/r_1779020509865_194.jpg",
+      "category": "[비타민K]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_비타민K_002",
+      "image_path": "real_samples/비타민K/real_비타민K_002.jpg",
+      "language": "en",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[비타민K]/(아이허브) 라이프익스텐션 비타민K2 본리스토어 캡슐 120정 2개_9925380423/상세페이지/d_1779020503116_33.jpg",
+      "category": "[비타민K]",
+      "gt_text": "LIFE EXTENSION®\nBone Restore*\nCalcium Supplement with Vitamin K2\nGLUTEN FREE\nNON GMO LE CERTIFIED\nSupports Healthy Bones*\n120 CAPSULES\nDIETARY SUPPLEMENT",
+      "gt_fields": {
+        "product_name": "Bone Restore Calcium Supplement with Vitamin K2",
+        "ingredients": [
+          "Calcium",
+          "Vitamin K2"
+        ],
+        "dosage": null
+      },
+      "labeled": true,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9805904100922977,
+      "reviewer": "claude-multimodal"
+    },
+    {
+      "id": "real_수면_멜라토닌_001",
+      "image_path": "real_samples/수면_멜라토닌/real_수면_멜라토닌_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[수면_멜라토닌]/[6개월분] 락티브 식물성 멜라토닌 2mg 함유 멜라드림 60정, 3개_11146379810/리뷰/r_1779064553940_347.jpg",
+      "category": "[수면_멜라토닌]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_수면_멜라토닌_002",
+      "image_path": "real_samples/수면_멜라토닌/real_수면_멜라토닌_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[수면_멜라토닌]/[6개월분] 락티브 식물성 멜라토닌 2mg 함유 멜라드림 60정, 3개_11146379810/리뷰/r_1779064516044_107.jpg",
+      "category": "[수면_멜라토닌]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_스트레스_아쉬와간다_001",
+      "image_path": "real_samples/스트레스_아쉬와간다/real_스트레스_아쉬와간다_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[스트레스_아쉬와간다]/나우푸드 맥주효모&블랙마카_10476329840/리뷰/r_1778993248607_382.jpg",
+      "category": "[스트레스_아쉬와간다]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_스트레스_아쉬와간다_002",
+      "image_path": "real_samples/스트레스_아쉬와간다/real_스트레스_아쉬와간다_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[스트레스_아쉬와간다]/나우푸드 블랙마카_10527873036/리뷰/r_1778993169613_236.jpg",
+      "category": "[스트레스_아쉬와간다]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_스피루리나_클로렐라_001",
+      "image_path": "real_samples/스피루리나_클로렐라/real_스피루리나_클로렐라_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[스피루리나_클로렐라]/내츄럴플러스 스피루리나_2523500065/리뷰/r_1779091318368_102.jpg",
+      "category": "[스피루리나_클로렐라]",
+      "gt_text": "ALEDFOR\nPCGCOT\nLTVKS\nn\nIECTION\nED FORYOUR\nPRO\nSTSREIE\n×\nMCN\naralplus\nSPIRULI\nLINA\nsDA\n나\n루리나\nLi8a mg aday\n1,182\nmg a day\n수\n있음\n14mg 양유\nm9x300정(\n180 2\nm\n오네\n단 하나의배\n모두를 위한",
+      "gt_fields": {
+        "product_name": "ALEDFOR",
+        "ingredients": [],
+        "dosage": "182mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.7749379192079816
+    },
+    {
+      "id": "real_스피루리나_클로렐라_002",
+      "image_path": "real_samples/스피루리나_클로렐라/real_스피루리나_클로렐라_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[스피루리나_클로렐라]/내츄럴플러스 스피루리나_4851839527/리뷰/r_1779081758378_76.jpg",
+      "category": "[스피루리나_클로렐라]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_식이섬유_001",
+      "image_path": "real_samples/식이섬유/real_식이섬유_001.jpg",
+      "language": "mixed",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[식이섬유]/종근당 장건강 프로젝트 365 차전자피 식이섬유환 4.5g 30포, 4개_7720109631/리뷰/r_1779016076915_54.jpg",
+      "category": "[식이섬유]",
+      "gt_text": "종근당\n장건강 프로젝트 365\n차전자피 식이섬유환\nINTESTINE CARE PROJECT 365\n식약처 기능성 인정 원료\n1일 섭취량 9 g당 식이섬유 5 g 함유\n배변활동 원활에 도움을 줄 수 있음\n건강기능식품\n4.5 g x 30포 (135 g)",
+      "gt_fields": {
+        "product_name": "장건강 프로젝트 365 차전자피 식이섬유환",
+        "ingredients": [
+          "차전자피",
+          "식이섬유"
+        ],
+        "dosage": "5g"
+      },
+      "labeled": true,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9392458312213421,
+      "reviewer": "claude-multimodal"
+    },
+    {
+      "id": "real_식이섬유_002",
+      "image_path": "real_samples/식이섬유/real_식이섬유_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[식이섬유]/종근당 장건강 프로젝트 365 차전자피 식이섬유환 4.5g 30포, 4개_7720109631/리뷰/r_1779016082292_320.jpg",
+      "category": "[식이섬유]",
+      "gt_text": "종근당\ncc^\n소비자중심\n공정거래워를회\n장건강\n프로젝트365\n차전자피식이섬유환\nNTESTINE CARE PROJECT 365\n식약처 기능성 인정 원료\n1일 섭취량9g당 식이섬유 5 g 함유\n배변활동 원활에 도움을 줄 수 있음\n건강기능식품\n4.5ax.30포(135",
+      "gt_fields": {
+        "product_name": "종근당",
+        "ingredients": [],
+        "dosage": "9g"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9210472840529221
+    },
+    {
+      "id": "real_아르기닌_시트룰린_001",
+      "image_path": "real_samples/아르기닌_시트룰린/real_아르기닌_시트룰린_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[아르기닌_시트룰린]/뉴트리코스트 L-아르기닌 아르지닌 1,000mg 300정 300일분_8475556921/리뷰/r_1779010911987_56.jpg",
+      "category": "[아르기닌_시트룰린]",
+      "gt_text": "HEO\n/\nL-Arginine\nnutricost\n00OMG\n300\n300\nTablets\nServings\nnutricos",
+      "gt_fields": {
+        "product_name": "HEO",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.8633803069591522
+    },
+    {
+      "id": "real_아르기닌_시트룰린_002",
+      "image_path": "real_samples/아르기닌_시트룰린/real_아르기닌_시트룰린_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[아르기닌_시트룰린]/뉴트리코스트 L-아르기닌 500mg + L-오르니틴 250mg 180캡슐 6개월분_9568876372/리뷰/r_1779010319818_94.jpg",
+      "category": "[아르기닌_시트룰린]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_아사이_베리류_001",
+      "image_path": "real_samples/아사이_베리류/real_아사이_베리류_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[아사이_베리류]/뉴트리코스트 고함량 크랜베리 추출물 120캡슐 25g, 1개_2936151139/리뷰/r_1779011284834_249.jpg",
+      "category": "[아사이_베리류]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_아사이_베리류_002",
+      "image_path": "real_samples/아사이_베리류/real_아사이_베리류_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[아사이_베리류]/고려은단 석류콜라겐 젤리스틱 저분자피쉬콜라겐 14포, 6개_5093509745/리뷰/r_1779015553019_480.jpg",
+      "category": "[아사이_베리류]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_아연_001",
+      "image_path": "real_samples/아연/real_아연_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[아연]/나우푸드 아연 면역 이뮤노 디펜스 30포, 6개_12132566293/리뷰/r_1778991200537_47.jpg",
+      "category": "[아연]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_아연_002",
+      "image_path": "real_samples/아연/real_아연_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[아연]/[4개월] 닥터린 아연 셀렌 셀레늄 30정, 4개_10685076925/리뷰/r_1779018123845_261.jpg",
+      "category": "[아연]",
+      "gt_text": "E=k시7-4\n=k1\nM.2\nWriter\nDr.Lean\n닥터린\n아연셀렌\n건강기능식품\n24 g(800 mg ×30정)",
+      "gt_fields": {
+        "product_name": "E=k 시 7-4",
+        "ingredients": [],
+        "dosage": "24g"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.7777163883050283
+    },
+    {
+      "id": "real_어린이_키성장_001",
+      "image_path": "real_samples/어린이_키성장/real_어린이_키성장_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[어린이_키성장]/얼라이브 삼부커스 엘더베리 구미 60구미 3개(총 180구미)_12270942711/리뷰/r_1779091938394_106.jpg",
+      "category": "[어린이_키성장]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_어린이_키성장_002",
+      "image_path": "real_samples/어린이_키성장/real_어린이_키성장_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[어린이_키성장]/얼라이브 삼부커스 엘더베리 구미 60구미 3개(총 180구미)_12270942711/리뷰/r_1779091938370_30.jpg",
+      "category": "[어린이_키성장]",
+      "gt_text": "밴디류질리569\n1(2.69×6016\n식물성펙탄2\n엘더베리구미\n1커스\n얼라이브!\nuunb\njomy",
+      "gt_fields": {
+        "product_name": "밴디류질리 569",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.847641758620739
+    },
+    {
+      "id": "real_여성영양제_001",
+      "image_path": "real_samples/여성영양제/real_여성영양제_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[여성영양제]/[슈퍼적립] 유한양행 유한 백수오 골드 6개월 갱년기 케어_7978272048/리뷰/r_1779017447467_288.jpg",
+      "category": "[여성영양제]",
+      "gt_text": "HORI\naronui",
+      "gt_fields": {
+        "product_name": "HORI",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.44990701973438263
+    },
+    {
+      "id": "real_여성영양제_002",
+      "image_path": "real_samples/여성영양제/real_여성영양제_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[여성영양제]/[슈퍼적립] 유한양행 유한 백수오 골드 6개월 갱년기 케어_7978272048/리뷰/r_1779017444919_156.jpg",
+      "category": "[여성영양제]",
+      "gt_text": "DAILY CARE\nDAILY CARE\n유한\n유한\nYUHAN\nYUHAN\nBAEKSUO GOLD\nBAEKSUO GOLD\n백수오골드\n백수오\n골드\n여성 갱년기 관리의 현명한 선택\n여성 갱년기 관리의 현명한 선택\nIED\nIED\nP\nP\nR\nERIF\nCESS\n30\n30\nB\nB\n백수오 등 복합추출물\n백수오 등 복합추출물\n건강\n건강\n1일취innamicacido.00514mg\n1일섭취 Cnnamic aid 0.00514mg\n기능식품\n기능식품\nShanzhiside Methylester 0.257 mg\nShanzhiside Methylester 0.257 mg\n식품의약품안진처\nNodakenin 2.3644 mg\nLtnpr\n야\n(09XU 006) 의<\n이노9 )",
+      "gt_fields": {
+        "product_name": "DAILY CARE",
+        "ingredients": [],
+        "dosage": "00514mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9107153706252575
+    },
+    {
+      "id": "real_오메가3_001",
+      "image_path": "real_samples/오메가3/real_오메가3_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[오메가3]/종근당건강 아이클리어 루테인지아잔틴 오메가3 60캡슐, 3개_6711743060/리뷰/r_1779019995810_440.jpg",
+      "category": "[오메가3]",
+      "gt_text": "+3\n아잔틴\n클리어\n루테인지아잔틴\n아이클리어\n오메가3\n운극큼\nAE\n운 극큼\nBi위\nR\n어어\n루테인지아잔틴\n아이클리어\n뜯는 곳\n오메가3\n루테인지아잔틴\n아이클리어\nH\nS∠MT",
+      "gt_fields": {
+        "product_name": "+3",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.7726178258657456
+    },
+    {
+      "id": "real_오메가3_002",
+      "image_path": "real_samples/오메가3/real_오메가3_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[오메가3]/종근당건강 아이클리어 루테인지아잔틴 오메가3 60캡슐, 3개_6711743060/리뷰/r_1779019991301_274.jpg",
+      "category": "[오메가3]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_유산균_프로바이오틱_001",
+      "image_path": "real_samples/유산균_프로바이오틱/real_유산균_프로바이오틱_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[유산균_프로바이오틱]/삼대오백 프로바이오틱스 20억 유산균 500mgx30캡슐_10284470843/리뷰/r_1779009386532_155.jpg",
+      "category": "[유산균_프로바이오틱]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_유산균_프로바이오틱_002",
+      "image_path": "real_samples/유산균_프로바이오틱/real_유산균_프로바이오틱_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[유산균_프로바이오틱]/종근당건강 락토핏 슬림 60포, 2개_8205114387/리뷰/r_1779018317007_159.jpg",
+      "category": "[유산균_프로바이오틱]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_종합영양제_001",
+      "image_path": "real_samples/종합영양제/real_종합영양제_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[종합영양제]/[얼라이브] 원스데일리 밀크씨슬 복합 기능성 60정_5873221194/리뷰/r_1779091876276_120.jpg",
+      "category": "[종합영양제]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_종합영양제_002",
+      "image_path": "real_samples/종합영양제/real_종합영양제_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[종합영양제]/[6개월] 닥터린 올인원 루테인 지아잔틴 아스타잔틴 60캡슐, 3개_10543594330/리뷰/r_1779013891665_146.jpg",
+      "category": "[종합영양제]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_철분_001",
+      "image_path": "real_samples/철분/real_철분_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[철분]/[4개월분] 락티브 하트 톡 철분 30캡슐, 4개_12085484859/리뷰/r_1779064523764_26.jpg",
+      "category": "[철분]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_철분_002",
+      "image_path": "real_samples/철분/real_철분_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[철분]/[4개월분] 락티브 하트 톡 철분 30캡슐, 4개_12085484859/리뷰/r_1779064524707_341.jpg",
+      "category": "[철분]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_카페인_각성_001",
+      "image_path": "real_samples/카페인_각성/real_카페인_각성_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[카페인_각성]/뉴트리코스트 무수 카페인 200mg 500캡슐 16개월분_9568875619/리뷰/r_1779010738483_17.jpg",
+      "category": "[카페인_각성]",
+      "gt_text": "nutricost\nCaffei\nin\ne\n200MG\n5O0\n500\nServing\nsules\nCHb\nHao",
+      "gt_fields": {
+        "product_name": "nutricost",
+        "ingredients": [],
+        "dosage": "200MG"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.8396178050474687
+    },
+    {
+      "id": "real_카페인_각성_002",
+      "image_path": "real_samples/카페인_각성/real_카페인_각성_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[카페인_각성]/뉴트리코스트 무수 카페인 200mg 500캡슐 16개월분_9568875619/리뷰/r_1779010795604_296.jpg",
+      "category": "[카페인_각성]",
+      "gt_text": "-\nhutricost",
+      "gt_fields": {
+        "product_name": "-",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.5183698907494545
+    },
+    {
+      "id": "real_칼슘_001",
+      "image_path": "real_samples/칼슘/real_칼슘_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[칼슘]/[6개월] 내츄럴플러스 차태현 상어연골 칼슘 캐나다 180캡슐, 2개_4930046336/리뷰/r_1779089964828_151.jpg",
+      "category": "[칼슘]",
+      "gt_text": "(62091)8\n08\nafe\nLUI\nyieus\nsnjo\nmeanneu",
+      "gt_fields": {
+        "product_name": "(62091)8",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.6488780549594334
+    },
+    {
+      "id": "real_칼슘_002",
+      "image_path": "real_samples/칼슘/real_칼슘_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[칼슘]/[6개월] 내츄럴플러스 차태현 상어연골 칼슘 캐나다 180캡슐, 2개_4930046336/리뷰/r_1779089964491_43.jpg",
+      "category": "[칼슘]",
+      "gt_text": "na+uralplu\nFORYOR-\nSOMETHING SPECIAL\nRALLFENU\n스아이트레\nin CANADA\n5층503호\nShark\n라틴돈\nCartilage\nCalcium\n-탈레이트\n을-해서늘한\n칼슘\n상어연골\n금:1일2회,1회\n주의사항:층분\n|Calcium 38omgp\nNOOCCE\n영류\n영영\n여류이\nBL\nT\nYu\n8\n6119)081× 6u 68\n재활용어리",
+      "gt_fields": {
+        "product_name": "na+uralplu",
+        "ingredients": [
+          "금"
+        ],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.7953341177531651
+    },
+    {
+      "id": "real_코엔자임Q10_001",
+      "image_path": "real_samples/코엔자임Q10/real_코엔자임Q10_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[코엔자임Q10]/[슈퍼적립] 유한양행 유한 코엔자임 Q10 6개월분 항산화 높은 혈압감소 코큐텐_9161078400/리뷰/r_1779017229553_381.jpg",
+      "category": "[코엔자임Q10]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_코엔자임Q10_002",
+      "image_path": "real_samples/코엔자임Q10/real_코엔자임Q10_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[코엔자임Q10]/[슈퍼적립 10_] 종근당 혈압건강 프로젝트365 코엔자임Q10 30캡슐, 4개_12696705555/리뷰/r_1779008335629_332.jpg",
+      "category": "[코엔자임Q10]",
+      "gt_text": "",
+      "gt_fields": {
+        "product_name": null,
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.0
+    },
+    {
+      "id": "real_콜라겐_001",
+      "image_path": "real_samples/콜라겐/real_콜라겐_001.jpg",
+      "language": "mixed",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[콜라겐]/[임박특가][슈퍼적립+5,000P] 세노비스 콜라겐 비타민 젤리 7포, 10개 [원산지상세설명에 표시]_10866050226/리뷰/r_1779014332981_414.jpg",
+      "category": "[콜라겐]",
+      "gt_text": "CENOVIS\n콜라겐 비타민 젤리\nCOLLAGEN VITAMIN JELLY\n석류맛",
+      "gt_fields": {
+        "product_name": "콜라겐 비타민 젤리",
+        "ingredients": [
+          "콜라겐",
+          "비타민"
+        ],
+        "dosage": null
+      },
+      "labeled": true,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9430836935838064,
+      "reviewer": "claude-multimodal"
+    },
+    {
+      "id": "real_콜라겐_002",
+      "image_path": "real_samples/콜라겐/real_콜라겐_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[콜라겐]/[임박특가][슈퍼적립+5,000P] 세노비스 콜라겐 비타민 젤리 7포, 10개 [원산지상세설명에 표시]_10866050226/리뷰/r_1779014330515_205.jpg",
+      "category": "[콜라겐]",
+      "gt_text": "CENOVIS\n콜라겐\n비타민\n젤리\n국극러Y\n석류맛\n건강\n가능식품\nCOLLAGENVITAMIN JELLY\n식의역필인전저",
+      "gt_fields": {
+        "product_name": "CENOVIS",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9046520531177521
+    },
+    {
+      "id": "real_크레아틴_001",
+      "image_path": "real_samples/크레아틴/real_크레아틴_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[크레아틴]/삼대오백 크레아틴 모노 하이드레이트 헬스부스터 300g_7831578716/리뷰/r_1779009049221_455.jpg",
+      "category": "[크레아틴]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_크레아틴_002",
+      "image_path": "real_samples/크레아틴/real_크레아틴_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[크레아틴]/삼대오백 크레아틴 모노 하이드레이트 헬스부스터 300g_7831578716/리뷰/r_1779009047453_274.jpg",
+      "category": "[크레아틴]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_프로폴리스_벌_001",
+      "image_path": "real_samples/프로폴리스_벌/real_프로폴리스_벌_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[프로폴리스_벌]/[12개월]내츄럴플러스 프로폴리스 아연 1000 180캡슐 2병+비타민C 1000 구미2봉_2613388556/리뷰/r_1779082732773_359.jpg",
+      "category": "[프로폴리스_벌]",
+      "gt_text": "SERTONER\nARTRIDGE\nT-K510S\n(1.5K\n.0513W,0563FW.6563w",
+      "gt_fields": {
+        "product_name": "SERTONER",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9495258212089539
+    },
+    {
+      "id": "real_프로폴리스_벌_002",
+      "image_path": "real_samples/프로폴리스_벌/real_프로폴리스_벌_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[프로폴리스_벌]/나우푸드 브라질 그린프로폴리스_5487428004/리뷰/r_1778993701252_241.jpg",
+      "category": "[프로폴리스_벌]",
+      "gt_text": "00000\nLOL9aE\n10000",
+      "gt_fields": {
+        "product_name": "00000",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.508480966091156
+    },
+    {
+      "id": "real_프리워크아웃_001",
+      "image_path": "real_samples/프리워크아웃/real_프리워크아웃_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[프리워크아웃]/뉴트리코스트 베타 알라닌 3,400mg 240캡슐 60일분_4679873285/리뷰/r_1779010014236_398.jpg",
+      "category": "[프리워크아웃]",
+      "gt_text": "Suplel\nSupplement Facd\n0\nServing\na\nl\n로a Alane\n-Dnil e  arl\nOmer ngradien m cas e\nuel\nn\nPASTTO\nCT",
+      "gt_fields": {
+        "product_name": "Suplel",
+        "ingredients": [],
+        "dosage": null
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.6159447626425669
+    },
+    {
+      "id": "real_프리워크아웃_002",
+      "image_path": "real_samples/프리워크아웃/real_프리워크아웃_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[프리워크아웃]/뉴트리코스트 베타 알라닌 3,400mg 240캡슐 60일분_4679873285/리뷰/r_1779010013539_249.jpg",
+      "category": "[프리워크아웃]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_항산화_001",
+      "image_path": "real_samples/항산화/real_항산화_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[항산화]/종근당 벤비티 리포좀 글루타치온 코어 375mg 30매, 4개_11122304882/리뷰/r_1779007452193_430.jpg",
+      "category": "[항산화]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_항산화_002",
+      "image_path": "real_samples/항산화/real_항산화_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[항산화]/메가 리포좀 글루타치온 필름_10812624449/리뷰/r_1779080864831_352.jpg",
+      "category": "[항산화]",
+      "gt_text": "na uralplus\nna+uralplus\nna+uralplus\n메가 리포좀\nOPEN\nOPEN\n글루타치온 필름\n메가 리포좀\n메가 리포좀\n1a+ural\nMega Liposome Glutathione Film\n글루타치온 필름\n글루타치온 필름\n리포좀 L-글루타치온 150mg 투입\nMega Liposome Glutathione Film\nMega Liposome Glutathione Film\n좀\n리포좀 L-글루타치온 150mg 투입\n리포좀 L-글루타치온 150mg 투입\n음 필름\nPpemium\nen\nPpemium\npemium\nhione Film\nmg 투입\n리포좀 L-글루타치온 효모추출물\n리포좀 L-글루타치온 효모추출물\n39.89 %(L-글루타치온 90 %)\n리포좀 L-글루타치온 효모추출물\n39.89 %(L-글루타치온 90%)\n39.89%(L-글루타치온 90%)\n9\n기타가공품\n기타가공품\nHACCP\n기타가공품\nHACCP\n1매(376 mg)\n376mg × 30매,\n식몸인천만리인증\n1매(376mg)\nHACCP\n총11.39\n틀물\n이품\n1매(376 mg)\nHACaP",
+      "gt_fields": {
+        "product_name": "na uralplus",
+        "ingredients": [],
+        "dosage": "150mg"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.924077482894063
+    },
+    {
+      "id": "real_혈관_낫토_폴리코사놀_001",
+      "image_path": "real_samples/혈관_낫토_폴리코사놀/real_혈관_낫토_폴리코사놀_001.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[혈관_낫토_폴리코사놀]/나우푸드 콜레스테롤&혈당 서포트_10759867738/리뷰/r_1778993157471_336.jpg",
+      "category": "[혈관_낫토_폴리코사놀]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_혈관_낫토_폴리코사놀_002",
+      "image_path": "real_samples/혈관_낫토_폴리코사놀/real_혈관_낫토_폴리코사놀_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[혈관_낫토_폴리코사놀]/나우푸드 콜레스테롤&혈당 서포트_10759867738/리뷰/r_1778993157468_317.jpg",
+      "category": "[혈관_낫토_폴리코사놀]",
+      "gt_text": "",
+      "gt_fields": null,
+      "labeled": false
+    },
+    {
+      "id": "real_효소_소화_001",
+      "image_path": "real_samples/효소_소화/real_효소_소화_001.jpg",
+      "language": "mixed",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[효소_소화]/내츄럴플러스 파인애플 효소_10866550087/리뷰/r_1779080831702_411.jpg",
+      "category": "[효소_소화]",
+      "gt_text": "natural plus\n파인애플 효소\nPINEAPPLE ENZYME\n파인애플과즙분말 10 %\n파인애플추출분말(브로멜라인 함유) 1.1 %\n15베리발효효소 2.15 %\nα-아밀라아제 680,000 unit/3g\n프로테아제 3,000 unit/3g\n효소식품\n3 g x 30포 (90 g / 351 kcal)\nHACCP\n식품안전관리인증\n식품의약품안전처",
+      "gt_fields": {
+        "product_name": "파인애플 효소",
+        "ingredients": [
+          "파인애플과즙분말",
+          "파인애플추출분말",
+          "15베리발효효소",
+          "α-아밀라아제",
+          "프로테아제"
+        ],
+        "dosage": null
+      },
+      "labeled": true,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9760351479053497,
+      "reviewer": "claude-multimodal"
+    },
+    {
+      "id": "real_효소_소화_002",
+      "image_path": "real_samples/효소_소화/real_효소_소화_002.jpg",
+      "language": "unknown",
+      "source_path": "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver/[효소_소화]/내츄럴플러스 테프 발효 효소 1박스_10844786654/리뷰/r_1779080844678_148.jpg",
+      "category": "[효소_소화]",
+      "gt_text": "na+uralplus\nHACCP\n테프\n발효효소\nn\nASRE\n효소식품3g",
+      "gt_fields": {
+        "product_name": "na+uralplus",
+        "ingredients": [],
+        "dosage": "3g"
+      },
+      "labeled": false,
+      "bootstrap_engine": "paddleocr_v3_korean",
+      "bootstrap_confidence": 0.9066211496080671
+    }
+  ],
+  "bootstrap_count": 40
+}

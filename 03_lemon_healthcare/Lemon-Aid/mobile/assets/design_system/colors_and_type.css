@@ -1,0 +1,172 @@
+/* ============================================================
+   Lemon Aid — Color & Type tokens
+   Liquid-glass healthcare brand for a chronic-disease companion.
+   ============================================================ */
+
+/* ── Fonts ─────────────────────────────────────────────────── */
+
+/* Display: AtoZ — provided OTF/TTF, used for the wordmark and big numbers */
+@font-face {
+  font-family: "AtoZ";
+  src: url("./fonts/AtoZ-1Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-display: swap;
+}
+@font-face {
+  font-family: "AtoZ";
+  src: url("./fonts/AtoZ-8ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "AtoZ";
+  src: url("./fonts/AtoZ-9Black.ttf") format("truetype");
+  font-weight: 900;
+  font-display: swap;
+}
+
+/* Body: Pretendard via CDN — the de-facto Korean product font; mirrors what
+   the Flutter app reaches for via google_fonts (Noto Sans KR is the fallback). */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+
+/* Mono: SF Mono / Roboto Mono fallback chain to honour the Apple iOS 26 / macOS 26
+   reference the brand brief calls out. */
+
+:root {
+  /* ── Brand palette ───────────────────────────────────────── */
+  /* Drawn directly from the mascot illustration. The "lemon-aid" wordmark
+     uses Lemon for "Lemon" and Leaf for "Aid". */
+  --lemon-50:  #FFFEF2;   /* warm white background */
+  --lemon-100: #FFF8C7;   /* pale lemon — primaryContainer */
+  --lemon-200: #FFEE7A;   /* lemon shell highlight */
+  --lemon-300: #FFDE3F;   /* lemon midtone */
+  --lemon-400: #FFCE00;   /* lemon core — primary brand */
+  --lemon-500: #F0B800;   /* deep lemon shadow */
+  --lemon-600: #C99100;   /* roasted lemon — text on lemon */
+
+  --leaf-50:  #ECFBEE;
+  --leaf-100: #C9F2D0;
+  --leaf-200: #94E2A2;
+  --leaf-300: #6FCB73;    /* leaf gloss — secondary */
+  --leaf-400: #4FB964;
+  --leaf-500: #2EA354;
+  --leaf-600: #1F8A4A;    /* deep leaf / success */
+  --leaf-700: #176B3A;
+
+  --sky-300: #7BD0F4;     /* trust blue (data, links) */
+  --sky-400: #4FC3F7;
+  --sky-500: #2CA8E0;
+
+  /* Liquid-glass tints — applied as fills over photos / dashboards */
+  --glass-lemon-tint: rgba(255, 206, 0, 0.18);
+  --glass-leaf-tint:  rgba(111, 203, 115, 0.20);
+  --glass-sky-tint:   rgba(79, 195, 247, 0.18);
+  --glass-shadow:     0 12px 32px -8px rgba(214, 158, 0, 0.28),
+                      0 2px 6px   -2px rgba(0, 0, 0, 0.08);
+  --glass-inner-hl:   inset 0 1px 0 rgba(255, 255, 255, 0.65),
+                      inset 0 -1px 0 rgba(255, 255, 255, 0.12);
+
+  /* ── Neutrals ────────────────────────────────────────────── */
+  --ink-900: #1B1300;     /* primary text — warm near-black */
+  --ink-700: #3C3526;     /* body */
+  --ink-500: #6A6353;     /* secondary text */
+  --ink-300: #ABA590;     /* tertiary / placeholder */
+  --ink-200: #D8D3BE;     /* divider / hairline */
+  --ink-100: #EBE6D4;     /* surface stroke */
+  --paper:   #FFFDF6;     /* card surface */
+  --canvas:  #FBF8EC;     /* page canvas */
+
+  /* ── Semantic ────────────────────────────────────────────── */
+  --success:        var(--leaf-600);
+  --success-soft:   var(--leaf-100);
+  --warning:        #FB8C00;
+  --warning-soft:   #FFEACC;
+  --danger:         #D9342B;
+  --danger-soft:    #FCE2E0;
+  --info:           var(--sky-500);
+  --info-soft:      #DAF1FB;
+  --review:         #B86A00;       /* "확인 필요" reviewer state */
+  --review-soft:    #FFE9C4;
+
+  /* ── Radii ──────────────────────────────────────────────── */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-2xl: 36px;          /* used for liquid-glass cards & sheets */
+  --r-pill: 999px;
+
+  /* ── Spacing ────────────────────────────────────────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 56px;
+
+  /* ── Elevation ──────────────────────────────────────────── */
+  --shadow-1: 0 1px 2px rgba(27, 19, 0, 0.06);
+  --shadow-2: 0 4px 12px -4px rgba(27, 19, 0, 0.10),
+              0 1px 2px rgba(27, 19, 0, 0.06);
+  --shadow-3: 0 12px 28px -10px rgba(27, 19, 0, 0.18),
+              0 2px 6px -2px rgba(27, 19, 0, 0.06);
+  --shadow-lemon: 0 18px 40px -12px rgba(240, 184, 0, 0.40);
+
+  /* ── Type families ──────────────────────────────────────── */
+  --font-display: "AtoZ", "Pretendard Variable", -apple-system,
+                  BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --font-body:    "Pretendard Variable", "Pretendard", -apple-system,
+                  BlinkMacSystemFont, "Apple SD Gothic Neo",
+                  "Noto Sans KR", sans-serif;
+  --font-mono:    ui-monospace, "SF Mono", "JetBrains Mono",
+                  "Roboto Mono", monospace;
+
+  /* ── Type scale ─────────────────────────────────────────── *
+     iOS 26 / macOS 26 cadence — large at the top, tightened text body. */
+  --t-display-1: 600 56px/1.04 var(--font-display);
+  --t-display-2: 800 44px/1.06 var(--font-display);
+  --t-h1: 700 34px/1.14 var(--font-body);
+  --t-h2: 700 26px/1.20 var(--font-body);
+  --t-h3: 600 20px/1.30 var(--font-body);
+  --t-h4: 600 17px/1.30 var(--font-body);
+  --t-body-lg: 400 17px/1.50 var(--font-body);
+  --t-body:    400 15px/1.55 var(--font-body);
+  --t-body-sm: 400 13px/1.50 var(--font-body);
+  --t-label:   500 13px/1.30 var(--font-body);
+  --t-caption: 500 11px/1.20 var(--font-body);
+  --t-mono:    500 13px/1.50 var(--font-mono);
+  --t-num-xl:  800 56px/1.00 var(--font-display);
+  --t-num-lg:  700 36px/1.00 var(--font-body);
+}
+
+/* ── Semantic class helpers (use these instead of raw vars in markup) ── */
+
+body, .lm-body          { color: var(--ink-900); font: var(--t-body); background: var(--canvas); }
+.lm-display, h1.lm      { font: var(--t-display-1); letter-spacing: -0.01em; }
+.lm-h1, h1              { font: var(--t-h1); letter-spacing: -0.01em; }
+.lm-h2, h2              { font: var(--t-h2); letter-spacing: -0.005em; }
+.lm-h3, h3              { font: var(--t-h3); }
+.lm-h4, h4              { font: var(--t-h4); }
+.lm-lead                { font: var(--t-body-lg); color: var(--ink-700); }
+p                       { font: var(--t-body); color: var(--ink-700); }
+small, .lm-small        { font: var(--t-body-sm); color: var(--ink-500); }
+.lm-label               { font: var(--t-label); color: var(--ink-500);
+                          text-transform: none; letter-spacing: 0.01em; }
+.lm-caption             { font: var(--t-caption); color: var(--ink-500);
+                          letter-spacing: 0.04em; text-transform: uppercase; }
+code, .lm-mono          { font: var(--t-mono); color: var(--ink-700); }
+.lm-num                 { font: var(--t-num-xl); color: var(--ink-900);
+                          font-variant-numeric: tabular-nums;
+                          letter-spacing: -0.02em; }
+
+/* The wordmark itself.  Use `<span class="lm-wordmark">Lemon-Aid</span>`. */
+.lm-wordmark {
+  font: 800 1em/1 var(--font-display);
+  letter-spacing: -0.02em;
+}
+.lm-wordmark .lemon { color: var(--lemon-400); }
+.lm-wordmark .aid   { color: var(--leaf-400); }

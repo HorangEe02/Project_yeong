@@ -1,0 +1,14 @@
+.DS_Store
+.env
+**/.DS_Store
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.ruff_cache/
+htmlcov/
+Nutrition-backend/htmlcov/
+Nutrition-backend/.mypy_cache/
+Nutrition-backend/.pytest_cache/
+Nutrition-backend/.ruff_cache/
+data/private/
+outputs/

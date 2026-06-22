@@ -1,0 +1,276 @@
+{
+  "absolute_paths_stored": false,
+  "blocked_requirement_count": 5,
+  "current_blocker_batch_key": "brand_product_review:001",
+  "current_blocker_blank_row_count": 50,
+  "current_blocker_queue_key": "brand_product_review",
+  "db_write_performed": false,
+  "external_provider_call_performed": false,
+  "generated_at": "2026-06-04T16:02:01.461308+00:00",
+  "incomplete_requirement_keys": [
+    "brand_product_db_import",
+    "taxonomy_db_import_verified",
+    "review_image_ground_truth_privacy_gate",
+    "manual_ocr_ground_truth",
+    "teacher_ocr_paddleocr_comparison",
+    "detail_page_yolo_bbox_annotation",
+    "section_yolo_dataset_ready",
+    "paddleocr_training_loop_ready"
+  ],
+  "input_names": {
+    "batch_progress": "operator-review-batch-progress.json",
+    "next_work_order": "operator-next-batch-work-order.json",
+    "post_completion_plan": "operator-post-completion-command-plan.json",
+    "readiness": "supplement-learning-pipeline-readiness.json",
+    "taxonomy_audit": "2026-06-04-crawling-image-taxonomy-audit.json",
+    "taxonomy_staging": "2026-06-04-supplement-taxonomy-db-staging.summary.json"
+  },
+  "input_path_hashes": {
+    "batch_progress": "763f936a2d57550c16154b645ca16ef5c0d960e946680565909d8bfb5c83e497",
+    "next_work_order": "e4297aa545c66e9d90a1ea1e936fd47e208efdebe5fdbe19609c6d273b0a4169",
+    "post_completion_plan": "f30b1db4dc8ec3a9b2fe0756ecc0945cce33ee630ecf7d2a2b755fb566bea54d",
+    "readiness": "d456a131e701da667ff0213528141358e2f442b7e369587c373ad9af501f2ba7",
+    "taxonomy_audit": "681ba68656d029061c1e359a4c2bd2f1c7123e92e76602b69d19d0cb7fffdb12",
+    "taxonomy_staging": "9a0013eaa8de449e60d55a548f5e47f0a8c2fbeb7bfee9722d39c944f6385428"
+  },
+  "llm_call_performed": false,
+  "local_path_literals_stored": false,
+  "objective_completion_allowed": false,
+  "operator_next_action": "complete_brand_product_human_review",
+  "overall_status": "in_progress_blocked_by_missing_evidence",
+  "pending_requirement_count": 3,
+  "post_completion_blocker_codes": [
+    "batch_not_complete",
+    "blank_rows_remaining"
+  ],
+  "post_completion_execution_allowed": false,
+  "product_dir_literals_stored": false,
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "requirement_count": 12,
+  "requirements": [
+    {
+      "blocker_codes": [],
+      "evidence": [
+        "taxonomy_structure_audit:verified",
+        "category_count=43"
+      ],
+      "next_action": "complete_current_operator_batch_before_post_completion_steps",
+      "objective_mapping": "Verify category/product/review/detail-page folder structure.",
+      "requirement_key": "source_structure_audited",
+      "stage_keys": [
+        "taxonomy_structure_audit"
+      ],
+      "status": "verified",
+      "title": "crawling-image structure verified"
+    },
+    {
+      "blocker_codes": [],
+      "evidence": [
+        "taxonomy_db_staging:verified",
+        "row_count=431"
+      ],
+      "next_action": "complete_current_operator_batch_before_post_completion_steps",
+      "objective_mapping": "Redesign DB staging if brand/product structure differs.",
+      "requirement_key": "taxonomy_staging_redesign_ready",
+      "stage_keys": [
+        "taxonomy_db_staging"
+      ],
+      "status": "verified",
+      "title": "taxonomy staging reflects actual source shape"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:approved_product_import"
+      ],
+      "evidence": [
+        "brand_product_review:pending_operator_review",
+        "next_batch=brand_product_review:001",
+        "total_blank_rows=808",
+        "post_completion_allowed=false"
+      ],
+      "next_action": "complete_brand_product_human_review",
+      "objective_mapping": "Store products under categories and brands after review.",
+      "requirement_key": "brand_product_db_import",
+      "stage_keys": [
+        "brand_product_review"
+      ],
+      "status": "pending_operator_review",
+      "title": "brand/product DB import is approved"
+    },
+    {
+      "blocker_codes": [],
+      "evidence": [
+        "category_seed_db_verification:verified"
+      ],
+      "next_action": "complete_current_operator_batch_before_post_completion_steps",
+      "objective_mapping": "Verify source category folders are persisted as category seed rows.",
+      "requirement_key": "category_seed_db_verified",
+      "stage_keys": [
+        "category_seed_db_verification"
+      ],
+      "status": "verified",
+      "title": "category seed DB import is verified"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:approved_product_import",
+        "missing_required:taxonomy_db_verification"
+      ],
+      "evidence": [
+        "taxonomy_db_import_verification:blocked_missing_artifact"
+      ],
+      "next_action": "run_read_only_db_import_verification",
+      "objective_mapping": "Verify categories and reviewed products in DB.",
+      "requirement_key": "taxonomy_db_import_verified",
+      "stage_keys": [
+        "taxonomy_db_import_verification"
+      ],
+      "status": "blocked_missing_artifact",
+      "title": "reviewed brand/product DB import is verified"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:pii_screening_apply"
+      ],
+      "evidence": [
+        "review_pii_screening:pending_operator_review",
+        "next_batch=brand_product_review:001",
+        "total_blank_rows=808",
+        "post_completion_allowed=false"
+      ],
+      "next_action": "apply_pii_screening_decisions",
+      "objective_mapping": "Use review images as OCR ground-truth only after screening.",
+      "requirement_key": "review_image_ground_truth_privacy_gate",
+      "stage_keys": [
+        "review_pii_screening"
+      ],
+      "status": "pending_operator_review",
+      "title": "review images are cleared for ground truth"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:ocr_benchmark_manifest"
+      ],
+      "evidence": [
+        "manual_ocr_ground_truth:blocked_missing_artifact"
+      ],
+      "next_action": "complete_human_reviewed_ocr_ground_truth",
+      "objective_mapping": "Create exact label text ground truth from review images.",
+      "requirement_key": "manual_ocr_ground_truth",
+      "stage_keys": [
+        "manual_ocr_ground_truth"
+      ],
+      "status": "blocked_missing_artifact",
+      "title": "manual OCR ground truth is ready"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:ocr_three_tier_eval"
+      ],
+      "evidence": [
+        "teacher_ocr_comparison:blocked_missing_artifact"
+      ],
+      "next_action": "run_clova_google_vision_paddleocr_comparison",
+      "objective_mapping": "Compare teacher OCR outputs with final PaddleOCR output.",
+      "requirement_key": "teacher_ocr_paddleocr_comparison",
+      "stage_keys": [
+        "teacher_ocr_comparison"
+      ],
+      "status": "blocked_missing_artifact",
+      "title": "CLOVA/Google Vision/PaddleOCR comparison is complete"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:yolo_template_promotion"
+      ],
+      "evidence": [
+        "yolo_section_annotation:pending_operator_review",
+        "next_batch=brand_product_review:001",
+        "total_blank_rows=808",
+        "post_completion_allowed=false"
+      ],
+      "next_action": "complete_supplement_section_bbox_review",
+      "objective_mapping": "Label section boxes for ingredients, amounts, intake, cautions.",
+      "requirement_key": "detail_page_yolo_bbox_annotation",
+      "stage_keys": [
+        "yolo_section_annotation"
+      ],
+      "status": "pending_operator_review",
+      "title": "detail-page section bboxes are reviewed"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:yolo_dataset"
+      ],
+      "evidence": [
+        "yolo_section_dataset:blocked_missing_artifact"
+      ],
+      "next_action": "materialize_section_yolo_dataset",
+      "objective_mapping": "Turn accepted bbox labels into a YOLO section dataset.",
+      "requirement_key": "section_yolo_dataset_ready",
+      "stage_keys": [
+        "yolo_section_dataset"
+      ],
+      "status": "blocked_missing_artifact",
+      "title": "YOLO section dataset is materialized"
+    },
+    {
+      "blocker_codes": [
+        "missing_required:paddleocr_baseline_eval",
+        "missing_required:paddleocr_baseline_gate",
+        "missing_required:paddleocr_dataset",
+        "missing_required:paddleocr_finetune_eval",
+        "missing_required:paddleocr_finetune_plan",
+        "missing_required:paddleocr_improvement_candidates",
+        "missing_required:paddleocr_promotion_runbook"
+      ],
+      "evidence": [
+        "paddleocr_improvement_triage:blocked_missing_artifact",
+        "paddleocr_annotation_tasks:blocked_missing_artifact",
+        "paddleocr_finetune_plan:blocked_missing_artifact",
+        "paddleocr_metric_gate:blocked_missing_artifact",
+        "paddleocr_promotion_runbook:blocked_missing_artifact"
+      ],
+      "next_action": "create_or_review_paddleocr_annotation_tasks",
+      "objective_mapping": "Feed ground truth back into PaddleOCR and gate metrics.",
+      "requirement_key": "paddleocr_training_loop_ready",
+      "stage_keys": [
+        "paddleocr_improvement_triage",
+        "paddleocr_annotation_tasks",
+        "paddleocr_finetune_plan",
+        "paddleocr_metric_gate",
+        "paddleocr_promotion_runbook"
+      ],
+      "status": "blocked_missing_artifact",
+      "title": "PaddleOCR training loop is gated and ready"
+    },
+    {
+      "blocker_codes": [],
+      "evidence": [
+        "unsafe input flags are false",
+        "redaction scan rejected raw OCR/provider/path payload fields"
+      ],
+      "next_action": "continue_using_redacted_summaries_only",
+      "objective_mapping": "Do not leak paths, raw OCR, provider payloads, or run unsafe writes.",
+      "requirement_key": "privacy_security_controls",
+      "stage_keys": [],
+      "status": "verified",
+      "title": "privacy and safety controls are preserved"
+    }
+  ],
+  "schema_version": "supplement-learning-completion-audit-v1",
+  "source_doc_urls": [
+    "https://docs.ultralytics.com/datasets/detect/",
+    "https://docs.ultralytics.com/tasks/detect/",
+    "https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/OCR.html",
+    "https://cloud.google.com/vision/docs/ocr",
+    "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr",
+    "https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html"
+  ],
+  "source_image_read_performed": false,
+  "source_rows_read": false,
+  "total_blank_row_count": 808,
+  "training_execution_performed_by_script": false,
+  "verified_requirement_count": 4
+}

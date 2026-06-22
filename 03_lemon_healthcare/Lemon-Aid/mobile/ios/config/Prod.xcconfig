@@ -1,0 +1,8 @@
+#include "AppEnvironment.xcconfig"
+
+// Production environment — mirrors Android product flavor `prod` (no suffix).
+// Wired into ios/Flutter/Release.xcconfig. Release builds require an explicit
+// --dart-define=LEMON_API_BASE_URL (HTTPS) and LEMON_CERTIFICATE_PINS; the Dart
+// AppConfig fails closed otherwise (see lib/core/config/app_config.dart).
+LEMON_APP_ENV = prod
+LEMON_BUNDLE_ID_SUFFIX =

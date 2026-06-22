@@ -1,0 +1,51 @@
+roboflow_class,aihub_class_ids,status,notes
+salad,B12014|B12042|B12046|B12059|B12066|B12088|B12096|B12097|B12119|B12147|B12152|B12156,broad_semantic,AI Hub salad classes including sweet potato pumpkin salmon chicken tofu and vegetable salads
+mixed-rice-bowl,A13014|B11093|B12030|B12053|B12126,exact_or_close,Bibimbap and mixed rice variants
+rice-bowl,A14026|A14150|B11010|B11011|B11012|B11020|B11050|B11053|B11079|B11094|B11098|B11099|B11108|B12002|B12034|B12120|B12149,broad_semantic,Dupbap cupbap and topped rice dishes
+fried-rice,A14019|B12012,exact_or_close,Fried rice variants found
+rice-soup,A13039|B12024|B12071,exact_or_close,Gukbap variants found
+rice-porridge,C03150|C03151|C03152|C03153|C03154|C03155|C03156|C03157,exact_or_close,Juk porridge variants
+seaweed-rice-roll,B11015|B11018|B11029|B11032|B11033|B11040|B11054|B11055|B11078|B11101,exact_or_close,Kimbap variants
+spicy-rice-cakes,B11009|B11013|B11036|B11038|B11048|B11087|B11090|B11096|B11103|B11117|B11119,exact_or_close,Tteokbokki variants
+dumplings,A13031|A14003|B12004|B12008|B12022|B12038|B12073|B12101|B12112,exact_or_close,Standalone dumpling variants only
+fish-cake,B12116|C06014,review_needed,Only fried fish cake and hotbar classes found
+fried-food-platter,A13028|A13035|B12130,review_needed,Standalone fried snack classes only
+savory-pancake,A13032|B12074,review_needed,Only jeon-like classes found
+korean-blood-sausage,A13022|B12078|B12139,exact_or_close,Standalone sundae Korean blood sausage variants
+takoyaki,A14130,exact_or_close,Takoyaki exact match
+soup,A13004|A13017|A13021|A13030|A13038|A13040|A13041|A13042|A13043|A13044|A13049|B12041|B12063|B12070|B12111|B12114|B12123|C04001|C04002|C04003|C04004|C04005,broad_semantic,Generic soups excluding noodle soup rice soup stew and seafood stew
+stew,A13045|B12027|B12032|B12086|B12104|B12138|B12167,exact_or_close,Jjigae and steamed kimchi style dishes
+hot-pot,A13033|A13047|B12005|B12035|B12058|B12069|B12091|B12109,exact_or_close,Jeongol hot pot variants
+noodle-soup,A13024|A13029|A13034|A14025|A14032|A14043|A14047|A14064|A14082|A14083|A14085|A14094|A14112|A14148|B12016|B12075|B12087|B12117|B12150|B12161,broad_semantic,Hot noodle soup and rice noodle soup variants
+cold-noodles,A14107|B12094|B12137|B12154,exact_or_close,Cold noodle and makguksu variants
+spicy-mixed-noodles,B12095|B12132,review_needed,No jjolmyeon class found
+ramen,A14024|A14027|A14052|A14084|A14086|A14114|B12062|B12068|B12166,exact_or_close,Ramen and ramyeon variants
+black-bean-noodles,B11088|B11091|B12099,exact_or_close,Jjajang noodle variants
+spicy-seafood-noodles,A14018|A14110|A14111|B11016|B11092|B11097|B12110,exact_or_close,Jjamppong variants
+fried-chicken,B11002|B11003|B11004|B11014|B11021|B11022|B11023|B11024|B11025|B11026|B11027|B11028|B11037|B11039|B11062|B11063|B11064|B11065|B11066|B11067|B11068|B11069|B11070|B11071|B11072|B11073|B11074|B11075|B11076|B11077|B11081|B11082|B11083|B11086|B11115|B11116|B11120|B11130|B11131|B11132|B12065|B12146,broad_semantic,Fried and seasoned chicken variants excluding burgers sandwiches salads and rice bowls
+pork-cutlet,A14034|A14126|A14127|A14151|B11035|B12013|B12015|B12163,exact_or_close,Tonkatsu donkatsu and katsu variants
+grilled-pork-belly,A14070,review_needed,Only pork belly steak class found
+grilled-beef,A14116|B12160|B12164,review_needed,No direct grilled beef class found steak classes only
+barbecue-ribs,A13015|A14077|A14091|B12006|B12061|B12081|B12105,review_needed,Galbi rib-adjacent variants excluding chicken galbi and dumplings
+bulgogi,B12018|B12092|B12157,exact_or_close,Bulgogi variants only
+stir-fried-pork,B12134,exact_or_close,Jeyuk bokkeum exact match
+braised-chicken,B12019|B12064|B12083,review_needed,Jjimdak dakbokkeumtang and gopdoritang variants
+chicken-galbi,B12003|B12144,exact_or_close,Dakgalbi variants excluding rice bowl and rib dishes
+braised-pork-hock,B11017|B11041|B12093,exact_or_close,Jokbal variants
+grilled-fish,A13001|B12007|B12017|B12025|B12031|B12100|B12135,exact_or_close,Grilled fish variants only
+raw-fish,A13003|A13012|A13016|A13019|A13020|A13026,exact_or_close,Raw fish seafood and mulhoe variants
+sushi,B12001|B12037|B12045|B12102|B12107|B12108|B12125|B12128|B12140,exact_or_close,Sushi variants excluding non-food name collisions
+seafood-stew,A13008|A13009|A13023|A13036|A13037|A13048|A14146|B12021|B12124|B12165,broad_semantic,Seafood tang jjim ttukbaegi and related stew variants
+shrimp-dish,A13010|A13011|A14014|A14129|B12085|B12148,exact_or_close,Shrimp dishes excluding shrimp rice bowl pasta burger sushi dumpling and kimbap
+squid-dish,B12122,review_needed,Only squid sundae found as cooked squid dish
+sweet-and-sour-pork,A14069,exact_or_close,Tangsuyuk exact match
+mala-hot-pot,A14044,exact_or_close,Mara tang exact match
+dim-sum,A14072|A14076,exact_or_close,Xiaolongbao variants
+udon,B11089|B12039|B12103|B12159,exact_or_close,Udon variants excluding curry udon already mapped to curry
+pasta,A14012|A14023|A14036|A14051|A14054|A14057|A14060|A14061|A14066|A14067|A14071|A14073|A14074|A14075|A14089|A14090|A14099|A14141,exact_or_close,Pasta and spaghetti variants
+pizza,A14009|A14013|A14021|A14028|A14030|A14037|A14045|A14065|A14087|A14095|A14101|A14142|A14145|B11007|B11008|B11047|B11051|B11052|B11060|B11061|B11107|B11113|B11114|B11121|B11122|B11123|B11124|B12043|B12089,broad_semantic,Pizza variants excluding pizza toast pizza cutlet and pizza bread
+hamburger,B11045|B11049|B11056|B11105|B11109,exact_or_close,Burger variants
+sandwich,B11001|B11005|B11006|B11019|B11030|B11031|B11042|B11043|B11044|B11046|B11058|B11059|B11080|B11084|B11085|B11100|B11102|B11106|B11110|B11112|B11118|B11125|B11126|B11127|B11128|B11129,exact_or_close,Sandwich and toast variants
+curry,A14002|A14016|A14046|A14102|A14119|A14124|A14140|B11111|C02122,broad_semantic,Curry variants including curry rice and curry udon
+bread,A14015|C02002|C02005|C02006|C02007|C02008|C02016|C02021|C02022|C02035|C02038|C02040|C02046|C02051|C02052|C02053|C02061|C02065|C02066|C02069|C02070|C02086|C02087|C02088|C02089|C02090|C02091|C02093|C02094|C02098|C02101|C02106|C02107|C02111|C02124|C02125|C02131|C02132|C02133|C02134|C02137|C02140|C02142|C02145|C02148,broad_semantic,Bread bun bagel and bakery bread variants
+cake,C02009|C02010|C02024|C02027|C02033|C02063|C02112|C02119,exact_or_close,Cake variants only

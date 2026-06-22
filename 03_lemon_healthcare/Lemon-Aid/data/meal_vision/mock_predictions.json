@@ -1,0 +1,224 @@
+{
+  "sample_kimchi_stew_rice.jpg": {
+    "detections": [
+      {
+        "class_id": 4,
+        "class_name_ko": "김치찌개",
+        "confidence": 0.86,
+        "bbox_xyxy": [120, 180, 520, 620]
+      },
+      {
+        "class_id": 0,
+        "class_name_ko": "공기밥",
+        "confidence": 0.91,
+        "bbox_xyxy": [560, 210, 780, 460]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["food", "rice", "stew", "korean cuisine"],
+      "ocr_text": ""
+    }
+  },
+  "sample_bibimbap_solo.jpg": {
+    "detections": [
+      {
+        "class_id": 2,
+        "class_name_ko": "비빔밥",
+        "confidence": 0.94,
+        "bbox_xyxy": [80, 60, 720, 700]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["bibimbap", "rice", "vegetable", "korean food"],
+      "ocr_text": ""
+    }
+  },
+  "sample_ramen_kimchi.jpg": {
+    "detections": [
+      {
+        "class_id": 7,
+        "class_name_ko": "라면",
+        "confidence": 0.88,
+        "bbox_xyxy": [100, 100, 600, 600]
+      },
+      {
+        "class_id": 12,
+        "class_name_ko": "김치",
+        "confidence": 0.74,
+        "bbox_xyxy": [620, 200, 800, 380]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["noodles", "ramen", "soup", "kimchi"],
+      "ocr_text": ""
+    }
+  },
+  "sample_low_conf_blurry.jpg": {
+    "detections": [
+      {
+        "class_id": 5,
+        "class_name_ko": "된장찌개",
+        "confidence": 0.32,
+        "bbox_xyxy": [150, 200, 500, 550]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["stew", "soup", "food"],
+      "ocr_text": ""
+    }
+  },
+  "sample_mid_conf_review.jpg": {
+    "detections": [
+      {
+        "class_id": 9,
+        "class_name_ko": "짜장면",
+        "confidence": 0.55,
+        "bbox_xyxy": [120, 150, 680, 620]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["noodles", "black sauce", "food"],
+      "ocr_text": ""
+    }
+  },
+  "sample_kimbap_lunchbox.jpg": {
+    "detections": [
+      {
+        "class_id": 3,
+        "class_name_ko": "김밥",
+        "confidence": 0.92,
+        "bbox_xyxy": [60, 100, 540, 360]
+      },
+      {
+        "class_id": 12,
+        "class_name_ko": "김치",
+        "confidence": 0.81,
+        "bbox_xyxy": [560, 120, 760, 280]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["kimbap", "seaweed", "rice", "side dish"],
+      "ocr_text": ""
+    }
+  },
+  "sample_tteokbokki_street.jpg": {
+    "detections": [
+      {
+        "class_id": 10,
+        "class_name_ko": "떡볶이",
+        "confidence": 0.89,
+        "bbox_xyxy": [40, 80, 760, 620]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["tteokbokki", "rice cake", "spicy"],
+      "ocr_text": ""
+    }
+  },
+  "sample_bulgogi_set.jpg": {
+    "detections": [
+      {
+        "class_id": 14,
+        "class_name_ko": "불고기",
+        "confidence": 0.87,
+        "bbox_xyxy": [60, 80, 540, 480]
+      },
+      {
+        "class_id": 0,
+        "class_name_ko": "공기밥",
+        "confidence": 0.93,
+        "bbox_xyxy": [580, 120, 780, 320]
+      },
+      {
+        "class_id": 6,
+        "class_name_ko": "미역국",
+        "confidence": 0.78,
+        "bbox_xyxy": [580, 360, 780, 600]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["bulgogi", "rice", "soup", "korean set meal"],
+      "ocr_text": ""
+    }
+  },
+  "sample_dumpling_kalguksu.jpg": {
+    "detections": [
+      {
+        "class_id": 11,
+        "class_name_ko": "만두",
+        "confidence": 0.83,
+        "bbox_xyxy": [80, 100, 380, 480]
+      },
+      {
+        "class_id": 8,
+        "class_name_ko": "칼국수",
+        "confidence": 0.86,
+        "bbox_xyxy": [400, 100, 760, 580]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["dumpling", "noodles", "soup"],
+      "ocr_text": ""
+    }
+  },
+  "sample_apple_banana_breakfast.jpg": {
+    "detections": [
+      {
+        "class_id": 17,
+        "class_name_ko": "사과",
+        "confidence": 0.95,
+        "bbox_xyxy": [60, 120, 360, 480]
+      },
+      {
+        "class_id": 18,
+        "class_name_ko": "바나나",
+        "confidence": 0.93,
+        "bbox_xyxy": [400, 200, 720, 460]
+      },
+      {
+        "class_id": 19,
+        "class_name_ko": "아메리카노",
+        "confidence": 0.76,
+        "bbox_xyxy": [320, 520, 540, 760]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["apple", "banana", "fruit", "coffee", "breakfast"],
+      "ocr_text": ""
+    }
+  },
+  "sample_conflict_yolo_gcv.jpg": {
+    "detections": [
+      {
+        "class_id": 4,
+        "class_name_ko": "김치찌개",
+        "confidence": 0.72,
+        "bbox_xyxy": [120, 180, 520, 620]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["doenjang", "soybean paste", "stew"],
+      "ocr_text": ""
+    }
+  },
+  "sample_duplicate_dish.jpg": {
+    "detections": [
+      {
+        "class_id": 13,
+        "class_name_ko": "계란말이",
+        "confidence": 0.84,
+        "bbox_xyxy": [80, 80, 360, 320]
+      },
+      {
+        "class_id": 13,
+        "class_name_ko": "계란말이",
+        "confidence": 0.71,
+        "bbox_xyxy": [420, 100, 700, 340]
+      }
+    ],
+    "gcv_hints": {
+      "labels": ["egg roll", "side dish"],
+      "ocr_text": ""
+    }
+  }
+}

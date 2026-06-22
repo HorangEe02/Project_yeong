@@ -1,0 +1,568 @@
+"""Build a local-only review bundle for supplement review-image PII screening.
+
+The bundle is a convenience layer around
+``export_supplement_review_pii_screening_template.py``. It writes a static
+HTML index, an editable decision JSONL template, and a short README so an
+operator can inspect materialized review images before teacher OCR transfer.
+
+The tool does not make privacy decisions, does not run OCR, does not call
+external providers, does not write to the database, and does not emit local
+absolute paths, raw OCR text, provider payloads, product directory literals, or
+image bytes.
+"""
+
+from __future__ import annotations
+
+import argparse
+import html
+import json
+import shutil
+import sys
+from collections import Counter
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
+
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+if str(BACKEND_ROOT) not in sys.path:
+    sys.path.insert(0, str(BACKEND_ROOT))
+
+from scripts import build_supplement_ocr_benchmark_manifest as benchmark  # noqa: E402
+from scripts import export_supplement_review_pii_screening_template as template_export  # noqa: E402
+
+SCHEMA_VERSION = "supplement-review-pii-screening-review-bundle-v1"
+EXPECTED_TEMPLATE_ROW_SCHEMA_VERSION = template_export.ROW_SCHEMA_VERSION
+SOURCE_DOC_URLS = template_export.SOURCE_DOC_URLS
+HTML_INDEX_NAME = "review-index.html"
+DECISION_TEMPLATE_NAME = "decisions.todo.jsonl"
+README_NAME = "README.md"
+SUMMARY_NAME = "summary.json"
+DECISION_GUIDE = {
+    "cleared_no_personal_data": "Use only when no face, name, contact, address, order, or other personal data is visible.",
+    "contains_personal_data": "Use when any personal data is visible; teacher OCR transfer stays blocked.",
+    "needs_rescreen": "Use when the image is ambiguous, cropped, blurry, or needs another reviewer.",
+    "reject": "Use for unrelated, wrong type, unreadable, or unsafe images.",
+}
+REASON_CODE_GUIDE = {
+    "no_personal_data_visible": "Required for cleared rows.",
+    "face_visible": "A face or identifiable person is visible.",
+    "name_visible": "A personal name is visible.",
+    "contact_visible": "Phone, email, account id, or similar contact data is visible.",
+    "address_visible": "Address or delivery location is visible.",
+    "receipt_or_order_visible": "Receipt, order number, invoice, or shipping/order context is visible.",
+    "other_personal_data_visible": "Any other personal data is visible.",
+    "unreadable": "Image cannot be safely reviewed.",
+    "needs_manual_rescreen": "Second pass needed before any provider transfer.",
+    "wrong_image_type": "Not a supplement label/review image suitable for OCR benchmark work.",
+}
+CLEARED_ATTESTATIONS = (
+    "attest_local_screening_completed",
+    "attest_no_personal_data_visible",
+    "attest_no_raw_text_copied",
+    "attest_teacher_ocr_transfer_allowed",
+)
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse command-line arguments.
+
+    Args:
+        argv: Optional argument list for tests.
+
+    Returns:
+        Parsed arguments.
+    """
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--template", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--source-run-id", default=None)
+    parser.add_argument("--limit", type=int, default=None)
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
+    """Write a local-only review bundle and print a redacted summary.
+
+    Args:
+        argv: Optional argument list for tests.
+    """
+    args = parse_args(argv)
+    output_dir = args.output_dir.expanduser().resolve()
+    try:
+        summary = build_review_bundle(
+            template_path=args.template,
+            output_dir=output_dir,
+            source_run_id=args.source_run_id,
+            limit=args.limit,
+        )
+        print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        failure = _failure_summary(
+            template_path=args.template,
+            output_dir=output_dir,
+            error=exc,
+        )
+        try:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            (output_dir / SUMMARY_NAME).write_text(
+                json.dumps(failure, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+        except OSError:
+            pass
+        print(json.dumps(failure, ensure_ascii=False, indent=2, sort_keys=True))
+        raise SystemExit(1) from None
+
+
+def build_review_bundle(
+    *,
+    template_path: Path,
+    output_dir: Path,
+    source_run_id: str | None = None,
+    limit: int | None = None,
+) -> dict[str, Any]:
+    """Build a review bundle from materialized PII screening template rows.
+
+    Args:
+        template_path: JSONL template generated by
+            ``export_supplement_review_pii_screening_template.py``.
+        output_dir: Directory where bundle files are written.
+        source_run_id: Optional operator run id.
+        limit: Optional maximum number of reviewable rows.
+
+    Returns:
+        Redacted bundle summary.
+
+    Raises:
+        ValueError: If rows are malformed, duplicated, unsafe, or not
+            materialized with relative image paths.
+    """
+    if limit is not None and limit < 0:
+        raise ValueError("limit must be nonnegative.")
+    template_path = template_path.expanduser().resolve()
+    template_rows = _read_template_rows(template_path)
+    review_rows, skip_reasons = _reviewable_rows(
+        template_rows,
+        source_base=template_path.parent,
+        limit=limit,
+    )
+    decision_rows = [_decision_template_row(row) for row in review_rows]
+    html_text = _html_index(review_rows)
+    readme_text = _readme_text()
+    summary = _summary(
+        template_path=template_path,
+        source_run_id=source_run_id,
+        template_row_count=len(template_rows),
+        review_rows=review_rows,
+        decision_rows=decision_rows,
+        skip_reasons=skip_reasons,
+        limit=limit,
+    )
+    payload = {
+        "html": html_text,
+        "readme": readme_text,
+        "decision_rows": decision_rows,
+        "summary": summary,
+    }
+    benchmark._reject_unsafe_payload(payload)
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    image_copied_count = _copy_review_images(
+        review_rows,
+        source_base=template_path.parent,
+        output_dir=output_dir,
+    )
+    summary["image_copied_count"] = image_copied_count
+    benchmark._reject_unsafe_payload(summary)
+    (output_dir / HTML_INDEX_NAME).write_text(html_text, encoding="utf-8")
+    (output_dir / DECISION_TEMPLATE_NAME).write_text(
+        "".join(
+            json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in decision_rows
+        ),
+        encoding="utf-8",
+    )
+    (output_dir / README_NAME).write_text(readme_text, encoding="utf-8")
+    (output_dir / SUMMARY_NAME).write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return summary
+
+
+def _read_template_rows(path: Path) -> list[dict[str, Any]]:
+    """Read and validate PII screening template JSONL rows.
+
+    Args:
+        path: Template JSONL path.
+
+    Returns:
+        Validated template rows.
+
+    Raises:
+        ValueError: If a row is unsafe, malformed, or duplicated.
+    """
+    rows = benchmark._read_jsonl(path)
+    seen: set[str] = set()
+    for row in rows:
+        benchmark._reject_unsafe_payload(row)
+        if row.get("schema_version") != EXPECTED_TEMPLATE_ROW_SCHEMA_VERSION:
+            raise ValueError("Supplement PII review bundle requires screening template rows.")
+        fixture_id = benchmark._safe_required_token(row.get("fixture_id"), field_name="fixture_id")
+        if fixture_id in seen:
+            raise ValueError(f"Duplicate supplement PII template fixture_id: {fixture_id}")
+        seen.add(fixture_id)
+        if row.get("operator_decision_required") is not True:
+            raise ValueError("Supplement PII template rows must require operator decisions.")
+        if row.get("external_transfer_allowed") is not False:
+            raise ValueError("Supplement PII review rows must remain external-transfer blocked.")
+        if row.get("teacher_ocr_allowed") is not False:
+            raise ValueError("Supplement PII review rows must remain teacher-OCR blocked.")
+    return rows
+
+
+def _reviewable_rows(
+    rows: list[dict[str, Any]],
+    *,
+    source_base: Path,
+    limit: int | None,
+) -> tuple[list[dict[str, Any]], Counter[str]]:
+    """Return rows with materialized relative images.
+
+    Args:
+        rows: Template rows.
+        source_base: Directory containing the template and image fixture folder.
+        limit: Optional maximum number of reviewable rows.
+
+    Returns:
+        Reviewable rows and skip reason counts.
+    """
+    review_rows: list[dict[str, Any]] = []
+    skip_reasons: Counter[str] = Counter()
+    for row in rows:
+        if limit is not None and len(review_rows) >= limit:
+            skip_reasons["limit_reached"] += 1
+            continue
+        image_path = row.get("image_path")
+        if not isinstance(image_path, str) or not image_path:
+            skip_reasons["missing_materialized_image_path"] += 1
+            continue
+        _safe_relative_image_path(image_path)
+        if not (source_base / image_path).is_file():
+            skip_reasons["materialized_image_file_not_found"] += 1
+            continue
+        review_rows.append(row)
+    return review_rows, skip_reasons
+
+
+def _copy_review_images(
+    rows: list[dict[str, Any]],
+    *,
+    source_base: Path,
+    output_dir: Path,
+) -> int:
+    """Copy materialized review images into the bundle directory.
+
+    Args:
+        rows: Reviewable template rows.
+        source_base: Directory containing source relative image paths.
+        output_dir: Bundle output directory.
+
+    Returns:
+        Number of copied or already-present image files.
+    """
+    copied_count = 0
+    for row in rows:
+        image_path = _safe_relative_image_path(str(row.get("image_path")))
+        source = (source_base / image_path).resolve()
+        destination = (output_dir / image_path).resolve()
+        if source == destination:
+            copied_count += 1
+            continue
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+        copied_count += 1
+    return copied_count
+
+
+def _decision_template_row(row: dict[str, Any]) -> dict[str, Any]:
+    """Return an editable decision stub for one review row.
+
+    Args:
+        row: PII screening template row.
+
+    Returns:
+        Decision JSONL row accepted by the apply script after operator edits.
+    """
+    decision_stub = row.get("decision_stub")
+    if not isinstance(decision_stub, dict):
+        raise ValueError("Supplement PII template rows require a decision_stub.")
+    benchmark._reject_unsafe_payload(decision_stub)
+    decision_row = {
+        "schema_version": decision_stub.get("schema_version"),
+        "fixture_id": benchmark._safe_required_token(
+            row.get("fixture_id"), field_name="fixture_id"
+        ),
+        "pii_screening_decision": dict(decision_stub.get("pii_screening_decision") or {}),
+        "decision_guide": dict(DECISION_GUIDE),
+        "reason_code_guide": dict(REASON_CODE_GUIDE),
+        "cleared_required_attestations": list(CLEARED_ATTESTATIONS),
+    }
+    benchmark._reject_unsafe_payload(decision_row)
+    return decision_row
+
+
+def _html_index(rows: list[dict[str, Any]]) -> str:
+    """Return static local-only HTML for review images.
+
+    Args:
+        rows: Reviewable template rows.
+
+    Returns:
+        HTML string with relative image references only.
+    """
+    cards = "\n".join(_html_card(row, index=index + 1) for index, row in enumerate(rows))
+    decision_guide = "\n".join(
+        f"      <li><code>{html.escape(decision)}</code>: {html.escape(description)}</li>"
+        for decision, description in DECISION_GUIDE.items()
+    )
+    attestation_guide = "\n".join(
+        f"      <li><code>{html.escape(attestation)}</code></li>"
+        for attestation in CLEARED_ATTESTATIONS
+    )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Supplement PII Screening Review</title>
+  <style>
+    body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 24px; background: #f6f7f9; color: #17202a; }}
+    header {{ max-width: 980px; margin: 0 auto 24px; }}
+    .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; max-width: 1180px; margin: 0 auto; }}
+    article {{ background: white; border: 1px solid #dde2e8; border-radius: 8px; padding: 14px; }}
+    img {{ width: 100%; max-height: 420px; object-fit: contain; background: #111; border-radius: 6px; }}
+    code {{ word-break: break-all; }}
+    .meta {{ color: #52606d; font-size: 13px; line-height: 1.5; }}
+    .checklist {{ margin: 10px 0 0; padding-left: 20px; color: #24313f; }}
+    .guide {{ max-width: 980px; margin: 12px auto 24px; padding: 16px; background: #fff; border: 1px solid #dde2e8; border-radius: 8px; }}
+    .guide li {{ margin: 4px 0; }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Supplement Review Image PII Screening</h1>
+    <p>Inspect local images only. Edit <code>{html.escape(DECISION_TEMPLATE_NAME)}</code> after review. Do not copy raw label text, review text, names, contact details, addresses, or order details into decisions.</p>
+  </header>
+  <section class="guide">
+    <h2>Decision Guide</h2>
+    <ul>
+{decision_guide}
+    </ul>
+    <h2>Cleared Row Attestations</h2>
+    <p>Only <code>cleared_no_personal_data</code> rows may set teacher OCR transfer to true, and only when all attestations below are true.</p>
+    <ul>
+{attestation_guide}
+    </ul>
+  </section>
+  <main class="grid">
+{cards}
+  </main>
+</body>
+</html>
+"""
+
+
+def _html_card(row: dict[str, Any], *, index: int) -> str:
+    """Return one HTML review card.
+
+    Args:
+        row: Reviewable template row.
+        index: One-based display index.
+
+    Returns:
+        HTML card.
+    """
+    image_path = _safe_relative_image_path(str(row.get("image_path")))
+    fixture_id = benchmark._safe_required_token(row.get("fixture_id"), field_name="fixture_id")
+    category_key = benchmark._safe_required_token(
+        row.get("category_key"), field_name="category_key"
+    )
+    size_bytes = benchmark._safe_nonnegative_int(row.get("image_size_bytes"))
+    mime_type = benchmark._safe_optional_text(row.get("image_mime_type"), max_length=80) or ""
+    return f"""    <article>
+      <h2>{index}. <code>{html.escape(fixture_id)}</code></h2>
+      <img src="{html.escape(image_path)}" alt="review image for {html.escape(fixture_id)}">
+      <p class="meta">category: <code>{html.escape(category_key)}</code><br>size: {size_bytes} bytes<br>mime: {html.escape(mime_type)}</p>
+      <ul class="checklist">
+        <li>No face, name, contact, address, order, or other personal data visible.</li>
+        <li>No raw text copied into the decision file.</li>
+        <li>Teacher OCR transfer only after all attestations are true.</li>
+      </ul>
+    </article>"""
+
+
+def _readme_text() -> str:
+    """Return local review instructions.
+
+    Returns:
+        Markdown instructions.
+    """
+    return """# Supplement PII Screening Review Bundle
+
+Open `review-index.html` locally and inspect each materialized review image.
+
+Edit `decisions.todo.jsonl` only after review. A row can be cleared only when
+no face, name, contact detail, address, order detail, or other personal data is
+visible. Do not copy raw label text or review text into the decision file.
+
+## Decision Guide
+
+- `cleared_no_personal_data`: Use only when no face, name, contact, address,
+  order, or other personal data is visible.
+- `contains_personal_data`: Use when any personal data is visible; teacher OCR
+  transfer stays blocked.
+- `needs_rescreen`: Use when the image is ambiguous, cropped, blurry, or needs
+  another reviewer.
+- `reject`: Use for unrelated, wrong type, unreadable, or unsafe images.
+
+## Reason Codes
+
+- `no_personal_data_visible`: Required for cleared rows.
+- `face_visible`: A face or identifiable person is visible.
+- `name_visible`: A personal name is visible.
+- `contact_visible`: Phone, email, account id, or similar contact data is visible.
+- `address_visible`: Address or delivery location is visible.
+- `receipt_or_order_visible`: Receipt, order number, invoice, or shipping/order
+  context is visible.
+- `other_personal_data_visible`: Any other personal data is visible.
+- `unreadable`: Image cannot be safely reviewed.
+- `needs_manual_rescreen`: Second pass needed before any provider transfer.
+- `wrong_image_type`: Not a supplement label/review image suitable for OCR benchmark work.
+
+## Cleared Row Requirements
+
+Rows with `decision=cleared_no_personal_data` must set all of these to `true`:
+
+- `attest_local_screening_completed`
+- `attest_no_personal_data_visible`
+- `attest_no_raw_text_copied`
+- `attest_teacher_ocr_transfer_allowed`
+
+After completing decisions, run `apply_supplement_review_pii_screening_decisions.py`
+against the original candidate manifest and the edited decision JSONL.
+"""
+
+
+def _summary(
+    *,
+    template_path: Path,
+    source_run_id: str | None,
+    template_row_count: int,
+    review_rows: list[dict[str, Any]],
+    decision_rows: list[dict[str, Any]],
+    skip_reasons: Counter[str],
+    limit: int | None,
+) -> dict[str, Any]:
+    """Return a redacted bundle summary.
+
+    Args:
+        template_path: Source template path.
+        source_run_id: Optional operator run id.
+        template_row_count: Input template row count.
+        review_rows: Rows included in the HTML index.
+        decision_rows: Decision template rows.
+        skip_reasons: Skip reason counts.
+        limit: Optional row limit.
+
+    Returns:
+        Summary dictionary.
+    """
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "source_run_id": source_run_id,
+        "generated_at": datetime.now(UTC).isoformat(),
+        "template_name": template_path.name,
+        "template_hash": benchmark._sha256_text(str(template_path.expanduser())),
+        "template_row_count": template_row_count,
+        "reviewable_row_count": len(review_rows),
+        "decision_template_row_count": len(decision_rows),
+        "skip_reason_counts": dict(sorted(skip_reasons.items())),
+        "limit": limit,
+        "html_index_name": HTML_INDEX_NAME,
+        "decision_template_name": DECISION_TEMPLATE_NAME,
+        "readme_name": README_NAME,
+        "image_path_style": "relative_private_hashed_fixture_copy",
+        "external_transfer_allowed_rows": 0,
+        "teacher_ocr_allowed_rows": 0,
+        "operator_decision_required_count": len(review_rows),
+        "db_write_performed": False,
+        "ocr_provider_call_performed": False,
+        "paddleocr_training_performed": False,
+        "raw_ocr_text_stored": False,
+        "raw_provider_payload_stored": False,
+        "absolute_paths_stored": False,
+        "product_dir_literals_stored": False,
+        "source_doc_urls": list(SOURCE_DOC_URLS),
+    }
+
+
+def _safe_relative_image_path(value: str) -> str:
+    """Validate and return a relative image path.
+
+    Args:
+        value: Candidate image path.
+
+    Returns:
+        The validated path.
+
+    Raises:
+        ValueError: If the path is absolute, traversing, or not under images/.
+    """
+    if value.startswith("/") or value.startswith("\\") or "://" in value:
+        raise ValueError("Supplement PII review bundle requires relative image paths.")
+    path = Path(value)
+    if path.is_absolute() or ".." in path.parts or not path.parts:
+        raise ValueError("Supplement PII review bundle image paths must be safe relative paths.")
+    if path.parts[0] != "images":
+        raise ValueError("Supplement PII review bundle image paths must stay under images/.")
+    return value
+
+
+def _failure_summary(
+    *,
+    template_path: Path,
+    output_dir: Path,
+    error: Exception,
+) -> dict[str, Any]:
+    """Return a redacted failure summary.
+
+    Args:
+        template_path: Source template path.
+        output_dir: Planned output directory.
+        error: Raised exception.
+
+    Returns:
+        JSON-safe failure summary.
+    """
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": datetime.now(UTC).isoformat(),
+        "status": "error",
+        "template_name": template_path.name,
+        "template_hash": benchmark._sha256_text(str(template_path.expanduser())),
+        "output_dir_hash": benchmark._sha256_text(str(output_dir.expanduser())),
+        "error_code": type(error).__name__,
+        "error_message": "Supplement PII screening review bundle build failed.",
+        "reviewable_row_count": 0,
+        "db_write_performed": False,
+        "ocr_provider_call_performed": False,
+        "paddleocr_training_performed": False,
+        "raw_ocr_text_stored": False,
+        "raw_provider_payload_stored": False,
+        "absolute_paths_stored": False,
+        "product_dir_literals_stored": False,
+    }
+
+
+if __name__ == "__main__":
+    main()

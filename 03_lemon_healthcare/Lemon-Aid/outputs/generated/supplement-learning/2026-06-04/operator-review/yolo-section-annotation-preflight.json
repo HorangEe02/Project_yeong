@@ -1,0 +1,50 @@
+{
+  "absolute_paths_stored": false,
+  "blank_box_row_count": 205,
+  "db_write_performed": false,
+  "duplicate_fixture_id_count": 0,
+  "export_artifact_written": false,
+  "generated_at": "2026-06-04T06:36:43.724320+00:00",
+  "image_missing_or_unresolved_count": 0,
+  "image_path_printed": false,
+  "image_sha256_mismatch_count": 0,
+  "invalid_reason_counts": {},
+  "invalid_row_count": 0,
+  "labels_printed": false,
+  "limit_reached_count": 0,
+  "llm_call_performed": false,
+  "local_path_literals_stored": false,
+  "next_operator_action": "complete_supplement_section_bbox_review",
+  "ocr_provider_call_performed": false,
+  "pending_operator_action_count": 205,
+  "pending_review_row_count": 205,
+  "product_dir_literals_stored": false,
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "ready_for_partial_promotion": false,
+  "ready_for_requested_promotion": false,
+  "ready_for_strict_promotion": false,
+  "require_all_reviewed": true,
+  "reviewed_box_row_count": 0,
+  "schema_version": "supplement-yolo-annotation-decision-preflight-v1",
+  "source_doc_urls": [
+    "https://docs.ultralytics.com/datasets/detect/",
+    "https://docs.ultralytics.com/tasks/detect/"
+  ],
+  "source_image_read_performed": true,
+  "source_image_read_purpose": "fixture_sha256_integrity_check_only",
+  "source_map_name": "annotation.todo.jsonl.source-map.json",
+  "source_map_written": false,
+  "source_ref_printed": false,
+  "split_counts": {
+    "train": 205
+  },
+  "status_counts": {
+    "pending_human_bbox_review": 205
+  },
+  "template_name": "annotation.todo.jsonl",
+  "template_row_count": 205,
+  "training_performed": false,
+  "unpromotable_accepted_row_count": 0,
+  "valid_accepted_row_count": 0
+}

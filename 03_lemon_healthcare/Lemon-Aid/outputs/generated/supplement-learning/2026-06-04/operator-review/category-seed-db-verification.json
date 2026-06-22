@@ -1,0 +1,33 @@
+{
+  "db_import_verified": true,
+  "db_write_performed": false,
+  "expected_category_count": 43,
+  "expected_product_category_count": 0,
+  "expected_product_count": 0,
+  "generated_at": "2026-06-04T15:41:25.695245+00:00",
+  "local_paths_printed": false,
+  "manufacturer_names_printed": false,
+  "matched_category_count": 43,
+  "matched_product_category_count": 0,
+  "matched_product_count": 0,
+  "missing_category_count": 0,
+  "missing_category_key_hashes": [],
+  "missing_product_category_count": 0,
+  "missing_product_category_key_hashes": [],
+  "missing_product_count": 0,
+  "missing_product_source_key_hashes": [],
+  "product_import_manifest_name": null,
+  "product_import_manifest_sha256": null,
+  "product_names_printed": false,
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "require_approved_products": false,
+  "schema_version": "supplement-taxonomy-db-import-verification-v1",
+  "source_doc_urls": [
+    "https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html",
+    "https://docs.sqlalchemy.org/en/21/orm/extensions/asyncio.html",
+    "https://supabase.com/docs/guides/database/postgres/row-level-security"
+  ],
+  "taxonomy_staging_name": "2026-06-04-supplement-taxonomy-db-staging.jsonl",
+  "taxonomy_staging_sha256": "fc0a731e16fbcded535d6dd5128f7541f80231aa4b4117baa7fe46e0ee91e74d"
+}

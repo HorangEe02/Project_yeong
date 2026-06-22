@@ -1,0 +1,68 @@
+{
+  "absolute_paths_stored": false,
+  "all_batches_complete": false,
+  "batch_file_name": "brand_product_review-001.jsonl",
+  "batch_key": "brand_product_review:001",
+  "batch_review_file_name": "brand_product_review-001.review.csv",
+  "batch_status": "pending",
+  "blank_row_count": 50,
+  "bundle_file_names": [
+    "decisions.todo.jsonl",
+    "review-index.html",
+    "README.md",
+    "review.csv"
+  ],
+  "db_write_performed": false,
+  "expected_row_count": 50,
+  "external_provider_call_performed": false,
+  "generated_at": "2026-06-04T16:01:40.159340+00:00",
+  "input_names": {
+    "batch_progress": "operator-review-batch-progress.json",
+    "readiness": "supplement-learning-pipeline-readiness.json",
+    "workpack_summary": "summary.json"
+  },
+  "input_path_hashes": {
+    "batch_progress": "763f936a2d57550c16154b645ca16ef5c0d960e946680565909d8bfb5c83e497",
+    "readiness": "d456a131e701da667ff0213528141358e2f442b7e369587c373ad9af501f2ba7",
+    "workpack_summary": "1e52839a6e291459a6bd5458d51fdbf96f45d1fd237aa78488f63f7b9a10a3b4"
+  },
+  "invalid_row_count": 0,
+  "llm_call_performed": false,
+  "local_path_literals_stored": false,
+  "missing_row_count": 0,
+  "operator_checklist": [
+    "fill_reviewed_manufacturer",
+    "fill_reviewed_product_name",
+    "set_approve_or_reject_decision",
+    "keep_db_import_attestation_explicit"
+  ],
+  "pending_row_count": 0,
+  "post_completion_gates": [
+    "reconcile_operator_batch_files",
+    "rerun_operator_batch_progress_preflight",
+    "extract_reviewed_brand_decisions_for_partial_manifest_preview",
+    "rerun_brand_decision_preflight",
+    "create_approved_product_import_only_after_blank_invalid_counts_are_zero"
+  ],
+  "product_dir_literals_stored": false,
+  "queue_key": "brand_product_review",
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "reason_counts": {
+    "blank_decision": 50
+  },
+  "row_index_end": 50,
+  "row_index_start": 1,
+  "schema_version": "supplement-operator-review-next-work-order-v1",
+  "source_editable_file_name": "decisions.todo.jsonl",
+  "source_image_read_performed": false,
+  "source_rows_read": false,
+  "stage_key": "brand_product_review",
+  "stage_next_operator_action": "complete_brand_product_human_review",
+  "stage_status": "pending_operator_review",
+  "status": "pending_operator_review",
+  "total_blank_row_count": 808,
+  "training_execution_performed_by_script": false,
+  "valid_row_count": 0,
+  "workpack_file_name": "brand_product_review-001.md"
+}

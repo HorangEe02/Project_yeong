@@ -1,0 +1,32 @@
+nutrient_code,nutrient_name,sex,age_min,age_max,pregnancy_status,reference_type,reference_amount,reference_unit,ul_amount,ul_unit,source_note
+energy_kcal,Energy,all,19,64,none,EER,2000,kcal,,,sample_fixture_not_verified_kdris
+protein_g,Protein,all,19,64,none,RDA,60,g,,,sample_fixture_not_verified_kdris
+fiber_g,Dietary fiber,all,19,64,none,AI,25,g,,,sample_fixture_not_verified_kdris
+calcium_mg,Calcium,all,19,64,none,RDA,800,mg,2500,mg,sample_fixture_not_verified_kdris
+phosphorus_mg,Phosphorus,all,19,64,none,RDA,700,mg,3500,mg,sample_fixture_not_verified_kdris
+iron_mg,Iron,all,19,64,none,RDA,10,mg,45,mg,sample_fixture_not_verified_kdris
+potassium_mg,Potassium,all,19,64,none,AI,3500,mg,,,sample_fixture_not_verified_kdris
+sodium_mg,Sodium,all,19,64,none,AI,1500,mg,2300,mg,sample_fixture_not_verified_kdris
+vitamin_a_ug,Vitamin A,all,19,64,none,RDA,700,ug,3000,ug,sample_fixture_not_verified_kdris
+vitamin_d_ug,Vitamin D,all,19,64,none,AI,10,ug,100,ug,sample_fixture_not_verified_kdris
+vitamin_e_mg,Vitamin E,all,19,64,none,AI,12,mg,540,mg,sample_fixture_not_verified_kdris
+vitamin_k_ug,Vitamin K,all,19,64,none,AI,75,ug,,,sample_fixture_not_verified_kdris
+vitamin_c_mg,Vitamin C,all,19,64,none,RDA,100,mg,2000,mg,sample_fixture_not_verified_kdris
+thiamin_mg,Thiamin,all,19,64,none,RDA,1.2,mg,,,sample_fixture_not_verified_kdris
+riboflavin_mg,Riboflavin,all,19,64,none,RDA,1.4,mg,,,sample_fixture_not_verified_kdris
+niacin_mg,Niacin,all,19,64,none,RDA,15,mg,35,mg,sample_fixture_not_verified_kdris
+vitamin_b6_mg,Vitamin B6,all,19,64,none,RDA,1.5,mg,100,mg,sample_fixture_not_verified_kdris
+folate_ug,Folate,all,19,64,none,RDA,400,ug,1000,ug,sample_fixture_not_verified_kdris
+vitamin_b12_ug,Vitamin B12,all,19,64,none,RDA,2.4,ug,,,sample_fixture_not_verified_kdris
+biotin_ug,Biotin,all,19,64,none,AI,30,ug,,,sample_fixture_not_verified_kdris
+pantothenic_acid_mg,Pantothenic acid,all,19,64,none,AI,5,mg,,,sample_fixture_not_verified_kdris
+magnesium_mg,Magnesium,all,19,64,none,RDA,350,mg,,,sample_fixture_not_verified_kdris
+zinc_mg,Zinc,all,19,64,none,RDA,10,mg,35,mg,sample_fixture_not_verified_kdris
+copper_mg,Copper,all,19,64,none,RDA,0.8,mg,10,mg,sample_fixture_not_verified_kdris
+manganese_mg,Manganese,all,19,64,none,AI,3.5,mg,11,mg,sample_fixture_not_verified_kdris
+selenium_ug,Selenium,all,19,64,none,RDA,60,ug,400,ug,sample_fixture_not_verified_kdris
+iodine_ug,Iodine,all,19,64,none,RDA,150,ug,2400,ug,sample_fixture_not_verified_kdris
+chloride_mg,Chloride,all,19,64,none,AI,2300,mg,3600,mg,sample_fixture_not_verified_kdris
+chromium_ug,Chromium,all,19,64,none,AI,30,ug,,,sample_fixture_not_verified_kdris
+molybdenum_ug,Molybdenum,all,19,64,none,RDA,25,ug,600,ug,sample_fixture_not_verified_kdris
+vitamin_c_mg,Vitamin C,female,19,64,pregnant,RDA,110,mg,2000,mg,sample_fixture_not_verified_kdris

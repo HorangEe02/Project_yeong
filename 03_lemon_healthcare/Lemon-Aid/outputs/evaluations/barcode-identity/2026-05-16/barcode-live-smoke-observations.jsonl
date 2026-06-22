@@ -1,0 +1,3 @@
+{"fixture_id":"live-smoke-2026-05-16-foodqr-default-barcode","source_rights":"smoke_only_no_product_claim","barcode_text":"08801007325224","observations":[{"provider":"foodqr","status":"not_found","message_code":null,"item_count":0}]}
+{"fixture_id":"live-smoke-2026-05-16-mfds-c003-default-report","source_rights":"smoke_only_no_product_claim","mfds_report_no":"20070017035202","observations":[{"provider":"mfds_c003","status":"provider_error","message_code":"NON_JSON_PROVIDER_ERROR","item_count":0}]}
+{"fixture_id":"live-smoke-2026-05-16-mfds-i0760-first-page","source_rights":"smoke_only_no_product_claim","observations":[{"provider":"mfds_i0760","status":"matched","message_code":"INFO-000","item_count":100}]}

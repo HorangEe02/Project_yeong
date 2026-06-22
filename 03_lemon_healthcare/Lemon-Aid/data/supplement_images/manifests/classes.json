@@ -1,0 +1,12 @@
+{
+  "version": "2026-05-15",
+  "domain": "supplement_images",
+  "classes": [
+    "supplement_label",
+    "supplement_bottle",
+    "blister_pack",
+    "nutrition_facts_panel",
+    "non_supplement",
+    "unknown"
+  ]
+}

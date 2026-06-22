@@ -1,0 +1,154 @@
+{
+  "schema_version": "supplement-parsed-snapshot-v3",
+  "requires_user_confirmation": true,
+  "source": {
+    "analysis_id": "172e097c-ac41-5ca6-b1ed-9fbfe9cc212e",
+    "ocr_provider": "manual",
+    "ocr_confidence": null,
+    "layout_available": false,
+    "raw_image_stored": false,
+    "raw_ocr_text_stored": false,
+    "raw_provider_payload_stored": false,
+    "raw_model_response_stored": false,
+    "parser_schema_version": "supplement-parser-output-v2"
+  },
+  "product": {
+    "product_name": "TBD",
+    "manufacturer": "Doctor's Best, Inc.",
+    "barcode_candidates": [],
+    "evidence_refs": []
+  },
+  "serving": {
+    "serving_size_text": "2 Marine Softgels",
+    "serving_amount": null,
+    "serving_unit": null,
+    "daily_servings": 2,
+    "evidence_refs": []
+  },
+  "ingredients": [
+    {
+      "display_name": "Fish Oil",
+      "normalized_name": "fish oil",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Omega-3 Fatty Acids (EPA & DHA)",
+      "normalized_name": "omega-3 fatty acids (epa & dha)",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Gelatin",
+      "normalized_name": "gelatin",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Glycerin",
+      "normalized_name": "glycerin",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Water",
+      "normalized_name": "water",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Natural Flavors",
+      "normalized_name": "natural flavors",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Citric Acid",
+      "normalized_name": "citric acid",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Mixed Tocopherols",
+      "normalized_name": "mixed tocopherols",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    }
+  ],
+  "label_sections": [],
+  "intake_method": {
+    "text": null,
+    "structured": {
+      "frequency": "unknown",
+      "time_of_day": [],
+      "with_food": "unknown"
+    },
+    "evidence_refs": []
+  },
+  "precautions": [],
+  "functional_claims": [],
+  "evidence_spans": [],
+  "domain_correction_audit": [],
+  "low_confidence_fields": [],
+  "warnings": [
+    "ground_truth_pending_human_review",
+    "category:오메가3",
+    "labels:live_naver,detail_page",
+    "auto_seeded_by_qwen3_5_9b",
+    "vision_seeded_by_gemma4"
+  ],
+  "chronic_disease_indications": [
+    "cardiovascular",
+    "cognitive_decline",
+    "diabetes",
+    "dyslipidemia"
+  ]
+}

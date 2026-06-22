@@ -1,0 +1,25 @@
+{
+  "absolute_paths_stored": false,
+  "approved_for_db_write_rows": 0,
+  "db_write_performed": false,
+  "generated_at": "2026-06-04T06:28:56.521667+00:00",
+  "limit": null,
+  "operator_decision_required_count": 388,
+  "product_dir_literals_stored": false,
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "schema_version": "supplement-brand-review-template-v1",
+  "skip_reason_counts": {
+    "not_product_brand_candidate": 43
+  },
+  "source_doc_urls": [
+    "https://www.postgresql.org/docs/current/ddl-constraints.html",
+    "https://supabase.com/docs/guides/database/postgres/row-level-security",
+    "https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html"
+  ],
+  "source_run_id": "2026-06-04-taxonomy-ocr-yolo-plan",
+  "staging_row_count": 431,
+  "taxonomy_staging_hash": "edcf7193d5e036076ac68990cde9e61258cd4fc5e8a8fe6c7e7fbdc57cd667f6",
+  "taxonomy_staging_name": "2026-06-04-supplement-taxonomy-db-staging.jsonl",
+  "template_row_count": 388
+}

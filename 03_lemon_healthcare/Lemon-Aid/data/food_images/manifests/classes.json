@@ -1,0 +1,26 @@
+{
+  "version": "2026-05-15",
+  "domain": "food_images",
+  "classes": [
+    "korean_main",
+    "korean_soup",
+    "korean_side",
+    "korean_dessert",
+    "western_main",
+    "western_soup",
+    "western_side",
+    "western_dessert",
+    "chinese_main",
+    "chinese_soup",
+    "chinese_side",
+    "chinese_dessert",
+    "japanese_main",
+    "japanese_soup",
+    "japanese_side",
+    "japanese_dessert",
+    "other_main",
+    "other_soup",
+    "other_side",
+    "other_dessert"
+  ]
+}

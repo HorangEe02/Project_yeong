@@ -1,0 +1,32 @@
+{
+  "generated_at": "2026-05-21T01:23:46.732686+00:00",
+  "manifest": "../data/supplement_images/private_workspace/stage0_naver_chronic/manifest-three-tier.jsonl",
+  "fixture_count": 16,
+  "missing_image_count": 0,
+  "observation_count": 16,
+  "providers": {
+    "paddleocr_local": {
+      "calls": 16,
+      "text_non_empty_rate": 0.875,
+      "parser_success_rate": 0.875,
+      "average_latency_ms": 5787.0625,
+      "ingredient_name_exact_rate": 0.0,
+      "errors": 0,
+      "llm_parse_attempt_count": 14,
+      "llm_parse_success_rate": 0.0,
+      "llm_ingredient_name_exact_rate": null,
+      "cer_ko_avg": null,
+      "cer_en_avg": null,
+      "wer_ko_avg": null,
+      "wer_en_avg": null,
+      "accuracy_by_condition": {
+        "cardiovascular": 0.0,
+        "diabetes": 0.0,
+        "dyslipidemia": 0.0,
+        "osteoporosis": 0.0
+      }
+    }
+  },
+  "raw_artifacts_stored": false,
+  "raw_ocr_text_stored": false
+}

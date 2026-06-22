@@ -1,0 +1,377 @@
+{
+  "schema_version": "ocr-fixture-chronic-supplement-categories-v1",
+  "generated_at": "2026-05-24",
+  "purpose": "OCR/DB labeling fixture taxonomy only. This file must not be used as a supplement recommendation engine.",
+  "language_targets": ["ko", "en"],
+  "official_source_urls": [
+    "https://ods.od.nih.gov/factsheets/list-all/",
+    "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely",
+    "https://www.nccih.nih.gov/health/safety",
+    "https://www.nccih.nih.gov/health/diabetes-and-dietary-supplements-what-you-need-to-know",
+    "https://www.kidney.org/kidney-topics/vitamins-chronic-kidney-disease"
+  ],
+  "condition_tag_legend": {
+    "cardiovascular": "Cardiovascular disease fixture coverage",
+    "dyslipidemia": "Lipid/cholesterol fixture coverage",
+    "diabetes": "Diabetes or blood glucose fixture coverage",
+    "hypertension": "Blood pressure fixture coverage",
+    "chronic_kidney_disease": "Kidney disease caution/review fixture coverage",
+    "osteoporosis": "Bone health/osteoporosis fixture coverage",
+    "liver_disease": "Liver condition or hepatotoxicity review coverage",
+    "cognitive_decline": "Cognitive health fixture coverage",
+    "general_supplement": "General supplement label coverage",
+    "sports_nutrition": "Sports nutrition label coverage",
+    "sleep": "Sleep-related supplement label coverage",
+    "eye_health": "Eye health supplement label coverage",
+    "digestive_health": "Digestive health supplement label coverage",
+    "immune_health": "Immune health supplement label coverage",
+    "women_health": "Women's health supplement label coverage",
+    "men_health": "Men's health supplement label coverage",
+    "pediatric_review": "Pediatric review required before use as a patient fixture"
+  },
+  "categories": {
+    "bcaa_eaa": {
+      "display_name_ko": "BCAA/EAA",
+      "display_name_en": "BCAA/EAA amino acids",
+      "folder_aliases": ["BCAA_EAA"],
+      "condition_tags": ["sports_nutrition"],
+      "caution_tags": ["kidney_disease_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "hmb_taurine": {
+      "display_name_ko": "HMB/타우린",
+      "display_name_en": "HMB/Taurine",
+      "folder_aliases": ["HMB_타우린"],
+      "condition_tags": ["sports_nutrition"],
+      "caution_tags": ["kidney_disease_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "turmeric_curcumin": {
+      "display_name_ko": "강황/커큐민",
+      "display_name_en": "Turmeric/Curcumin",
+      "folder_aliases": ["강황_커큐민"],
+      "condition_tags": ["dyslipidemia", "liver_disease"],
+      "caution_tags": ["liver_injury_review", "anticoagulant_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/turmeric"]
+    },
+    "joint_msm_chondroitin": {
+      "display_name_ko": "관절/MSM/콘드로이친",
+      "display_name_en": "Joint/MSM/Chondroitin",
+      "folder_aliases": ["관절_MSM_콘드로이친", "글루코사민"],
+      "condition_tags": ["osteoporosis", "general_supplement"],
+      "caution_tags": ["diabetes_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    },
+    "general_other": {
+      "display_name_ko": "기타",
+      "display_name_en": "Other supplements",
+      "folder_aliases": ["기타"],
+      "condition_tags": ["general_supplement"],
+      "caution_tags": ["human_review_required"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    },
+    "saw_palmetto": {
+      "display_name_ko": "쏘팔메토",
+      "display_name_en": "Saw palmetto",
+      "folder_aliases": ["남성_쏘팔메토"],
+      "condition_tags": ["men_health"],
+      "caution_tags": ["hormone_sensitive_condition_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    },
+    "ginkgo": {
+      "display_name_ko": "은행잎",
+      "display_name_en": "Ginkgo",
+      "folder_aliases": ["뇌_은행잎"],
+      "condition_tags": ["cognitive_decline", "cardiovascular"],
+      "caution_tags": ["anticoagulant_review", "surgery_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    },
+    "weight_management": {
+      "display_name_ko": "다이어트/체지방",
+      "display_name_en": "Weight management",
+      "folder_aliases": ["다이어트_체지방"],
+      "condition_tags": ["diabetes", "cardiovascular"],
+      "caution_tags": ["stimulant_review", "liver_injury_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "protein": {
+      "display_name_ko": "단백질/프로틴",
+      "display_name_en": "Protein",
+      "folder_aliases": ["단백질_프로틴"],
+      "condition_tags": ["sports_nutrition", "chronic_kidney_disease"],
+      "caution_tags": ["kidney_disease_review"],
+      "source_urls": ["https://www.kidney.org/kidney-topics/vitamins-chronic-kidney-disease"]
+    },
+    "lutein_eye": {
+      "display_name_ko": "루테인/눈",
+      "display_name_en": "Lutein/Eye health",
+      "folder_aliases": ["루테인_눈"],
+      "condition_tags": ["eye_health", "diabetes"],
+      "caution_tags": ["human_review_required"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/list-all/"]
+    },
+    "magnesium": {
+      "display_name_ko": "마그네슘",
+      "display_name_en": "Magnesium",
+      "folder_aliases": ["마그네슘"],
+      "condition_tags": ["diabetes", "hypertension", "cardiovascular", "chronic_kidney_disease"],
+      "caution_tags": ["kidney_disease_review"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/"]
+    },
+    "multivitamin": {
+      "display_name_ko": "멀티비타민/종합영양제",
+      "display_name_en": "Multivitamin",
+      "folder_aliases": ["멀티비타민", "종합영양제"],
+      "condition_tags": ["general_supplement"],
+      "caution_tags": ["kidney_disease_review", "warfarin_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/vitamins-and-minerals"]
+    },
+    "milk_thistle": {
+      "display_name_ko": "밀크씨슬/간",
+      "display_name_en": "Milk thistle/Liver",
+      "folder_aliases": ["밀크씨슬_간"],
+      "condition_tags": ["liver_disease"],
+      "caution_tags": ["liver_disease_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    },
+    "vitamin_a": {
+      "display_name_ko": "비타민A",
+      "display_name_en": "Vitamin A",
+      "folder_aliases": ["비타민A"],
+      "condition_tags": ["general_supplement", "eye_health"],
+      "caution_tags": ["pregnancy_review", "liver_disease_review"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/VitaminA-HealthProfessional/"]
+    },
+    "vitamin_b_complex": {
+      "display_name_ko": "비타민B",
+      "display_name_en": "Vitamin B complex",
+      "folder_aliases": ["비타민B"],
+      "condition_tags": ["diabetes", "cognitive_decline", "chronic_kidney_disease"],
+      "caution_tags": ["metformin_b12_review", "kidney_disease_review"],
+      "source_urls": [
+        "https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/",
+        "https://ods.od.nih.gov/factsheets/Folate-HealthProfessional/"
+      ]
+    },
+    "vitamin_c": {
+      "display_name_ko": "비타민C",
+      "display_name_en": "Vitamin C",
+      "folder_aliases": ["비타민C"],
+      "condition_tags": ["general_supplement"],
+      "caution_tags": ["kidney_stone_review", "hemochromatosis_review"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/"]
+    },
+    "vitamin_d": {
+      "display_name_ko": "비타민D",
+      "display_name_en": "Vitamin D",
+      "folder_aliases": ["비타민D"],
+      "condition_tags": ["osteoporosis", "diabetes", "cardiovascular", "chronic_kidney_disease"],
+      "caution_tags": ["hypercalcemia_review", "kidney_disease_review"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/VitaminD-HealthProfessional/"]
+    },
+    "vitamin_e": {
+      "display_name_ko": "비타민E",
+      "display_name_en": "Vitamin E",
+      "folder_aliases": ["비타민E"],
+      "condition_tags": ["general_supplement"],
+      "caution_tags": ["anticoagulant_review"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/VitaminE-HealthProfessional/"]
+    },
+    "vitamin_k": {
+      "display_name_ko": "비타민K",
+      "display_name_en": "Vitamin K",
+      "folder_aliases": ["비타민K"],
+      "condition_tags": ["osteoporosis", "cardiovascular"],
+      "caution_tags": ["warfarin_review"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/VitaminK-HealthProfessional/"]
+    },
+    "melatonin_sleep": {
+      "display_name_ko": "수면/멜라토닌",
+      "display_name_en": "Sleep/Melatonin",
+      "folder_aliases": ["수면_멜라토닌"],
+      "condition_tags": ["sleep"],
+      "caution_tags": ["sedation_review", "medication_interaction_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    },
+    "ashwagandha_stress": {
+      "display_name_ko": "스트레스/아쉬와간다",
+      "display_name_en": "Stress/Ashwagandha",
+      "folder_aliases": ["스트레스_아쉬와간다"],
+      "condition_tags": ["general_supplement"],
+      "caution_tags": ["liver_injury_review", "thyroid_review", "pregnancy_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "spirulina_chlorella": {
+      "display_name_ko": "스피루리나/클로렐라",
+      "display_name_en": "Spirulina/Chlorella",
+      "folder_aliases": ["스피루리나_클로렐라"],
+      "condition_tags": ["general_supplement"],
+      "caution_tags": ["contamination_review", "autoimmune_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "fiber": {
+      "display_name_ko": "식이섬유",
+      "display_name_en": "Dietary fiber",
+      "folder_aliases": ["식이섬유"],
+      "condition_tags": ["diabetes", "dyslipidemia", "cardiovascular", "digestive_health"],
+      "caution_tags": ["medication_absorption_review"],
+      "source_urls": ["https://www.cdc.gov/diabetes/healthy-eating/fiber-helps-diabetes.html"]
+    },
+    "arginine_citrulline": {
+      "display_name_ko": "아르기닌/시트룰린",
+      "display_name_en": "Arginine/Citrulline",
+      "folder_aliases": ["아르기닌_시트룰린"],
+      "condition_tags": ["hypertension", "cardiovascular", "sports_nutrition"],
+      "caution_tags": ["blood_pressure_medication_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "acai_berries": {
+      "display_name_ko": "아사이/베리류",
+      "display_name_en": "Acai/Berry supplements",
+      "folder_aliases": ["아사이_베리류"],
+      "condition_tags": ["general_supplement"],
+      "caution_tags": ["human_review_required"],
+      "source_urls": ["https://www.nccih.nih.gov/health/antioxidant-supplements-what-you-need-to-know"]
+    },
+    "zinc": {
+      "display_name_ko": "아연",
+      "display_name_en": "Zinc",
+      "folder_aliases": ["아연"],
+      "condition_tags": ["immune_health", "general_supplement"],
+      "caution_tags": ["copper_deficiency_review"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/"]
+    },
+    "child_growth": {
+      "display_name_ko": "어린이/키성장",
+      "display_name_en": "Children/Growth",
+      "folder_aliases": ["어린이_키성장"],
+      "condition_tags": ["pediatric_review"],
+      "caution_tags": ["pediatric_human_review_required"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    },
+    "women_nutrition": {
+      "display_name_ko": "여성영양제",
+      "display_name_en": "Women's nutrition",
+      "folder_aliases": ["여성영양제"],
+      "condition_tags": ["women_health", "osteoporosis"],
+      "caution_tags": ["pregnancy_review", "hormone_sensitive_condition_review"],
+      "source_urls": ["https://ods.od.nih.gov/factsheets/list-all/"]
+    },
+    "omega_3": {
+      "display_name_ko": "오메가3",
+      "display_name_en": "Omega-3 fatty acids",
+      "folder_aliases": ["오메가3"],
+      "condition_tags": ["cardiovascular", "dyslipidemia"],
+      "caution_tags": ["anticoagulant_review", "atrial_fibrillation_review"],
+      "source_urls": [
+        "https://ods.od.nih.gov/factsheets/Omega3FattyAcids-HealthProfessional/",
+        "https://www.nccih.nih.gov/health/tips/things-to-know-about-omegas-for-heart-disease"
+      ]
+    },
+    "probiotics": {
+      "display_name_ko": "유산균/프로바이오틱",
+      "display_name_en": "Probiotics",
+      "folder_aliases": ["유산균_프로바이오틱"],
+      "condition_tags": ["digestive_health", "diabetes", "immune_health"],
+      "caution_tags": ["immunocompromised_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/probiotics-usefulness-and-safety"]
+    },
+    "iron": {
+      "display_name_ko": "철분",
+      "display_name_en": "Iron",
+      "folder_aliases": ["철분"],
+      "condition_tags": ["chronic_kidney_disease", "women_health"],
+      "caution_tags": ["hemochromatosis_review", "diagnosed_deficiency_required"],
+      "source_urls": [
+        "https://ods.od.nih.gov/factsheets/Iron-HealthProfessional/",
+        "https://www.kidney.org/kidney-topics/vitamins-chronic-kidney-disease"
+      ]
+    },
+    "caffeine_stimulant": {
+      "display_name_ko": "카페인/각성",
+      "display_name_en": "Caffeine/Stimulants",
+      "folder_aliases": ["카페인_각성"],
+      "condition_tags": ["hypertension", "cardiovascular", "sports_nutrition"],
+      "caution_tags": ["hypertension_review", "arrhythmia_review", "sleep_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "calcium": {
+      "display_name_ko": "칼슘",
+      "display_name_en": "Calcium",
+      "folder_aliases": ["칼슘"],
+      "condition_tags": ["osteoporosis", "chronic_kidney_disease"],
+      "caution_tags": ["kidney_stone_review", "kidney_disease_review"],
+      "source_urls": [
+        "https://ods.od.nih.gov/factsheets/Calcium-HealthProfessional/",
+        "https://www.kidney.org/kidney-topics/vitamins-chronic-kidney-disease"
+      ]
+    },
+    "coq10": {
+      "display_name_ko": "코엔자임Q10",
+      "display_name_en": "Coenzyme Q10",
+      "folder_aliases": ["코엔자임Q10"],
+      "condition_tags": ["cardiovascular", "hypertension"],
+      "caution_tags": ["warfarin_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/tips/high-cholesterol-and-dietary-supplements"]
+    },
+    "collagen": {
+      "display_name_ko": "콜라겐",
+      "display_name_en": "Collagen",
+      "folder_aliases": ["콜라겐"],
+      "condition_tags": ["general_supplement"],
+      "caution_tags": ["human_review_required"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    },
+    "creatine": {
+      "display_name_ko": "크레아틴",
+      "display_name_en": "Creatine",
+      "folder_aliases": ["크레아틴"],
+      "condition_tags": ["sports_nutrition", "chronic_kidney_disease"],
+      "caution_tags": ["kidney_disease_review"],
+      "source_urls": ["https://www.kidney.org/kidney-topics/vitamins-chronic-kidney-disease"]
+    },
+    "propolis": {
+      "display_name_ko": "프로폴리스/벌",
+      "display_name_en": "Propolis/Bee products",
+      "folder_aliases": ["프로폴리스_벌"],
+      "condition_tags": ["immune_health"],
+      "caution_tags": ["allergy_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "preworkout": {
+      "display_name_ko": "프리워크아웃",
+      "display_name_en": "Pre-workout",
+      "folder_aliases": ["프리워크아웃"],
+      "condition_tags": ["sports_nutrition", "hypertension", "cardiovascular"],
+      "caution_tags": ["stimulant_review", "hypertension_review", "arrhythmia_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/safety"]
+    },
+    "antioxidant": {
+      "display_name_ko": "항산화",
+      "display_name_en": "Antioxidants",
+      "folder_aliases": ["항산화"],
+      "condition_tags": ["cardiovascular", "general_supplement"],
+      "caution_tags": ["cancer_treatment_review", "hemochromatosis_review"],
+      "source_urls": ["https://www.nccih.nih.gov/health/antioxidant-supplements-what-you-need-to-know"]
+    },
+    "vascular_natto_policosanol": {
+      "display_name_ko": "혈관/낫토/폴리코사놀",
+      "display_name_en": "Vascular/Natto/Policosanol",
+      "folder_aliases": ["혈관_낫토_폴리코사놀"],
+      "condition_tags": ["cardiovascular", "dyslipidemia"],
+      "caution_tags": ["anticoagulant_review", "warfarin_review"],
+      "source_urls": [
+        "https://www.nccih.nih.gov/health/tips/high-cholesterol-and-dietary-supplements",
+        "https://ods.od.nih.gov/factsheets/VitaminK-HealthProfessional/"
+      ]
+    },
+    "digestive_enzyme": {
+      "display_name_ko": "효소/소화",
+      "display_name_en": "Digestive enzymes",
+      "folder_aliases": ["효소_소화"],
+      "condition_tags": ["digestive_health"],
+      "caution_tags": ["human_review_required"],
+      "source_urls": ["https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"]
+    }
+  }
+}

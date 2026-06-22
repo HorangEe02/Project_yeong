@@ -1,0 +1,24 @@
+{
+  "version": "2026-05-15",
+  "domain": "food_images",
+  "class_name_rule": "{cuisine_type}_{meal_component}",
+  "levels": [
+    "cuisine_type",
+    "meal_component",
+    "dish_name"
+  ],
+  "cuisine_types": [
+    "korean",
+    "western",
+    "chinese",
+    "japanese",
+    "other"
+  ],
+  "meal_components": [
+    "main",
+    "soup",
+    "side",
+    "dessert"
+  ],
+  "dish_name_source": "manifests/food_images_full.csv"
+}

@@ -1,0 +1,55 @@
+# 2026-06-03 Todo Notes
+
+- `2026-06-03-yolo26-gemma4-wiki-rag-implementation-plan.md`
+  - `crawling-image` 실제 구조 감사 결과
+  - 영양제 category/brand 후보 DB 설계 판단
+  - category seed row와 brand review-gated row staging 구현 결과
+  - brand/product review template와 승인 decision 기반 `supplement_product_import` manifest 구현 결과
+  - review OCR ground-truth 후보와 detail-page YOLO bbox annotation 후보 manifest 구현 결과
+  - pending review OCR 후보를 local-only PII screening template와 private hashed fixture로 export하는 구현 결과
+  - 운영자 PII screening decision을 적용해 no-PII attested 리뷰 후보만 teacher OCR로 승격하는 구현 결과
+  - PII-cleared 리뷰 후보를 사람이 작성할 수동 OCR ground-truth 템플릿으로 export하는 구현 결과
+  - PII-cleared + human-reviewed GT만 CLOVA/Google Vision/PaddleOCR benchmark fixture로 승격하는 구현 결과
+  - 상세페이지 YOLO 후보를 사람이 bbox 작업할 annotation template와 private hashed fixture로 export하는 구현 결과
+  - 사람이 승인한 YOLO bbox template를 YOLO export/source-map으로 승격하고 materializer까지 연결하는 구현 결과
+  - YOLO26 section bbox, OCR provider 비교, PaddleOCR 개선, Gemma 4 + LLM-WIKI RAG 구현 계획
+  - 최신 실제 데이터 audit/staging refresh 결과와 33개 unit test 통과 내역
+  - CLOVA/Google Vision/PaddleOCR 비교 eval 스크립트 검증 내역
+  - 최종 좁은 범위 회귀 ruff 통과 및 pytest 82개 통과 내역
+  - 실제 brand review template 388개 생성 및 신규 단위 테스트 12개 포함 내역
+  - 1차/2차/3차/4차/5차/6차/8차/9차/10차/11차/12차 구현 파일 및 7차 검증 명령
+  - 13차 approved taxonomy DB importer 구현, 실제 데이터 dry-run 43개 category upsert 계획, importer 포함 ruff 및 pytest 74개 통과 내역
+  - 14차 PaddleOCR improvement candidate manifest 구현, 오류 유형별 detection/recognition/post-processing/manual triage 분류, 신규 단위 테스트 6개 통과 내역
+  - 15차 accepted `ocr_textline_label` annotation task를 PaddleOCR detection/recognition dataset item으로 승격하는 스크립트 구현, 신규 단위 테스트 6개 통과 내역
+  - 16차 PaddleOCR improvement candidate를 pending `ocr_textline_label` annotation task로 생성하는 DB-backed bridge 구현, file-only `crawling-image` 후보 skip 정책, 신규 단위 테스트 6개 통과 내역
+  - 17차 materialized OCR benchmark fixture를 private `MediaObject`로 등록하고 `source_ref=media:<uuid>` rewritten manifest를 만드는 bridge 구현, 신규 단위 테스트 6개 통과 내역
+  - 18차 accepted PaddleOCR dataset item export를 공식 PaddleOCR detection/recognition label txt와 image copy로 materialize하는 스크립트 구현, 신규 단위 테스트 5개 통과 내역
+  - 19차 PaddleOCR recognition `crop_box` 계약 확장, source image crop materialization, 관련 단위 테스트 17개 및 OCR/PaddleOCR 연결 회귀 테스트 42개 통과 내역
+  - 20차 materialized PaddleOCR dataset을 검증해 fine-tuning run plan artifact를 만드는 스크립트 구현, 신규 단위 테스트 6개 및 OCR/PaddleOCR 연결 회귀 테스트 48개 통과 내역
+  - 21차 fine-tune run plan과 verified metrics를 `model_training_runs` 등록으로 연결하는 bridge 구현, 신규 단위 테스트 5개 및 OCR/PaddleOCR 연결 회귀 테스트 58개 통과 내역
+  - 22차 fine-tune run plan을 trusted-worker에서 dry-run 또는 `shell=False` subprocess로 실행하는 runner 구현, raw stdout/stderr 미저장, 신규 단위 테스트 6개 및 OCR/PaddleOCR 연결 회귀 테스트 147개 통과 내역
+  - 23차 fine-tune eval trusted-worker 구현, `tools/eval.py` metric dict에서 recognition `acc/norm_edit_dis`, detection `precision/recall/hmean`을 flat metrics JSON으로 추출, 신규 단위 테스트 7개 및 OCR/PaddleOCR 연결 회귀 테스트 154개 통과 내역
+  - 24차 fine-tuned PaddleOCR metric을 baseline metric과 비교해 절대 threshold 및 baseline 개선 조건을 모두 통과한 경우에만 promotion rule artifact를 생성하는 gate 구현, 신규 단위 테스트 7개 및 OCR/PaddleOCR 연결 회귀 테스트 133개 통과 내역
+  - 25차 baseline gate가 만든 `paddleocr-promotion-metric-rules-v1` artifact를 기존 `promote_model_candidate.py`가 직접 읽도록 `--metric-rules-json` 연결, 신규 promotion CLI 단위 테스트 4개 추가 및 OCR/PaddleOCR/model promotion 연결 회귀 테스트 158개 통과 내역
+  - 26차 동일 plan/config/eval dataset에서 기존 PaddleOCR baseline checkpoint를 평가해 comparison-ready flat metric JSON을 만드는 trusted-worker 구현, 신규 단위 테스트 6개 및 OCR/PaddleOCR/model promotion 연결 회귀 테스트 164개 통과 내역
+  - 27차 plan, fine-tuned eval, baseline eval, baseline gate, promotion rules artifact의 task/status/redaction 상태를 promotion 직전 검증하는 readiness preflight 구현, 신규 단위 테스트 6개 및 OCR/PaddleOCR/model promotion 연결 회귀 테스트 170개 통과 내역
+  - 28차 preflight 이후 operator가 검토할 plan/eval/baseline/gate/rules/readiness artifact chain과 promotion boundary를 redacted runbook으로 고정하는 스크립트 구현, 신규 단위 테스트 5개 및 관련 script 회귀 테스트 262개 통과 내역
+  - 29차 taxonomy staging/approved product import manifest 기준으로 `supplement_categories`, `supplement_products`, `supplement_product_categories` DB 반영 여부를 read-only로 확인하는 verifier 구현, 신규 단위 테스트 6개 통과 내역
+  - 30차 taxonomy DB, brand review, PII screening, OCR ground truth, teacher OCR comparison, YOLO section annotation, PaddleOCR training/promotion artifact를 15개 stage로 집계하는 redacted readiness report 구현, 신규 단위 테스트 6개 통과 내역
+  - 31차 실제 `/private/tmp` artifact 적용 중 확인된 pretty JSON/다중 row JSONL parser 문제 보정, 신규 pretty JSON regression test 추가, 실제 readiness report 생성 결과 3 verified / 2 operator pending / 10 blocked 확인 내역
+  - 32차 실제 review OCR 후보 215개에서 PII screening template 및 private hashed image fixture 215개 생성, readiness report 기준 `review_pii_screening`이 blocked에서 operator-review pending으로 이동한 내역
+  - 33차 PII screening template 215개를 운영자용 local review bundle로 변환, HTML index/decision template/README/summary 생성, readiness report가 `pii_screening_review_bundle` pending evidence를 인식하도록 확장한 내역
+  - 34차 detail-page YOLO 후보 205개 전체를 annotation template와 운영자용 local bbox review bundle로 변환, HTML index/editable JSONL/Label Studio task/README/summary 생성, readiness report가 `yolo_annotation_review_bundle` pending evidence를 인식하도록 확장한 내역
+  - 35차 brand/product 후보 388개 전체를 운영자용 local review bundle로 변환, HTML index/CSV/decision template/README/summary 생성, readiness report가 `brand_review_bundle` pending evidence를 인식하도록 확장한 내역
+  - 36차 PII-cleared review 이미지에서 생성될 manual OCR ground-truth template를 운영자용 local review bundle로 변환하는 스크립트 구현, readiness report가 `ocr_ground_truth_review_bundle` pending evidence를 인식하도록 확장한 내역
+  - 37차 운영자 PII screening decision 적용 전 preflight 구현, 실제 215개 decision stub이 모두 blank라 `pii_screening_apply`를 아직 실행하면 안 된다는 readiness evidence 생성 내역
+  - 38차 brand/product review decision 적용 전 preflight 구현, 실제 388개 brand decision stub이 모두 blank라 `approved_product_import` manifest를 아직 생성하면 안 된다는 readiness evidence 생성 내역
+  - 39차 YOLO section bbox annotation decision 적용 전 preflight 구현, 실제 205개 detail-page bbox row가 모두 pending/blank라 `yolo_template_promotion`을 아직 실행하면 안 된다는 readiness evidence 생성 내역
+  - 40차 brand/product, review PII, YOLO section bbox 수동 검수 preflight를 하나의 redacted operator review queue/runbook으로 집계, 실제 pending operator action 808건과 다음 큐 `brand_product_review` 확인 내역
+  - 41차 통합 operator review queue를 50개 row 단위 batch plan/checklist로 분할, 실제 18개 배치(brand 8, PII 5, YOLO 5) 생성 및 수동 검수 완료 규칙 명시 내역
+  - 42차 operator decision/annotation 파일을 batch plan 기준으로 다시 스캔하는 progress preflight 구현, 실제 18개 batch 모두 pending 및 808개 blank row 확인 내역
+  - 43차 batch plan을 operator-local editable JSONL 파일 18개로 분할 export, 실제 808개 row 복사 및 redacted summary/Markdown 생성 내역
+  - 44차 operator-local batch JSONL을 queue-level reconciled copy로 되돌리는 reconcile 도구 구현, 실제 현재 batch 기준 변경 0건 및 preflight blank 808건 재확인 내역
+  - 45차 batch별 operator workpack Markdown guide 18개와 index 생성, source bundle 파일명과 batch JSONL 작업 순서를 redacted 형태로 연결한 내역
+  - 46차 readiness report가 operator review workpack을 brand/PII/YOLO 수동 검수 stage의 shared pending evidence로 인식하도록 연결한 내역
+  - 47차 readiness report가 operator review batch progress를 shared pending evidence로 인식하고 실제 18개 pending batch, 808개 blank row, 다음 batch `brand_product_review:001`을 aggregate로 노출하도록 연결한 내역

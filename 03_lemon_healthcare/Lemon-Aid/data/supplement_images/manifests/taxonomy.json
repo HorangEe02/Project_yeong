@@ -1,0 +1,41 @@
+{
+  "version": "2026-05-15",
+  "domain": "supplement_images",
+  "class_name_rule": "{package_or_label_type}",
+  "levels": [
+    "supplement_status",
+    "package_or_label_type",
+    "text_detectability",
+    "language",
+    "structured_extraction"
+  ],
+  "supplement_statuses": [
+    "supplement",
+    "non_supplement",
+    "unknown"
+  ],
+  "package_or_label_types": [
+    "supplement_label",
+    "supplement_bottle",
+    "blister_pack",
+    "nutrition_facts_panel",
+    "non_supplement",
+    "unknown"
+  ],
+  "text_detectability": [
+    "detectable",
+    "not_detectable",
+    "unknown"
+  ],
+  "languages": [
+    "ko",
+    "en",
+    "mixed",
+    "unknown"
+  ],
+  "structured_extraction_fields": [
+    "ingredient_name",
+    "ingredient_amount",
+    "serving_instruction"
+  ]
+}

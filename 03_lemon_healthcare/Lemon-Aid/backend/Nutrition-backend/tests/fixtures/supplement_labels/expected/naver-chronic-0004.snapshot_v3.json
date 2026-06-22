@@ -1,0 +1,51 @@
+{
+  "schema_version": "supplement-parsed-snapshot-v3",
+  "requires_user_confirmation": true,
+  "source": {
+    "analysis_id": "f9928b81-0d1d-5286-bf1f-57e90ef2ba15",
+    "ocr_provider": "manual",
+    "ocr_confidence": null,
+    "layout_available": false,
+    "raw_image_stored": false,
+    "raw_ocr_text_stored": false,
+    "raw_provider_payload_stored": false,
+    "raw_model_response_stored": false,
+    "parser_schema_version": "supplement-parser-output-v2"
+  },
+  "product": {
+    "product_name": "Brewer's Yeast & Black Maca 맥주효모 & 블랙마카",
+    "manufacturer": null,
+    "barcode_candidates": [],
+    "evidence_refs": []
+  },
+  "serving": {
+    "serving_size_text": "TBD",
+    "serving_amount": null,
+    "serving_unit": null,
+    "daily_servings": null,
+    "evidence_refs": []
+  },
+  "ingredients": [],
+  "label_sections": [],
+  "intake_method": {
+    "text": null,
+    "structured": {
+      "frequency": "unknown",
+      "time_of_day": [],
+      "with_food": "unknown"
+    },
+    "evidence_refs": []
+  },
+  "precautions": [],
+  "functional_claims": [],
+  "evidence_spans": [],
+  "domain_correction_audit": [],
+  "low_confidence_fields": [],
+  "warnings": [
+    "ground_truth_pending_human_review",
+    "category:스트레스_아쉬와간다",
+    "labels:live_naver,detail_page",
+    "vision_seeded_by_gemma4"
+  ],
+  "chronic_disease_indications": []
+}

@@ -1,0 +1,27 @@
+# Ultralytics YOLO detect dataset for supplement section ROI detection.
+#
+# Purpose:
+#   Train a custom YOLO26 detector that separates OCR regions for supplement labels.
+#   This is not a food detector and must not be replaced by COCO or meal YOLO weights.
+#
+# Required OCR section classes:
+#   0 supplement_facts  - Supplement/Nutrition facts table
+#   1 precautions       - Warnings, allergy/allergen, cautions
+#   2 intake_method     - Suggested use, directions, dosage
+#   3 ingredients       - Other ingredients / ingredient declaration
+#
+# Reference:
+#   https://docs.ultralytics.com/datasets/detect/
+#   https://docs.ultralytics.com/models/yolo26/
+
+path: ../processed/section_yolo
+train: images/train
+val: images/val
+test: images/test
+
+nc: 4
+names:
+  0: supplement_facts
+  1: precautions
+  2: intake_method
+  3: ingredients

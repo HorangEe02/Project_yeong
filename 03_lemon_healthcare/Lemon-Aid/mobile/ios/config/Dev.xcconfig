@@ -1,0 +1,8 @@
+#include "AppEnvironment.xcconfig"
+
+// Local development environment — mirrors Android product flavor `dev`.
+// Wired into ios/Flutter/Debug.xcconfig and Profile.xcconfig as the default
+// environment for simulator runs. The backend URL is injected at build time
+// through --dart-define=LEMON_API_BASE_URL (compile-time Dart value).
+LEMON_APP_ENV = dev
+LEMON_BUNDLE_ID_SUFFIX = .dev

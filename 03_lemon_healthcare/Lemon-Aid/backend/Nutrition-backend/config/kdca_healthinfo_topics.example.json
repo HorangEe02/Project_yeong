@@ -1,0 +1,222 @@
+{
+  "_comment": "Copy this file to kdca_healthinfo_topics.local.json and fill each topic_id with the KDCA 4-digit XML identifier. Do not commit the local file.",
+  "url_template": "PASTE_COMMON_KDCA_XML_URL_WITH_{topic_id}",
+  "topics": {
+    "hypertension": {
+      "title": "고혈압",
+      "topic_id": ""
+    },
+    "elderly_hypertension": {
+      "title": "노인 고혈압",
+      "topic_id": ""
+    },
+    "hypertension_exercise": {
+      "title": "고혈압 환자의 운동요법",
+      "topic_id": ""
+    },
+    "hypertension_diet": {
+      "title": "고혈압 환자의 식이요법",
+      "topic_id": ""
+    },
+    "hypertensive_retinopathy": {
+      "title": "고혈압과 눈(고혈압망막병증)",
+      "topic_id": ""
+    },
+    "hypertensive_kidney_disease": {
+      "title": "고혈압성 콩팥병",
+      "topic_id": ""
+    },
+    "gestational_hypertension_preeclampsia": {
+      "title": "임신고혈압과 전자간증(임신중독증)",
+      "topic_id": ""
+    },
+    "pediatric_adolescent_hypertension": {
+      "title": "소아청소년기고혈압",
+      "topic_id": ""
+    },
+    "hypertensive_heart_disease": {
+      "title": "고혈압심장질환",
+      "topic_id": ""
+    },
+    "elderly_diabetes": {
+      "title": "노인 당뇨병",
+      "topic_id": ""
+    },
+    "diabetic_retinopathy": {
+      "title": "당뇨망막병증",
+      "topic_id": ""
+    },
+    "diabetes_diet": {
+      "title": "당뇨환자의 식이요법",
+      "topic_id": ""
+    },
+    "chronic_diabetes_complications": {
+      "title": "당뇨병 합병증(만성 합병증)",
+      "topic_id": ""
+    },
+    "acute_diabetes_complications_dka_hhs": {
+      "title": "당뇨병 합병증(급성 합병증_당뇨병케토산증, 고혈당고삼투질상태)",
+      "topic_id": ""
+    },
+    "diabetes_medication": {
+      "title": "당뇨환자의 약물요법",
+      "topic_id": ""
+    },
+    "diabetes_exercise": {
+      "title": "당뇨환자의 운동요법",
+      "topic_id": ""
+    },
+    "diabetic_foot": {
+      "title": "당뇨병성 족부병증",
+      "topic_id": ""
+    },
+    "abnormal_urine_diabetes": {
+      "title": "소변이상(당뇨)",
+      "topic_id": ""
+    },
+    "diabetes": {
+      "title": "당뇨병",
+      "topic_id": ""
+    },
+    "gestational_diabetes": {
+      "title": "임신당뇨병",
+      "topic_id": ""
+    },
+    "acute_diabetes_complications_hypoglycemia": {
+      "title": "당뇨병 합병증(급성 합병증_저혈당)",
+      "topic_id": ""
+    },
+    "acute_diabetes_complications": {
+      "title": "당뇨병 합병증(급성 합병증)",
+      "topic_id": ""
+    },
+    "valvular_heart_disease": {
+      "title": "심장 판막 질환",
+      "topic_id": ""
+    },
+    "pericarditis_cardiac_tamponade": {
+      "title": "심낭염(심장눌림증)",
+      "topic_id": ""
+    },
+    "pacemaker": {
+      "title": "심장박동조율기",
+      "topic_id": ""
+    },
+    "stroke_rehabilitation": {
+      "title": "뇌졸중 환자의 재활",
+      "topic_id": ""
+    },
+    "stroke": {
+      "title": "뇌졸중",
+      "topic_id": ""
+    },
+    "osteoporosis": {
+      "title": "골다공증",
+      "topic_id": ""
+    },
+    "anemia": {
+      "title": "빈혈",
+      "topic_id": ""
+    },
+    "metabolic_dysfunction_associated_steatotic_liver_disease": {
+      "title": "대사이상지방간질환",
+      "topic_id": ""
+    },
+    "dyslipidemia_diet": {
+      "title": "이상지질혈증 식사요법",
+      "topic_id": ""
+    },
+    "dyslipidemia": {
+      "title": "이상지질혈증",
+      "topic_id": ""
+    },
+    "chronic_rhinitis": {
+      "title": "만성비염",
+      "topic_id": ""
+    },
+    "drinking": {
+      "title": "음주",
+      "topic_id": ""
+    },
+    "risky_drinking": {
+      "title": "위험음주! 알려드리겠습니다!",
+      "topic_id": ""
+    },
+    "functional_food": {
+      "title": "건강기능식품",
+      "topic_id": ""
+    },
+    "healthy_carbohydrate_intake": {
+      "title": "건강하게 탄수화물 먹는 방법! 알려드리겠습니다!",
+      "topic_id": ""
+    },
+    "healthy_salt_intake": {
+      "title": "건강하게 염분 섭취하는 방법! 알려드리겠습니다!",
+      "topic_id": ""
+    },
+    "national_health_screening": {
+      "title": "건강검진(국가건강검진)",
+      "topic_id": ""
+    },
+    "cancer_screening": {
+      "title": "건강검진(암 검진)",
+      "topic_id": ""
+    },
+    "healthy_weight_control_diet": {
+      "title": "건강한 체중조절을 위한 식사",
+      "topic_id": ""
+    },
+    "heavy_snow_health_rules": {
+      "title": "겨울철 대설대비 건강수칙",
+      "topic_id": ""
+    },
+    "cold_wave_health_rules": {
+      "title": "겨울철 한파대비 건강수칙",
+      "topic_id": ""
+    },
+    "healthy_aging": {
+      "title": "건강노화",
+      "topic_id": ""
+    },
+    "secondhand_smoke": {
+      "title": "간접흡연",
+      "topic_id": ""
+    },
+    "smoking": {
+      "title": "흡연",
+      "topic_id": ""
+    },
+    "elderly_exercise": {
+      "title": "노인 운동",
+      "topic_id": ""
+    },
+    "knee_osteoarthritis": {
+      "title": "무릎관절염",
+      "topic_id": ""
+    },
+    "exercise": {
+      "title": "운동",
+      "topic_id": ""
+    },
+    "weight_loss": {
+      "title": "체중 감소",
+      "topic_id": ""
+    },
+    "reading_prescription_and_medication_leaflet": {
+      "title": "처방전과 약설명서 읽는 방법! 알려드리겠습니다!",
+      "topic_id": ""
+    },
+    "supplements": {
+      "title": "영양제",
+      "topic_id": ""
+    },
+    "obesity": {
+      "title": "비만",
+      "topic_id": ""
+    },
+    "pediatric_obesity": {
+      "title": "소아 비만",
+      "topic_id": ""
+    }
+  }
+}

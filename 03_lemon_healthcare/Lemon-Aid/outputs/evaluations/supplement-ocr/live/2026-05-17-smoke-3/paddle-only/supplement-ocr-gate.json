@@ -1,0 +1,129 @@
+{
+  "schema_version": "supplement-ocr-gate-report-v1",
+  "generated_at": "2026-05-17T11:29:28.574886+00:00",
+  "gate_mode": "report_only",
+  "gate_status": "warning",
+  "release_blocked": false,
+  "fixture_version": "supplement-ocr-live-manifest-v1",
+  "fixture_count": 3,
+  "missing_image_count": 0,
+  "expected_source_counts": {
+    "pending_google_vision_auto_seed": 3
+  },
+  "provisional_expected_count": 3,
+  "required_providers": [
+    "paddleocr_local"
+  ],
+  "provider_metrics": {
+    "paddleocr_local": {
+      "observations": 3,
+      "completed_calls": 3,
+      "not_run_count": 0,
+      "error_count": 0,
+      "text_non_empty_rate": 1.0,
+      "parser_success_rate": 1.0,
+      "ingredient_name_exact_rate": null,
+      "numeric_amount_exact_rate": null,
+      "unit_exact_rate": null,
+      "layout_available_rate": 1.0,
+      "evidence_grounded_rate": 1.0,
+      "self_seeded_expected_excluded_count": 0,
+      "average_latency_ms": 8103.0
+    }
+  },
+  "baseline_metrics": {
+    "text_non_empty_rate": 1.0,
+    "parser_success_rate": 1.0,
+    "ingredient_name_exact_rate": 0.0,
+    "numeric_amount_exact_rate": 0.0,
+    "unit_exact_rate": 0.0,
+    "layout_available_rate": 1.0,
+    "evidence_grounded_rate": 1.0
+  },
+  "candidate_metrics": {
+    "text_non_empty_rate": 1.0,
+    "parser_success_rate": 1.0,
+    "ingredient_name_exact_rate": 0.0,
+    "numeric_amount_exact_rate": 0.0,
+    "unit_exact_rate": 0.0,
+    "layout_available_rate": 1.0,
+    "evidence_grounded_rate": 1.0
+  },
+  "safety_metrics": {
+    "provider_not_run_count": 0.0,
+    "provider_error_count": 0.0,
+    "raw_text_leak_count": 0.0,
+    "raw_data_leak_count": 0.0,
+    "evidence_grounding_regression_count": 0.0
+  },
+  "reasons": [
+    "baseline_fixture_count_below_minimum"
+  ],
+  "source_doc_urls": [
+    "https://cloud.google.com/vision/docs/ocr",
+    "https://cloud.google.com/vision/docs/reference/rest/v1/Feature",
+    "https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/OCR.html",
+    "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr"
+  ],
+  "interpretation": "Metrics are redacted fixture observations. Provisional Google Vision auto-seeded expected snapshots are agreement baselines, not official OCR accuracy claims; the seed provider is excluded from self-exact field metrics.",
+  "governance_report": {
+    "schema_version": "redacted-evaluation-report-v1",
+    "report_id": "supplement-ocr-gate-2026-05-17",
+    "pipeline": "supplement_ocr_gate",
+    "frozen_fixture_version": "supplement-ocr-live-manifest-v1",
+    "split_version": "supplement-ocr-gate-fixtures",
+    "aggregate_case_count": 3,
+    "primary_metric_names": [
+      "text_non_empty_rate",
+      "parser_success_rate",
+      "ingredient_name_exact_rate",
+      "numeric_amount_exact_rate",
+      "unit_exact_rate",
+      "layout_available_rate",
+      "evidence_grounded_rate"
+    ],
+    "required_safety_metric_names": [
+      "provider_not_run_count",
+      "provider_error_count",
+      "raw_text_leak_count",
+      "raw_data_leak_count",
+      "evidence_grounding_regression_count"
+    ],
+    "baseline_metrics": {
+      "text_non_empty_rate": 1.0,
+      "parser_success_rate": 1.0,
+      "ingredient_name_exact_rate": 0.0,
+      "numeric_amount_exact_rate": 0.0,
+      "unit_exact_rate": 0.0,
+      "layout_available_rate": 1.0,
+      "evidence_grounded_rate": 1.0
+    },
+    "candidate_metrics": {
+      "text_non_empty_rate": 1.0,
+      "parser_success_rate": 1.0,
+      "ingredient_name_exact_rate": 0.0,
+      "numeric_amount_exact_rate": 0.0,
+      "unit_exact_rate": 0.0,
+      "layout_available_rate": 1.0,
+      "evidence_grounded_rate": 1.0
+    },
+    "safety_metrics": {
+      "provider_not_run_count": 0.0,
+      "provider_error_count": 0.0,
+      "raw_text_leak_count": 0.0,
+      "raw_data_leak_count": 0.0,
+      "evidence_grounding_regression_count": 0.0
+    },
+    "artifact_provenance": [],
+    "source_doc_urls": [
+      "https://cloud.google.com/vision/docs/ocr",
+      "https://cloud.google.com/vision/docs/reference/rest/v1/Feature",
+      "https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/OCR.html",
+      "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr"
+    ],
+    "generated_at": "2026-05-17T11:29:28.574877Z",
+    "notes": [
+      "No official supplement-label OCR acceptance threshold is claimed."
+    ]
+  }
+}

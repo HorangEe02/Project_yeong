@@ -1,0 +1,21 @@
+{
+  "generated_at": "2026-05-16T07:09:47.387634+00:00",
+  "manifest": "../data/nutrition_reference/barcode/fixtures/barcode_identity_cases.foodqr-public.2026-05-16.jsonl",
+  "fixture_count": 10,
+  "observation_count": 10,
+  "providers": {
+    "foodqr": {
+      "calls": 10,
+      "matched_rate": 1.0,
+      "not_found_rate": 0.0,
+      "provider_error_rate": 0.0,
+      "single_item_observation_count": 3,
+      "multi_item_observation_count": 7,
+      "max_item_count": 6,
+      "expected_status_match_rate": null
+    }
+  },
+  "raw_provider_payload_stored": false,
+  "credentials_stored": false,
+  "interpretation": "Provider status rates are fixture observations, not barcode accuracy, MFDS coverage, or OCR improvement metrics."
+}

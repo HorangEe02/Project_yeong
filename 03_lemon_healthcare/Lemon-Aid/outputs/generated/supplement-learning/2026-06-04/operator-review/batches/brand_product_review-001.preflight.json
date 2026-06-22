@@ -1,0 +1,64 @@
+{
+  "absolute_paths_stored": false,
+  "actual_row_count": 50,
+  "batch_file_name": "brand_product_review-001.jsonl",
+  "batch_key": "brand_product_review:001",
+  "batch_review_csv_matches_batch": true,
+  "batch_review_csv_name": "brand_product_review-001.review.csv",
+  "batch_review_csv_required": true,
+  "batch_review_csv_row_count": 50,
+  "batch_review_csv_status": "matched",
+  "batch_status": "pending",
+  "blank_row_count": 50,
+  "db_write_performed": false,
+  "expected_row_count": 50,
+  "external_provider_call_performed": false,
+  "extra_row_count": 0,
+  "generated_at": "2026-06-04T16:12:28.911811+00:00",
+  "input_names": {
+    "batch_file": "brand_product_review-001.jsonl",
+    "batch_plan": "operator-review-batch-plan.json",
+    "batch_review_csv": "brand_product_review-001.review.csv"
+  },
+  "input_path_hashes": {
+    "batch_file": "5452056069a7d705bc771c559acf855910ca3864662e27ebfd1b5b2bd25a5155",
+    "batch_plan": "927ae8ddfd857c7a3a3fb2b5298236087041f715a0808eb1e807ffd4a4c932d3",
+    "batch_review_csv": "98a42b085f3ebf04e86f2c04d6d885e9675e02b9ec654d5e9cd7d28e91ad20cd"
+  },
+  "invalid_row_count": 0,
+  "llm_call_performed": false,
+  "local_path_literals_stored": false,
+  "missing_row_count": 0,
+  "next_steps": [
+    "finish_current_batch_edits",
+    "keep_row_count_equal_to_batch_plan",
+    "rerun_batch_file_preflight"
+  ],
+  "pending_row_count": 0,
+  "product_dir_literals_stored": false,
+  "queue_key": "brand_product_review",
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "ready_for_reconcile": false,
+  "reason_counts": {
+    "blank_decision": 50
+  },
+  "row_index_end": 50,
+  "row_index_start": 1,
+  "schema_version": "supplement-operator-review-batch-file-preflight-v1",
+  "source_doc_urls": [
+    "https://docs.python.org/3/library/csv.html",
+    "https://docs.ultralytics.com/datasets/detect/",
+    "https://docs.ultralytics.com/tasks/detect/",
+    "https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/OCR.html",
+    "https://cloud.google.com/vision/docs/ocr",
+    "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr",
+    "https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html",
+    "https://www.postgresql.org/docs/current/ddl-constraints.html",
+    "https://supabase.com/docs/guides/database/postgres/row-level-security"
+  ],
+  "source_editable_file_name": "decisions.todo.jsonl",
+  "source_image_read_performed": false,
+  "training_execution_performed_by_script": false,
+  "valid_row_count": 0
+}

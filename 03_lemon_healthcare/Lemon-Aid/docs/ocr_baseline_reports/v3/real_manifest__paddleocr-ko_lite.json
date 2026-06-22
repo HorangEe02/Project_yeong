@@ -1,0 +1,127 @@
+{
+  "adapter": "paddleocr_v3_korean_lite",
+  "manifest_path": "../data/ocr_eval/real_manifest.json",
+  "total": 86,
+  "skipped": 79,
+  "avg_cer": 0.3827004178654479,
+  "avg_wer": 0.6568097101860756,
+  "exact_match_ratio": 0.0,
+  "field_match_ratio": 0.09523809523809523,
+  "field_match_breakdown": {
+    "product_name": 0.0,
+    "ingredients": 0.0,
+    "dosage": 0.2857142857142857
+  },
+  "by_language": {
+    "mixed": {
+      "count": 6.0,
+      "avg_cer": 0.40508948533103994,
+      "exact_match_ratio": 0.0
+    },
+    "en": {
+      "count": 1.0,
+      "avg_cer": 0.24836601307189543,
+      "exact_match_ratio": 0.0
+    }
+  },
+  "items": [
+    {
+      "id": "real_글루코사민_001",
+      "language": "mixed",
+      "cer": 0.26053639846743293,
+      "wer": 0.6226415094339622,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_lite",
+      "elapsed_ms": 8976.117042009719
+    },
+    {
+      "id": "real_뇌_은행잎_002",
+      "language": "mixed",
+      "cer": 0.0847457627118644,
+      "wer": 0.5185185185185185,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_lite",
+      "elapsed_ms": 67618.23670798913
+    },
+    {
+      "id": "real_비타민C_002",
+      "language": "mixed",
+      "cer": 0.4766355140186916,
+      "wer": 0.6296296296296297,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_lite",
+      "elapsed_ms": 65499.572166008875
+    },
+    {
+      "id": "real_비타민K_002",
+      "language": "en",
+      "cer": 0.24836601307189543,
+      "wer": 0.45454545454545453,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_lite",
+      "elapsed_ms": 5078.617415972985
+    },
+    {
+      "id": "real_식이섬유_001",
+      "language": "mixed",
+      "cer": 0.9436619718309859,
+      "wer": 0.9736842105263158,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_lite",
+      "elapsed_ms": 12276.73191705253
+    },
+    {
+      "id": "real_콜라겐_001",
+      "language": "mixed",
+      "cer": 0.37777777777777777,
+      "wer": 0.75,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_lite",
+      "elapsed_ms": 9793.056708062068
+    },
+    {
+      "id": "real_효소_소화_001",
+      "language": "mixed",
+      "cer": 0.28717948717948716,
+      "wer": 0.6486486486486487,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_lite",
+      "elapsed_ms": 73989.24233298749
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "schema_version": "supplement-parsed-snapshot-v3",
+  "requires_user_confirmation": true,
+  "source": {
+    "analysis_id": "c8cfdae2-5da8-5aa0-a3d0-18a8ddba77ed",
+    "ocr_provider": "manual",
+    "ocr_confidence": null,
+    "layout_available": false,
+    "raw_image_stored": false,
+    "raw_ocr_text_stored": false,
+    "raw_provider_payload_stored": false,
+    "raw_model_response_stored": false,
+    "parser_schema_version": "supplement-parser-output-v2"
+  },
+  "product": {
+    "product_name": "Ubiquinol",
+    "manufacturer": "Doctor's Best, Inc.",
+    "barcode_candidates": [],
+    "evidence_refs": []
+  },
+  "serving": {
+    "serving_size_text": "1 Softgel",
+    "serving_amount": null,
+    "serving_unit": null,
+    "daily_servings": 1,
+    "evidence_refs": []
+  },
+  "ingredients": [
+    {
+      "display_name": "Ubiquinol",
+      "normalized_name": "ubiquinol",
+      "nutrient_code_candidates": [],
+      "amount": 200.0,
+      "unit": "mg",
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.95,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Extra virgin olive oil",
+      "normalized_name": "extra virgin olive oil",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.85,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    },
+    {
+      "display_name": "Other ingredients",
+      "normalized_name": "other ingredients",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.9,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    }
+  ],
+  "label_sections": [],
+  "intake_method": {
+    "text": null,
+    "structured": {
+      "frequency": "unknown",
+      "time_of_day": [],
+      "with_food": "unknown"
+    },
+    "evidence_refs": []
+  },
+  "precautions": [],
+  "functional_claims": [],
+  "evidence_spans": [],
+  "domain_correction_audit": [],
+  "low_confidence_fields": [],
+  "warnings": [
+    "ground_truth_pending_human_review",
+    "category:코엔자임Q10",
+    "labels:live_naver,detail_page",
+    "auto_seeded_by_qwen3_5_9b",
+    "vision_seeded_by_gemma4"
+  ],
+  "chronic_disease_indications": [
+    "cardiovascular",
+    "diabetes",
+    "hypertension"
+  ]
+}

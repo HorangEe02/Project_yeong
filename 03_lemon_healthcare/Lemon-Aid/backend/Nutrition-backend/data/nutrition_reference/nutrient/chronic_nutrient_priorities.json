@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0",
+  "review_status": "source_backed_non_clinical_priority",
+  "message_templates": {
+    "priority_review": "현재 입력과 만성질환 정보를 함께 볼 때 우선 확인 대상입니다."
+  },
+  "conditions": {
+    "hypertension": {
+      "aliases": ["htn", "high_blood_pressure"],
+      "priority_nutrients": [
+        {
+          "nutrient_code": "potassium_mg",
+          "boost": 30,
+          "message_key": "priority_review",
+          "source_ids": ["nhlbi_dash"]
+        },
+        {
+          "nutrient_code": "calcium_mg",
+          "boost": 20,
+          "message_key": "priority_review",
+          "source_ids": ["nhlbi_dash"]
+        },
+        {
+          "nutrient_code": "magnesium_mg",
+          "boost": 20,
+          "message_key": "priority_review",
+          "source_ids": ["nhlbi_dash"]
+        },
+        {
+          "nutrient_code": "fiber_g",
+          "boost": 10,
+          "message_key": "priority_review",
+          "source_ids": ["nhlbi_dash"]
+        }
+      ],
+      "caution_nutrients": []
+    },
+    "cardiovascular": {
+      "aliases": ["heart_disease", "cvd"],
+      "priority_nutrients": [
+        {
+          "nutrient_code": "fiber_g",
+          "boost": 20,
+          "message_key": "priority_review",
+          "source_ids": ["cdc_heart_prevention"]
+        }
+      ],
+      "caution_nutrients": []
+    },
+    "diabetes": {
+      "aliases": ["type2_diabetes", "type_2_diabetes", "prediabetes"],
+      "priority_nutrients": [
+        {
+          "nutrient_code": "fiber_g",
+          "boost": 25,
+          "message_key": "priority_review",
+          "source_ids": ["cdc_diabetes_fiber", "niddk_diabetes_plate_method"]
+        }
+      ],
+      "caution_nutrients": []
+    },
+    "chronic_kidney_disease": {
+      "aliases": ["ckd", "renal_failure", "kidney_disease"],
+      "priority_nutrients": [],
+      "caution_nutrients": [
+        {
+          "nutrient_code": "potassium_mg",
+          "source_ids": ["niddk_ckd_nutrition"],
+          "note": "CKD potassium needs vary by labs and care plan; do not auto-boost."
+        },
+        {
+          "nutrient_code": "phosphorus_mg",
+          "source_ids": ["niddk_ckd_nutrition"],
+          "note": "CKD phosphorus needs vary by labs and care plan; do not auto-boost."
+        },
+        {
+          "nutrient_code": "sodium_mg",
+          "source_ids": ["niddk_ckd_nutrition"],
+          "note": "CKD sodium needs vary by labs and care plan; do not auto-boost."
+        }
+      ]
+    },
+    "joint": {
+      "aliases": ["arthritis"],
+      "priority_nutrients": [],
+      "caution_nutrients": []
+    },
+    "respiratory": {
+      "aliases": ["copd", "asthma"],
+      "priority_nutrients": [],
+      "caution_nutrients": []
+    }
+  },
+  "sources": {
+    "nhlbi_dash": {
+      "title": "NHLBI DASH Eating Plan",
+      "url": "https://www.nhlbi.nih.gov/health/dash-eating-plan"
+    },
+    "cdc_diabetes_fiber": {
+      "title": "CDC Fiber: The Carb That Helps You Manage Diabetes",
+      "url": "https://www.cdc.gov/diabetes/healthy-eating/fiber-helps-diabetes.html"
+    },
+    "niddk_diabetes_plate_method": {
+      "title": "NIDDK Healthy Living with Diabetes",
+      "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/healthy-living-with-diabetes"
+    },
+    "niddk_ckd_nutrition": {
+      "title": "NIDDK Healthy Eating for Adults with Chronic Kidney Disease",
+      "url": "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/healthy-eating-adults-chronic-kidney-disease"
+    },
+    "cdc_heart_prevention": {
+      "title": "CDC Preventing Heart Disease",
+      "url": "https://www.cdc.gov/heart-disease/prevention/index.html"
+    },
+    "nccih_diabetes_supplements": {
+      "title": "NCCIH Diabetes and Dietary Supplements",
+      "url": "https://www.nccih.nih.gov/health/diabetes-and-dietary-supplements-what-you-need-to-know"
+    }
+  }
+}

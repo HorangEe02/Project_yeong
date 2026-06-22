@@ -1,0 +1,36 @@
+{
+  "name": "lemon-aid-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:local": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start",
+    "smoke:local": "node scripts/smoke-web.mjs",
+    "smoke:remote": "LEMON_WEB_SMOKE_REQUIRE_REMOTE=1 LEMON_WEB_SMOKE_UPLOADS=0 node scripts/smoke-web.mjs",
+    "smoke:remote:uploads": "LEMON_WEB_SMOKE_REQUIRE_REMOTE=1 LEMON_WEB_SMOKE_UPLOADS=1 node scripts/smoke-web.mjs",
+    "vercel:ls-preview-env": "vercel env ls preview",
+    "vercel:readiness": "node scripts/check-vercel-preview-readiness.mjs",
+    "vercel:check-sync-source": "node scripts/check-vercel-sync-source.mjs",
+    "vercel:check-env": "node scripts/check-vercel-preview-env.mjs",
+    "vercel:build": "vercel build --yes",
+    "vercel:check-output": "node scripts/check-vercel-output-safety.mjs",
+    "vercel:preflight": "npm run typecheck && npm run vercel:check-env && npm run vercel:build && npm run vercel:check-output",
+    "goal:audit": "node scripts/check-goal-completion.mjs",
+    "audit:high": "npm audit --audit-level=high",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.106.2",
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "24.12.4",
+    "@types/react": "19.2.15",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}

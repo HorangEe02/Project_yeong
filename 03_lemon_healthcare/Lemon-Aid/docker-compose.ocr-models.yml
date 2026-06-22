@@ -1,0 +1,13 @@
+services:
+  backend:
+    # Optional PaddleOCR recognition model mounts.
+    #
+    # Keep these outside the default compose file because Docker Desktop can fail
+    # to create bind mounts under external volume paths with spaces. For local
+    # OCR experiments, copy/symlink the exported inference models into a stable
+    # host path such as /private/tmp/lemon-aid-docker-models and run:
+    #
+    #   docker compose -f docker-compose.yml -f docker-compose.ocr-models.yml up -d backend
+    volumes:
+      - ${LOCAL_OCR_TEXT_RECOGNITION_HOST_DIR:-/private/tmp/lemon-aid-docker-models/paddleocr-rec}:/app/models/paddleocr-rec:ro
+      - ${LOCAL_OCR_SECONDARY_TEXT_RECOGNITION_HOST_DIR:-/private/tmp/lemon-aid-docker-models/paddleocr-rec-secondary}:/app/models/paddleocr-rec-secondary:ro

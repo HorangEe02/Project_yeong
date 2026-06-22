@@ -1,0 +1,39 @@
+{
+  "absolute_paths_stored": false,
+  "approved_decision_count": 0,
+  "approved_for_db_write_rows": 0,
+  "blank_decision_count": 388,
+  "blocked_decision_count": 0,
+  "brand_candidate_count": 388,
+  "db_write_performed": false,
+  "decision_counts": {
+    "blank": 388
+  },
+  "decision_row_count": 388,
+  "decisions_name": "decisions.todo.jsonl",
+  "generated_at": "2026-06-04T06:35:14.221475+00:00",
+  "invalid_decision_count": 0,
+  "invalid_reason_counts": {},
+  "llm_call_performed": false,
+  "local_path_literals_stored": false,
+  "missing_decision_count": 0,
+  "next_operator_action": "complete_operator_brand_review",
+  "ocr_provider_call_performed": false,
+  "pending_operator_action_count": 388,
+  "product_dir_literals_stored": false,
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "ready_for_partial_apply": false,
+  "ready_for_requested_apply": false,
+  "ready_for_strict_apply": false,
+  "require_all_reviewed": true,
+  "schema_version": "supplement-brand-review-decision-preflight-v1",
+  "source_doc_urls": [
+    "https://www.postgresql.org/docs/current/ddl-constraints.html",
+    "https://supabase.com/docs/guides/database/postgres/row-level-security",
+    "https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html"
+  ],
+  "taxonomy_staging_name": "2026-06-04-supplement-taxonomy-db-staging.jsonl",
+  "unmatched_decision_count": 0,
+  "valid_decision_count": 0
+}

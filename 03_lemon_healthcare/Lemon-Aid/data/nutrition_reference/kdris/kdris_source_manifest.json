@@ -1,0 +1,133 @@
+{
+  "schema_version": "2.0",
+  "current_official_reference_year": 2025,
+  "local_dataset_year": 2025,
+  "local_dataset_status": "official_2025_approved",
+  "operational_dataset_version": "2025",
+  "candidate_dataset_version": "2025",
+  "candidate_dataset_status": "promoted_to_production",
+  "current_errata_version": "2026-03-16",
+  "retrieved_at": "2026-05-14",
+  "dataset_artifacts": [
+    {
+      "id": "kdris_2020_sample_fixture",
+      "version": "2020-sample",
+      "path": "data/nutrition_reference/kdris/kdris_2020.csv",
+      "reference_year": 2020,
+      "status": "implementation_sample_not_official_reference_table",
+      "checksum_sha256": "c2f9f18991f2e147222b9437b81fb206415518760964c881714279956d861399",
+      "review_status": "not_applicable_sample_fixture"
+    },
+    {
+      "id": "kdris_2025_candidate",
+      "version": "2025",
+      "path": "data/nutrition_reference/kdris/kdris_2025.csv",
+      "reference_year": 2025,
+      "status": "official_2025_approved",
+      "checksum_sha256": "132ea658b6c3a1c25c643d257a0af7c460eecce7e7eac984d19adab3c62a5091",
+      "review_status": "approved"
+    },
+    {
+      "id": "kdris_2025_target_nutrient_inventory",
+      "version": "2025",
+      "path": "data/nutrition_reference/kdris/review/2025/kdris_2025_target_nutrient_inventory.csv",
+      "reference_year": 2025,
+      "status": "review_artifact",
+      "checksum_sha256": "1dfbee2c388a62fd135a335029fd58f8ba0b240d3246acf859ff83fa0a27cf4f",
+      "review_status": "source_check_pending"
+    },
+    {
+      "id": "kdris_2025_candidate_review_rows",
+      "version": "2025",
+      "path": "data/nutrition_reference/kdris/review/2025/kdris_2025_candidate_rows.csv",
+      "reference_year": 2025,
+      "status": "review_artifact",
+      "checksum_sha256": "2af8071a26ff66febaca375bd45de43ed21d7867fffcb8086dd5ce75672551bd",
+      "review_status": "source_check_pending"
+    },
+    {
+      "id": "kdris_2025_candidate_schema_issues",
+      "version": "2025",
+      "path": "data/nutrition_reference/kdris/review/2025/kdris_2025_candidate_issues.csv",
+      "reference_year": 2025,
+      "status": "review_artifact",
+      "checksum_sha256": "ec970fd64bbcb452484e95dace96c6b34429efc62c24c24661988e46c019c433",
+      "review_status": "schema_decision_resolved"
+    },
+    {
+      "id": "kdris_2025_schema_decisions",
+      "version": "2025",
+      "path": "data/nutrition_reference/kdris/review/2025/kdris_2025_schema_decisions.md",
+      "reference_year": 2025,
+      "status": "review_artifact",
+      "checksum_sha256": "12dc020a0d843586c91a25010274315589927e73786c41a90c5c7a7f0cfae165",
+      "review_status": "schema_decision_resolved"
+    }
+  ],
+  "sources": [
+    {
+      "id": "mohw_2025_kdris_press_release",
+      "reference_year": 2025,
+      "publisher": "Ministry of Health and Welfare, Republic of Korea",
+      "title": "2025 한국인 영양소 섭취기준 보도자료",
+      "artifact_type": "official_press_release",
+      "source_url": "https://m.korea.kr/briefing/pressReleaseView.do?newsId=156737581",
+      "release_date": "2025-12-31",
+      "retrieved_at": "2026-05-14",
+      "license_note": "Policy briefing text is marked for attribution use; attachments and non-text media require attribution and separate reuse review before public redistribution.",
+      "errata_note": "Use Ministry of Health and Welfare and Korean Nutrition Society publication pages for detailed books and errata.",
+      "checksum_sha256": "7dba5811d43ab05ab4c3fda9fa90f7ab6b0e7192635a018a7c82ba7b93e27ef5",
+      "usage_status": "current_official_reference"
+    },
+    {
+      "id": "kns_2025_kdris_publication",
+      "reference_year": 2025,
+      "publisher": "The Korean Nutrition Society",
+      "title": "2025 KDRI 공개자료 및 정오표 안내",
+      "artifact_type": "official_publication_archive",
+      "source_url": "https://www.kns.or.kr/FileRoom/FileRoom_view.asp?BoardID=Kdr&idx=167",
+      "release_date": "2025-12-31",
+      "retrieved_at": "2026-05-14",
+      "license_note": "Raw official archive is committed for project traceability; confirm Korean Nutrition Society redistribution terms before public release or external redistribution.",
+      "errata_note": "Publication page notes typo updates dated 2026-02-02, 2026-02-27, and 2026-03-16. Use 2026-03-16 as the current tracked errata version.",
+      "checksum_sha256": "26966013355039668bfc9eae799e86bd7ca45c27942ae5d10fb41c637913a6cb",
+      "usage_status": "current_official_reference"
+    },
+    {
+      "id": "mohw_2020_kdris_publication",
+      "reference_year": 2020,
+      "publisher": "Ministry of Health and Welfare, Republic of Korea",
+      "title": "2020 한국인 영양소 섭취기준 배포",
+      "artifact_type": "official_publication_page",
+      "source_url": "https://www.mohw.go.kr/board.es?act=view&bid=0019&list_no=362385&mid=a10411010100",
+      "release_date": "2020-12-23",
+      "retrieved_at": "2026-05-11",
+      "license_note": "Public page marks the publication with public-use restrictions: attribution, non-commercial use, and no derivative works.",
+      "errata_note": "Errata updates are listed for 2021-01-08, 2021-01-15, 2021-01-29, and 2022-07-01.",
+      "checksum_sha256": null,
+      "usage_status": "legacy_reference"
+    },
+    {
+      "id": "local_kdris_2020_sample_fixture",
+      "reference_year": 2020,
+      "publisher": "Lemon Healthcare project",
+      "title": "Phase 1 KDRIs sample fixture",
+      "artifact_type": "local_csv_fixture",
+      "source_url": "data/nutrition_reference/kdris/kdris_2020.csv",
+      "release_date": "2026-05-11",
+      "retrieved_at": "2026-05-11",
+      "license_note": "Internal implementation fixture only; not an official KDRIs reference table.",
+      "errata_note": "Replace with reviewed official 2025 KDRIs-derived tables before production use.",
+      "checksum_sha256": "c2f9f18991f2e147222b9437b81fb206415518760964c881714279956d861399",
+      "usage_status": "sample_fixture"
+    }
+  ],
+  "production_quality_gates": [
+    "digitize official 2025 KDRIs tables from permitted source artifacts",
+    "record official source artifact name, page/table number, reviewer, and review date for every nutrient row",
+    "apply all official errata before enabling production use",
+    "replace sample_fixture source notes with official table identifiers",
+    "complete license and redistribution review before committing official derived datasets",
+    "run backend/scripts/validate_kdris_dataset.py --require-approved and store the passing checksum in dataset_artifacts"
+  ]
+}

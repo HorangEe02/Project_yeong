@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "authorization_hint": "reachable",
+      "check": "mfds_c003_sample_first_page",
+      "credentials_stored": false,
+      "item_count": 5,
+      "message_code": "INFO-000",
+      "provider": "mfds_openapi",
+      "raw_provider_payload_stored": false,
+      "service_id": "C003",
+      "status": "matched",
+      "total_count": 44647
+    },
+    {
+      "authorization_hint": "key_rejected_or_wrong_key_type",
+      "check": "mfds_c003_first_page",
+      "credentials_stored": false,
+      "item_count": 0,
+      "message_code": "INFO-100",
+      "provider": "mfds_openapi",
+      "raw_provider_payload_stored": false,
+      "service_id": "C003",
+      "status": "provider_error",
+      "total_count": null
+    },
+    {
+      "authorization_hint": "key_rejected_or_wrong_key_type",
+      "check": "mfds_c003_report_no",
+      "credentials_stored": false,
+      "item_count": 0,
+      "message_code": "INFO-100",
+      "provider": "mfds_openapi",
+      "raw_provider_payload_stored": false,
+      "service_id": "C003",
+      "status": "provider_error",
+      "total_count": null
+    },
+    {
+      "authorization_hint": "reachable",
+      "check": "mfds_i0760_first_page",
+      "credentials_stored": false,
+      "item_count": 100,
+      "message_code": "INFO-000",
+      "provider": "mfds_openapi",
+      "raw_provider_payload_stored": false,
+      "service_id": "I0760",
+      "status": "matched",
+      "total_count": 585
+    }
+  ],
+  "credentials_stored": false,
+  "generated_at": "2026-05-16T11:47:57.831109+00:00",
+  "interpretation": "This is an access diagnosis only. It is not barcode matching accuracy, MFDS coverage, or OCR improvement evidence.",
+  "raw_provider_payload_stored": false
+}

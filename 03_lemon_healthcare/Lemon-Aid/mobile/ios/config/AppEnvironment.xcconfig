@@ -1,0 +1,14 @@
+// Shared iOS app identity for the Flutter Runner target.
+//
+// Single source of truth for the reviewed reverse-domain bundle id. The
+// environment xcconfig files (Dev/Staging/Prod) include this file and append
+// LEMON_BUNDLE_ID_SUFFIX so the iOS bundle id mirrors the Android product
+// flavor application ids:
+//
+//   dev      -> kr.ai.lemonade.mobile.dev
+//   staging  -> kr.ai.lemonade.mobile.staging
+//   prod     -> kr.ai.lemonade.mobile
+//
+// project.pbxproj resolves PRODUCT_BUNDLE_IDENTIFIER from
+// $(LEMON_BUNDLE_ID)$(LEMON_BUNDLE_ID_SUFFIX).
+LEMON_BUNDLE_ID = kr.ai.lemonade.mobile

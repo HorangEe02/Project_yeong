@@ -1,0 +1,31 @@
+{
+  "absolute_paths_stored": false,
+  "db_write_performed": false,
+  "decision_template_name": "decisions.todo.jsonl",
+  "decision_template_row_count": 215,
+  "external_transfer_allowed_rows": 0,
+  "generated_at": "2026-06-04T06:32:33.122189+00:00",
+  "html_index_name": "review-index.html",
+  "image_copied_count": 215,
+  "image_path_style": "relative_private_hashed_fixture_copy",
+  "limit": null,
+  "ocr_provider_call_performed": false,
+  "operator_decision_required_count": 215,
+  "paddleocr_training_performed": false,
+  "product_dir_literals_stored": false,
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "readme_name": "README.md",
+  "reviewable_row_count": 215,
+  "schema_version": "supplement-review-pii-screening-review-bundle-v1",
+  "skip_reason_counts": {},
+  "source_doc_urls": [
+    "https://cloud.google.com/vision/docs/ocr",
+    "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr"
+  ],
+  "source_run_id": "2026-06-04-taxonomy-ocr-yolo-plan",
+  "teacher_ocr_allowed_rows": 0,
+  "template_hash": "5b8515df2c89787d1ab180bfefd4d964b027a6e541b958390cc07d52ecfa0f59",
+  "template_name": "review-pii-screening-template.jsonl",
+  "template_row_count": 215
+}

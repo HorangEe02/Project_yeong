@@ -1,0 +1,171 @@
+{
+  "absolute_paths_stored": false,
+  "batch_key": "brand_product_review:001",
+  "batch_status": "pending",
+  "blocked_reason_codes": [
+    "batch_not_complete",
+    "blank_rows_remaining"
+  ],
+  "common_safety_rules": [
+    "run_local_batch_preflight_first",
+    "run_reconcile_before_queue_preflight",
+    "never_apply_or_promote_until_strict_gate_passes",
+    "keep_raw_ocr_provider_payload_and_local_paths_out_of_outputs"
+  ],
+  "db_write_performed": false,
+  "external_provider_call_performed": false,
+  "generated_at": "2026-06-04T07:15:57.424264+00:00",
+  "input_name": "operator-next-batch-work-order.json",
+  "input_path_hash": "e4297aa545c66e9d90a1ea1e936fd47e208efdebe5fdbe19609c6d273b0a4169",
+  "llm_call_performed": false,
+  "local_path_literals_stored": false,
+  "operator_required_before_execution": true,
+  "post_completion_execution_allowed": false,
+  "product_dir_literals_stored": false,
+  "queue_key": "brand_product_review",
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "row_counts": {
+    "blank_row_count": 50,
+    "invalid_row_count": 0,
+    "missing_row_count": 0,
+    "pending_row_count": 0
+  },
+  "schema_version": "supplement-operator-post-completion-command-plan-v1",
+  "source_image_read_performed": false,
+  "source_rows_read": false,
+  "step_count": 10,
+  "steps": [
+    {
+      "gate_policy": "must_pass_before_reconcile",
+      "input_roles": [
+        "batch_plan",
+        "operator_batch_file"
+      ],
+      "order": 1,
+      "output_roles": [
+        "batch_file_preflight_summary"
+      ],
+      "purpose": "confirm operator local batch is complete",
+      "script_key": "preflight_supplement_operator_review_batch_file"
+    },
+    {
+      "gate_policy": "no_source_overwrite",
+      "input_roles": [
+        "batch_plan",
+        "source_editable_queue_files",
+        "operator_batch_dir"
+      ],
+      "order": 2,
+      "output_roles": [
+        "reconciled_queue_files",
+        "reconcile_summary"
+      ],
+      "purpose": "merge completed batch into reconciled queue copies",
+      "script_key": "reconcile_supplement_operator_review_batch_files"
+    },
+    {
+      "gate_policy": "must_pass_before_queue_preflight",
+      "input_roles": [
+        "batch_plan",
+        "reconciled_queue_files"
+      ],
+      "order": 3,
+      "output_roles": [
+        "batch_progress_summary"
+      ],
+      "purpose": "confirm queue level batch progress after reconcile",
+      "script_key": "preflight_supplement_operator_review_batch_progress"
+    },
+    {
+      "gate_policy": "partial_preview_only",
+      "input_roles": [
+        "reconciled_brand_decisions"
+      ],
+      "order": 4,
+      "output_roles": [
+        "reviewed_brand_decisions",
+        "reviewed_brand_extract_summary"
+      ],
+      "purpose": "separate reviewed brand decisions from blank queue stubs",
+      "script_key": "extract_supplement_brand_reviewed_decisions"
+    },
+    {
+      "gate_policy": "strict_zero_blank_pending_invalid_required",
+      "input_roles": [
+        "reconciled_brand_decisions"
+      ],
+      "order": 5,
+      "output_roles": [
+        "brand_decision_preflight_summary"
+      ],
+      "purpose": "check strict brand decision readiness",
+      "script_key": "preflight_supplement_brand_review_decisions"
+    },
+    {
+      "gate_policy": "must_pass_before_product_manifest",
+      "input_roles": [
+        "brand_decision_preflight_summary"
+      ],
+      "order": 6,
+      "output_roles": [
+        "brand_db_import_gate_summary"
+      ],
+      "purpose": "gate product import manifest preparation",
+      "script_key": "gate_supplement_brand_db_import"
+    },
+    {
+      "gate_policy": "dry_run_or_manifest_only_before_db_gate",
+      "input_roles": [
+        "reviewed_brand_decisions"
+      ],
+      "order": 7,
+      "output_roles": [
+        "approved_product_import_manifest",
+        "brand_apply_summary"
+      ],
+      "purpose": "create approved product import manifest",
+      "script_key": "apply_supplement_brand_review_decisions"
+    },
+    {
+      "gate_policy": "dry_run_before_product_db_apply",
+      "input_roles": [
+        "taxonomy_staging",
+        "approved_product_import_manifest"
+      ],
+      "order": 8,
+      "output_roles": [
+        "taxonomy_import_dry_run_summary"
+      ],
+      "purpose": "dry run category product and mapping import",
+      "script_key": "import_supplement_taxonomy_approved_manifest"
+    },
+    {
+      "gate_policy": "must_pass_before_db_apply",
+      "input_roles": [
+        "brand_db_import_gate_summary",
+        "taxonomy_import_dry_run_summary"
+      ],
+      "order": 9,
+      "output_roles": [
+        "product_db_apply_gate_summary"
+      ],
+      "purpose": "gate reviewed product db apply",
+      "script_key": "gate_supplement_product_db_apply"
+    },
+    {
+      "gate_policy": "read_only_after_apply",
+      "input_roles": [
+        "taxonomy_staging",
+        "approved_product_import_manifest"
+      ],
+      "order": 10,
+      "output_roles": [
+        "taxonomy_db_import_verification_summary"
+      ],
+      "purpose": "verify imported categories products and mappings",
+      "script_key": "verify_supplement_taxonomy_db_import"
+    }
+  ],
+  "training_execution_performed_by_script": false
+}

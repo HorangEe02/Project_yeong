@@ -1,0 +1,38 @@
+{
+  "absolute_paths_stored": false,
+  "blank_decision_count": 215,
+  "blocked_decision_count": 0,
+  "candidate_manifest_name": "ocr-ground-truth-candidates.jsonl",
+  "candidate_row_count": 215,
+  "cleared_no_personal_data_count": 0,
+  "db_write_performed": false,
+  "decision_counts": {
+    "blank": 215
+  },
+  "decision_row_count": 215,
+  "decisions_name": "decisions.todo.jsonl",
+  "generated_at": "2026-06-04T06:35:17.447405+00:00",
+  "invalid_decision_count": 0,
+  "invalid_reason_counts": {},
+  "local_path_literals_stored": false,
+  "missing_decision_count": 0,
+  "next_operator_action": "complete_operator_pii_review",
+  "ocr_provider_call_performed": false,
+  "paddleocr_training_performed": false,
+  "pending_operator_action_count": 215,
+  "product_dir_literals_stored": false,
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "ready_for_partial_apply": false,
+  "ready_for_requested_apply": false,
+  "ready_for_strict_apply": false,
+  "require_all_reviewed": true,
+  "schema_version": "supplement-review-pii-screening-decision-preflight-v1",
+  "source_doc_urls": [
+    "https://cloud.google.com/vision/docs/ocr",
+    "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr"
+  ],
+  "source_image_read_performed": false,
+  "unmatched_decision_count": 0,
+  "valid_decision_count": 0
+}

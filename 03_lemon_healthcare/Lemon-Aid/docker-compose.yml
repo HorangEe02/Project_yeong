@@ -1,0 +1,179 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lemon
+      POSTGRES_PASSWORD: lemon  # pragma: allowlist secret
+      POSTGRES_DB: lemon
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lemon -d lemon"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - lemon-aid-pg-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - lemon-aid-redis-data:/data
+
+  backend:
+    image: lemon-aid-team-backend:dev
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        INSTALL_LOCAL_OCR: ${INSTALL_LOCAL_OCR:-true}
+        INSTALL_VISION: ${INSTALL_VISION:-false}
+        TORCH_INDEX_URL: ${TORCH_INDEX_URL:-https://download.pytorch.org/whl/cpu}
+        PRELOAD_PADDLEOCR: ${PRELOAD_PADDLEOCR:-false}
+        PRELOAD_PADDLEOCR_LANGUAGE: ${LOCAL_OCR_LANGUAGE:-korean}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - lemon-aid-paddle-cache:/home/lemon/.paddlex
+      - lemon-aid-hf-cache:/home/lemon/.cache/huggingface
+    environment:
+      ENVIRONMENT: development
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      AUTH_MODE: ${AUTH_MODE:-disabled}
+      # FORCE RLS Stage-2 flip: the app connects as the non-superuser request role
+      # lemon_app (NOSUPERUSER/NOBYPASSRLS), so owner reads/writes obey the 0023b/0041
+      # RLS policies via per-request GUCs. Out-of-band audit + post-commit learning
+      # writes need a privileged (superuser) engine, so AUDIT/LEARNING stay on lemon.
+      DATABASE_URL: postgresql+asyncpg://lemon_app:lemon_app@db:5432/lemon  # pragma: allowlist secret
+      AUDIT_DATABASE_URL: postgresql+asyncpg://lemon:lemon@db:5432/lemon  # pragma: allowlist secret
+      LEARNING_DATABASE_URL: postgresql+asyncpg://lemon:lemon@db:5432/lemon  # pragma: allowlist secret
+      # KDRIs: 번들 2020-sample 대신 공식 2025 데이터셋 사용.
+      # 데이터는 이미지에 baked 됨 (Dockerfile: COPY Nutrition-backend/data/nutrition_reference);
+      # 기본 경로가 baked 위치(/app/data/nutrition_reference/kdris)로 resolve 되므로
+      # 별도 path override·볼륨 마운트 불필요 — 버전만 지정.
+      KDRIS_DATA_VERSION: "2025"
+      ALLOW_SAMPLE_KDRIS: "false"
+      # 영양제 다중 이미지(앞면+영양·기능정보면) 1요청 융합 파싱 활성화: 앞면의 성분명과
+      # 정보면의 함량을 한 번에 OCR→파싱해 함량(#4)이 채워지도록 한다(모바일은 이미
+      # merge_strategy=single_product 전송). 분류(#5)는 인식된 성분명 기반 코드 매핑으로
+      # 자동 제안된다(응답 suggested_category_keys). 라벨 함량/분류용 로컬 비전(Gemma4)
+      # 머지는 단일 GPU 모델 스왑(qwen↔gemma4, 요청당 ~62s)과 e4b의 한글 함량 미인식
+      # 때문에 enable_supplement_label_vision_extraction 기본 off로 비활성.
+      SUPPLEMENT_ONE_SHOT_FUSION_ENABLED: "true"
+      ANALYZE_OPTIONAL_STAGE_BUDGET_SEC: "20"
+      REDIS_URL: redis://redis:6379/0
+      ALLOWED_HOSTS: '["localhost","127.0.0.1","testserver","0.0.0.0","10.0.2.2"]'
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-[]}
+      PRIVACY_HASH_SECRET: ${PRIVACY_HASH_SECRET:-development-insecure-privacy-hash-secret}
+      # 2026-06-12 결정 #7 채택: 일일 건강 점수 1일 1행 영속 → S-09 4주 추이 데이터 소스
+      PERSIST_DAILY_HEALTH_SCORE: ${PERSIST_DAILY_HEALTH_SCORE:-true}
+      LLM_PROVIDER: ollama
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      # Single model for both text generation and vision (same as
+      # OLLAMA_VISION_MODEL) so the local GPU never swaps models per request.
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma4:e4b}
+      OLLAMA_VISION_MODEL: ${OLLAMA_VISION_MODEL:-gemma4:e4b}
+      OLLAMA_TIMEOUT_SEC: ${OLLAMA_TIMEOUT_SEC:-60}
+      ALLOW_EXTERNAL_LLM: "false"
+      # Chatbot RAG: ground chatbot answers in the LLM-WIKI corpus, already ingested
+      # into pgvector (wiki_chunk_embeddings, bge-m3 1024-dim; 12,480 chunks). Vector
+      # mode is REQUIRED here — the wiki Markdown files are not mounted in the
+      # container, so a lexical file scan finds nothing; only the DB embeddings exist.
+      # The query is embedded via Ollama bge-m3 (pulled), matching the indexed model.
+      ENABLE_WIKI_VECTOR_RAG: ${ENABLE_WIKI_VECTOR_RAG:-true}
+      LLM_WIKI_RETRIEVAL_MODE: ${LLM_WIKI_RETRIEVAL_MODE:-vector}
+      ENABLE_SUPPLEMENT_LABEL_VISION_EXTRACTION: ${ENABLE_SUPPLEMENT_LABEL_VISION_EXTRACTION:-false}
+      # Async supplement analyze: POST returns 202 + in-process worker + mobile
+      # polling, so multi-image latency no longer blows the mobile upload timeout.
+      SUPPLEMENT_ANALYZE_ASYNC_ENABLED: ${SUPPLEMENT_ANALYZE_ASYNC_ENABLED:-false}
+      # Retain the full OCR source text (owner-scoped) so the "OCR 텍스트 전체" view can
+      # show it. Default false keeps the EXTERNAL_OCR_PROCESSING consent promise accurate.
+      STORE_RAW_OCR_TEXT: ${STORE_RAW_OCR_TEXT:-false}
+      # OCR provider: current phase is CLOVA-only while PaddleOCR is retrained, so the
+      # fallback defaults select CLOVA + disable local OCR (override via .env for
+      # paddleocr/google_vision). CLOVA_OCR_API_URL/SECRET still come from .env — without
+      # them the adapter fails loud at startup, which is the intended "no silent OCR" guard.
+      OCR_PRIMARY_PROVIDER: ${OCR_PRIMARY_PROVIDER:-clova}
+      ENABLE_LOCAL_OCR: ${ENABLE_LOCAL_OCR:-false}
+      LOCAL_OCR_LANGUAGE: ${LOCAL_OCR_LANGUAGE:-korean}
+      LOCAL_OCR_MODEL_PROFILE: ${LOCAL_OCR_MODEL_PROFILE:-server_detection}
+      LOCAL_OCR_TEXT_RECOGNITION_MODEL_DIR: ${LOCAL_OCR_TEXT_RECOGNITION_MODEL_DIR:-/app/models/paddleocr-rec}
+      LOCAL_OCR_SECONDARY_TEXT_RECOGNITION_MODEL_DIR: ${LOCAL_OCR_SECONDARY_TEXT_RECOGNITION_MODEL_DIR:-/app/models/paddleocr-rec-secondary}
+      LOCAL_OCR_PREPROCESS_MODE: ${LOCAL_OCR_PREPROCESS_MODE:-autocontrast}
+      LOCAL_OCR_TEXT_DET_LIMIT_TYPE: ${LOCAL_OCR_TEXT_DET_LIMIT_TYPE:-max}
+      LOCAL_OCR_TEXT_DET_LIMIT_SIDE_LEN: ${LOCAL_OCR_TEXT_DET_LIMIT_SIDE_LEN:-3072}
+      LOCAL_OCR_TEXT_DET_UNCLIP_RATIO: ${LOCAL_OCR_TEXT_DET_UNCLIP_RATIO:-3.0}
+      LOCAL_OCR_CONFIDENCE_THRESHOLD: ${LOCAL_OCR_CONFIDENCE_THRESHOLD:-0.75}
+      OCR_SECONDARY_MERGE_POLICY: ${OCR_SECONDARY_MERGE_POLICY:-disabled}
+      OCR_ENSEMBLE_VERIFICATION_MODE: ${OCR_ENSEMBLE_VERIFICATION_MODE:-inherit_sample}
+      PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK: "true"
+      ALLOW_EXTERNAL_OCR: ${ALLOW_EXTERNAL_OCR:-true}
+      ENABLE_CLOVA_OCR: ${ENABLE_CLOVA_OCR:-true}
+      CLOVA_OCR_API_URL: ${CLOVA_OCR_API_URL:-}
+      CLOVA_OCR_SECRET: ${CLOVA_OCR_SECRET:-}
+      GOOGLE_VISION_AUTH_MODE: ${GOOGLE_VISION_AUTH_MODE:-adc}
+      ALLOW_GOOGLE_API_KEY_AUTH: ${ALLOW_GOOGLE_API_KEY_AUTH:-false}
+      GOOGLE_CLOUD_API_KEY: ${GOOGLE_CLOUD_API_KEY:-}
+      GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT:-}
+      GOOGLE_VISION_LOCATION: ${GOOGLE_VISION_LOCATION:-global}
+      GOOGLE_VISION_FEATURE: ${GOOGLE_VISION_FEATURE:-document_text_detection}
+      GOOGLE_VISION_LANGUAGE_HINTS: ${GOOGLE_VISION_LANGUAGE_HINTS:-[]}
+      GOOGLE_VISION_TIMEOUT_SECONDS: ${GOOGLE_VISION_TIMEOUT_SECONDS:-15}
+      GOOGLE_VISION_MAX_RETRIES: ${GOOGLE_VISION_MAX_RETRIES:-2}
+      ENABLE_VISION_CLASSIFIER: ${ENABLE_VISION_CLASSIFIER:-false}
+      VISION_CLASSIFIER_MODEL: ${VISION_CLASSIFIER_MODEL:-yolov8n.pt}
+      OCR_ROI_PREPROCESSING_POLICY: ${OCR_ROI_PREPROCESSING_POLICY:-disabled}
+      OCR_ROI_CROP_PADDING_RATIO: ${OCR_ROI_CROP_PADDING_RATIO:-0.08}
+      OCR_ROI_CROP_MIN_PADDING_PX: ${OCR_ROI_CROP_MIN_PADDING_PX:-16}
+      OCR_ROI_CROP_MAX_PADDING_PX: ${OCR_ROI_CROP_MAX_PADDING_PX:-160}
+      ENABLE_FOOD_YOLO_DETECTOR: ${ENABLE_FOOD_YOLO_DETECTOR:-false}
+      MEAL_YOLO_MODEL_PATH: ${MEAL_YOLO_MODEL_PATH:-/app/Food-backend/best.pt}
+      MEAL_YOLO_MODEL_LABEL: ${MEAL_YOLO_MODEL_LABEL:-food_yolo_local}
+      MEAL_YOLO_MIN_CONFIDENCE: ${MEAL_YOLO_MIN_CONFIDENCE:-0.25}
+      MEAL_YOLO_MAX_DETECTIONS: ${MEAL_YOLO_MAX_DETECTIONS:-20}
+      ENABLE_FOOD_DINO_CLASSIFIER: ${ENABLE_FOOD_DINO_CLASSIFIER:-false}
+      MEAL_FOOD_CLASSIFIER_MODULE_DIR: ${MEAL_FOOD_CLASSIFIER_MODULE_DIR:-/app/Food-backend/src/classifier}
+      MEAL_FOOD_CLASSIFIER_EXP16B_MODEL_PATH: ${MEAL_FOOD_CLASSIFIER_EXP16B_MODEL_PATH:-/app/Food-backend/best.pt}
+      MEAL_FOOD_CLASSIFIER_PROBE_PATH: ${MEAL_FOOD_CLASSIFIER_PROBE_PATH:-/app/Food-backend/src/classifier/probe_head.pt}
+      MEAL_FOOD_CLASSIFIER_NUTRITION_CSV_PATH: ${MEAL_FOOD_CLASSIFIER_NUTRITION_CSV_PATH:-/app/Food-backend/src/classifier/nutrition/food_nutrition_40class.csv}
+      MEAL_FOOD_CLASSIFIER_MODEL_LABEL: ${MEAL_FOOD_CLASSIFIER_MODEL_LABEL:-food_dino_exp16b}
+      MEAL_FOOD_CLASSIFIER_GATE_CONFIDENCE: ${MEAL_FOOD_CLASSIFIER_GATE_CONFIDENCE:-0.10}
+      MEAL_FOOD_CLASSIFIER_MAX_PX: ${MEAL_FOOD_CLASSIFIER_MAX_PX:-896}
+      ENABLE_FOOD_CLIP_FILTER: ${ENABLE_FOOD_CLIP_FILTER:-false}
+      FOOD_CLIP_FILTER_THRESHOLD: ${FOOD_CLIP_FILTER_THRESHOLD:-0.5}
+      FOOD_CLIP_FILTER_MODEL_ID: ${FOOD_CLIP_FILTER_MODEL_ID:-openai/clip-vit-base-patch16}
+      # HF_TOKEN is required for gated DINOv3 food classifier weights after accepting
+      # the model license on Hugging Face. Keep it server-only and never expose it to
+      # Flutter/frontend bundles.
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_HOME: /home/lemon/.cache/huggingface
+      HF_HUB_CACHE: /home/lemon/.cache/huggingface/hub
+      ENABLE_MULTIMODAL_LLM: ${ENABLE_MULTIMODAL_LLM:-false}
+      MULTIMODAL_OCR_ASSIST_POLICY: ${MULTIMODAL_OCR_ASSIST_POLICY:-disabled}
+      ENABLE_MULTIMODAL_VERIFICATION: ${ENABLE_MULTIMODAL_VERIFICATION:-false}
+    command:
+      - sh
+      - -c
+      - |
+        DATABASE_URL='postgresql+asyncpg://lemon:lemon@db:5432/lemon' alembic upgrade head
+        exec uvicorn src.main:app --host 0.0.0.0 --port 8000
+
+volumes:
+  lemon-aid-pg-data:
+  lemon-aid-redis-data:
+  lemon-aid-paddle-cache:
+  lemon-aid-hf-cache:

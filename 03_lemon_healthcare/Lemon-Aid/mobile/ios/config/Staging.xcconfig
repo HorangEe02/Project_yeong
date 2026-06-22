@@ -1,0 +1,12 @@
+#include "AppEnvironment.xcconfig"
+
+// Pre-production environment — mirrors Android product flavor `staging`.
+//
+// TODO(env): not yet selectable from a build. To activate, add a dedicated
+// Xcode build configuration + scheme (e.g. "Debug-staging") whose base
+// configuration is this file, then run with
+// `flutter run --flavor staging --dart-define=LEMON_APP_ENV=staging
+//  --dart-define=LEMON_API_BASE_URL=<provisioned-staging-url>`.
+// Deferred until the staging backend URL and certificate pins are provisioned.
+LEMON_APP_ENV = staging
+LEMON_BUNDLE_ID_SUFFIX = .staging

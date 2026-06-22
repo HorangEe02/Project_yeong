@@ -1,0 +1,960 @@
+{
+  "version": 1,
+  "kind": "synthetic",
+  "seed": 42,
+  "count": 60,
+  "items": [
+    {
+      "id": "synth_0001",
+      "image_path": "synthetic/synth_0001.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n비타민 E 종합 영양제\n\n성분\n- 비타민 E: 200mg α-TE\n- 비타민 A: 25μg RAE\n- 인: 2000mg\n- 판토텐산: 100mg\n- 나이아신: 2000mg NE",
+      "gt_fields": {
+        "product_name": "비타민 E 종합 영양제",
+        "ingredients": [
+          "비타민 E",
+          "비타민 A",
+          "인",
+          "판토텐산",
+          "나이아신"
+        ],
+        "dosage": "200mg α-TE"
+      }
+    },
+    {
+      "id": "synth_0002",
+      "image_path": "synthetic/synth_0002.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nMilk Thistle Complex\n\nIngredients\n- Milk Thistle: 100mg\n- Selenium: 10μg\n- Vitamin D: 10μg\n- Iodine: 25μg\n- Calcium: 200mg",
+      "gt_fields": {
+        "product_name": "Milk Thistle Complex",
+        "ingredients": [
+          "Milk Thistle",
+          "Selenium",
+          "Vitamin D",
+          "Iodine",
+          "Calcium"
+        ],
+        "dosage": "100mg"
+      }
+    },
+    {
+      "id": "synth_0003",
+      "image_path": "synthetic/synth_0003.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n구리 / Copper\n\n성분 Ingredients\n- 구리 (Copper): 2000mg\n- 비타민 A (Vitamin A): 400μg RAE\n- 셀레늄 (Selenium): 200μg\n- 비타민 B2 (Riboflavin): 1000mg\n- 몰리브덴 (Molybdenum): 25μg",
+      "gt_fields": {
+        "product_name": "구리 / Copper",
+        "ingredients": [
+          "구리 (Copper)",
+          "비타민 A (Vitamin A)",
+          "셀레늄 (Selenium)",
+          "비타민 B2 (Riboflavin)",
+          "몰리브덴 (Molybdenum)"
+        ],
+        "dosage": "2000mg"
+      }
+    },
+    {
+      "id": "synth_0004",
+      "image_path": "synthetic/synth_0004.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n요오드 종합 영양제\n\n성분\n- 요오드: 10μg\n- 판토텐산: 200mg\n- 오메가-3 DHA: 2000mg\n- 루테인+지아잔틴: 1000mg",
+      "gt_fields": {
+        "product_name": "요오드 종합 영양제",
+        "ingredients": [
+          "요오드",
+          "판토텐산",
+          "오메가-3 DHA",
+          "루테인+지아잔틴"
+        ],
+        "dosage": "10μg"
+      }
+    },
+    {
+      "id": "synth_0005",
+      "image_path": "synthetic/synth_0005.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nPantothenic Acid Complex\n\nIngredients\n- Pantothenic Acid: 500mg\n- Vitamin K: 10μg\n- Riboflavin: 100mg\n- Potassium: 1000mg",
+      "gt_fields": {
+        "product_name": "Pantothenic Acid Complex",
+        "ingredients": [
+          "Pantothenic Acid",
+          "Vitamin K",
+          "Riboflavin",
+          "Potassium"
+        ],
+        "dosage": "500mg"
+      }
+    },
+    {
+      "id": "synth_0006",
+      "image_path": "synthetic/synth_0006.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n엽산 / Folate (DFE)\n\n성분 Ingredients\n- 엽산 (Folate (DFE)): 50μg DFE\n- 루테인+지아잔틴 (Lutein + Zeaxanthin): 100mg\n- 구리 (Copper): 2000mg",
+      "gt_fields": {
+        "product_name": "엽산 / Folate (DFE)",
+        "ingredients": [
+          "엽산 (Folate (DFE))",
+          "루테인+지아잔틴 (Lutein + Zeaxanthin)",
+          "구리 (Copper)"
+        ],
+        "dosage": "50μg DFE"
+      }
+    },
+    {
+      "id": "synth_0007",
+      "image_path": "synthetic/synth_0007.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n셀레늄 종합 영양제\n\n성분\n- 셀레늄: 10μg\n- 비타민 E: 1500mg α-TE\n- 코엔자임 Q10: 500mg\n- 비타민 B12: 400μg",
+      "gt_fields": {
+        "product_name": "셀레늄 종합 영양제",
+        "ingredients": [
+          "셀레늄",
+          "비타민 E",
+          "코엔자임 Q10",
+          "비타민 B12"
+        ],
+        "dosage": "10μg"
+      }
+    },
+    {
+      "id": "synth_0008",
+      "image_path": "synthetic/synth_0008.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nMilk Thistle Complex\n\nIngredients\n- Milk Thistle: 2000mg\n- Lutein + Zeaxanthin: 100mg\n- Folate (DFE): 10μg DFE\n- Iodine: 400μg\n- Riboflavin: 200mg",
+      "gt_fields": {
+        "product_name": "Milk Thistle Complex",
+        "ingredients": [
+          "Milk Thistle",
+          "Lutein + Zeaxanthin",
+          "Folate (DFE)",
+          "Iodine",
+          "Riboflavin"
+        ],
+        "dosage": "2000mg"
+      }
+    },
+    {
+      "id": "synth_0009",
+      "image_path": "synthetic/synth_0009.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n비타민 D / Vitamin D\n\n성분 Ingredients\n- 비타민 D (Vitamin D): 100μg\n- 루테인+지아잔틴 (Lutein + Zeaxanthin): 500mg\n- 나이아신 (Niacin (NE)): 1000mg NE\n- 비타민 E (Vitamin E): 2000mg α-TE",
+      "gt_fields": {
+        "product_name": "비타민 D / Vitamin D",
+        "ingredients": [
+          "비타민 D (Vitamin D)",
+          "루테인+지아잔틴 (Lutein + Zeaxanthin)",
+          "나이아신 (Niacin (NE))",
+          "비타민 E (Vitamin E)"
+        ],
+        "dosage": "100μg"
+      }
+    },
+    {
+      "id": "synth_0010",
+      "image_path": "synthetic/synth_0010.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n비타민 B1 종합 영양제\n\n성분\n- 비타민 B1: 500mg\n- 엽산: 400μg DFE\n- 비타민 B2: 2000mg\n- 크롬: 400μg",
+      "gt_fields": {
+        "product_name": "비타민 B1 종합 영양제",
+        "ingredients": [
+          "비타민 B1",
+          "엽산",
+          "비타민 B2",
+          "크롬"
+        ],
+        "dosage": "500mg"
+      }
+    },
+    {
+      "id": "synth_0011",
+      "image_path": "synthetic/synth_0011.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nCopper Complex\n\nIngredients\n- Copper: 1500mg\n- Manganese: 2000mg\n- Thiamine: 200mg",
+      "gt_fields": {
+        "product_name": "Copper Complex",
+        "ingredients": [
+          "Copper",
+          "Manganese",
+          "Thiamine"
+        ],
+        "dosage": "1500mg"
+      }
+    },
+    {
+      "id": "synth_0012",
+      "image_path": "synthetic/synth_0012.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n철 / Iron\n\n성분 Ingredients\n- 철 (Iron): 2000mg\n- 비타민 B12 (Vitamin B12): 400μg\n- 판토텐산 (Pantothenic Acid): 1500mg",
+      "gt_fields": {
+        "product_name": "철 / Iron",
+        "ingredients": [
+          "철 (Iron)",
+          "비타민 B12 (Vitamin B12)",
+          "판토텐산 (Pantothenic Acid)"
+        ],
+        "dosage": "2000mg"
+      }
+    },
+    {
+      "id": "synth_0013",
+      "image_path": "synthetic/synth_0013.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n크롬 종합 영양제\n\n성분\n- 크롬: 10μg\n- 비오틴: 25μg\n- 오메가-3 EPA: 100mg",
+      "gt_fields": {
+        "product_name": "크롬 종합 영양제",
+        "ingredients": [
+          "크롬",
+          "비오틴",
+          "오메가-3 EPA"
+        ],
+        "dosage": "10μg"
+      }
+    },
+    {
+      "id": "synth_0014",
+      "image_path": "synthetic/synth_0014.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nVitamin B12 Complex\n\nIngredients\n- Vitamin B12: 200μg\n- Pantothenic Acid: 2000mg\n- Vitamin D: 50μg\n- Riboflavin: 200mg",
+      "gt_fields": {
+        "product_name": "Vitamin B12 Complex",
+        "ingredients": [
+          "Vitamin B12",
+          "Pantothenic Acid",
+          "Vitamin D",
+          "Riboflavin"
+        ],
+        "dosage": "200μg"
+      }
+    },
+    {
+      "id": "synth_0015",
+      "image_path": "synthetic/synth_0015.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n마그네슘 / Magnesium\n\n성분 Ingredients\n- 마그네슘 (Magnesium): 1000mg\n- 비타민 B12 (Vitamin B12): 25μg\n- 밀크씨슬 (Milk Thistle): 500mg\n- 코엔자임 Q10 (Coenzyme Q10): 200mg\n- 망간 (Manganese): 200mg",
+      "gt_fields": {
+        "product_name": "마그네슘 / Magnesium",
+        "ingredients": [
+          "마그네슘 (Magnesium)",
+          "비타민 B12 (Vitamin B12)",
+          "밀크씨슬 (Milk Thistle)",
+          "코엔자임 Q10 (Coenzyme Q10)",
+          "망간 (Manganese)"
+        ],
+        "dosage": "1000mg"
+      }
+    },
+    {
+      "id": "synth_0016",
+      "image_path": "synthetic/synth_0016.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n셀레늄 종합 영양제\n\n성분\n- 셀레늄: 200μg\n- 판토텐산: 1000mg\n- 인: 500mg\n- 요오드: 25μg\n- 칼슘: 200mg",
+      "gt_fields": {
+        "product_name": "셀레늄 종합 영양제",
+        "ingredients": [
+          "셀레늄",
+          "판토텐산",
+          "인",
+          "요오드",
+          "칼슘"
+        ],
+        "dosage": "200μg"
+      }
+    },
+    {
+      "id": "synth_0017",
+      "image_path": "synthetic/synth_0017.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nMagnesium Complex\n\nIngredients\n- Magnesium: 100mg\n- Vitamin D: 25μg\n- Potassium: 2000mg\n- Vitamin C: 200mg\n- Lutein + Zeaxanthin: 2000mg",
+      "gt_fields": {
+        "product_name": "Magnesium Complex",
+        "ingredients": [
+          "Magnesium",
+          "Vitamin D",
+          "Potassium",
+          "Vitamin C",
+          "Lutein + Zeaxanthin"
+        ],
+        "dosage": "100mg"
+      }
+    },
+    {
+      "id": "synth_0018",
+      "image_path": "synthetic/synth_0018.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n구리 / Copper\n\n성분 Ingredients\n- 구리 (Copper): 1500mg\n- 비타민 D (Vitamin D): 50μg\n- 비타민 B12 (Vitamin B12): 200μg\n- 철 (Iron): 100mg",
+      "gt_fields": {
+        "product_name": "구리 / Copper",
+        "ingredients": [
+          "구리 (Copper)",
+          "비타민 D (Vitamin D)",
+          "비타민 B12 (Vitamin B12)",
+          "철 (Iron)"
+        ],
+        "dosage": "1500mg"
+      }
+    },
+    {
+      "id": "synth_0019",
+      "image_path": "synthetic/synth_0019.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n인 종합 영양제\n\n성분\n- 인: 500mg\n- 비타민 E: 2000mg α-TE\n- 크롬: 50μg\n- 밀크씨슬: 100mg\n- 셀레늄: 50μg",
+      "gt_fields": {
+        "product_name": "인 종합 영양제",
+        "ingredients": [
+          "인",
+          "비타민 E",
+          "크롬",
+          "밀크씨슬",
+          "셀레늄"
+        ],
+        "dosage": "500mg"
+      }
+    },
+    {
+      "id": "synth_0020",
+      "image_path": "synthetic/synth_0020.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nThiamine Complex\n\nIngredients\n- Thiamine: 2000mg\n- Iron: 500mg\n- Vitamin A: 200μg RAE\n- Phosphorus: 200mg",
+      "gt_fields": {
+        "product_name": "Thiamine Complex",
+        "ingredients": [
+          "Thiamine",
+          "Iron",
+          "Vitamin A",
+          "Phosphorus"
+        ],
+        "dosage": "2000mg"
+      }
+    },
+    {
+      "id": "synth_0021",
+      "image_path": "synthetic/synth_0021.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n코엔자임 Q10 / Coenzyme Q10\n\n성분 Ingredients\n- 코엔자임 Q10 (Coenzyme Q10): 2000mg\n- 비타민 E (Vitamin E): 1500mg α-TE\n- 루테인+지아잔틴 (Lutein + Zeaxanthin): 1500mg\n- 망간 (Manganese): 200mg\n- 비타민 B6 (Vitamin B6): 200mg",
+      "gt_fields": {
+        "product_name": "코엔자임 Q10 / Coenzyme Q10",
+        "ingredients": [
+          "코엔자임 Q10 (Coenzyme Q10)",
+          "비타민 E (Vitamin E)",
+          "루테인+지아잔틴 (Lutein + Zeaxanthin)",
+          "망간 (Manganese)",
+          "비타민 B6 (Vitamin B6)"
+        ],
+        "dosage": "2000mg"
+      }
+    },
+    {
+      "id": "synth_0022",
+      "image_path": "synthetic/synth_0022.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n칼륨 종합 영양제\n\n성분\n- 칼륨: 1500mg\n- 비타민 B1: 100mg\n- 셀레늄: 200μg\n- 코엔자임 Q10: 500mg",
+      "gt_fields": {
+        "product_name": "칼륨 종합 영양제",
+        "ingredients": [
+          "칼륨",
+          "비타민 B1",
+          "셀레늄",
+          "코엔자임 Q10"
+        ],
+        "dosage": "1500mg"
+      }
+    },
+    {
+      "id": "synth_0023",
+      "image_path": "synthetic/synth_0023.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nVitamin A Complex\n\nIngredients\n- Vitamin A: 50μg RAE\n- Vitamin E: 200mg α-TE\n- Coenzyme Q10: 100mg\n- Folate (DFE): 25μg DFE",
+      "gt_fields": {
+        "product_name": "Vitamin A Complex",
+        "ingredients": [
+          "Vitamin A",
+          "Vitamin E",
+          "Coenzyme Q10",
+          "Folate (DFE)"
+        ],
+        "dosage": "50μg RAE"
+      }
+    },
+    {
+      "id": "synth_0024",
+      "image_path": "synthetic/synth_0024.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n비타민 D / Vitamin D\n\n성분 Ingredients\n- 비타민 D (Vitamin D): 200μg\n- 인 (Phosphorus): 200mg\n- 마그네슘 (Magnesium): 200mg\n- 오메가-3 EPA (Omega-3 EPA): 2000mg\n- 칼륨 (Potassium): 1000mg",
+      "gt_fields": {
+        "product_name": "비타민 D / Vitamin D",
+        "ingredients": [
+          "비타민 D (Vitamin D)",
+          "인 (Phosphorus)",
+          "마그네슘 (Magnesium)",
+          "오메가-3 EPA (Omega-3 EPA)",
+          "칼륨 (Potassium)"
+        ],
+        "dosage": "200μg"
+      }
+    },
+    {
+      "id": "synth_0025",
+      "image_path": "synthetic/synth_0025.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n비타민 B1 종합 영양제\n\n성분\n- 비타민 B1: 1000mg\n- 판토텐산: 200mg\n- 아연: 1500mg\n- 루테인+지아잔틴: 2000mg\n- 구리: 2000mg",
+      "gt_fields": {
+        "product_name": "비타민 B1 종합 영양제",
+        "ingredients": [
+          "비타민 B1",
+          "판토텐산",
+          "아연",
+          "루테인+지아잔틴",
+          "구리"
+        ],
+        "dosage": "1000mg"
+      }
+    },
+    {
+      "id": "synth_0026",
+      "image_path": "synthetic/synth_0026.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nMolybdenum Complex\n\nIngredients\n- Molybdenum: 400μg\n- Vitamin B6: 2000mg\n- Vitamin B12: 50μg",
+      "gt_fields": {
+        "product_name": "Molybdenum Complex",
+        "ingredients": [
+          "Molybdenum",
+          "Vitamin B6",
+          "Vitamin B12"
+        ],
+        "dosage": "400μg"
+      }
+    },
+    {
+      "id": "synth_0027",
+      "image_path": "synthetic/synth_0027.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n밀크씨슬 / Milk Thistle\n\n성분 Ingredients\n- 밀크씨슬 (Milk Thistle): 200mg\n- 아연 (Zinc): 200mg\n- 철 (Iron): 100mg\n- 비타민 E (Vitamin E): 500mg α-TE",
+      "gt_fields": {
+        "product_name": "밀크씨슬 / Milk Thistle",
+        "ingredients": [
+          "밀크씨슬 (Milk Thistle)",
+          "아연 (Zinc)",
+          "철 (Iron)",
+          "비타민 E (Vitamin E)"
+        ],
+        "dosage": "200mg"
+      }
+    },
+    {
+      "id": "synth_0028",
+      "image_path": "synthetic/synth_0028.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n요오드 종합 영양제\n\n성분\n- 요오드: 200μg\n- 셀레늄: 25μg\n- 나이아신: 100mg NE",
+      "gt_fields": {
+        "product_name": "요오드 종합 영양제",
+        "ingredients": [
+          "요오드",
+          "셀레늄",
+          "나이아신"
+        ],
+        "dosage": "200μg"
+      }
+    },
+    {
+      "id": "synth_0029",
+      "image_path": "synthetic/synth_0029.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nMolybdenum Complex\n\nIngredients\n- Molybdenum: 25μg\n- Manganese: 100mg\n- Vitamin C: 100mg",
+      "gt_fields": {
+        "product_name": "Molybdenum Complex",
+        "ingredients": [
+          "Molybdenum",
+          "Manganese",
+          "Vitamin C"
+        ],
+        "dosage": "25μg"
+      }
+    },
+    {
+      "id": "synth_0030",
+      "image_path": "synthetic/synth_0030.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n비타민 D / Vitamin D\n\n성분 Ingredients\n- 비타민 D (Vitamin D): 400μg\n- 아연 (Zinc): 1000mg\n- 나이아신 (Niacin (NE)): 200mg NE\n- 판토텐산 (Pantothenic Acid): 1500mg",
+      "gt_fields": {
+        "product_name": "비타민 D / Vitamin D",
+        "ingredients": [
+          "비타민 D (Vitamin D)",
+          "아연 (Zinc)",
+          "나이아신 (Niacin (NE))",
+          "판토텐산 (Pantothenic Acid)"
+        ],
+        "dosage": "400μg"
+      }
+    },
+    {
+      "id": "synth_0031",
+      "image_path": "synthetic/synth_0031.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n인 종합 영양제\n\n성분\n- 인: 1500mg\n- 코엔자임 Q10: 1500mg\n- 밀크씨슬: 1000mg",
+      "gt_fields": {
+        "product_name": "인 종합 영양제",
+        "ingredients": [
+          "인",
+          "코엔자임 Q10",
+          "밀크씨슬"
+        ],
+        "dosage": "1500mg"
+      }
+    },
+    {
+      "id": "synth_0032",
+      "image_path": "synthetic/synth_0032.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nOmega-3 DHA Complex\n\nIngredients\n- Omega-3 DHA: 200mg\n- Magnesium: 100mg\n- Calcium: 100mg",
+      "gt_fields": {
+        "product_name": "Omega-3 DHA Complex",
+        "ingredients": [
+          "Omega-3 DHA",
+          "Magnesium",
+          "Calcium"
+        ],
+        "dosage": "200mg"
+      }
+    },
+    {
+      "id": "synth_0033",
+      "image_path": "synthetic/synth_0033.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n칼슘 / Calcium\n\n성분 Ingredients\n- 칼슘 (Calcium): 100mg\n- 엽산 (Folate (DFE)): 400μg DFE\n- 철 (Iron): 2000mg\n- 루테인+지아잔틴 (Lutein + Zeaxanthin): 2000mg\n- 인 (Phosphorus): 100mg",
+      "gt_fields": {
+        "product_name": "칼슘 / Calcium",
+        "ingredients": [
+          "칼슘 (Calcium)",
+          "엽산 (Folate (DFE))",
+          "철 (Iron)",
+          "루테인+지아잔틴 (Lutein + Zeaxanthin)",
+          "인 (Phosphorus)"
+        ],
+        "dosage": "100mg"
+      }
+    },
+    {
+      "id": "synth_0034",
+      "image_path": "synthetic/synth_0034.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n비타민 B12 종합 영양제\n\n성분\n- 비타민 B12: 10μg\n- 인: 200mg\n- 비오틴: 25μg",
+      "gt_fields": {
+        "product_name": "비타민 B12 종합 영양제",
+        "ingredients": [
+          "비타민 B12",
+          "인",
+          "비오틴"
+        ],
+        "dosage": "10μg"
+      }
+    },
+    {
+      "id": "synth_0035",
+      "image_path": "synthetic/synth_0035.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nSelenium Complex\n\nIngredients\n- Selenium: 100μg\n- Iron: 200mg\n- Vitamin K: 50μg",
+      "gt_fields": {
+        "product_name": "Selenium Complex",
+        "ingredients": [
+          "Selenium",
+          "Iron",
+          "Vitamin K"
+        ],
+        "dosage": "100μg"
+      }
+    },
+    {
+      "id": "synth_0036",
+      "image_path": "synthetic/synth_0036.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n나이아신 / Niacin (NE)\n\n성분 Ingredients\n- 나이아신 (Niacin (NE)): 1000mg NE\n- 루테인+지아잔틴 (Lutein + Zeaxanthin): 1500mg\n- 코엔자임 Q10 (Coenzyme Q10): 100mg\n- 비타민 D (Vitamin D): 10μg",
+      "gt_fields": {
+        "product_name": "나이아신 / Niacin (NE)",
+        "ingredients": [
+          "나이아신 (Niacin (NE))",
+          "루테인+지아잔틴 (Lutein + Zeaxanthin)",
+          "코엔자임 Q10 (Coenzyme Q10)",
+          "비타민 D (Vitamin D)"
+        ],
+        "dosage": "1000mg NE"
+      }
+    },
+    {
+      "id": "synth_0037",
+      "image_path": "synthetic/synth_0037.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n셀레늄 종합 영양제\n\n성분\n- 셀레늄: 25μg\n- 오메가-3 EPA: 200mg\n- 비타민 A: 100μg RAE\n- 비타민 D: 100μg\n- 코엔자임 Q10: 1000mg",
+      "gt_fields": {
+        "product_name": "셀레늄 종합 영양제",
+        "ingredients": [
+          "셀레늄",
+          "오메가-3 EPA",
+          "비타민 A",
+          "비타민 D",
+          "코엔자임 Q10"
+        ],
+        "dosage": "25μg"
+      }
+    },
+    {
+      "id": "synth_0038",
+      "image_path": "synthetic/synth_0038.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nLutein + Zeaxanthin Complex\n\nIngredients\n- Lutein + Zeaxanthin: 100mg\n- Vitamin B12: 25μg\n- Milk Thistle: 1000mg",
+      "gt_fields": {
+        "product_name": "Lutein + Zeaxanthin Complex",
+        "ingredients": [
+          "Lutein + Zeaxanthin",
+          "Vitamin B12",
+          "Milk Thistle"
+        ],
+        "dosage": "100mg"
+      }
+    },
+    {
+      "id": "synth_0039",
+      "image_path": "synthetic/synth_0039.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n비타민 B12 / Vitamin B12\n\n성분 Ingredients\n- 비타민 B12 (Vitamin B12): 100μg\n- 판토텐산 (Pantothenic Acid): 500mg\n- 코엔자임 Q10 (Coenzyme Q10): 1000mg",
+      "gt_fields": {
+        "product_name": "비타민 B12 / Vitamin B12",
+        "ingredients": [
+          "비타민 B12 (Vitamin B12)",
+          "판토텐산 (Pantothenic Acid)",
+          "코엔자임 Q10 (Coenzyme Q10)"
+        ],
+        "dosage": "100μg"
+      }
+    },
+    {
+      "id": "synth_0040",
+      "image_path": "synthetic/synth_0040.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n인 종합 영양제\n\n성분\n- 인: 1000mg\n- 오메가-3 DHA: 200mg\n- 셀레늄: 25μg\n- 크롬: 50μg\n- 몰리브덴: 25μg",
+      "gt_fields": {
+        "product_name": "인 종합 영양제",
+        "ingredients": [
+          "인",
+          "오메가-3 DHA",
+          "셀레늄",
+          "크롬",
+          "몰리브덴"
+        ],
+        "dosage": "1000mg"
+      }
+    },
+    {
+      "id": "synth_0041",
+      "image_path": "synthetic/synth_0041.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nIodine Complex\n\nIngredients\n- Iodine: 10μg\n- Phosphorus: 2000mg\n- Selenium: 50μg",
+      "gt_fields": {
+        "product_name": "Iodine Complex",
+        "ingredients": [
+          "Iodine",
+          "Phosphorus",
+          "Selenium"
+        ],
+        "dosage": "10μg"
+      }
+    },
+    {
+      "id": "synth_0042",
+      "image_path": "synthetic/synth_0042.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n비타민 C / Vitamin C\n\n성분 Ingredients\n- 비타민 C (Vitamin C): 1500mg\n- 요오드 (Iodine): 200μg\n- 마그네슘 (Magnesium): 200mg",
+      "gt_fields": {
+        "product_name": "비타민 C / Vitamin C",
+        "ingredients": [
+          "비타민 C (Vitamin C)",
+          "요오드 (Iodine)",
+          "마그네슘 (Magnesium)"
+        ],
+        "dosage": "1500mg"
+      }
+    },
+    {
+      "id": "synth_0043",
+      "image_path": "synthetic/synth_0043.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n아연 종합 영양제\n\n성분\n- 아연: 200mg\n- 비타민 D: 10μg\n- 루테인+지아잔틴: 1500mg",
+      "gt_fields": {
+        "product_name": "아연 종합 영양제",
+        "ingredients": [
+          "아연",
+          "비타민 D",
+          "루테인+지아잔틴"
+        ],
+        "dosage": "200mg"
+      }
+    },
+    {
+      "id": "synth_0044",
+      "image_path": "synthetic/synth_0044.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nChromium Complex\n\nIngredients\n- Chromium: 100μg\n- Lutein + Zeaxanthin: 100mg\n- Niacin (NE): 1500mg NE",
+      "gt_fields": {
+        "product_name": "Chromium Complex",
+        "ingredients": [
+          "Chromium",
+          "Lutein + Zeaxanthin",
+          "Niacin (NE)"
+        ],
+        "dosage": "100μg"
+      }
+    },
+    {
+      "id": "synth_0045",
+      "image_path": "synthetic/synth_0045.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n요오드 / Iodine\n\n성분 Ingredients\n- 요오드 (Iodine): 200μg\n- 구리 (Copper): 100mg\n- 비타민 C (Vitamin C): 1000mg",
+      "gt_fields": {
+        "product_name": "요오드 / Iodine",
+        "ingredients": [
+          "요오드 (Iodine)",
+          "구리 (Copper)",
+          "비타민 C (Vitamin C)"
+        ],
+        "dosage": "200μg"
+      }
+    },
+    {
+      "id": "synth_0046",
+      "image_path": "synthetic/synth_0046.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n요오드 종합 영양제\n\n성분\n- 요오드: 25μg\n- 아연: 2000mg\n- 비오틴: 400μg\n- 코엔자임 Q10: 500mg\n- 판토텐산: 200mg",
+      "gt_fields": {
+        "product_name": "요오드 종합 영양제",
+        "ingredients": [
+          "요오드",
+          "아연",
+          "비오틴",
+          "코엔자임 Q10",
+          "판토텐산"
+        ],
+        "dosage": "25μg"
+      }
+    },
+    {
+      "id": "synth_0047",
+      "image_path": "synthetic/synth_0047.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nVitamin B12 Complex\n\nIngredients\n- Vitamin B12: 50μg\n- Vitamin K: 100μg\n- Chromium: 50μg\n- Manganese: 100mg",
+      "gt_fields": {
+        "product_name": "Vitamin B12 Complex",
+        "ingredients": [
+          "Vitamin B12",
+          "Vitamin K",
+          "Chromium",
+          "Manganese"
+        ],
+        "dosage": "50μg"
+      }
+    },
+    {
+      "id": "synth_0048",
+      "image_path": "synthetic/synth_0048.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n철 / Iron\n\n성분 Ingredients\n- 철 (Iron): 100mg\n- 구리 (Copper): 100mg\n- 요오드 (Iodine): 200μg",
+      "gt_fields": {
+        "product_name": "철 / Iron",
+        "ingredients": [
+          "철 (Iron)",
+          "구리 (Copper)",
+          "요오드 (Iodine)"
+        ],
+        "dosage": "100mg"
+      }
+    },
+    {
+      "id": "synth_0049",
+      "image_path": "synthetic/synth_0049.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n아연 종합 영양제\n\n성분\n- 아연: 500mg\n- 판토텐산: 100mg\n- 비타민 K: 25μg",
+      "gt_fields": {
+        "product_name": "아연 종합 영양제",
+        "ingredients": [
+          "아연",
+          "판토텐산",
+          "비타민 K"
+        ],
+        "dosage": "500mg"
+      }
+    },
+    {
+      "id": "synth_0050",
+      "image_path": "synthetic/synth_0050.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nVitamin B6 Complex\n\nIngredients\n- Vitamin B6: 1500mg\n- Thiamine: 2000mg\n- Iron: 500mg\n- Omega-3 EPA: 1500mg",
+      "gt_fields": {
+        "product_name": "Vitamin B6 Complex",
+        "ingredients": [
+          "Vitamin B6",
+          "Thiamine",
+          "Iron",
+          "Omega-3 EPA"
+        ],
+        "dosage": "1500mg"
+      }
+    },
+    {
+      "id": "synth_0051",
+      "image_path": "synthetic/synth_0051.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n아연 / Zinc\n\n성분 Ingredients\n- 아연 (Zinc): 500mg\n- 비타민 A (Vitamin A): 400μg RAE\n- 크롬 (Chromium): 10μg\n- 오메가-3 EPA (Omega-3 EPA): 200mg\n- 셀레늄 (Selenium): 50μg",
+      "gt_fields": {
+        "product_name": "아연 / Zinc",
+        "ingredients": [
+          "아연 (Zinc)",
+          "비타민 A (Vitamin A)",
+          "크롬 (Chromium)",
+          "오메가-3 EPA (Omega-3 EPA)",
+          "셀레늄 (Selenium)"
+        ],
+        "dosage": "500mg"
+      }
+    },
+    {
+      "id": "synth_0052",
+      "image_path": "synthetic/synth_0052.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n밀크씨슬 종합 영양제\n\n성분\n- 밀크씨슬: 1500mg\n- 비타민 E: 200mg α-TE\n- 인: 500mg",
+      "gt_fields": {
+        "product_name": "밀크씨슬 종합 영양제",
+        "ingredients": [
+          "밀크씨슬",
+          "비타민 E",
+          "인"
+        ],
+        "dosage": "1500mg"
+      }
+    },
+    {
+      "id": "synth_0053",
+      "image_path": "synthetic/synth_0053.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nCopper Complex\n\nIngredients\n- Copper: 200mg\n- Riboflavin: 2000mg\n- Molybdenum: 400μg\n- Biotin: 50μg",
+      "gt_fields": {
+        "product_name": "Copper Complex",
+        "ingredients": [
+          "Copper",
+          "Riboflavin",
+          "Molybdenum",
+          "Biotin"
+        ],
+        "dosage": "200mg"
+      }
+    },
+    {
+      "id": "synth_0054",
+      "image_path": "synthetic/synth_0054.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n마그네슘 / Magnesium\n\n성분 Ingredients\n- 마그네슘 (Magnesium): 100mg\n- 판토텐산 (Pantothenic Acid): 100mg\n- 밀크씨슬 (Milk Thistle): 2000mg\n- 코엔자임 Q10 (Coenzyme Q10): 1000mg\n- 루테인+지아잔틴 (Lutein + Zeaxanthin): 500mg",
+      "gt_fields": {
+        "product_name": "마그네슘 / Magnesium",
+        "ingredients": [
+          "마그네슘 (Magnesium)",
+          "판토텐산 (Pantothenic Acid)",
+          "밀크씨슬 (Milk Thistle)",
+          "코엔자임 Q10 (Coenzyme Q10)",
+          "루테인+지아잔틴 (Lutein + Zeaxanthin)"
+        ],
+        "dosage": "100mg"
+      }
+    },
+    {
+      "id": "synth_0055",
+      "image_path": "synthetic/synth_0055.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n비타민 A 종합 영양제\n\n성분\n- 비타민 A: 25μg RAE\n- 비오틴: 400μg\n- 칼륨: 500mg",
+      "gt_fields": {
+        "product_name": "비타민 A 종합 영양제",
+        "ingredients": [
+          "비타민 A",
+          "비오틴",
+          "칼륨"
+        ],
+        "dosage": "25μg RAE"
+      }
+    },
+    {
+      "id": "synth_0056",
+      "image_path": "synthetic/synth_0056.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nPhosphorus Complex\n\nIngredients\n- Phosphorus: 2000mg\n- Iron: 1000mg\n- Selenium: 200μg",
+      "gt_fields": {
+        "product_name": "Phosphorus Complex",
+        "ingredients": [
+          "Phosphorus",
+          "Iron",
+          "Selenium"
+        ],
+        "dosage": "2000mg"
+      }
+    },
+    {
+      "id": "synth_0057",
+      "image_path": "synthetic/synth_0057.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n비타민 E / Vitamin E\n\n성분 Ingredients\n- 비타민 E (Vitamin E): 2000mg α-TE\n- 비타민 D (Vitamin D): 25μg\n- 밀크씨슬 (Milk Thistle): 1500mg",
+      "gt_fields": {
+        "product_name": "비타민 E / Vitamin E",
+        "ingredients": [
+          "비타민 E (Vitamin E)",
+          "비타민 D (Vitamin D)",
+          "밀크씨슬 (Milk Thistle)"
+        ],
+        "dosage": "2000mg α-TE"
+      }
+    },
+    {
+      "id": "synth_0058",
+      "image_path": "synthetic/synth_0058.jpg",
+      "language": "ko",
+      "gt_text": "영양 정보\n오메가-3 EPA 종합 영양제\n\n성분\n- 오메가-3 EPA: 1500mg\n- 엽산: 25μg DFE\n- 요오드: 100μg",
+      "gt_fields": {
+        "product_name": "오메가-3 EPA 종합 영양제",
+        "ingredients": [
+          "오메가-3 EPA",
+          "엽산",
+          "요오드"
+        ],
+        "dosage": "1500mg"
+      }
+    },
+    {
+      "id": "synth_0059",
+      "image_path": "synthetic/synth_0059.jpg",
+      "language": "en",
+      "gt_text": "Nutrition Facts\nVitamin C Complex\n\nIngredients\n- Vitamin C: 100mg\n- Vitamin B6: 500mg\n- Folate (DFE): 25μg DFE",
+      "gt_fields": {
+        "product_name": "Vitamin C Complex",
+        "ingredients": [
+          "Vitamin C",
+          "Vitamin B6",
+          "Folate (DFE)"
+        ],
+        "dosage": "100mg"
+      }
+    },
+    {
+      "id": "synth_0060",
+      "image_path": "synthetic/synth_0060.jpg",
+      "language": "mixed",
+      "gt_text": "영양 정보 / Nutrition Facts\n나이아신 / Niacin (NE)\n\n성분 Ingredients\n- 나이아신 (Niacin (NE)): 1500mg NE\n- 크롬 (Chromium): 100μg\n- 비타민 E (Vitamin E): 1500mg α-TE\n- 엽산 (Folate (DFE)): 400μg DFE\n- 칼륨 (Potassium): 200mg",
+      "gt_fields": {
+        "product_name": "나이아신 / Niacin (NE)",
+        "ingredients": [
+          "나이아신 (Niacin (NE))",
+          "크롬 (Chromium)",
+          "비타민 E (Vitamin E)",
+          "엽산 (Folate (DFE))",
+          "칼륨 (Potassium)"
+        ],
+        "dosage": "1500mg NE"
+      }
+    }
+  ]
+}

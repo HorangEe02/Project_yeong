@@ -1,0 +1,68 @@
+{
+  "schema_version": "supplement-parsed-snapshot-v3",
+  "requires_user_confirmation": true,
+  "source": {
+    "analysis_id": "7492437b-52b7-5521-a90e-04a2de526d98",
+    "ocr_provider": "manual",
+    "ocr_confidence": null,
+    "layout_available": false,
+    "raw_image_stored": false,
+    "raw_ocr_text_stored": false,
+    "raw_provider_payload_stored": false,
+    "raw_model_response_stored": false,
+    "parser_schema_version": "supplement-parser-output-v2"
+  },
+  "product": {
+    "product_name": "차전자피 껍질 / Psyllium Husk",
+    "manufacturer": null,
+    "barcode_candidates": [],
+    "evidence_refs": []
+  },
+  "serving": {
+    "serving_size_text": "1일 섭취량 당 식이섬유 5g",
+    "serving_amount": null,
+    "serving_unit": null,
+    "daily_servings": 1,
+    "evidence_refs": []
+  },
+  "ingredients": [
+    {
+      "display_name": "차전자피분말",
+      "normalized_name": "차전자피분말",
+      "nutrient_code_candidates": [],
+      "amount": null,
+      "unit": null,
+      "daily_amount": null,
+      "daily_unit": null,
+      "confidence": 0.5,
+      "source": "ocr_llm_preview",
+      "evidence_refs": []
+    }
+  ],
+  "label_sections": [],
+  "intake_method": {
+    "text": null,
+    "structured": {
+      "frequency": "unknown",
+      "time_of_day": [],
+      "with_food": "unknown"
+    },
+    "evidence_refs": []
+  },
+  "precautions": [],
+  "functional_claims": [],
+  "evidence_spans": [],
+  "domain_correction_audit": [],
+  "low_confidence_fields": [],
+  "warnings": [
+    "ground_truth_pending_human_review",
+    "category:식이섬유",
+    "labels:live_naver,detail_page",
+    "auto_seeded_by_qwen3_5_9b",
+    "vision_seeded_by_gemma4"
+  ],
+  "chronic_disease_indications": [
+    "diabetes",
+    "dyslipidemia"
+  ]
+}

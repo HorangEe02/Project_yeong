@@ -1,0 +1,640 @@
+/*
+ * /keynote — WWDC 스타일 스크롤 키노트 (Lemon AID).
+ * 애플 키노트 미학(순수 블랙, 거대한 타이포, 한 슬라이드 한 메시지, 순차 reveal,
+ * 섹션 단어 디바이더, one more thing)을 *원본 콘텐츠*에 적용한 오리지널 디자인.
+ */
+
+.deck {
+  --bg: #000;
+  --ink: #f5f5f7;
+  --muted: #86868b;
+  --muted-2: #6e6e73;
+  --line: rgba(255, 255, 255, 0.1);
+  --lemon: #ffd60a;
+  --lemon-2: #ffb800;
+  --card: #0e0e10;
+  --card-2: #161618;
+
+  position: relative;
+  height: 100svh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background: var(--bg);
+  color: var(--ink);
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', 'Apple SD Gothic Neo',
+    'Pretendard', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  scrollbar-width: none;
+}
+
+.deck::-webkit-scrollbar {
+  display: none;
+}
+
+/* ----------------------------------------------------------------- Slide */
+
+.slide {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  padding: clamp(48px, 9vh, 120px) 24px;
+  scroll-snap-align: start;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* 위→아래 미세 그라데이션으로 깊이감 */
+.slideTint {
+  background: radial-gradient(120% 80% at 50% 0%, rgba(255, 214, 10, 0.08), transparent 60%), var(--bg);
+}
+
+.slideDark {
+  background: radial-gradient(100% 70% at 50% 120%, rgba(255, 184, 0, 0.07), transparent 60%), var(--bg);
+}
+
+/* ---------------------------------------------------------- Typography */
+
+.kicker {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: clamp(12px, 1.5vw, 15px);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.kickerLemon {
+  color: var(--lemon-2);
+}
+
+.headline {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(40px, 8.2vw, 116px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  white-space: pre-line;
+}
+
+.giant {
+  margin: 0;
+  font-size: clamp(84px, 20vw, 300px);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+}
+
+.sub {
+  margin: 28px 0 0;
+  max-width: 30ch;
+  color: var(--muted);
+  font-size: clamp(17px, 2.4vw, 27px);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  white-space: pre-line;
+}
+
+.subTight {
+  max-width: 38ch;
+}
+
+/* 그라데이션 강조 텍스트 (레몬 브랜드) */
+.accent {
+  background: linear-gradient(135deg, #fff3b0 0%, var(--lemon) 38%, var(--lemon-2) 78%, #ff9d00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* AI 디바이더용 컬러 그라데이션 (브랜드 톤 유지) */
+.accentAi {
+  background: linear-gradient(110deg, #fff 0%, #ffe27a 30%, var(--lemon) 55%, #ff9d00 78%, #ff5e3a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* --------------------------------------------------------- Reveal anim */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal[data-d='1'] {
+  transition-delay: 0.08s;
+}
+.reveal[data-d='2'] {
+  transition-delay: 0.16s;
+}
+.reveal[data-d='3'] {
+  transition-delay: 0.24s;
+}
+
+.inview {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .deck {
+    scroll-behavior: auto;
+  }
+}
+
+/* --------------------------------------------------------- Scroll hint */
+
+.scrollHint {
+  position: absolute;
+  bottom: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  color: var(--muted-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.scrollHint span {
+  width: 22px;
+  height: 34px;
+  border: 2px solid var(--muted-2);
+  border-radius: 12px;
+  position: relative;
+}
+
+.scrollHint span::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 3px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--muted-2);
+  transform: translateX(-50%);
+  animation: wheel 1.6s ease-in-out infinite;
+}
+
+@keyframes wheel {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 9px);
+  }
+}
+
+/* --------------------------------------------------- Pipeline overview */
+
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 48px;
+}
+
+.flowNode {
+  display: grid;
+  gap: 8px;
+  min-width: 150px;
+  padding: 22px 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--card);
+}
+
+.flowNum {
+  color: var(--lemon-2);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.flowKr {
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.flowTech {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.flowArrow {
+  align-self: center;
+  color: var(--muted-2);
+  font-size: 22px;
+}
+
+/* ---------------------------------------------------------- Stage slide */
+
+.stageTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.stageNum {
+  font-size: clamp(15px, 2vw, 19px);
+  font-weight: 800;
+  color: var(--lemon-2);
+  letter-spacing: 0.1em;
+}
+
+.stageLogo {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 5px;
+  border-radius: 8px;
+  background: #f5f6f8;
+}
+
+.stageLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 입력 → 출력 비주얼 */
+.io {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 3vw, 34px);
+  margin-top: 44px;
+}
+
+.ioBox {
+  display: grid;
+  place-items: center;
+  width: clamp(140px, 22vw, 230px);
+  height: clamp(140px, 22vw, 230px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--card);
+  overflow: hidden;
+  position: relative;
+}
+
+.ioLabel {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  color: var(--muted-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.ioArrow {
+  color: var(--lemon);
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 300;
+}
+
+/* 입력: 라벨 느낌의 줄들 */
+.mockLabel {
+  display: grid;
+  gap: 7px;
+  width: 64%;
+}
+.mockLabel i {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.22);
+}
+.mockLabel i:nth-child(1) { width: 90%; }
+.mockLabel i:nth-child(2) { width: 70%; }
+.mockLabel i:nth-child(3) { width: 82%; }
+.mockLabel i:nth-child(4) { width: 55%; }
+
+/* YOLO: 바운딩 박스 */
+.bbox {
+  position: absolute;
+  border: 2px solid var(--lemon);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+.bbox::before {
+  content: attr(data-tag);
+  position: absolute;
+  top: -18px;
+  left: -2px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--lemon);
+  color: #111;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* OCR: 추출 텍스트 */
+.ocrOut {
+  display: grid;
+  gap: 6px;
+  width: 72%;
+  text-align: left;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+  color: #d6ffe0;
+}
+
+/* LLM: 구조화 JSON */
+.jsonOut {
+  width: 80%;
+  text-align: left;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #cfe3ff;
+}
+.jsonOut b {
+  color: var(--lemon);
+  font-weight: 700;
+}
+
+.credit {
+  margin-top: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: clamp(12px, 1.6vw, 14px);
+  font-weight: 600;
+}
+
+.creditDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--lemon);
+  box-shadow: 0 0 10px var(--lemon);
+}
+
+/* ----------------------------------------------- Sticky pipeline bar */
+
+.railWrap {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(20, 20, 22, 0.72);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.railShown {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.railStage {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  transition: color 0.3s ease, background 0.3s ease;
+}
+
+.railStageActive {
+  background: var(--lemon);
+  color: #111;
+}
+
+.railArrow {
+  color: var(--muted-2);
+  font-size: 12px;
+}
+
+/* ----------------------------------------------------- Device mockup */
+
+.phoneWrap {
+  margin-top: 40px;
+  perspective: 1400px;
+}
+
+.phone {
+  width: clamp(230px, 30vw, 300px);
+  border: 10px solid #1c1c1e;
+  border-radius: 44px;
+  background: #000;
+  box-shadow: 0 40px 120px rgba(255, 184, 0, 0.16), 0 10px 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.phoneScreen {
+  background: linear-gradient(180deg, #111 0%, #0b0b0c 100%);
+  padding: 22px 16px 26px;
+  text-align: left;
+}
+
+.phoneNotch {
+  width: 38%;
+  height: 18px;
+  margin: 0 auto 16px;
+  border-radius: 0 0 12px 12px;
+  background: #1c1c1e;
+}
+
+.scoreRing {
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+  margin: 4px auto 16px;
+  border-radius: 999px;
+  background: conic-gradient(var(--lemon) 78%, rgba(255, 255, 255, 0.08) 0);
+}
+.scoreRing > div {
+  display: grid;
+  place-items: center;
+  width: 94px;
+  height: 94px;
+  border-radius: 999px;
+  background: #0b0b0c;
+}
+.scoreRing b {
+  font-size: 34px;
+  font-weight: 800;
+}
+.scoreRing span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.mrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 13px;
+  margin-top: 8px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  font-weight: 600;
+}
+.mtag {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.mok {
+  background: rgba(40, 200, 120, 0.16);
+  color: #4ade80;
+}
+.mwarn {
+  background: rgba(255, 184, 0, 0.16);
+  color: var(--lemon);
+}
+
+/* ------------------------------------------------------ Stack montage */
+
+.stackGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(64px, 78px));
+  gap: 14px;
+  justify-content: center;
+  margin-top: 44px;
+  max-width: 760px;
+}
+
+.stackChip {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #f5f6f8;
+}
+.stackChip img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.techLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 38px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #111;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.16s ease;
+}
+.techLink:hover {
+  transform: translateY(-2px);
+}
+
+/* ---------------------------------------------------- One more thing */
+
+.otmt {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: clamp(18px, 2.6vw, 26px);
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+/* ------------------------------------------------------------ Closer */
+
+.wordmark {
+  font-size: clamp(44px, 9vw, 120px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.disclaimer {
+  margin-top: 40px;
+  max-width: 40ch;
+  color: var(--muted-2);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------- Responsive */
+
+@media (max-width: 720px) {
+  .deck {
+    scroll-snap-type: none;
+  }
+  .io {
+    flex-direction: column;
+  }
+  .ioArrow {
+    transform: rotate(90deg);
+  }
+  .railWrap {
+    bottom: 14px;
+    gap: 2px;
+    padding: 6px 7px;
+  }
+  .railStage {
+    padding: 5px 9px;
+    font-size: 11.5px;
+  }
+  .railStage span {
+    display: none;
+  }
+  .railStageActive span {
+    display: inline;
+  }
+}

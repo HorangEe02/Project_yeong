@@ -1,0 +1,22 @@
+{
+  "dataset": "kdris_2020_sample_fixture",
+  "status": "implementation_sample_not_official_reference_table",
+  "current_official_reference_year": 2025,
+  "local_dataset_year": 2020,
+  "not_production": true,
+  "created_at": "2026-05-11",
+  "description": "Phase 1 API and unit-test fixture for KDRIs lookup shape. Numeric values must be replaced after official 2025 KDRIs source digitization and team review.",
+  "source_urls_for_future_digitization": [
+    "https://m.korea.kr/briefing/pressReleaseView.do?newsId=156737581",
+    "https://www.kns.or.kr/fileroom/FileRoom_view.asp?BoardID=Kdr&idx=167",
+    "https://www.mohw.go.kr/board.es?act=view&bid=0019&list_no=362385&mid=a10411010100",
+    "https://eiec.kdi.re.kr/policy/materialView.do?num=223213",
+    "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002817751"
+  ],
+  "quality_gate_before_production": [
+    "verify each nutrient against official KDRIs source tables",
+    "record reviewer and review date",
+    "replace source_note with official table identifier",
+    "add license and redistribution notes"
+  ]
+}

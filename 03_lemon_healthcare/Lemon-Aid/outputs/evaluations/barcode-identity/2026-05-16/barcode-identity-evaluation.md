@@ -1,0 +1,33 @@
+# Barcode Identity Evaluation
+
+- generated_at: `2026-05-16T06:51:53.863575+00:00`
+- fixture_count: `3`
+- observation_count: `3`
+- raw_provider_payload_stored: `False`
+- credentials_stored: `False`
+
+## Providers
+
+### foodqr
+
+- calls: `1`
+- matched_rate: `0.0`
+- not_found_rate: `1.0`
+- provider_error_rate: `0.0`
+- expected_status_match_rate: `None`
+
+### mfds_c003
+
+- calls: `1`
+- matched_rate: `0.0`
+- not_found_rate: `0.0`
+- provider_error_rate: `1.0`
+- expected_status_match_rate: `None`
+
+### mfds_i0760
+
+- calls: `1`
+- matched_rate: `1.0`
+- not_found_rate: `0.0`
+- provider_error_rate: `0.0`
+- expected_status_match_rate: `None`

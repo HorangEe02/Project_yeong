@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "reference_year": 2025,
+  "retrieved_at": "2026-05-14",
+  "errata_version": "2026-03-16",
+  "review_status": "needs_row_digitization_review",
+  "official_target_nutrient_count": 41,
+  "artifacts": [
+    {
+      "id": "kns_2025_kdri_books_summaries_errata_f4_zip",
+      "relative_path": "kns_2025_kdri_books_summaries_errata_f4.zip",
+      "source_url": "https://www.kns.or.kr/FileRoom/FileRoom_view.asp?BoardID=Kdr&idx=167",
+      "checksum_sha256": "26966013355039668bfc9eae799e86bd7ca45c27942ae5d10fb41c637913a6cb",
+      "artifact_type": "official_publication_archive",
+      "path": "data/nutrition_reference/kdris/raw/2025/kns_2025_kdri_books_summaries_errata_f4.zip",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "id": "kns_2025_kdri_korean_summary_pdf",
+      "relative_path": "kns_2025_kdri_korean_summary_2025-12-29.pdf",
+      "source_url": "https://www.kns.or.kr/FileRoom/FileRoom_view.asp?BoardID=Kdr&idx=167",
+      "checksum_sha256": "605ff8431ea7b6c465165bb5335aba580dcd4d56ba13a69583e62d163a7cc0c2",
+      "artifact_type": "official_summary_pdf",
+      "path": "data/nutrition_reference/kdris/raw/2025/kns_2025_kdri_korean_summary_2025-12-29.pdf",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "id": "mohw_2025_kdri_press_release_hwpx",
+      "relative_path": "mohw_2025_kdri_press_release.hwpx",
+      "source_url": "https://m.korea.kr/briefing/pressReleaseView.do?newsId=156737581",
+      "checksum_sha256": "c41eba906c21a3fd829097ca052b15bec11a9ecf1b31cd6288ed5324af5a4451",
+      "artifact_type": "official_press_release",
+      "path": "data/nutrition_reference/kdris/raw/2025/mohw_2025_kdri_press_release.hwpx",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "id": "mohw_2025_kdri_press_release_pdf",
+      "relative_path": "mohw_2025_kdri_press_release.pdf",
+      "source_url": "https://m.korea.kr/briefing/pressReleaseView.do?newsId=156737581",
+      "checksum_sha256": "7dba5811d43ab05ab4c3fda9fa90f7ab6b0e7192635a018a7c82ba7b93e27ef5",
+      "artifact_type": "official_press_release",
+      "path": "data/nutrition_reference/kdris/raw/2025/mohw_2025_kdri_press_release.pdf",
+      "retrieved_at": "2026-05-14"
+    },
+    {
+      "id": "mohw_2025_kdri_2020_comparison_pdf",
+      "relative_path": "mohw_2025_kdri_2020_comparison.pdf",
+      "source_url": "https://m.korea.kr/briefing/pressReleaseView.do?newsId=156737581",
+      "checksum_sha256": "0d7bb12f94ce205c0782fbfd1184bf91e00df31f69aa1dd0546bd90b6173ccd7",
+      "artifact_type": "official_comparison_pdf",
+      "path": "data/nutrition_reference/kdris/raw/2025/mohw_2025_kdri_2020_comparison.pdf",
+      "retrieved_at": "2026-05-14"
+    }
+  ]
+}

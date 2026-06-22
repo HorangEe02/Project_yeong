@@ -1,0 +1,209 @@
+{
+  "absolute_paths_stored": false,
+  "current_next_batch_file_name": "brand_product_review-001.jsonl",
+  "current_next_batch_key": "brand_product_review:001",
+  "current_next_queue_key": "brand_product_review",
+  "current_post_completion_blocker_codes": [
+    "batch_not_complete",
+    "blank_rows_remaining"
+  ],
+  "current_post_completion_execution_allowed": false,
+  "current_post_completion_steps": [
+    {
+      "gate_policy": "must_pass_before_reconcile",
+      "order": 1,
+      "purpose": "confirm operator local batch is complete",
+      "script_key": "preflight_supplement_operator_review_batch_file"
+    },
+    {
+      "gate_policy": "no_source_overwrite",
+      "order": 2,
+      "purpose": "merge completed batch into reconciled queue copies",
+      "script_key": "reconcile_supplement_operator_review_batch_files"
+    },
+    {
+      "gate_policy": "must_pass_before_queue_preflight",
+      "order": 3,
+      "purpose": "confirm queue level batch progress after reconcile",
+      "script_key": "preflight_supplement_operator_review_batch_progress"
+    },
+    {
+      "gate_policy": "partial_preview_only",
+      "order": 4,
+      "purpose": "separate reviewed brand decisions from blank queue stubs",
+      "script_key": "extract_supplement_brand_reviewed_decisions"
+    },
+    {
+      "gate_policy": "strict_zero_blank_pending_invalid_required",
+      "order": 5,
+      "purpose": "check strict brand decision readiness",
+      "script_key": "preflight_supplement_brand_review_decisions"
+    },
+    {
+      "gate_policy": "must_pass_before_product_manifest",
+      "order": 6,
+      "purpose": "gate product import manifest preparation",
+      "script_key": "gate_supplement_brand_db_import"
+    },
+    {
+      "gate_policy": "dry_run_or_manifest_only_before_db_gate",
+      "order": 7,
+      "purpose": "create approved product import manifest",
+      "script_key": "apply_supplement_brand_review_decisions"
+    },
+    {
+      "gate_policy": "dry_run_before_product_db_apply",
+      "order": 8,
+      "purpose": "dry run category product and mapping import",
+      "script_key": "import_supplement_taxonomy_approved_manifest"
+    },
+    {
+      "gate_policy": "must_pass_before_db_apply",
+      "order": 9,
+      "purpose": "gate reviewed product db apply",
+      "script_key": "gate_supplement_product_db_apply"
+    },
+    {
+      "gate_policy": "read_only_after_apply",
+      "order": 10,
+      "purpose": "verify imported categories products and mappings",
+      "script_key": "verify_supplement_taxonomy_db_import"
+    }
+  ],
+  "db_write_performed": false,
+  "external_provider_call_performed": false,
+  "generated_at": "2026-06-04T08:29:32.134383+00:00",
+  "input_names": {
+    "batch_progress": "operator-review-batch-progress.json",
+    "completion_audit": "supplement-learning-completion-audit.json",
+    "next_work_order": "operator-next-batch-work-order.json",
+    "post_completion_plan": "operator-post-completion-command-plan.json"
+  },
+  "input_path_hashes": {
+    "batch_progress": "763f936a2d57550c16154b645ca16ef5c0d960e946680565909d8bfb5c83e497",
+    "completion_audit": "61f191879980eb772baa0db0f3798ad059eb5c24afe6783c4992bada0dd23a35",
+    "next_work_order": "e4297aa545c66e9d90a1ea1e936fd47e208efdebe5fdbe19609c6d273b0a4169",
+    "post_completion_plan": "f30b1db4dc8ec3a9b2fe0756ecc0945cce33ee630ecf7d2a2b755fb566bea54d"
+  },
+  "llm_call_performed": false,
+  "local_path_literals_stored": false,
+  "objective_completion_allowed": false,
+  "operator_sequence": [
+    {
+      "blank_row_count": 388,
+      "next_action": "complete_brand_product_human_review",
+      "next_batch_key": "brand_product_review:001",
+      "order": 1,
+      "queue_key": "brand_product_review",
+      "status": "pending_operator_review",
+      "title": "brand and product review",
+      "unblocks": "taxonomy product/category DB import"
+    },
+    {
+      "blank_row_count": 215,
+      "next_action": "complete_review_image_pii_screening",
+      "next_batch_key": "review_pii_screening:001",
+      "order": 2,
+      "queue_key": "review_pii_screening",
+      "status": "pending_operator_review",
+      "title": "review image PII screening",
+      "unblocks": "manual OCR ground truth and teacher OCR comparison"
+    },
+    {
+      "blank_row_count": 205,
+      "next_action": "complete_supplement_section_bbox_review",
+      "next_batch_key": "yolo_section_annotation:001",
+      "order": 3,
+      "queue_key": "yolo_section_annotation",
+      "status": "pending_operator_review",
+      "title": "supplement section bbox annotation",
+      "unblocks": "YOLO section dataset and PaddleOCR improvement loop"
+    },
+    {
+      "blank_row_count": 0,
+      "next_action": "run_post_completion_gates_in_order",
+      "next_batch_key": "",
+      "order": 4,
+      "queue_key": "post_operator_gates",
+      "status": "blocked_until_operator_batches_complete",
+      "title": "post-operator gates",
+      "unblocks": "remaining requirement gates: brand_product_db_import, taxonomy_db_import_verified, review_image_ground_truth_privacy_gate, manual_ocr_ground_truth, teacher_ocr_paddleocr_comparison, detail_page_yolo_bbox_annotation, section_yolo_dataset_ready, paddleocr_training_loop_ready"
+    }
+  ],
+  "product_dir_literals_stored": false,
+  "queue_summaries": [
+    {
+      "batch_count": 8,
+      "blank_row_count": 388,
+      "invalid_row_count": 0,
+      "missing_row_count": 0,
+      "next_batch_key": "brand_product_review:001",
+      "queue_key": "brand_product_review",
+      "reason_counts": {
+        "blank_decision": 388
+      },
+      "status": "pending_operator_review",
+      "valid_row_count": 0
+    },
+    {
+      "batch_count": 5,
+      "blank_row_count": 215,
+      "invalid_row_count": 0,
+      "missing_row_count": 0,
+      "next_batch_key": "review_pii_screening:001",
+      "queue_key": "review_pii_screening",
+      "reason_counts": {
+        "blank_decision": 215
+      },
+      "status": "pending_operator_review",
+      "valid_row_count": 0
+    },
+    {
+      "batch_count": 5,
+      "blank_row_count": 205,
+      "invalid_row_count": 0,
+      "missing_row_count": 0,
+      "next_batch_key": "yolo_section_annotation:001",
+      "queue_key": "yolo_section_annotation",
+      "reason_counts": {
+        "blank_boxes": 205
+      },
+      "status": "pending_operator_review",
+      "valid_row_count": 0
+    }
+  ],
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "requirement_summary": {
+    "blocked": 5,
+    "incomplete_requirement_keys": [
+      "brand_product_db_import",
+      "taxonomy_db_import_verified",
+      "review_image_ground_truth_privacy_gate",
+      "manual_ocr_ground_truth",
+      "teacher_ocr_paddleocr_comparison",
+      "detail_page_yolo_bbox_annotation",
+      "section_yolo_dataset_ready",
+      "paddleocr_training_loop_ready"
+    ],
+    "pending": 3,
+    "verified": 3
+  },
+  "schema_version": "supplement-operator-unblock-runbook-v1",
+  "source_doc_urls": [
+    "https://docs.ultralytics.com/datasets/detect/",
+    "https://docs.ultralytics.com/tasks/detect/",
+    "https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/OCR.html",
+    "https://cloud.google.com/vision/docs/ocr",
+    "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr",
+    "https://docs.sqlalchemy.org/en/21/orm/queryguide/select.html",
+    "https://www.postgresql.org/docs/current/ddl-constraints.html",
+    "https://supabase.com/docs/guides/database/postgres/row-level-security"
+  ],
+  "source_editable_file_name": "decisions.todo.jsonl",
+  "source_image_read_performed": false,
+  "source_rows_read": false,
+  "status": "blocked_by_operator_review",
+  "total_blank_row_count": 808,
+  "training_execution_performed_by_script": false
+}

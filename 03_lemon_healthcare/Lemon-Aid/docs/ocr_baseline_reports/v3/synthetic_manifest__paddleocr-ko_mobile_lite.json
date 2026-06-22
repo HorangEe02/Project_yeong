@@ -1,0 +1,874 @@
+{
+  "adapter": "paddleocr_v3_korean_mobile_lite",
+  "manifest_path": "../data/ocr_eval/synthetic_manifest.json",
+  "total": 60,
+  "skipped": 0,
+  "avg_cer": 0.2932852734258428,
+  "avg_wer": 0.8625458287012279,
+  "exact_match_ratio": 0.0,
+  "field_match_ratio": 0.34444444444444444,
+  "field_match_breakdown": {
+    "product_name": 0.0,
+    "ingredients": 0.16666666666666666,
+    "dosage": 0.8666666666666667
+  },
+  "by_language": {
+    "ko": {
+      "count": 20.0,
+      "avg_cer": 0.5441602501780046,
+      "exact_match_ratio": 0.0
+    },
+    "en": {
+      "count": 20.0,
+      "avg_cer": 0.06445442167085666,
+      "exact_match_ratio": 0.0
+    },
+    "mixed": {
+      "count": 20.0,
+      "avg_cer": 0.2712411484286672,
+      "exact_match_ratio": 0.0
+    }
+  },
+  "items": [
+    {
+      "id": "synth_0001",
+      "language": "ko",
+      "cer": 0.47572815533980584,
+      "wer": 0.8888888888888888,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 885.59379207436
+    },
+    {
+      "id": "synth_0002",
+      "language": "en",
+      "cer": 0.08029197080291971,
+      "wer": 0.6956521739130435,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 773.3439169824123
+    },
+    {
+      "id": "synth_0003",
+      "language": "mixed",
+      "cer": 0.2568306010928962,
+      "wer": 0.9411764705882353,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 963.5464580496773
+    },
+    {
+      "id": "synth_0004",
+      "language": "ko",
+      "cer": 0.5714285714285714,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 808.2803750876337
+    },
+    {
+      "id": "synth_0005",
+      "language": "en",
+      "cer": 0.058823529411764705,
+      "wer": 0.65,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 939.5373330917209
+    },
+    {
+      "id": "synth_0006",
+      "language": "mixed",
+      "cer": 0.27702702702702703,
+      "wer": 0.9629629629629629,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1125.195708940737
+    },
+    {
+      "id": "synth_0007",
+      "language": "ko",
+      "cer": 0.5287356321839081,
+      "wer": 0.9545454545454546,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 796.4682499878109
+    },
+    {
+      "id": "synth_0008",
+      "language": "en",
+      "cer": 0.10559006211180125,
+      "wer": 0.8846153846153846,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 970.0814170064405
+    },
+    {
+      "id": "synth_0009",
+      "language": "mixed",
+      "cer": 0.2765957446808511,
+      "wer": 0.9459459459459459,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1136.334291077219
+    },
+    {
+      "id": "synth_0010",
+      "language": "ko",
+      "cer": 0.4939759036144578,
+      "wer": 0.9545454545454546,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 718.1906249606982
+    },
+    {
+      "id": "synth_0011",
+      "language": "en",
+      "cer": 0.05154639175257732,
+      "wer": 0.6428571428571429,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 689.029417000711
+    },
+    {
+      "id": "synth_0012",
+      "language": "mixed",
+      "cer": 0.2595419847328244,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 942.7807090105489
+    },
+    {
+      "id": "synth_0013",
+      "language": "ko",
+      "cer": 0.5666666666666667,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 713.1449170410633
+    },
+    {
+      "id": "synth_0014",
+      "language": "en",
+      "cer": 0.06015037593984962,
+      "wer": 0.6190476190476191,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 786.7214999860153
+    },
+    {
+      "id": "synth_0015",
+      "language": "mixed",
+      "cer": 0.2676767676767677,
+      "wer": 0.9428571428571428,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1080.8252909919247
+    },
+    {
+      "id": "synth_0016",
+      "language": "ko",
+      "cer": 0.5609756097560976,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 702.7787909610197
+    },
+    {
+      "id": "synth_0017",
+      "language": "en",
+      "cer": 0.06622516556291391,
+      "wer": 0.6666666666666666,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 866.0031670005992
+    },
+    {
+      "id": "synth_0018",
+      "language": "mixed",
+      "cer": 0.2585034013605442,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 869.3945409031585
+    },
+    {
+      "id": "synth_0019",
+      "language": "ko",
+      "cer": 0.5116279069767442,
+      "wer": 0.9565217391304348,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 748.1064579915255
+    },
+    {
+      "id": "synth_0020",
+      "language": "en",
+      "cer": 0.08333333333333333,
+      "wer": 0.6842105263157895,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 737.9894589539617
+    },
+    {
+      "id": "synth_0021",
+      "language": "mixed",
+      "cer": 0.26905829596412556,
+      "wer": 0.9512195121951219,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1113.5000829817727
+    },
+    {
+      "id": "synth_0022",
+      "language": "ko",
+      "cer": 0.5384615384615384,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 681.0597920557484
+    },
+    {
+      "id": "synth_0023",
+      "language": "en",
+      "cer": 0.06521739130434782,
+      "wer": 0.64,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 758.4900000365451
+    },
+    {
+      "id": "synth_0024",
+      "language": "mixed",
+      "cer": 0.24479166666666666,
+      "wer": 0.9166666666666666,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 990.0378750171512
+    },
+    {
+      "id": "synth_0025",
+      "language": "ko",
+      "cer": 0.5204081632653061,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 788.3063750341535
+    },
+    {
+      "id": "synth_0026",
+      "language": "en",
+      "cer": 0.04672897196261682,
+      "wer": 0.5,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 682.0585000095889
+    },
+    {
+      "id": "synth_0027",
+      "language": "mixed",
+      "cer": 0.28846153846153844,
+      "wer": 0.967741935483871,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 987.8082500072196
+    },
+    {
+      "id": "synth_0028",
+      "language": "ko",
+      "cer": 0.5901639344262295,
+      "wer": 0.9375,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 621.8882920220494
+    },
+    {
+      "id": "synth_0029",
+      "language": "en",
+      "cer": 0.07766990291262135,
+      "wer": 0.9333333333333333,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 683.222624938935
+    },
+    {
+      "id": "synth_0030",
+      "language": "mixed",
+      "cer": 0.26785714285714285,
+      "wer": 0.9393939393939394,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 945.1529170619324
+    },
+    {
+      "id": "synth_0031",
+      "language": "ko",
+      "cer": 0.5555555555555556,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 688.5711669456214
+    },
+    {
+      "id": "synth_0032",
+      "language": "en",
+      "cer": 0.0673076923076923,
+      "wer": 0.8125,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 725.9129580343142
+    },
+    {
+      "id": "synth_0033",
+      "language": "mixed",
+      "cer": 0.2393617021276596,
+      "wer": 0.9117647058823529,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1062.0670830830932
+    },
+    {
+      "id": "synth_0034",
+      "language": "ko",
+      "cer": 0.5483870967741935,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 666.6657499736175
+    },
+    {
+      "id": "synth_0035",
+      "language": "en",
+      "cer": 0.0425531914893617,
+      "wer": 0.4,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 657.5007499195635
+    },
+    {
+      "id": "synth_0036",
+      "language": "mixed",
+      "cer": 0.2857142857142857,
+      "wer": 0.9428571428571428,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1095.2267079846933
+    },
+    {
+      "id": "synth_0037",
+      "language": "ko",
+      "cer": 0.4854368932038835,
+      "wer": 0.9615384615384616,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 855.835665948689
+    },
+    {
+      "id": "synth_0038",
+      "language": "en",
+      "cer": 0.031496062992125984,
+      "wer": 0.4,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 840.826041996479
+    },
+    {
+      "id": "synth_0039",
+      "language": "mixed",
+      "cer": 0.27848101265822783,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1069.9063340434805
+    },
+    {
+      "id": "synth_0040",
+      "language": "ko",
+      "cer": 0.5119047619047619,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 783.5206249728799
+    },
+    {
+      "id": "synth_0041",
+      "language": "en",
+      "cer": 0.05263157894736842,
+      "wer": 0.5,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 705.5362079991028
+    },
+    {
+      "id": "synth_0042",
+      "language": "mixed",
+      "cer": 0.3106060606060606,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 829.0386670269072
+    },
+    {
+      "id": "synth_0043",
+      "language": "ko",
+      "cer": 0.6349206349206349,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 738.2256670389324
+    },
+    {
+      "id": "synth_0044",
+      "language": "en",
+      "cer": 0.07758620689655173,
+      "wer": 0.8333333333333334,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 777.9596670297906
+    },
+    {
+      "id": "synth_0045",
+      "language": "mixed",
+      "cer": 0.29508196721311475,
+      "wer": 0.9583333333333334,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 847.8615420171991
+    },
+    {
+      "id": "synth_0046",
+      "language": "ko",
+      "cer": 0.5393258426966292,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 754.207874997519
+    },
+    {
+      "id": "synth_0047",
+      "language": "en",
+      "cer": 0.04918032786885246,
+      "wer": 0.4,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 709.0202909894288
+    },
+    {
+      "id": "synth_0048",
+      "language": "mixed",
+      "cer": 0.26851851851851855,
+      "wer": 0.9545454545454546,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 717.0730830403045
+    },
+    {
+      "id": "synth_0049",
+      "language": "ko",
+      "cer": 0.603448275862069,
+      "wer": 1.0,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 601.3109589694068
+    },
+    {
+      "id": "synth_0050",
+      "language": "en",
+      "cer": 0.09836065573770492,
+      "wer": 0.95,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 745.3625840134919
+    },
+    {
+      "id": "synth_0051",
+      "language": "mixed",
+      "cer": 0.2727272727272727,
+      "wer": 0.9714285714285714,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1021.1315420456231
+    },
+    {
+      "id": "synth_0052",
+      "language": "ko",
+      "cer": 0.5454545454545454,
+      "wer": 0.9411764705882353,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 699.7345830313861
+    },
+    {
+      "id": "synth_0053",
+      "language": "en",
+      "cer": 0.07017543859649122,
+      "wer": 0.7058823529411765,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 733.736583031714
+    },
+    {
+      "id": "synth_0054",
+      "language": "mixed",
+      "cer": 0.27522935779816515,
+      "wer": 0.9722222222222222,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1179.2465419275686
+    },
+    {
+      "id": "synth_0055",
+      "language": "ko",
+      "cer": 0.59375,
+      "wer": 0.9444444444444444,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 672.7972920052707
+    },
+    {
+      "id": "synth_0056",
+      "language": "en",
+      "cer": 0.04,
+      "wer": 0.5,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 642.7796249045059
+    },
+    {
+      "id": "synth_0057",
+      "language": "mixed",
+      "cer": 0.2827586206896552,
+      "wer": 0.9666666666666667,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 896.5357079869136
+    },
+    {
+      "id": "synth_0058",
+      "language": "ko",
+      "cer": 0.5068493150684932,
+      "wer": 0.9444444444444444,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 714.4280839711428
+    },
+    {
+      "id": "synth_0059",
+      "language": "en",
+      "cer": 0.06422018348623854,
+      "wer": 0.6842105263157895,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": true,
+        "dosage": true
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 727.8579579433426
+    },
+    {
+      "id": "synth_0060",
+      "language": "mixed",
+      "cer": 0.25,
+      "wer": 0.9210526315789473,
+      "exact": false,
+      "field_matches": {
+        "product_name": false,
+        "ingredients": false,
+        "dosage": false
+      },
+      "chosen_engine": "paddleocr_v3_korean_mobile_lite",
+      "elapsed_ms": 1129.9316249787807
+    }
+  ]
+}

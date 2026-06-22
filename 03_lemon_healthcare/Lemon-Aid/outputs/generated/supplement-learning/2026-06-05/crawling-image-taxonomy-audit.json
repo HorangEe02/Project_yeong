@@ -1,0 +1,2849 @@
+{
+  "absolute_paths_stored": false,
+  "brand_candidate_counts": {
+    "YDY": 1,
+    "고려은단": 20,
+    "굿앤키즈": 11,
+    "나우푸드": 44,
+    "내츄럴플러스": 62,
+    "네이처스웨이": 3,
+    "네츄럴펙터스": 1,
+    "뉴트리코스트": 40,
+    "뉴트리코어": 1,
+    "닥터린": 16,
+    "닥터스베스트": 6,
+    "닥터에디션": 1,
+    "닥터프로그램": 2,
+    "데일리": 1,
+    "덴프스": 1,
+    "라이프익스텐션": 2,
+    "락토핏": 1,
+    "락티브": 18,
+    "리포데이": 4,
+    "마시는": 1,
+    "메가": 1,
+    "미국산": 1,
+    "바디닥터스": 1,
+    "블루보넷뉴트리션": 2,
+    "삼대오백": 8,
+    "세노비스": 16,
+    "센트룸": 8,
+    "수용성": 4,
+    "스포츠리서치": 1,
+    "식물성": 1,
+    "써큐란": 1,
+    "쏜": 1,
+    "쏜리서치": 30,
+    "아르기닌": 1,
+    "아임비타": 1,
+    "알부민": 1,
+    "얼라이브": 6,
+    "에너지": 1,
+    "에버핏": 4,
+    "원스데일리": 3,
+    "유기농": 2,
+    "유통기한": 1,
+    "유한양행": 9,
+    "이노빅스랩스": 1,
+    "자로우포뮬러스": 1,
+    "조인트": 1,
+    "종근당": 21,
+    "종근당건강": 21,
+    "파라다이스허브": 1,
+    "프롬바이오": 1
+  },
+  "categories": [
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 1,
+        "뉴트리코스트": 1,
+        "삼대오백": 1
+      },
+      "category_key": "bcaa_eaa",
+      "display_name": "BCAA_EAA",
+      "image_count": 1110,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 3,
+      "product_count": 3,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 503,
+          "issue_counts": {},
+          "product_dir_hash": "b9b12dfa88a5561105414177b83759bd2eeaecc82491a2965e265c62aa3149c1",
+          "source_kind_counts": {
+            "detail_page": 3,
+            "review": 500
+          },
+          "source_product_id": "10356752201"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 100,
+          "issue_counts": {},
+          "product_dir_hash": "fca17ff53fb9a2d8cb6a7b9b03b3f4e6f69216f0b6bdd454a9525e29812dc095",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 95
+          },
+          "source_product_id": "13075736980"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "삼대오백",
+            "display_name": "삼대오백",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 507,
+          "issue_counts": {},
+          "product_dir_hash": "2b22d37e442b1fc42543e27743523d10fc66319cd0e3c45b4cbb92901c88e261",
+          "source_kind_counts": {
+            "detail_page": 10,
+            "review": 497
+          },
+          "source_product_id": "11235198438"
+        }
+      ],
+      "sort_order": 0,
+      "source_folder_hash": "009d2f4de8a64488853f1ce317890a9a7ab58b549687c200bbb535047b9464b0",
+      "source_folder_name": "[BCAA_EAA]",
+      "source_kind_counts": {
+        "detail_page": 18,
+        "review": 1092
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "뉴트리코스트": 2
+      },
+      "category_key": "hmb_타우린",
+      "display_name": "HMB_타우린",
+      "image_count": 587,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 3,
+      "product_count": 2,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 81,
+          "issue_counts": {},
+          "product_dir_hash": "564c04aa0435ae83f4028821db977d691a4471909d5235c211da6c29ace31eb6",
+          "source_kind_counts": {
+            "detail_page": 9,
+            "review": 72
+          },
+          "source_product_id": "11537232565"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 506,
+          "issue_counts": {},
+          "product_dir_hash": "9cf7faec8ad5924f4822b1e590ca53d7c51d258e27824e7d326566d401430267",
+          "source_kind_counts": {
+            "detail_page": 6,
+            "review": 500
+          },
+          "source_product_id": "736016173"
+        }
+      ],
+      "sort_order": 1,
+      "source_folder_hash": "7f45d5cb236f541e2ec7ddc2d39bffe6422d14be6d955034b2380c165928d708",
+      "source_folder_name": "[HMB_타우린]",
+      "source_kind_counts": {
+        "detail_page": 15,
+        "review": 572
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "수용성": 4,
+        "쏜리서치": 3
+      },
+      "category_key": "강황_커큐민",
+      "display_name": "강황_커큐민",
+      "image_count": 2425,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 9,
+      "product_count": 7,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "수용성",
+            "display_name": "수용성",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 397,
+          "issue_counts": {},
+          "product_dir_hash": "d8e35da61a1e1b771a379bf60a1185d26d9e2ff3eac4368ff0d106e90284af98",
+          "source_kind_counts": {
+            "detail_page": 1,
+            "review": 396
+          },
+          "source_product_id": "11750832074"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "수용성",
+            "display_name": "수용성",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 124,
+          "issue_counts": {},
+          "product_dir_hash": "aebe7913dd632a3dd4503a35b4e6c931166b1740690c18405ed18fc808246419",
+          "source_kind_counts": {
+            "detail_page": 3,
+            "review": 121
+          },
+          "source_product_id": "12176974394"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "수용성",
+            "display_name": "수용성",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 501,
+          "issue_counts": {},
+          "product_dir_hash": "9a0c1f72fa89d3d225175771bd671e9beca5022e9f56fc7046307cf0de1b9b7d",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 499
+          },
+          "source_product_id": "5383085718"
+        }
+      ],
+      "sort_order": 2,
+      "source_folder_hash": "86706149bc12210cf9eaba09cad06f6c602579bc95c8fea0770e1eee45a24b6f",
+      "source_folder_name": "[강황_커큐민]",
+      "source_kind_counts": {
+        "detail_page": 100,
+        "review": 2325
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "내츄럴플러스": 2,
+        "닥터린": 2,
+        "닥터스베스트": 2,
+        "락티브": 1,
+        "쏜리서치": 1,
+        "종근당": 2
+      },
+      "category_key": "관절_msm_콘드로이친",
+      "display_name": "관절_MSM_콘드로이친",
+      "image_count": 3527,
+      "issue_counts": {
+        "missing_review_dir": 1
+      },
+      "non_image_file_count": 0,
+      "product_count": 10,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "닥터스베스트",
+            "display_name": "닥터스베스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 333,
+          "issue_counts": {},
+          "product_dir_hash": "a5feb14dfd185da6fc133566d31ab5b9992ed769d54710f6bb0763fdc738ea16",
+          "source_kind_counts": {
+            "detail_page": 34,
+            "review": 299
+          },
+          "source_product_id": "8735610167"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "닥터스베스트",
+            "display_name": "닥터스베스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 497,
+          "issue_counts": {},
+          "product_dir_hash": "ad1ded157cccabe2aa45a7690f6ad315eccecab92145dcac92f3f847bb4b6255",
+          "source_kind_counts": {
+            "detail_page": 35,
+            "review": 462
+          },
+          "source_product_id": "8670233351"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "닥터린",
+            "display_name": "닥터린",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 104,
+          "issue_counts": {},
+          "product_dir_hash": "7eae8f06b96ce293734556032ad22e4a6f4a641da6b042f2353433cc28ae990d",
+          "source_kind_counts": {
+            "detail_page": 38,
+            "review": 66
+          },
+          "source_product_id": "12781058111"
+        }
+      ],
+      "sort_order": 3,
+      "source_folder_hash": "4ef5ffadae19557ef591ca9747e6541795d5ca3b84728e2386a5f623a809c750",
+      "source_folder_name": "[관절_MSM_콘드로이친]",
+      "source_kind_counts": {
+        "detail_page": 164,
+        "review": 3363
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "내츄럴플러스": 1
+      },
+      "category_key": "글루코사민",
+      "display_name": "글루코사민",
+      "image_count": 124,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 1,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 124,
+          "issue_counts": {},
+          "product_dir_hash": "80346212b869d31ca99ae44dcbecaef28e8b587157ff6a05895abfb02246c28d",
+          "source_kind_counts": {
+            "detail_page": 35,
+            "review": 89
+          },
+          "source_product_id": "9925196160"
+        }
+      ],
+      "sort_order": 4,
+      "source_folder_hash": "5de03940b21faf445c1d23ce9d3b01ee8405629e82841a294dccb845b0ecaf93",
+      "source_folder_name": "[글루코사민]",
+      "source_kind_counts": {
+        "detail_page": 35,
+        "review": 89
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 1,
+        "나우푸드": 1,
+        "내츄럴플러스": 20,
+        "네츄럴펙터스": 1,
+        "뉴트리코스트": 6,
+        "닥터린": 3,
+        "덴프스": 1,
+        "락티브": 1,
+        "마시는": 1,
+        "삼대오백": 3,
+        "식물성": 1,
+        "써큐란": 1,
+        "쏜": 1,
+        "쏜리서치": 9,
+        "알부민": 1,
+        "에너지": 1,
+        "유기농": 2,
+        "조인트": 1,
+        "종근당": 3,
+        "종근당건강": 1,
+        "파라다이스허브": 1
+      },
+      "category_key": "기타",
+      "display_name": "기타",
+      "image_count": 15487,
+      "issue_counts": {
+        "missing_review_dir": 7
+      },
+      "non_image_file_count": 5,
+      "product_count": 60,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "네츄럴펙터스",
+            "display_name": "네츄럴펙터스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 443,
+          "issue_counts": {},
+          "product_dir_hash": "5409b308fb1f33e55a9cc1e852a8f4c813003e51517868af64703574d7ac606e",
+          "source_kind_counts": {
+            "detail_page": 35,
+            "review": 408
+          },
+          "source_product_id": "9198408459"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "파라다이스허브",
+            "display_name": "파라다이스허브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 57,
+          "issue_counts": {},
+          "product_dir_hash": "0428aeea296bfba0dd5fcdaecb21167d323de6291e9c4a32ce4875305618a695",
+          "source_kind_counts": {
+            "detail_page": 34,
+            "review": 23
+          },
+          "source_product_id": "8785090762"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 12,
+          "issue_counts": {
+            "missing_review_dir": 1
+          },
+          "product_dir_hash": "eb825cfb7cd3ae28374af4f00e1e743c80f498878fb398a35503242720b26b40",
+          "source_kind_counts": {
+            "detail_page": 12
+          },
+          "source_product_id": "12944881470"
+        }
+      ],
+      "sort_order": 5,
+      "source_folder_hash": "6e6366f55dfd3d9ff0cf22d74e644eb5e6919385b376d3b75285932decd40d85",
+      "source_folder_name": "[기타]",
+      "source_kind_counts": {
+        "detail_page": 592,
+        "review": 14895
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 1,
+        "나우푸드": 1,
+        "내츄럴플러스": 1
+      },
+      "category_key": "남성_쏘팔메토",
+      "display_name": "남성_쏘팔메토",
+      "image_count": 1322,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 3,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "고려은단",
+            "display_name": "고려은단",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 499,
+          "issue_counts": {},
+          "product_dir_hash": "7dc524e9b8a791f7ddbe580eac208766f81a75087f8be912e9ff63a7829545d5",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 494
+          },
+          "source_product_id": "10764662775"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 497,
+          "issue_counts": {},
+          "product_dir_hash": "887add448cac8e9d814ecb808c8fbb2b9eae25bc0e1224ade5ee82a707dd3d62",
+          "source_kind_counts": {
+            "detail_page": 3,
+            "review": 494
+          },
+          "source_product_id": "5294151157"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 326,
+          "issue_counts": {},
+          "product_dir_hash": "026fc33e7645c88e6e18e45b93a7235e369ec910d4c37df5146d64ec41df5b46",
+          "source_kind_counts": {
+            "detail_page": 15,
+            "review": 311
+          },
+          "source_product_id": "9417314501"
+        }
+      ],
+      "sort_order": 6,
+      "source_folder_hash": "d4ec1e4bcd1b8da97ed48bb8d34d0b9c5507d0643ef1c6c318236cf4c6828106",
+      "source_folder_name": "[남성_쏘팔메토]",
+      "source_kind_counts": {
+        "detail_page": 23,
+        "review": 1299
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 1,
+        "닥터린": 1,
+        "락티브": 2,
+        "종근당": 1
+      },
+      "category_key": "뇌_은행잎",
+      "display_name": "뇌_은행잎",
+      "image_count": 2172,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 5,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "닥터린",
+            "display_name": "닥터린",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 503,
+          "issue_counts": {},
+          "product_dir_hash": "21dfb57ffa2bf36935f6fa31830b4af1f05f1257b2051c65368a006962ed069d",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 498
+          },
+          "source_product_id": "8490007771"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "락티브",
+            "display_name": "락티브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 501,
+          "issue_counts": {},
+          "product_dir_hash": "dc85a219add2f32891707a3d86c8a25d639b3320773a289a48923978ecf9e113",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 499
+          },
+          "source_product_id": "10718647050"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "락티브",
+            "display_name": "락티브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 500,
+          "issue_counts": {},
+          "product_dir_hash": "18d771de71226f237905f8ad7b447d71f16e433f337228507923a25ee2f20fa1",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 498
+          },
+          "source_product_id": "11264419738"
+        }
+      ],
+      "sort_order": 7,
+      "source_folder_hash": "7613b9b42a0ff94485351019b3a5e83a08c2410d9043914fc1f98fc23ed1054e",
+      "source_folder_name": "[뇌_은행잎]",
+      "source_kind_counts": {
+        "detail_page": 13,
+        "review": 2159
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 3,
+        "내츄럴플러스": 1
+      },
+      "category_key": "다이어트_체지방",
+      "display_name": "다이어트_체지방",
+      "image_count": 2000,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 1,
+      "product_count": 4,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 502,
+          "issue_counts": {},
+          "product_dir_hash": "408eac442ea049f623a97bfe830a88699e5588b370d4cf52c1ccf76ff25a9894",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 500
+          },
+          "source_product_id": "4981986511"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 502,
+          "issue_counts": {},
+          "product_dir_hash": "9bba29e783af20e5cce896204461cefa7b95086bca3f98bcc7ac9ebf26f86cbe",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 500
+          },
+          "source_product_id": "10998181198"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 497,
+          "issue_counts": {},
+          "product_dir_hash": "ba36e41361df2eb5a201d49b14c56ad6969335157bd94208b3f3d3d6307cf96a",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 495
+          },
+          "source_product_id": "10998184938"
+        }
+      ],
+      "sort_order": 8,
+      "source_folder_hash": "dbcc38a4a9966ef033eb14ec71fa8be996b321c77243cd252af2457262610cdf",
+      "source_folder_name": "[다이어트_체지방]",
+      "source_kind_counts": {
+        "detail_page": 8,
+        "review": 1992
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "뉴트리코스트": 4
+      },
+      "category_key": "단백질_프로틴",
+      "display_name": "단백질_프로틴",
+      "image_count": 129,
+      "issue_counts": {
+        "category_contains_non_image_files": 1,
+        "missing_review_dir": 2
+      },
+      "non_image_file_count": 5,
+      "product_count": 4,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 27,
+          "issue_counts": {
+            "missing_review_dir": 1
+          },
+          "product_dir_hash": "6892baded320306a233f64b8d2e3628fe4a66ca55741e5a3dfca268e36aa1f52",
+          "source_kind_counts": {
+            "detail_page": 27
+          },
+          "source_product_id": "8475552924"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 53,
+          "issue_counts": {},
+          "product_dir_hash": "ae34a58d9f3a68fb1b10a9c9377e11a68901e85e4d53682b42a15735ce2641db",
+          "source_kind_counts": {
+            "detail_page": 29,
+            "review": 24
+          },
+          "source_product_id": "2936151136"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 27,
+          "issue_counts": {
+            "missing_review_dir": 1
+          },
+          "product_dir_hash": "97b7a01effb780e1406b2abc0671b7e809c8c51e915111ec801b599cbf0afa42",
+          "source_kind_counts": {
+            "detail_page": 27
+          },
+          "source_product_id": "8475559657"
+        }
+      ],
+      "sort_order": 9,
+      "source_folder_hash": "cd44c0f3b335e87ef6a320cfb932ace08ec4c26d5834de768a8283ac1f09fb57",
+      "source_folder_name": "[단백질_프로틴]",
+      "source_kind_counts": {
+        "detail_page": 86,
+        "review": 43
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 1,
+        "내츄럴플러스": 1,
+        "뉴트리코스트": 1,
+        "닥터린": 1,
+        "유한양행": 1,
+        "종근당": 2,
+        "종근당건강": 1
+      },
+      "category_key": "루테인_눈",
+      "display_name": "루테인_눈",
+      "image_count": 3967,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 8,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "닥터린",
+            "display_name": "닥터린",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 505,
+          "issue_counts": {},
+          "product_dir_hash": "49020b1f7530c51c7fae611c0e6e788a6655bbdcb252f52453de434241e52812",
+          "source_kind_counts": {
+            "detail_page": 6,
+            "review": 499
+          },
+          "source_product_id": "9742214766"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 431,
+          "issue_counts": {},
+          "product_dir_hash": "cf852fedbfc56ff24b66fe7ccfecb14e64f32820654aeb968b524a68e095cab1",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 429
+          },
+          "source_product_id": "4486595616"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "고려은단",
+            "display_name": "고려은단",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 501,
+          "issue_counts": {},
+          "product_dir_hash": "f95ed735776eb1117af21a75d14d397e38bbda800c6f33959c18e5d4c17fa330",
+          "source_kind_counts": {
+            "detail_page": 501
+          },
+          "source_product_id": "9396259383"
+        }
+      ],
+      "sort_order": 10,
+      "source_folder_hash": "9a7aa2ebad4c5e6d55aff476d7aa6239db0ab72616af15ccbd4b9f14c800cc2d",
+      "source_folder_name": "[루테인_눈]",
+      "source_kind_counts": {
+        "detail_page": 548,
+        "review": 3419
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 1,
+        "나우푸드": 1,
+        "뉴트리코스트": 1,
+        "닥터린": 1,
+        "닥터스베스트": 2,
+        "락티브": 1,
+        "바디닥터스": 1,
+        "블루보넷뉴트리션": 2,
+        "세노비스": 1,
+        "쏜리서치": 2,
+        "종근당건강": 2,
+        "프롬바이오": 1
+      },
+      "category_key": "마그네슘",
+      "display_name": "마그네슘",
+      "image_count": 5964,
+      "issue_counts": {
+        "category_contains_non_image_files": 1,
+        "missing_review_dir": 1
+      },
+      "non_image_file_count": 20,
+      "product_count": 16,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "닥터스베스트",
+            "display_name": "닥터스베스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 430,
+          "issue_counts": {},
+          "product_dir_hash": "65cc2ee08efcb8fed7ee5c90b732c36e15eaee287361f7ef8964182f3dea8a0b",
+          "source_kind_counts": {
+            "detail_page": 33,
+            "review": 397
+          },
+          "source_product_id": "8735610330"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "닥터스베스트",
+            "display_name": "닥터스베스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 332,
+          "issue_counts": {},
+          "product_dir_hash": "695b96a976eb54bfb30e6a93777b3bea729e97846b82f80075a95eff72e7e5bb",
+          "source_kind_counts": {
+            "detail_page": 35,
+            "review": 297
+          },
+          "source_product_id": "8735610330"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "블루보넷뉴트리션",
+            "display_name": "블루보넷뉴트리션",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 189,
+          "issue_counts": {},
+          "product_dir_hash": "757d54b2baf9296200d747ff4b3b757196ebcc2f76f6cdf89a19846ceb9d0986",
+          "source_kind_counts": {
+            "detail_page": 33,
+            "review": 156
+          },
+          "source_product_id": "10092927627"
+        }
+      ],
+      "sort_order": 11,
+      "source_folder_hash": "5039ce856d6a070acce422381109165f1cf856c51fc05e48f5950a1471cfa89c",
+      "source_folder_name": "[마그네슘]",
+      "source_kind_counts": {
+        "detail_page": 625,
+        "review": 5339
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 1,
+        "굿앤키즈": 1,
+        "나우푸드": 2,
+        "내츄럴플러스": 2,
+        "네이처스웨이": 3,
+        "뉴트리코스트": 1,
+        "라이프익스텐션": 1,
+        "락티브": 2,
+        "세노비스": 6,
+        "센트룸": 7,
+        "쏜리서치": 1,
+        "얼라이브": 2,
+        "유통기한": 1,
+        "종근당건강": 2
+      },
+      "category_key": "멀티비타민",
+      "display_name": "멀티비타민",
+      "image_count": 12550,
+      "issue_counts": {
+        "category_contains_non_image_files": 1,
+        "missing_review_dir": 1
+      },
+      "non_image_file_count": 24,
+      "product_count": 32,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "네이처스웨이",
+            "display_name": "네이처스웨이",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 66,
+          "issue_counts": {},
+          "product_dir_hash": "0b6a974a5fa190cbf712f0ceb569632f7a34a8466f4f004465f4f360b98e4485",
+          "source_kind_counts": {
+            "detail_page": 34,
+            "review": 32
+          },
+          "source_product_id": "11524270725"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "네이처스웨이",
+            "display_name": "네이처스웨이",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 60,
+          "issue_counts": {},
+          "product_dir_hash": "f66af7e3aec5682c0de38cdba19a33ed8ace3156e9468475c449fe2ac287ecd1",
+          "source_kind_counts": {
+            "detail_page": 36,
+            "review": 24
+          },
+          "source_product_id": "10385481809"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "네이처스웨이",
+            "display_name": "네이처스웨이",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 152,
+          "issue_counts": {},
+          "product_dir_hash": "274a75b1c95ff5e66f3f9169fa46cc1e5e80e53b5cb4fe65b3031789349d3921",
+          "source_kind_counts": {
+            "detail_page": 36,
+            "review": 116
+          },
+          "source_product_id": "8785090160"
+        }
+      ],
+      "sort_order": 12,
+      "source_folder_hash": "58553a60e847e79b3ad053db45279e5c2396e0a11b8b7cc58f92d59d01c1779a",
+      "source_folder_name": "[멀티비타민]",
+      "source_kind_counts": {
+        "detail_page": 405,
+        "review": 12145
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 1,
+        "나우푸드": 4,
+        "내츄럴플러스": 1,
+        "세노비스": 1,
+        "유한양행": 1
+      },
+      "category_key": "밀크씨슬_간",
+      "display_name": "밀크씨슬_간",
+      "image_count": 2767,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 8,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 499,
+          "issue_counts": {},
+          "product_dir_hash": "fc258365833b75295f36b86421d9b33826cca7af07cdfa4ba9f7cc01c7412e3c",
+          "source_kind_counts": {
+            "detail_page": 6,
+            "review": 493
+          },
+          "source_product_id": "3029167994"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "고려은단",
+            "display_name": "고려은단",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 512,
+          "issue_counts": {},
+          "product_dir_hash": "b072eefac3700c9e59fb959c472889a17a0f48706468dad5cc772813e78b4cf7",
+          "source_kind_counts": {
+            "detail_page": 16,
+            "review": 496
+          },
+          "source_product_id": "11243018665"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 31,
+          "issue_counts": {},
+          "product_dir_hash": "cc20b10ff9661e95b0cdb4b0e870348a29106013f12f6d597fbf954f8a0a0b6c",
+          "source_kind_counts": {
+            "detail_page": 24,
+            "review": 7
+          },
+          "source_product_id": "13005623275"
+        }
+      ],
+      "sort_order": 13,
+      "source_folder_hash": "586b5bb755abf41033db761adced77021e20d5ca1e1b0f58427785e10b3099bb",
+      "source_folder_name": "[밀크씨슬_간]",
+      "source_kind_counts": {
+        "detail_page": 62,
+        "review": 2705
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "뉴트리코스트": 1
+      },
+      "category_key": "비타민a",
+      "display_name": "비타민A",
+      "image_count": 23,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 1,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 23,
+          "issue_counts": {},
+          "product_dir_hash": "94269e81f4671ec5252937f39c4338e438f776332bd727c50316492887c63a6a",
+          "source_kind_counts": {
+            "detail_page": 3,
+            "review": 20
+          },
+          "source_product_id": "10141939999"
+        }
+      ],
+      "sort_order": 14,
+      "source_folder_hash": "2024dc8c4550d8023b1951b48bd584fc916d45ce8ea82e79919852d7b592ede2",
+      "source_folder_name": "[비타민A]",
+      "source_kind_counts": {
+        "detail_page": 3,
+        "review": 20
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 2,
+        "나우푸드": 2,
+        "내츄럴플러스": 1,
+        "뉴트리코스트": 8,
+        "닥터린": 1,
+        "락티브": 1,
+        "쏜리서치": 3
+      },
+      "category_key": "비타민b",
+      "display_name": "비타민B",
+      "image_count": 6414,
+      "issue_counts": {
+        "category_contains_non_image_files": 1,
+        "missing_review_dir": 1
+      },
+      "non_image_file_count": 17,
+      "product_count": 18,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 500,
+          "issue_counts": {},
+          "product_dir_hash": "51f514b97da643327a855ec756e7caab5d0ff1cfcb0fc31fea8bc1328a727755",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 498
+          },
+          "source_product_id": "7541152375"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "닥터린",
+            "display_name": "닥터린",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 505,
+          "issue_counts": {},
+          "product_dir_hash": "0b9328605e18f9b58848d9b43fef7026d8dbbb6e1a6b632f1f913fe5c2550ee9",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 500
+          },
+          "source_product_id": "8468206305"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "락티브",
+            "display_name": "락티브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 498,
+          "issue_counts": {},
+          "product_dir_hash": "f7ca50e7423e088c7808306f8423f44288523e4a1c5a7b21b3e2f4653bafd21f",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 496
+          },
+          "source_product_id": "10718815456"
+        }
+      ],
+      "sort_order": 15,
+      "source_folder_hash": "7e42dab21bc50b994ffb4e18635f1949e5ef694df2f6f44be83c929f717d4835",
+      "source_folder_name": "[비타민B]",
+      "source_kind_counts": {
+        "detail_page": 202,
+        "review": 6212
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 3,
+        "굿앤키즈": 3,
+        "나우푸드": 1,
+        "내츄럴플러스": 3,
+        "뉴트리코스트": 1,
+        "쏜리서치": 1,
+        "얼라이브": 1,
+        "종근당": 2,
+        "종근당건강": 1
+      },
+      "category_key": "비타민c",
+      "display_name": "비타민C",
+      "image_count": 6392,
+      "issue_counts": {
+        "category_contains_non_image_files": 1,
+        "missing_detail_page_dir": 1
+      },
+      "non_image_file_count": 18,
+      "product_count": 16,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 514,
+          "issue_counts": {},
+          "product_dir_hash": "d5871d70bdf143afb32f70991825ff758b578200b1c1475b493de34a18a7dd7b",
+          "source_kind_counts": {
+            "detail_page": 4,
+            "review": 510
+          },
+          "source_product_id": "13021262756"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "고려은단",
+            "display_name": "고려은단",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 526,
+          "issue_counts": {},
+          "product_dir_hash": "f1349039cf3b43edd6e013f0a11aef4032905c7ceaf9548f71db0223cd79db3a",
+          "source_kind_counts": {
+            "detail_page": 37,
+            "review": 489
+          },
+          "source_product_id": "5866524379"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "고려은단",
+            "display_name": "고려은단",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 513,
+          "issue_counts": {},
+          "product_dir_hash": "5d983208740457e1ec6bcfa6450b5fe1a3da56ba8bcf97125a12ec1b0f973fd5",
+          "source_kind_counts": {
+            "detail_page": 24,
+            "review": 489
+          },
+          "source_product_id": "5184170043"
+        }
+      ],
+      "sort_order": 16,
+      "source_folder_hash": "2c805335df951bc47954fe3bc1f605ff85eee6c9e535e4231a3bcf37e0ae57d6",
+      "source_folder_name": "[비타민C]",
+      "source_kind_counts": {
+        "detail_page": 160,
+        "review": 6232
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 2,
+        "굿앤키즈": 1,
+        "나우푸드": 4,
+        "내츄럴플러스": 1,
+        "뉴트리코스트": 1,
+        "락티브": 3,
+        "세노비스": 1,
+        "쏜리서치": 4,
+        "얼라이브": 1,
+        "유한양행": 1
+      },
+      "category_key": "비타민d",
+      "display_name": "비타민D",
+      "image_count": 5250,
+      "issue_counts": {
+        "missing_review_dir": 2
+      },
+      "non_image_file_count": 0,
+      "product_count": 19,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 2,
+          "issue_counts": {
+            "missing_review_dir": 1
+          },
+          "product_dir_hash": "baf9f440b65d50f49165eac75f199c036de477f7836ae70b9b2d062f6ef8cdef",
+          "source_kind_counts": {
+            "detail_page": 2
+          },
+          "source_product_id": "10680595666"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "고려은단",
+            "display_name": "고려은단",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 476,
+          "issue_counts": {},
+          "product_dir_hash": "29778bb4884dbfd413236a1c81cd3cb67398b60dd52a61b239211897cf32bce2",
+          "source_kind_counts": {
+            "detail_page": 3,
+            "review": 473
+          },
+          "source_product_id": "11585234218"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "고려은단",
+            "display_name": "고려은단",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 501,
+          "issue_counts": {},
+          "product_dir_hash": "6df83ed95b2b785458a282209c148a416c72ba9567c7f5620218e7a4bcb8c6ea",
+          "source_kind_counts": {
+            "detail_page": 6,
+            "review": 495
+          },
+          "source_product_id": "12765563240"
+        }
+      ],
+      "sort_order": 17,
+      "source_folder_hash": "928e649c54487854764c1d891e4a7d448dd4e22986b4b4515634efe347e6f95b",
+      "source_folder_name": "[비타민D]",
+      "source_kind_counts": {
+        "detail_page": 144,
+        "review": 5106
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "세노비스": 1
+      },
+      "category_key": "비타민e",
+      "display_name": "비타민E",
+      "image_count": 499,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 1,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "세노비스",
+            "display_name": "세노비스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 499,
+          "issue_counts": {},
+          "product_dir_hash": "497eff1c2356d2ff7c9e637615eb00c766ab2ca474b921b1fe7eebf98297eb96",
+          "source_kind_counts": {
+            "detail_page": 4,
+            "review": 495
+          },
+          "source_product_id": "585419668"
+        }
+      ],
+      "sort_order": 18,
+      "source_folder_hash": "3b683fcae0cd0ecf5542a76df3847610634108aa2822843eaa0e3fcc14a82fa7",
+      "source_folder_name": "[비타민E]",
+      "source_kind_counts": {
+        "detail_page": 4,
+        "review": 495
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "뉴트리코스트": 1,
+        "닥터린": 1,
+        "라이프익스텐션": 1
+      },
+      "category_key": "비타민k",
+      "display_name": "비타민K",
+      "image_count": 795,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 5,
+      "product_count": 3,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "라이프익스텐션",
+            "display_name": "라이프익스텐션",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 222,
+          "issue_counts": {},
+          "product_dir_hash": "59c3b838f0290763ffa1b3f29eff0cdab848ff88cedd334198a920e7b8f3dac9",
+          "source_kind_counts": {
+            "detail_page": 34,
+            "review": 188
+          },
+          "source_product_id": "9925380423"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 78,
+          "issue_counts": {},
+          "product_dir_hash": "f04780d851c2de22ed8a86660a7be42118fa3b0c267c04b5ab8d2621552d4056",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 76
+          },
+          "source_product_id": "11552404482"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "닥터린",
+            "display_name": "닥터린",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 495,
+          "issue_counts": {},
+          "product_dir_hash": "29f150d8bcdc40ca7cc1a6f61cde7882267b49dbb10f92ad2ccc9fba075bae6d",
+          "source_kind_counts": {
+            "detail_page": 7,
+            "review": 488
+          },
+          "source_product_id": "10492396385"
+        }
+      ],
+      "sort_order": 19,
+      "source_folder_hash": "20db89567c52f0f3287490845fe6ea30501ee60a6d1d0140ab2ecf15772930fb",
+      "source_folder_name": "[비타민K]",
+      "source_kind_counts": {
+        "detail_page": 43,
+        "review": 752
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "락티브": 2
+      },
+      "category_key": "수면_멜라토닌",
+      "display_name": "수면_멜라토닌",
+      "image_count": 634,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 3,
+      "product_count": 2,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "락티브",
+            "display_name": "락티브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 493,
+          "issue_counts": {},
+          "product_dir_hash": "21210d5173f8051ea344fcd8e1f3a82eddb72da5d657d5f851853f7494fd0abe",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 491
+          },
+          "source_product_id": "11146379810"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "락티브",
+            "display_name": "락티브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 141,
+          "issue_counts": {},
+          "product_dir_hash": "fb75023feb0feccc0a17e43845cd83f625cee5c699c083604017caebe880b83a",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 139
+          },
+          "source_product_id": "12746906191"
+        }
+      ],
+      "sort_order": 20,
+      "source_folder_hash": "3ae24ec379a63ec70c4b3d63d3f78f38b046c282a3dd3577866e1e9d371f7e40",
+      "source_folder_name": "[수면_멜라토닌]",
+      "source_kind_counts": {
+        "detail_page": 4,
+        "review": 630
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 4,
+        "삼대오백": 1,
+        "쏜리서치": 1
+      },
+      "category_key": "스트레스_아쉬와간다",
+      "display_name": "스트레스_아쉬와간다",
+      "image_count": 2940,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 6,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 402,
+          "issue_counts": {},
+          "product_dir_hash": "7d99501ccc12683790eddcec4852d6c7f6a3302e87800bf3114d1c25863e677a",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 400
+          },
+          "source_product_id": "10476329840"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 920,
+          "issue_counts": {},
+          "product_dir_hash": "5a661f81b2bccee34257334e01db47e23c08e5ce0ef83c29e399149126726701",
+          "source_kind_counts": {
+            "detail_page": 4,
+            "review": 916
+          },
+          "source_product_id": "10718380696"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 499,
+          "issue_counts": {},
+          "product_dir_hash": "08c2393f207da6965f0ec21fd7655f1b0298d29cea574bc2350affd03e2cf3b3",
+          "source_kind_counts": {
+            "detail_page": 1,
+            "review": 498
+          },
+          "source_product_id": "10527873036"
+        }
+      ],
+      "sort_order": 21,
+      "source_folder_hash": "e5c641dc8a3c387aaab9cea00078baf6d57ddeebd41c265db4f7942aeff17c61",
+      "source_folder_name": "[스트레스_아쉬와간다]",
+      "source_kind_counts": {
+        "detail_page": 64,
+        "review": 2876
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "내츄럴플러스": 2
+      },
+      "category_key": "스피루리나_클로렐라",
+      "display_name": "스피루리나_클로렐라",
+      "image_count": 799,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 5,
+      "product_count": 2,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 299,
+          "issue_counts": {},
+          "product_dir_hash": "2f64afb380611b5dfbc0d045cddf8eebf10a81a4d7867c49fa3819875cce3195",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 297
+          },
+          "source_product_id": "2523500065"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 500,
+          "issue_counts": {},
+          "product_dir_hash": "40881efdce4906ca170111b2769cfe2b855167ca92c31f085974e97e4c292f9a",
+          "source_kind_counts": {
+            "detail_page": 7,
+            "review": 493
+          },
+          "source_product_id": "4851839527"
+        }
+      ],
+      "sort_order": 22,
+      "source_folder_hash": "b1e65ef7bca41170e12dcc959b8676983783757c2890d21197e2d0c1fd2aed2e",
+      "source_folder_name": "[스피루리나_클로렐라]",
+      "source_kind_counts": {
+        "detail_page": 9,
+        "review": 790
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "에버핏": 1,
+        "종근당": 1
+      },
+      "category_key": "식이섬유",
+      "display_name": "식이섬유",
+      "image_count": 794,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 3,
+      "product_count": 2,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "에버핏",
+            "display_name": "에버핏",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 301,
+          "issue_counts": {},
+          "product_dir_hash": "64485a8d933f36dc9dd6410c6e0a0f84f99f11ad4b840c1e0403d0b6a955da66",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 299
+          },
+          "source_product_id": "2386577571"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "종근당",
+            "display_name": "종근당",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 493,
+          "issue_counts": {},
+          "product_dir_hash": "8b24ea6cf62fd0dca6747bc0273175d65f9cf2e5f31792523fc130eb7cb96abe",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 491
+          },
+          "source_product_id": "7720109631"
+        }
+      ],
+      "sort_order": 23,
+      "source_folder_hash": "1c34b04fc9a8d21070587eadb3544b8e976903dd38ade031dcef37433bcc524c",
+      "source_folder_name": "[식이섬유]",
+      "source_kind_counts": {
+        "detail_page": 4,
+        "review": 790
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "뉴트리코스트": 2,
+        "아르기닌": 1
+      },
+      "category_key": "아르기닌_시트룰린",
+      "display_name": "아르기닌_시트룰린",
+      "image_count": 1254,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 3,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 499,
+          "issue_counts": {},
+          "product_dir_hash": "9b2a00db507d4ac372ef4d3f65ee583b3942b6cafbed15cbbe591ce7eed3d791",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 494
+          },
+          "source_product_id": "9568876372"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 412,
+          "issue_counts": {},
+          "product_dir_hash": "286732b5110469fda4dda0c5d650e0cea38ce596640789299b8d8ef49ba6e4cb",
+          "source_kind_counts": {
+            "detail_page": 13,
+            "review": 399
+          },
+          "source_product_id": "8475556921"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "아르기닌",
+            "display_name": "아르기닌",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 343,
+          "issue_counts": {},
+          "product_dir_hash": "db78253932866340cb8ebfbc5fb8fd8d7f18cc84b08d81f3a6b41bfab576e52f",
+          "source_kind_counts": {
+            "detail_page": 8,
+            "review": 335
+          },
+          "source_product_id": "13303700526"
+        }
+      ],
+      "sort_order": 24,
+      "source_folder_hash": "e488f4ce2aea45bbf0801e2cd74bea2fd6f75ee491e2b030df61e26a8142d088",
+      "source_folder_name": "[아르기닌_시트룰린]",
+      "source_kind_counts": {
+        "detail_page": 26,
+        "review": 1228
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 1,
+        "뉴트리코스트": 2
+      },
+      "category_key": "아사이_베리류",
+      "display_name": "아사이_베리류",
+      "image_count": 1021,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 3,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "고려은단",
+            "display_name": "고려은단",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 504,
+          "issue_counts": {},
+          "product_dir_hash": "acad0be4a5b4d62497869aa505e44303507a1cf3e32636d9d61c2b240c880fd0",
+          "source_kind_counts": {
+            "detail_page": 9,
+            "review": 495
+          },
+          "source_product_id": "5093509745"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 504,
+          "issue_counts": {},
+          "product_dir_hash": "ce2e3c2318b523b582452c2c180179dfbac3ad067cdf180f81344b39f9ae6a40",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 499
+          },
+          "source_product_id": "2936151139"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 13,
+          "issue_counts": {},
+          "product_dir_hash": "ed9324e1c2af4c142a6c9be43a525bf9bb8630823ca62246a4a63ae54fe5deed",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 8
+          },
+          "source_product_id": "11536953840"
+        }
+      ],
+      "sort_order": 25,
+      "source_folder_hash": "44bbce91631ca7dbf07f54ed0911e214c8b2983774e870b0a85595068b3fc732",
+      "source_folder_name": "[아사이_베리류]",
+      "source_kind_counts": {
+        "detail_page": 19,
+        "review": 1002
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 2,
+        "내츄럴플러스": 2,
+        "뉴트리코스트": 1,
+        "닥터린": 1,
+        "쏜리서치": 1
+      },
+      "category_key": "아연",
+      "display_name": "아연",
+      "image_count": 1824,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 7,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "닥터린",
+            "display_name": "닥터린",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 500,
+          "issue_counts": {},
+          "product_dir_hash": "31fbdc53ada472d61871ce40e3b171fc023cd6b44d778ead06f68c042615fc33",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 495
+          },
+          "source_product_id": "10685076925"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 275,
+          "issue_counts": {},
+          "product_dir_hash": "a39706b24be4f3333a3a95d99cb48d09a2a7f97f51b5bd6c0f63dc3b9bbc8422",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 273
+          },
+          "source_product_id": "11730597493"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 279,
+          "issue_counts": {},
+          "product_dir_hash": "e848be6f4a7d7c7ef735c2da3be5010361ce118ee5b55e3b21349a1af77dcbdd",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 277
+          },
+          "source_product_id": "5350657730"
+        }
+      ],
+      "sort_order": 26,
+      "source_folder_hash": "88881af203aaa675ac4932582d47a267d457e09cc84978bb4de4da19614ad8ce",
+      "source_folder_name": "[아연]",
+      "source_kind_counts": {
+        "detail_page": 50,
+        "review": 1774
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "얼라이브": 1
+      },
+      "category_key": "어린이_키성장",
+      "display_name": "어린이_키성장",
+      "image_count": 189,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 3,
+      "product_count": 1,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "얼라이브",
+            "display_name": "얼라이브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 189,
+          "issue_counts": {},
+          "product_dir_hash": "a187cf750cefc915112cb7bcdd6ed1d864f1465590f46a7c91be6fe59c8c3266",
+          "source_kind_counts": {
+            "detail_page": 8,
+            "review": 181
+          },
+          "source_product_id": "12270942711"
+        }
+      ],
+      "sort_order": 27,
+      "source_folder_hash": "f5c08be5c5c45de6b44f5b59c99e6d99563e524e3e151498f1754193e954cf9d",
+      "source_folder_name": "[어린이_키성장]",
+      "source_kind_counts": {
+        "detail_page": 8,
+        "review": 181
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "유한양행": 1
+      },
+      "category_key": "여성영양제",
+      "display_name": "여성영양제",
+      "image_count": 503,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 1,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "유한양행",
+            "display_name": "유한양행",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 503,
+          "issue_counts": {},
+          "product_dir_hash": "ad445b9bc536181f7d5940f6e1f47c9e3017f57a3730ad355606a3a32e661392",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 498
+          },
+          "source_product_id": "7978272048"
+        }
+      ],
+      "sort_order": 28,
+      "source_folder_hash": "2934984b0e46c5fad8f37bcf4ea85706cb5e8c5433fa9b59efdb17fea6756250",
+      "source_folder_name": "[여성영양제]",
+      "source_kind_counts": {
+        "detail_page": 5,
+        "review": 498
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "YDY": 1,
+        "고려은단": 2,
+        "나우푸드": 4,
+        "내츄럴플러스": 3,
+        "뉴트리코스트": 1,
+        "뉴트리코어": 1,
+        "닥터린": 2,
+        "닥터스베스트": 1,
+        "락티브": 2,
+        "세노비스": 1,
+        "스포츠리서치": 1,
+        "유한양행": 1,
+        "종근당": 3,
+        "종근당건강": 3
+      },
+      "category_key": "오메가3",
+      "display_name": "오메가3",
+      "image_count": 11358,
+      "issue_counts": {},
+      "non_image_file_count": 10,
+      "product_count": 26,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "닥터스베스트",
+            "display_name": "닥터스베스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 58,
+          "issue_counts": {},
+          "product_dir_hash": "2bb1c2ac9dc6c4ad9bb898dee7cb3014af9deecb07ff818b7e8b959bec7de9b3",
+          "source_kind_counts": {
+            "detail_page": 34,
+            "review": 24
+          },
+          "source_product_id": "10504375833"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "ydy",
+            "display_name": "YDY",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 403,
+          "issue_counts": {},
+          "product_dir_hash": "cb94bb8c3f2b55bbadcf9fe287ab2000247b8795eeb9fc058f94ad6260df8993",
+          "source_kind_counts": {
+            "detail_page": 4,
+            "review": 399
+          },
+          "source_product_id": "8195176402"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "락티브",
+            "display_name": "락티브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 499,
+          "issue_counts": {},
+          "product_dir_hash": "9de9140de17f746f3e2b5af6876ff8235749f132f4406aa4e48eeca121928d4f",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 497
+          },
+          "source_product_id": "10718952096"
+        }
+      ],
+      "sort_order": 29,
+      "source_folder_hash": "1f247bbf581404f9e89b57f584a7ed3790805c8d2af4a026eecd660cd9792b09",
+      "source_folder_name": "[오메가3]",
+      "source_kind_counts": {
+        "detail_page": 201,
+        "review": 11157
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 2,
+        "굿앤키즈": 5,
+        "나우푸드": 4,
+        "내츄럴플러스": 11,
+        "뉴트리코스트": 1,
+        "락토핏": 1,
+        "락티브": 2,
+        "삼대오백": 1,
+        "세노비스": 3,
+        "쏜리서치": 1,
+        "에버핏": 1,
+        "유한양행": 2,
+        "이노빅스랩스": 1,
+        "자로우포뮬러스": 1,
+        "종근당": 3,
+        "종근당건강": 10,
+        "혈당유산균": 1
+      },
+      "category_key": "유산균_프로바이오틱",
+      "display_name": "유산균_프로바이오틱",
+      "image_count": 20252,
+      "issue_counts": {
+        "missing_review_dir": 2
+      },
+      "non_image_file_count": 1,
+      "product_count": 50,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 366,
+          "issue_counts": {},
+          "product_dir_hash": "3731711fd889b8f0fd8acc2698ead9123e059da9d306629ee445ec4dae1f58c4",
+          "source_kind_counts": {
+            "detail_page": 33,
+            "review": 333
+          },
+          "source_product_id": "9243156414"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "이노빅스랩스",
+            "display_name": "이노빅스랩스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 361,
+          "issue_counts": {},
+          "product_dir_hash": "ca908fffa0272d5edfcbb3158155c69e4cfa77dc8aaa067788e7ed1c446ddede",
+          "source_kind_counts": {
+            "detail_page": 35,
+            "review": 326
+          },
+          "source_product_id": "9198418859"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "자로우포뮬러스",
+            "display_name": "자로우포뮬러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 331,
+          "issue_counts": {},
+          "product_dir_hash": "380de050cc26db2562005f7f93f79a9b93ed2a8e7434e0e665f9fc7e24db9d15",
+          "source_kind_counts": {
+            "detail_page": 37,
+            "review": 294
+          },
+          "source_product_id": "9632201353"
+        }
+      ],
+      "sort_order": 30,
+      "source_folder_hash": "7a574758f0672eb0c0b59f3a0c95367544b823975867dd7ad64976025b8027e6",
+      "source_folder_name": "[유산균_프로바이오틱]",
+      "source_kind_counts": {
+        "detail_page": 1007,
+        "review": 19245
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "고려은단": 2,
+        "나우푸드": 4,
+        "내츄럴플러스": 4,
+        "닥터린": 3,
+        "닥터에디션": 1,
+        "닥터프로그램": 2,
+        "데일리": 1,
+        "리포데이": 4,
+        "삼대오백": 1,
+        "센트룸": 1,
+        "아임비타": 1,
+        "얼라이브": 1,
+        "원스데일리": 3,
+        "종근당": 2,
+        "종근당건강": 1
+      },
+      "category_key": "종합영양제",
+      "display_name": "종합영양제",
+      "image_count": 10553,
+      "issue_counts": {
+        "missing_review_dir": 1
+      },
+      "non_image_file_count": 17,
+      "product_count": 31,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "얼라이브",
+            "display_name": "얼라이브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 503,
+          "issue_counts": {},
+          "product_dir_hash": "4a8f6cd1f98f3e11be6cdfed2da1eaf1bc1eea202f9b41457e8e2d9a11a046c9",
+          "source_kind_counts": {
+            "detail_page": 3,
+            "review": 500
+          },
+          "source_product_id": "6059172022"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 498,
+          "issue_counts": {},
+          "product_dir_hash": "2431aceb008ad2b775e24ed9b394dc98bd0e2332b071eb48cd59557013ef005f",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 496
+          },
+          "source_product_id": "12167132662"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "닥터린",
+            "display_name": "닥터린",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 498,
+          "issue_counts": {},
+          "product_dir_hash": "8340705da04a305e338f44b757fc80aea06c372afaf684fd37cca633c2e6eb82",
+          "source_kind_counts": {
+            "detail_page": 7,
+            "review": 491
+          },
+          "source_product_id": "10543594330"
+        }
+      ],
+      "sort_order": 31,
+      "source_folder_hash": "f1f3643cb61a4b225147eae7cc19701b21f3974d01d6f4f343a63701058c9024",
+      "source_folder_name": "[종합영양제]",
+      "source_kind_counts": {
+        "detail_page": 319,
+        "review": 10234
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "락티브": 1
+      },
+      "category_key": "철분",
+      "display_name": "철분",
+      "image_count": 497,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 1,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "락티브",
+            "display_name": "락티브",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 497,
+          "issue_counts": {},
+          "product_dir_hash": "8da33d57ed37663bcfa9ce3b958669dde392840c80f8c399b54681efbd768fba",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 495
+          },
+          "source_product_id": "12085484859"
+        }
+      ],
+      "sort_order": 32,
+      "source_folder_hash": "49972a54cc65c158f9890eccab5531f69e9f283dd28da8011ce6d1e1ae25d420",
+      "source_folder_name": "[철분]",
+      "source_kind_counts": {
+        "detail_page": 2,
+        "review": 495
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "뉴트리코스트": 2
+      },
+      "category_key": "카페인_각성",
+      "display_name": "카페인_각성",
+      "image_count": 420,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 3,
+      "product_count": 2,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 110,
+          "issue_counts": {},
+          "product_dir_hash": "4276875b0c6888669fb04187fb622a15e5744a6ae5d8d954e9bd505a5fecd8ba",
+          "source_kind_counts": {
+            "detail_page": 10,
+            "review": 100
+          },
+          "source_product_id": "5067711722"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 310,
+          "issue_counts": {},
+          "product_dir_hash": "7c9deb72c7df5b06201ca6fbd0841ad69b3657c301a849cb001f7491da32d8c6",
+          "source_kind_counts": {
+            "detail_page": 10,
+            "review": 300
+          },
+          "source_product_id": "9568875619"
+        }
+      ],
+      "sort_order": 33,
+      "source_folder_hash": "3144caf2c6cb6c17ebad2c2b7da68f3d66f78ddc46072071aac2ea1fd93bbfa9",
+      "source_folder_name": "[카페인_각성]",
+      "source_kind_counts": {
+        "detail_page": 20,
+        "review": 400
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "굿앤키즈": 1,
+        "내츄럴플러스": 1
+      },
+      "category_key": "칼슘",
+      "display_name": "칼슘",
+      "image_count": 500,
+      "issue_counts": {
+        "category_contains_non_image_files": 1,
+        "missing_review_dir": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 2,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 499,
+          "issue_counts": {},
+          "product_dir_hash": "af94070671e2d2afdcb0384421b72181cc8c14a1e7ee40b55a65fcb8585df741",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 497
+          },
+          "source_product_id": "4930046336"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "굿앤키즈",
+            "display_name": "굿앤키즈",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 1,
+          "issue_counts": {
+            "missing_review_dir": 1
+          },
+          "product_dir_hash": "a13fd9f123da1bc8a591d0f5e451e293328d44f9c51c90f6a691ca73e6a12d17",
+          "source_kind_counts": {
+            "detail_page": 1
+          },
+          "source_product_id": "12142716486"
+        }
+      ],
+      "sort_order": 34,
+      "source_folder_hash": "3402e5070d682706d1fa457a0e913975e99b7c63eab3f46cc176460055515c65",
+      "source_folder_name": "[칼슘]",
+      "source_kind_counts": {
+        "detail_page": 3,
+        "review": 497
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 1,
+        "뉴트리코스트": 1,
+        "닥터스베스트": 1,
+        "유한양행": 2,
+        "종근당": 1
+      },
+      "category_key": "코엔자임q10",
+      "display_name": "코엔자임Q10",
+      "image_count": 2265,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 1,
+      "product_count": 6,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "닥터스베스트",
+            "display_name": "닥터스베스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 84,
+          "issue_counts": {},
+          "product_dir_hash": "496787fc6e5426db0690aa97a0244ddf311e50b11f59052c251dbaa4a7aa0b36",
+          "source_kind_counts": {
+            "detail_page": 31,
+            "review": 53
+          },
+          "source_product_id": "11515840638"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "종근당",
+            "display_name": "종근당",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 496,
+          "issue_counts": {},
+          "product_dir_hash": "bd8407d7893e6bcb258b1508267c4887753f6793c769c6f03f70346bce28455c",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 494
+          },
+          "source_product_id": "12696705555"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "유한양행",
+            "display_name": "유한양행",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 505,
+          "issue_counts": {},
+          "product_dir_hash": "60b852bcdc0f118787124b88e9d0077f3638698aa15d3ce92b8598a6bc4d5104",
+          "source_kind_counts": {
+            "detail_page": 7,
+            "review": 498
+          },
+          "source_product_id": "9161078400"
+        }
+      ],
+      "sort_order": 35,
+      "source_folder_hash": "2ce3494fa2da9626b1d29f4b1473c8817e9a91d65c63dc3439ec973ab2dc615c",
+      "source_folder_name": "[코엔자임Q10]",
+      "source_kind_counts": {
+        "detail_page": 48,
+        "review": 2217
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "세노비스": 1,
+        "에버핏": 2
+      },
+      "category_key": "콜라겐",
+      "display_name": "콜라겐",
+      "image_count": 1368,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 3,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "에버핏",
+            "display_name": "에버핏",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 368,
+          "issue_counts": {},
+          "product_dir_hash": "52af706b9d8ba23e6225d976a6de8d1966ca2285e41033784e4cfe16fda2d014",
+          "source_kind_counts": {
+            "detail_page": 4,
+            "review": 364
+          },
+          "source_product_id": "8658265198"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "세노비스",
+            "display_name": "세노비스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 500,
+          "issue_counts": {},
+          "product_dir_hash": "73533783b3e1c4f229de45a67695729b9388fceebb169a1208969f92bd13a4f3",
+          "source_kind_counts": {
+            "detail_page": 3,
+            "review": 497
+          },
+          "source_product_id": "10866050226"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "에버핏",
+            "display_name": "에버핏",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 500,
+          "issue_counts": {},
+          "product_dir_hash": "ae69b3ca8178af65be68df50d65f17849651c096a0fc19aa9494d4d3813fff2d",
+          "source_kind_counts": {
+            "detail_page": 4,
+            "review": 496
+          },
+          "source_product_id": "6317415699"
+        }
+      ],
+      "sort_order": 36,
+      "source_folder_hash": "0792d2672f57713cae2b083ac0aac07e66cce98bf84bc18007f1e07e98418e08",
+      "source_folder_name": "[콜라겐]",
+      "source_kind_counts": {
+        "detail_page": 11,
+        "review": 1357
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "뉴트리코스트": 1,
+        "삼대오백": 1,
+        "쏜리서치": 2
+      },
+      "category_key": "크레아틴",
+      "display_name": "크레아틴",
+      "image_count": 1055,
+      "issue_counts": {
+        "missing_review_dir": 1
+      },
+      "non_image_file_count": 0,
+      "product_count": 4,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "쏜리서치",
+            "display_name": "쏜리서치",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 80,
+          "issue_counts": {},
+          "product_dir_hash": "cbab6ed4f3714d10e23f14cc83a141f1dceb757b10d741629aca67b6edff6ceb",
+          "source_kind_counts": {
+            "detail_page": 11,
+            "review": 69
+          },
+          "source_product_id": "12601176345"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 432,
+          "issue_counts": {},
+          "product_dir_hash": "bfd6b7005c9d1e358f516d44e034355a6b67feb2ef3e0aaedb62c0d714e15f8e",
+          "source_kind_counts": {
+            "detail_page": 33,
+            "review": 399
+          },
+          "source_product_id": "2936151128"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "삼대오백",
+            "display_name": "삼대오백",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 530,
+          "issue_counts": {},
+          "product_dir_hash": "321116809e5136b43c4c092850cfd4473b210e9fcd342c08b37d0a3c43eacff2",
+          "source_kind_counts": {
+            "detail_page": 38,
+            "review": 492
+          },
+          "source_product_id": "7831578716"
+        }
+      ],
+      "sort_order": 37,
+      "source_folder_hash": "72e938f97f6dd81f20bd2d2acb28f5fe94f0b8b40fbac7b8fb73c580938f9a7b",
+      "source_folder_name": "[크레아틴]",
+      "source_kind_counts": {
+        "detail_page": 95,
+        "review": 960
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 1,
+        "내츄럴플러스": 2,
+        "세노비스": 1
+      },
+      "category_key": "프로폴리스_벌",
+      "display_name": "프로폴리스_벌",
+      "image_count": 1908,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 4,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 520,
+          "issue_counts": {},
+          "product_dir_hash": "870394ffb38ee91a3d10ac353d0e15aba1dce7ab491644eaf4e5d1a3ef4720b0",
+          "source_kind_counts": {
+            "detail_page": 25,
+            "review": 495
+          },
+          "source_product_id": "2613388556"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 392,
+          "issue_counts": {},
+          "product_dir_hash": "dce3a8dd63937f618365dd7f74880fba6e45582063f80002914ec1135965f08d",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 390
+          },
+          "source_product_id": "5487428004"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 500,
+          "issue_counts": {},
+          "product_dir_hash": "c10469e8bcf440b5f15a2d62fd2f37d3b226018b26cf1bf1d1153308fb9c6a52",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 498
+          },
+          "source_product_id": "5419103417"
+        }
+      ],
+      "sort_order": 38,
+      "source_folder_hash": "d959aec42bb72660aeff80db6448ba681659f40883e31808dcbdeb3c20608c25",
+      "source_folder_name": "[프로폴리스_벌]",
+      "source_kind_counts": {
+        "detail_page": 33,
+        "review": 1875
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "뉴트리코스트": 1,
+        "미국산": 1
+      },
+      "category_key": "프리워크아웃",
+      "display_name": "프리워크아웃",
+      "image_count": 566,
+      "issue_counts": {
+        "category_contains_non_image_files": 1,
+        "missing_review_dir": 1
+      },
+      "non_image_file_count": 2,
+      "product_count": 2,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "뉴트리코스트",
+            "display_name": "뉴트리코스트",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 534,
+          "issue_counts": {},
+          "product_dir_hash": "c1045ef8499d03cc5fca7e7dd2c475dc1ebe21f28a85f83a0d04deeacbfd8070",
+          "source_kind_counts": {
+            "detail_page": 34,
+            "review": 500
+          },
+          "source_product_id": "4679873285"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "미국산",
+            "display_name": "미국산",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 32,
+          "issue_counts": {
+            "missing_review_dir": 1
+          },
+          "product_dir_hash": "efb8e8f564b83e8db3d563d3e2afe9d8f9a4276fc30d99096e2fcc04ee302af4",
+          "source_kind_counts": {
+            "detail_page": 32
+          },
+          "source_product_id": "13485743068"
+        }
+      ],
+      "sort_order": 39,
+      "source_folder_hash": "5c64e1db2af16f5bb6ec6967fb42ce68caa962771f7910c4360f9422175fe8c6",
+      "source_folder_name": "[프리워크아웃]",
+      "source_kind_counts": {
+        "detail_page": 66,
+        "review": 500
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 1,
+        "메가": 1,
+        "쏜리서치": 1,
+        "종근당": 1
+      },
+      "category_key": "항산화",
+      "display_name": "항산화",
+      "image_count": 1432,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 4,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 200,
+          "issue_counts": {},
+          "product_dir_hash": "255976bddab789cc779b596271a64e8d9ea4decf2fc1ecb547f19cdce7d04091",
+          "source_kind_counts": {
+            "detail_page": 3,
+            "review": 197
+          },
+          "source_product_id": "8697657480"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "메가",
+            "display_name": "메가",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 501,
+          "issue_counts": {},
+          "product_dir_hash": "335ebd31bed64b30cc06285fbcc55e7708422a27e19a820a731b6f2dcd2136d2",
+          "source_kind_counts": {
+            "detail_page": 5,
+            "review": 496
+          },
+          "source_product_id": "10812624449"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "쏜리서치",
+            "display_name": "쏜리서치",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 243,
+          "issue_counts": {},
+          "product_dir_hash": "bde0a3780637e349ef412da7009fe527fe30132aba5421f0f9ef25417df9c1c6",
+          "source_kind_counts": {
+            "detail_page": 10,
+            "review": 233
+          },
+          "source_product_id": "12381833540"
+        }
+      ],
+      "sort_order": 40,
+      "source_folder_hash": "fa199e5214a5d06ab21eda637f5debb5887a86a57f9ede93d3726932612478af",
+      "source_folder_name": "[항산화]",
+      "source_kind_counts": {
+        "detail_page": 19,
+        "review": 1413
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "나우푸드": 2
+      },
+      "category_key": "혈관_낫토_폴리코사놀",
+      "display_name": "혈관_낫토_폴리코사놀",
+      "image_count": 817,
+      "issue_counts": {
+        "category_contains_non_image_files": 1
+      },
+      "non_image_file_count": 3,
+      "product_count": 2,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 796,
+          "issue_counts": {},
+          "product_dir_hash": "bc714278a1a636e4b0d8414dcb6d6722cbaf6195f2d833def9b40331a8be6140",
+          "source_kind_counts": {
+            "detail_page": 12,
+            "review": 784
+          },
+          "source_product_id": "10759867738"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "나우푸드",
+            "display_name": "나우푸드",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 21,
+          "issue_counts": {},
+          "product_dir_hash": "e8bc744939ae63b1d34695e5fde02fa36f9934a3c7cc06cbcf56f785dc21d700",
+          "source_kind_counts": {
+            "detail_page": 9,
+            "review": 12
+          },
+          "source_product_id": "13005723364"
+        }
+      ],
+      "sort_order": 41,
+      "source_folder_hash": "7897d264c0620f7be70287c2bb6cf664f705f1b4e360bb9b00d397791da74e0d",
+      "source_folder_name": "[혈관_낫토_폴리코사놀]",
+      "source_kind_counts": {
+        "detail_page": 21,
+        "review": 796
+      }
+    },
+    {
+      "brand_candidate_counts": {
+        "내츄럴플러스": 3
+      },
+      "category_key": "효소_소화",
+      "display_name": "효소_소화",
+      "image_count": 1356,
+      "issue_counts": {},
+      "non_image_file_count": 0,
+      "product_count": 3,
+      "product_samples": [
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 418,
+          "issue_counts": {},
+          "product_dir_hash": "7937dc6489b5047251a77118aa5b872bb317fea3658e3732400d7d11e339363e",
+          "source_kind_counts": {
+            "detail_page": 1,
+            "review": 417
+          },
+          "source_product_id": "10844786654"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 501,
+          "issue_counts": {},
+          "product_dir_hash": "4cf38d47441edf5ce84791c6310e8cab572dfaa584957548c35b9404c302063c",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 499
+          },
+          "source_product_id": "12054178734"
+        },
+        {
+          "brand_candidate": {
+            "brand_key": "내츄럴플러스",
+            "display_name": "내츄럴플러스",
+            "verification_status": "requires_human_review"
+          },
+          "image_count": 437,
+          "issue_counts": {},
+          "product_dir_hash": "bc70c6d5a3fd8bac65da1c798abd486b9f187f796eaab7e755fd3620223cb89a",
+          "source_kind_counts": {
+            "detail_page": 2,
+            "review": 435
+          },
+          "source_product_id": "10866550087"
+        }
+      ],
+      "sort_order": 42,
+      "source_folder_hash": "a963a8579d9af47d22d7bd65ba5e10a1acbd9a9deb12799b29a736976492a5f4",
+      "source_folder_name": "[효소_소화]",
+      "source_kind_counts": {
+        "detail_page": 5,
+        "review": 1351
+      }
+    }
+  ],
+  "category_count": 43,
+  "db_seed_contract": {
+    "brand_source": "review_required_product_folder_prefix",
+    "category_source": "top_level_folder_name",
+    "product_source_id_source": "trailing_numeric_product_folder_suffix",
+    "requires_brand_review_before_db_write": true,
+    "store_absolute_paths": false,
+    "store_product_dir_literals": false
+  },
+  "generated_at": "2026-06-04T17:10:32.144771+00:00",
+  "ground_truth_contract": {
+    "detail_page_images": "YOLO section bbox annotation candidates",
+    "required_sections": [
+      "product_identity",
+      "supplement_facts",
+      "ingredient_amounts",
+      "intake_method",
+      "precautions"
+    ],
+    "review_images": "OCR ground-truth candidates after PII screening",
+    "target_ocr_provider": "paddleocr",
+    "teacher_ocr_providers": [
+      "clova",
+      "google_vision"
+    ]
+  },
+  "image_count": 137809,
+  "issue_counts": {
+    "category_contains_non_image_files": 27,
+    "missing_detail_page_dir": 1,
+    "missing_review_dir": 21
+  },
+  "non_image_file_count": 179,
+  "observations": [
+    "top_level_category_folders_present",
+    "dedicated_brand_folder_level_absent",
+    "product_folder_combines_brand_product_name_and_source_product_id",
+    "brand_candidates_require_human_review_before_db_write",
+    "structure_issues_present"
+  ],
+  "product_count": 388,
+  "product_dir_literals_stored": false,
+  "raw_ocr_text_stored": false,
+  "raw_provider_payload_stored": false,
+  "schema_version": "supplement-crawling-image-taxonomy-audit-v1",
+  "source_doc_urls": [
+    "https://docs.ultralytics.com/tasks/detect/",
+    "https://docs.ultralytics.com/modes/predict/",
+    "https://www.paddleocr.ai/main/en/version3.x/pipeline_usage/OCR.html",
+    "https://cloud.google.com/vision/docs/ocr",
+    "https://api.ncloud-docs.com/docs/en/ai-application-service-ocr",
+    "https://docs.ollama.com/capabilities/vision",
+    "https://docs.ollama.com/capabilities/structured-outputs"
+  ],
+  "source_kind_counts": {
+    "detail_page": 5289,
+    "review": 132520
+  },
+  "source_root_hash": "f6e08c25a76085b566e8d1fe356439ebd03f86952886685d4fd2cfdfb0b9a078",
+  "source_root_name": "crawling-image"
+}
