@@ -52,6 +52,11 @@ FOOD_PROMPTS = [
     "Korean traditional tea or sikhye",
     "bubble tea with tapioca pearls",
     "fruit smoothie in a tall glass",
+    # 일반 음식 보강 (프롬프트 실험 2026-06-23 — 음식 recall 소폭↑)
+    "a plate of food",
+    "a dish of cooked food",
+    "grilled or fried food",
+    "a serving of a main course meal",
 ]
 
 NOT_FOOD_PROMPTS = [
@@ -84,6 +89,17 @@ NOT_FOOD_PROMPTS = [
     "a disposable paper cup with brand logo",
     "a takeout paper cup on the table",
     "a plain water cup or glass",
+    # 일반 비음식 카테고리 보강 (프롬프트 실험 2026-06-23 — 다양한 비음식 635장서 거부율 85%→96%)
+    "a photo of an indoor room or interior",
+    "a photo of an outdoor landscape or nature scenery",
+    "a photo of a building or architecture",
+    "a photo of a car or vehicle",
+    "a photo of an animal or a pet",
+    "a photo of furniture such as a chair, sofa, or table",
+    "a document, a book, or a page of text",
+    "a photo of clothing, shoes, or accessories",
+    "a computer, laptop, or electronic device",
+    "a street, road, or city scene",
 ]
 
 
