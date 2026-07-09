@@ -4,7 +4,7 @@ MediWay는 **병원 내 환자·의료진 동선 안내** React + Firebase 애�
 QR 기반 익명 세션, 방문 계획, 길찾기(Dijkstra), 스태프 코드 초대, 관리자 콘솔을 제공합니다.
 
 > **현재 버전**: v1.0 (단일 데모 병원 구현) — `main` 브랜치 + `v1.0-mediway-demo` 태그로 고정.
-> **v2.0 작업**: `mediway/develop` 브랜치에서 Multi-Tenant SaaS 전환 진행 예정.
+> **v2.0 작업**: `mediway/plusultra/*` 브랜치에서 Multi-Tenant SaaS 전환 진행 중 (main 미병합 — main은 v1.0 데모 기준).
 
 ---
 

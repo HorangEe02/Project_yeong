@@ -47,7 +47,7 @@
 | **LLM 분석** | Ollama Gemma 4 / Qwen3.5 (RAM 기반 자동·수동 선택) · 컨텍스트 주입 + HallucinationDetector 환각 검증 |
 | **백엔드/프론트** | FastAPI(25+ EP · SSE 스트리밍) · Next.js 16 + React 19 + Tailwind v4(7페이지) + Three.js 3D 뷰어 / Streamlit(Legacy) |
 | **Multi-CAD** | DWG(ODA) · STEP(CadQuery) · IGES(OCP) · STL 포맷 지원 |
-| **배포 · 품질** | Docker Compose 3-서비스 · **845 tests passing** · 검색 시간 **~95% 단축** |
+| **배포 · 품질** | Docker Compose 2-서비스(app·ollama, ChromaDB 임베디드) · **540+ tests** · 검색 시간 **~95% 단축** |
 
 **포트폴리오 포인트** — 5종 모델(YOLO-cls/det·OpenCLIP·GNN·OCR) 역할별 조합 · DXF를 **그래프(GNN)로 구조 유사도 검색** · LLM **환각 검증** 설계 · 모델링→FastAPI→Next.js→Docker **풀스택 + MLOps 완주**
 
@@ -66,7 +66,7 @@
 | **인증·보안** | 이메일 + Kakao·Naver·Google OAuth(Cloud Functions) · RBAC · RTDB Security Rules 데이터 격리 |
 | **기술 스택** | React 18 · TypeScript · Vite · Tailwind · Zustand · Leaflet · react-hook-form+zod · Firebase(RTDB·Auth·Functions `asia-northeast3`) · Vitest |
 
-**현재까지 작업 현황 (PlusUltra v2.0 — `mediway/plusultra/*` 브랜치, 35 pages·91 components)**
+**현재까지 작업 현황 (PlusUltra v2.0 — ⚠️ main 미병합, `mediway/plusultra/*` 브랜치에서 진행 중 · 35 pages·91 components)**
 
 | Phase | 작업 내용 |
 |-------|----------|
@@ -95,7 +95,7 @@
 | **백엔드** | Python 3.11 · FastAPI · PostgreSQL 16 · **TimescaleDB**(시계열 건강데이터) · Redis · Docker Compose |
 | **AI / 데이터** | Google Cloud Vision OCR(영양제 라벨) · **Ollama 로컬 LLM** 기반 라벨 파싱 · KDRIs 영양 권장량 · 식약처 데이터 표준화 |
 | **모바일** | **Flutter 3.24** · Apple HealthKit · Google Health Connect 연동 |
-| **상태** | 개발 진행 중 (Phase 0~4) · `yeong-Vision-Nutrition`이 활성 산출물, `pr2`·`pr3`는 후속 기업 과제 placeholder |
+| **상태** | 개발 진행 중 (Phase 0~4) · `Lemon-Aid`가 활성 산출물 |
 
 **포트폴리오 포인트** — **기업 발주 실무 협업** · 영양제 라벨 **OCR → LLM 구조화 → 공식 데이터 검증** 파이프라인 · 음식·영양제·활동 정보를 연결하는 통합 건강분석 UX · FastAPI + Flutter + TimescaleDB **풀스택 모바일 헬스케어**
 
@@ -104,7 +104,7 @@
 - **영양제 라벨 비특화 보완**: 영양성분표·섭취량·단위(mg, μg, IU 등)를 영양제 라벨 문맥에 맞게 정규화
 - **정보 통합 어려움 해결**: 음식·영양제·활동·체중 정보를 5종 분석 결과로 연결
 
-📂 [03_lemon_healthcare](./03_lemon_healthcare) · 📄 [Lemon AID README](./03_lemon_healthcare/yeong-Vision-Nutrition/README.md)
+📂 [03_lemon_healthcare](./03_lemon_healthcare) · 📄 [Lemon AID README](./03_lemon_healthcare/Lemon-Aid/README.md)
 
 ---
 
@@ -142,7 +142,7 @@
 | **LLM** | Ollama(qwen3.5 · exaone · gemma4) · Vertex AI Gemini · 하이브리드 라우터 · 환각 검증 |
 | **백엔드** | FastAPI(REST·SSE·OpenAPI) · Firebase(RTDB·Auth·Functions) · PostgreSQL · TimescaleDB · Redis · SQLite |
 | **프론트엔드 · 모바일** | Next.js 16 · React 18/19 · Tailwind · Three.js · Vite · Zustand · Leaflet · Flutter |
-| **인프라 · 품질** | Docker Compose · Cloud Run · Firebase Hosting · Supabase · pytest(845) · Vitest · RBAC · Security Rules |
+| **인프라 · 품질** | Docker Compose · Cloud Run · Firebase Hosting · Supabase · pytest(540+) · Vitest · RBAC · Security Rules |
 
 ---
 

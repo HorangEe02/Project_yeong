@@ -434,7 +434,7 @@ CLIP Fine-tuning 전에는 text_weight=1.0이 최적이었으나, 도면 데이�
 
 - **문제 발견 능력**: 도면 검색의 실제 비효율성(30분~2시간)을 AI로 1분 이내로 단축
 - **기술 선택 근거**: VLM 5개 모델 실제 비교 후 역할별 분담 결정, CLIP 이미지 vs 텍스트 가중치 튜닝으로 최적 비율 도출
-- **정량적 성과**: YOLOv8-cls v2 정확도 93.87%(81카테고리), CLIP Fine-tuning 카테고리 R@5=94.7%, 검색 응답 0.104초, 68,647건 벡터 DB, 724 테스트
+- **정량적 성과**: YOLOv8-cls v2 정확도 93.87%(81카테고리), CLIP Fine-tuning 카테고리 R@5=94.7%, 검색 응답 0.104초, 68,647건 벡터 DB, 540+ 테스트
 - **아키텍처 진화**: Streamlit 모놀리스 → FastAPI REST API + Streamlit 프론트엔드 분리, Docker Compose 3-컨테이너 (API/UI/ChromaDB)
 - **검색 품질 개선**: 한/영 동의어 사전 (140+ 기계부품 용어), DXF 리랭커 (엔티티 분포+개수+종횡비 보정), 카테고리 특화 LLM 프롬프트 (15종)
 - **문제 해결 과정**: MPS 메모리 누수 → Epoch Runner 고안, ChromaDB 손상 → sqlite3 .recover 복구, VLM 환각 → HallucinationDetector 구현, pip 26 빌드 실패 → setuptools 핀닝
@@ -461,4 +461,4 @@ CLIP Fine-tuning 전에는 text_weight=1.0이 최적이었으나, 도면 데이�
 
 *Last Updated: 2026-03-25*
 *Author: Yeong*
-*Version: 5.3 — FastAPI REST API + Docker Compose + 한/영 동의어 + 카테고리 특화 프롬프트 + DXF 리랭커 + 724 tests*
+*Version: 5.6 — FastAPI REST API + Docker Compose + 한/영 동의어 + 카테고리 특화 프롬프트 + DXF 리랭커 + 540+ tests*

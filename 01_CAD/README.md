@@ -16,8 +16,8 @@
 | **Reranker** | Cross-encoder 2차 정밀 정렬 |
 | **Backend** | FastAPI REST API (25+ 엔드포인트) |
 | **Frontend** | React (Next.js 16 + Tailwind v4) + Streamlit (Legacy) |
-| **배포** | Docker Compose (api + ui + chromadb) |
-| **테스트** | 845 tests passing |
+| **배포** | Docker Compose (app + ollama, ChromaDB 임베디드) |
+| **테스트** | 540+ tests |
 
 ## Architecture
 
@@ -71,7 +71,7 @@
 
 ### v5.0~v5.3: REST API + Docker
 - **FastAPI**: 25+ REST 엔드포인트, SSE 스트리밍, Rate Limiting
-- **Docker Compose**: 3-서비스 배포
+- **Docker Compose**: 2-서비스 배포 (app·ollama)
 - **DXF Reranker**: 구조 검색 후처리 리랭킹
 - **한/영 동의어 사전**: 140+ 기계부품 동의어
 
@@ -88,7 +88,7 @@
 │   ├── config/settings.py      # 전역 설정 (Gemma4/Qwen3.5 자동선택)
 │   ├── core/                   # 핵심 엔진 (20+ 모듈)
 │   ├── scripts/                # 유틸리티 스크립트
-│   ├── tests/                  # 845 테스트
+│   ├── tests/                  # 540+ 테스트
 │   ├── docs/                   # 가이드 문서
 │   ├── CHANGELOG.md            # v4.0 → v5.6 전체 변경 이력
 │   └── README.md               # 상세 README
@@ -124,7 +124,7 @@
 | Frontend (New) | Next.js 16 + React 19 + Tailwind v4 + Three.js |
 | Frontend (Legacy) | Streamlit (Engineering Terminal theme) |
 | Deploy | Docker Compose (3 services) |
-| Testing | pytest (845 tests) |
+| Testing | pytest (540+ tests) |
 
 ## Quick Start
 

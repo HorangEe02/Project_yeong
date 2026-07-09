@@ -100,8 +100,8 @@ Engineering Drawing Retrieval & Classification System powered by Open-Source Mul
 | 벡터 DB | ChromaDB (3채널) | image 61,475 + text 68,649 + gnn 61,451건 |
 | 프론트엔드 (Legacy) | Streamlit (Engineering Terminal) | 7페이지 + 6개 컴포넌트 (다크 테마, 블루프린트 그리드) |
 | 프론트엔드 (v5.5) | Next.js 16 + React 19 + Tailwind v4 | 다크/라이트 모드, Settings 패널, 3D 뷰어 (Three.js) |
-| 컨테이너 | Docker + docker-compose | 3-서비스 배포 (api + ui + chromadb) |
-| 테스트 | pytest | **845개** 테스트 케이스 |
+| 컨테이너 | Docker + docker-compose | 2-서비스 배포 (app + ollama, ChromaDB 임베디드) |
+| 테스트 | pytest | **540+** 테스트 케이스 |
 
 ### 개발 여정 (Phase A → K)
 
@@ -160,7 +160,7 @@ VLM 5개 모델(qwen3-vl, qwen3.5, translategemma, glm-ocr, glm-4.7-flash)을 �
 
 비개발자도 실행할 수 있도록 Docker 기반 배포 환경을 구축했다:
 - ML 모델 프리로드 (빌드 시 CLIP/E5/PaddleOCR 다운로드)
-- 원클릭 실행 스크립트 (`scripts/docker-start.sh`)
+- 원클릭 실행 스크립트 (`docker-start.sh`)
 - Ollama 모델 자동 pull + 헬스체크 + 브라우저 자동 열기
 - `pydantic_settings.BaseSettings`를 통한 환경변수 자동 주입으로 Docker/로컬 설정 분리
 - 외부 도면 경로 매핑 (`DRAWING_PATH_REMAP_FROM/TO`)으로 호스트↔컨테이너 경로 호환
@@ -364,7 +364,7 @@ docker-compose (2 서비스)
 | LLM | **Qwen3.5** (RAM 자동선택: 27b/9b/4b) |
 | LLM 분석 시간 | **<20초** (텍스트 전용 모드) |
 | DXF 지원 | DXF 업로드 → PNG 자동 변환 + 구조 검색 |
-| 테스트 케이스 | **412개** 전부 통과 |
+| 테스트 케이스 | **540+** |
 | 보안 테스트 | **60개** (SSRF, 프롬프트 인젝션, 레이트 리미팅 등) |
 | ML 학습 데이터셋 | **72,730장** (9개 소스, 34GB) |
 
@@ -399,7 +399,7 @@ drawing-llm/
 │   ├── category_keywords.json    # 카테고리별 검색 키워드
 │   ├── metadata/                 # 평가/튜닝 결과 JSON
 │   └── ground_truth_misumi.json  # 142개 평가 쿼리
-├── tests/                        # pytest 412개 테스트
+├── tests/                        # pytest 540+ 테스트
 │   ├── test_embeddings.py        # 임베딩 테스트
 │   ├── test_llm.py               # LLM 기본 테스트
 │   ├── test_llm_context.py       # 컨텍스트 주입 + 환각 검증 테스트
@@ -428,10 +428,10 @@ drawing-llm/
 
 ```bash
 # 프로젝트 폴더로 이동 (외장 드라이브 경로)
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd <저장소 클론 경로>/01_CAD/app
 
 # 원클릭 실행 (Docker Desktop 필요)
-./scripts/docker-start.sh
+./docker-start.sh
 
 # 브라우저가 자동으로 http://localhost:8501 에 열립니다
 ```
@@ -463,7 +463,7 @@ docker compose restart ollama    # Ollama만 재시작 (분석 오류 시)
 
 ```bash
 # 프로젝트 폴더로 이동
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd <저장소 클론 경로>/01_CAD/app
 
 # 가상환경 + 의존성
 python3 -m venv venv && source venv/bin/activate
@@ -477,7 +477,7 @@ ollama pull qwen3.5:9b
 streamlit run app/streamlit_app.py
 
 # 테스트 실행
-pytest tests/ -v                    # 전체 412개 테스트
+pytest tests/ -v                    # 전체 540+ 테스트
 pytest tests/test_llm.py -v         # LLM 기본 테스트
 pytest tests/test_llm_context.py -v # 컨텍스트 주입 + 환각 검증
 pytest tests/test_classifier.py -v  # YOLOv8-cls 분류기
@@ -617,4 +617,4 @@ MIT License
 
 ---
 
-*Developed by Yeong | 2026 — v5.3 (FastAPI REST API + Docker Compose 3-컨테이너 + 한/영 동의어 + 카테고리 특화 프롬프트 + DXF 리랭커 + 724 tests)*
+*Developed by Yeong | 2026 — v5.6 (FastAPI REST API + Docker Compose 2-서비스 + 한/영 동의어 + 카테고리 특화 프롬프트 + DXF 리랭커 + 540+ tests)*

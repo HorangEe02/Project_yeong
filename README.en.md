@@ -47,7 +47,7 @@
 | **LLM analysis** | Ollama Gemma 4 / Qwen3.5 (RAM-based auto/manual selection) · context injection + HallucinationDetector |
 | **Backend/Frontend** | FastAPI (25+ endpoints · SSE streaming) · Next.js 16 + React 19 + Tailwind v4 (7 pages) + Three.js 3D viewer / Streamlit (legacy) |
 | **Multi-CAD** | DWG (ODA) · STEP (CadQuery) · IGES (OCP) · STL |
-| **Deploy · Quality** | Docker Compose 3-service · **845 tests passing** · ~**95%** search-time reduction |
+| **Deploy · Quality** | Docker Compose 2-service (app·ollama, embedded ChromaDB) · **540+ tests** · ~**95%** search-time reduction |
 
 **Highlights** — combines 5 models (YOLO-cls/det · OpenCLIP · GNN · OCR) by role · **graph-based (GNN) structural similarity search** of DXF · LLM **hallucination verification** · full-stack + MLOps end to end (modeling → FastAPI → Next.js → Docker)
 
@@ -66,7 +66,7 @@
 | **Auth · Security** | Email + Kakao·Naver·Google OAuth (Cloud Functions) · RBAC · RTDB Security Rules data isolation |
 | **Stack** | React 18 · TypeScript · Vite · Tailwind · Zustand · Leaflet · react-hook-form+zod · Firebase (RTDB·Auth·Functions `asia-northeast3`) · Vitest |
 
-**Progress so far (PlusUltra v2.0 — `mediway/plusultra/*` branches, 35 pages · 91 components)**
+**Progress so far (PlusUltra v2.0 — ⚠️ not merged to main, in progress on `mediway/plusultra/*` branches · 35 pages · 91 components)**
 
 | Phase | Work |
 |-------|----------|
@@ -95,7 +95,7 @@
 | **Backend** | Python 3.11 · FastAPI · PostgreSQL 16 · **TimescaleDB** (time-series health data) · Redis · Docker Compose |
 | **AI / Data** | Google Cloud Vision OCR (supplement labels) · **Ollama local LLM** label parsing · KDRIs nutrient-intake data · MFDS data normalization |
 | **Mobile** | **Flutter 3.24** · Apple HealthKit · Google Health Connect |
-| **Status** | In development (Phase 0–4) · `yeong-Vision-Nutrition` is the active deliverable; `pr2`/`pr3` are placeholders for follow-on client tasks |
+| **Status** | In development (Phase 0–4) · `Lemon-Aid` is the active deliverable |
 
 **Highlights** — **real client-commissioned collaboration** · supplement-label **OCR → LLM structuring → official-data validation** pipeline · integrated food/supplement/activity health-analysis UX · full-stack mobile healthcare (FastAPI + Flutter + TimescaleDB)
 
@@ -104,7 +104,7 @@
 - **Supplement-label-specific parsing**: normalizes supplement-table context such as serving size and units (mg, μg, IU)
 - **Integrated information flow**: connects food, supplements, activity, and weight into 5 health-analysis outputs
 
-📂 [03_lemon_healthcare](./03_lemon_healthcare) · 📄 [Lemon AID README](./03_lemon_healthcare/yeong-Vision-Nutrition/README.md)
+📂 [03_lemon_healthcare](./03_lemon_healthcare) · 📄 [Lemon AID README](./03_lemon_healthcare/Lemon-Aid/README.md)
 
 ---
 
@@ -142,7 +142,7 @@
 | **LLM** | Ollama (qwen3.5 · exaone · gemma4) · Vertex AI Gemini · hybrid router · hallucination verification |
 | **Backend** | FastAPI (REST·SSE·OpenAPI) · Firebase (RTDB·Auth·Functions) · PostgreSQL · TimescaleDB · Redis · SQLite |
 | **Frontend · Mobile** | Next.js 16 · React 18/19 · Tailwind · Three.js · Vite · Zustand · Leaflet · Flutter |
-| **Infra · Quality** | Docker Compose · Cloud Run · Firebase Hosting · Supabase · pytest (845) · Vitest · RBAC · Security Rules |
+| **Infra · Quality** | Docker Compose · Cloud Run · Firebase Hosting · Supabase · pytest (540+) · Vitest · RBAC · Security Rules |
 
 ---
 
