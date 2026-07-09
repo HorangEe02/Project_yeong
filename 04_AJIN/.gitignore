@@ -99,3 +99,6 @@ data/celery_beat.pid
 data/captures/mock_*
 data/real_documents/
 .vercel
+
+# Playwright CLI debug snapshots
+.playwright-cli/

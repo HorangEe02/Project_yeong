@@ -422,3 +422,6 @@ yarn.lock
 ../_private/
 # archive (Lemon-Aid 밖에 위치)
 ../_archive/
+
+# 날짜별 작업 todo 로그 (개발 과정 산출물)
+outputs/todo-list/
