@@ -94,7 +94,7 @@ def test_check_artifact_privacy_rejects_markdown_raw_tokens(tmp_path: Path) -> N
 def test_check_artifact_privacy_rejects_markdown_local_paths(tmp_path: Path) -> None:
     """Verify Markdown reports cannot contain local filesystem literals."""
     (tmp_path / "report.md").write_text(
-        "source=/Volumes/Corsair EX400U Media/raw.jpg\n",
+        "source=<EXTERNAL_DRIVE>/raw.jpg\n",
         encoding="utf-8",
     )
 
@@ -136,7 +136,7 @@ def test_check_artifact_privacy_rejects_local_path_literals(tmp_path: Path) -> N
     _write_jsonl(
         tmp_path / "bad.jsonl",
         [
-            {"image_ref": "/Volumes/Corsair EX400U Media/raw.jpg"},
+            {"image_ref": "<EXTERNAL_DRIVE>/raw.jpg"},
             {"image_ref": "/private/tmp/raw.jpg"},
         ],
     )

@@ -3,7 +3,7 @@
 **작성일**: 2026-05-27
 **대상 본선**: 2026-06-10~11 (KNU SILLI 2026)
 **현재 상태**: D-15
-**근거 자료**: `/Volumes/Corsair EX400U Media/LLM-WIKI/` (rag-variants.md, context-compression.md, bge-m3.md, rag-vs-refrag-overview.md) + 공식 논문 + 2026-05 웹 검색
+**근거 자료**: `<EXTERNAL_DRIVE>/LLM-WIKI/` (rag-variants.md, context-compression.md, bge-m3.md, rag-vs-refrag-overview.md) + 공식 논문 + 2026-05 웹 검색
 
 ---
 
@@ -67,8 +67,8 @@ citation_enforcer (사후 인용 검증)
 
 #### 출처·근거
 - 공식: [BAAI/bge-reranker-v2-m3](https://huggingface.co/BAAI/bge-reranker-v2-m3) (568M params, MIT license, 100+ languages)
-- Wiki: [bge-m3.md L103](file:///Volumes/Corsair%20EX400U%20Media/LLM-WIKI/wiki/entities/bge-m3.md) — "Reranker 짝: BGE Reranker (BAAI/bge-reranker-v2-m3): top-K 재정렬"
-- 권장 패턴: [rag-variants.md L99](file:///Volumes/Corsair%20EX400U%20Media/LLM-WIKI/wiki/concepts/rag-variants.md) — "[Reranker] cross-encoder로 top-K 재정렬"
+- Wiki: [bge-m3.md L103](file://<EXTERNAL_DRIVE>/LLM-WIKI/wiki/entities/bge-m3.md) — "Reranker 짝: BGE Reranker (BAAI/bge-reranker-v2-m3): top-K 재정렬"
+- 권장 패턴: [rag-variants.md L99](file://<EXTERNAL_DRIVE>/LLM-WIKI/wiki/concepts/rag-variants.md) — "[Reranker] cross-encoder로 top-K 재정렬"
 
 #### 도입 방식
 - **선택지 A (정공)**: `FlagEmbedding.FlagReranker` 직접 import (CloudRun 컨테이너 내 모델 로드)
@@ -118,7 +118,7 @@ RERANKER_USE_FP16 = os.getenv("RERANKER_USE_FP16", "true").lower() == "true"
 
 #### 출처·근거
 - 공식: [Yan et al. 2024, arXiv:2401.15884](https://arxiv.org/abs/2401.15884) — "Corrective Retrieval Augmented Generation"
-- Wiki: [rag-variants.md L28-34](file:///Volumes/Corsair%20EX400U%20Media/LLM-WIKI/wiki/concepts/rag-variants.md) — "Retrieval evaluator → confidence score → web search 보강"
+- Wiki: [rag-variants.md L28-34](file://<EXTERNAL_DRIVE>/LLM-WIKI/wiki/concepts/rag-variants.md) — "Retrieval evaluator → confidence score → web search 보강"
 - 2024 구현: [LangGraph CRAG 튜토리얼](https://www.datacamp.com/tutorial/corrective-rag-crag) — confidence ∈ {Correct, Incorrect, Ambiguous}
 
 #### AJIN 환경 적응
@@ -224,7 +224,7 @@ CRAG_LLM_JUDGE_ENABLED = os.getenv("CRAG_LLM_JUDGE_ENABLED", "false").lower() ==
   - NaturalQuestions: 4× 압축 + **21.4%p 성능 향상**
   - LooGLE: **비용 94% 감소**
   - 10k 토큰: **1.4–2.6× latency 개선**
-- Wiki: [context-compression.md L23-29](file:///Volumes/Corsair%20EX400U%20Media/LLM-WIKI/wiki/concepts/context-compression.md)
+- Wiki: [context-compression.md L23-29](file://<EXTERNAL_DRIVE>/LLM-WIKI/wiki/concepts/context-compression.md)
 
 #### 도입 방식
 ```python
@@ -489,10 +489,10 @@ LLMLINGUA_TARGET_RATIO=0.5
 ## 10. 참고 자료
 
 ### 10.1 LLM-WIKI (1차 자료)
-- `/Volumes/Corsair EX400U Media/LLM-WIKI/wiki/concepts/rag-variants.md` — CRAG, HyDE, FLARE 등 변형 카탈로그
-- `/Volumes/Corsair EX400U Media/LLM-WIKI/wiki/concepts/context-compression.md` — LongLLMLingua + GIST + ICAE 비교
-- `/Volumes/Corsair EX400U Media/LLM-WIKI/wiki/entities/bge-m3.md` — BGE-M3 + bge-reranker-v2-m3
-- `/Volumes/Corsair EX400U Media/LLM-WIKI/raw/references/2026-05-27-rag-vs-refrag-overview.md` — 원논문 인용
+- `<EXTERNAL_DRIVE>/LLM-WIKI/wiki/concepts/rag-variants.md` — CRAG, HyDE, FLARE 등 변형 카탈로그
+- `<EXTERNAL_DRIVE>/LLM-WIKI/wiki/concepts/context-compression.md` — LongLLMLingua + GIST + ICAE 비교
+- `<EXTERNAL_DRIVE>/LLM-WIKI/wiki/entities/bge-m3.md` — BGE-M3 + bge-reranker-v2-m3
+- `<EXTERNAL_DRIVE>/LLM-WIKI/raw/references/2026-05-27-rag-vs-refrag-overview.md` — 원논문 인용
 
 ### 10.2 공식 논문
 - CRAG: [Yan et al. 2024, arXiv:2401.15884](https://arxiv.org/abs/2401.15884)

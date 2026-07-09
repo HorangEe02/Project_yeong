@@ -23,7 +23,7 @@
 
 ### 실사 데이터셋 (`data/ocr_eval/real_manifest.json`)
 - **86장** — 43 영양제 카테고리(`[비타민C]`, `[오메가3]` 등) × 카테고리당 2장
-- 외장 드라이브 `/Volumes/Corsair EX400U Media/.../naver` 에서 결정론적 샘플링
+- 외장 드라이브 `<EXTERNAL_DRIVE>/.../naver` 에서 결정론적 샘플링
 - **GT 라벨링 대기 중**: 각 item 의 `gt_text` / `gt_fields` 필드를 사람이 채워야 측정 가능 (현재는 `gt_text: ""`)
 
 ## 3. 실제 베이스라인 측정 — 환경 충돌로 보류

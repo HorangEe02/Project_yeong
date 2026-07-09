@@ -122,7 +122,7 @@ def test_apply_pii_screening_decisions_rejects_unsafe_decisions(tmp_path: Path) 
     for payload, match in [
         (_decision(raw_ocr_text="secret"), "raw_ocr_text"),
         (_decision(review_note="free text"), "free-text"),
-        (_decision(reviewer_id="/Volumes/Corsair/user"), "local path"),
+        (_decision(reviewer_id="<EXTERNAL_DRIVE>/user"), "local path"),
         (_decision(reviewer_id="/private/tmp/user"), "local path"),
         (_decision(reviewer_id="ollama_gemma4"), "operator_ prefix"),
         (_decision(extracted_name="홍길동"), "unsupported field"),

@@ -54,7 +54,7 @@ VERCEL_URL = "https://ajin-ai-assistant-frontend.vercel.app/"
 # 절대 사용하지 말 것. vercel.json rewrites 도 stable URL 사용.
 CLOUD_RUN_HEALTH_URL = "https://ajin-backend-614046190602.asia-northeast3.run.app/api/health"
 CLOUD_RUN_COLD_THRESHOLD_MS = 1500  # min-instances=1 적용 시 < 1.5초 보장
-SSD_MODELS_PATH = "/Volumes/Corsair EX400U Media/.ollama/models"
+SSD_MODELS_PATH = "<EXTERNAL_DRIVE>/.ollama/models"
 
 EXPECTED_OLLAMA_MODEL_MIN = 17
 EXPECTED_BGE_MODEL = "bge-m3"

@@ -160,7 +160,7 @@ def test_build_dry_run_import_plan_rejects_raw_and_local_path_literals(
         dry_run.build_dry_run_import_plan(input_path=input_path)
 
     input_path_2 = tmp_path / "approved-local.jsonl"
-    _write_jsonl(input_path_2, [_approved_row(product_name="/Volumes/Corsair/a.jpg")])
+    _write_jsonl(input_path_2, [_approved_row(product_name="<EXTERNAL_DRIVE>/a.jpg")])
 
     with pytest.raises(ValueError, match="local path literal"):
         dry_run.build_dry_run_import_plan(input_path=input_path_2)

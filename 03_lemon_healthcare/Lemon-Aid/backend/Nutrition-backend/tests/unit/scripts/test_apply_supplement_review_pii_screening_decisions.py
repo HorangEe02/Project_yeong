@@ -246,7 +246,7 @@ def test_apply_decisions_rejects_unsafe_decision_payloads(tmp_path: Path) -> Non
         (_decision_row(fixture_id, raw_ocr_text="secret"), "raw_ocr_text"),
         (_decision_row(fixture_id, review_note="free text"), "free-text"),
         (_decision_row(fixture_id, reviewer_id="ollama_gemma4"), "operator_ prefix"),
-        (_decision_row(fixture_id, reviewer_id="/Volumes/Corsair/user"), "local path"),
+        (_decision_row(fixture_id, reviewer_id="<EXTERNAL_DRIVE>/user"), "local path"),
         (_decision_row(fixture_id, object_url="https://example.test/image.jpg"), "object_url"),
         (_decision_row(fixture_id, extracted_name="홍길동"), "unsupported field"),
     ]

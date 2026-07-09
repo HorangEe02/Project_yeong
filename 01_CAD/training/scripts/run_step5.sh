@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-BASE_DIR="/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD"
+BASE_DIR="<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD"
 DATASET_DIR="$BASE_DIR/drawing-datasets/preprocessed_dataset"
 DRAWING_LLM="$BASE_DIR/drawing-llm"
 TRAINING_DIR="$BASE_DIR/drawing-datasets/training"

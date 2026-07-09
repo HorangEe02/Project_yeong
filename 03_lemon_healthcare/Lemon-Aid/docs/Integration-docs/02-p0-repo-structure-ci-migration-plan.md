@@ -14,20 +14,20 @@ The current local implementation is usable, but the collaboration gate is at
 risk because the real Git root is:
 
 ```text
-/Users/yeong/99_me/00_github
+~/99_me/00_github
 ```
 
 The active GitHub Actions workflow directory is therefore:
 
 ```text
-/Users/yeong/99_me/00_github/.github/workflows
+~/99_me/00_github/.github/workflows
 ```
 
 GitHub Actions does not treat this nested folder as the repository workflow
 directory:
 
 ```text
-/Users/yeong/99_me/00_github/03_lemon_healthcare/.github/workflows
+~/99_me/00_github/03_lemon_healthcare/.github/workflows
 ```
 
 ## Official Documentation Checked
@@ -42,7 +42,7 @@ Use the following official GitHub documentation as the implementation boundary:
 
 ## Implementation Update (2026-05-15)
 
-- Root Lemon workflows now live under `/Users/yeong/99_me/00_github/.github/workflows/`.
+- Root Lemon workflows now live under `~/99_me/00_github/.github/workflows/`.
 - Root `17-lemon-backend-ci.yml` targets `03_lemon_healthcare/yeong-Lemon-Aid/backend`.
 - Root docs and mobile workflows were added as `17-lemon-docs-ci.yml` and `17-lemon-mobile-ci.yml`.
 - Root PR/Issue templates, CODEOWNERS, and Dependabot now include Lemon Healthcare paths.
@@ -56,7 +56,7 @@ Remaining release task: stage the old `yeong-Vision-Nutrition` deletions and new
 
 | Item | Current fact | Risk |
 | --- | --- | --- |
-| Git root | `/Users/yeong/99_me/00_github` | CI paths must be root-relative from this directory. |
+| Git root | `~/99_me/00_github` | CI paths must be root-relative from this directory. |
 | Current work branch | `codex/p1-5-stabilization` | Migration should be reviewed before publish to team branches. |
 | Old tracked path | `03_lemon_healthcare/yeong-Vision-Nutrition/` deleted in working tree | Needs formal rename/migration staging, not accidental deletion. |
 | New local path | `03_lemon_healthcare/yeong-Lemon-Aid/` untracked | Must be added selectively, excluding secrets and generated files. |
@@ -89,7 +89,7 @@ merged into the root `.github/` files.
 ## Target Repository Layout
 
 ```text
-/Users/yeong/99_me/00_github/
+~/99_me/00_github/
 ├── .github/
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   ├── CODEOWNERS

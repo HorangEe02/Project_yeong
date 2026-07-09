@@ -441,7 +441,7 @@ P1-4 구현만으로는 user-facing 기능을 바꾸지 않는다. 목표는 det
 ### Unit
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 .venv/bin/python -m pytest Nutrition-backend/tests/unit/parsing/test_layout_parser.py -q --no-cov
 ```
 
@@ -461,7 +461,7 @@ cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 ### Quality gate
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 .venv/bin/python -m ruff check Nutrition-backend/src/parsing Nutrition-backend/src/models/schemas/label_layout.py Nutrition-backend/tests/unit/parsing
 .venv/bin/python -m black --check Nutrition-backend/src/parsing Nutrition-backend/src/models/schemas/label_layout.py Nutrition-backend/tests/unit/parsing
 .venv/bin/python -m pytest Nutrition-backend/tests/unit/parsing/test_layout_parser.py Nutrition-backend/tests/unit/ocr -q --no-cov
@@ -521,7 +521,7 @@ P1-4는 OCR provider 호출과 DB write path를 바꾸지 않으므로 전체 AP
 검증 결과:
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 .venv/bin/python -m ruff check Nutrition-backend/src/models/schemas/label_layout.py Nutrition-backend/src/parsing Nutrition-backend/tests/unit/parsing
 # All checks passed
 

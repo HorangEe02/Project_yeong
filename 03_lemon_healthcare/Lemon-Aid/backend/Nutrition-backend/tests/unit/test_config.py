@@ -151,7 +151,7 @@ def test_default_development_settings_load(  # noqa: PLR0915
     assert settings.ollama_vision_model == "gemma4:e4b"
     assert settings.allow_external_llm is False
     assert settings.llm_wiki_retrieval_enabled is True
-    assert str(settings.llm_wiki_path) == "/Volumes/Corsair EX400U Media/LLM-WIKI"
+    assert str(settings.llm_wiki_path) == "<EXTERNAL_DRIVE>/LLM-WIKI"
     assert settings.llm_wiki_max_sources == 4
     assert settings.llm_wiki_excerpt_chars == 700
     assert settings.multimodal_ocr_assist_policy == "disabled"

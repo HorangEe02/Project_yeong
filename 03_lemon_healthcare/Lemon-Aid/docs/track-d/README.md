@@ -50,7 +50,7 @@ M-3-V.B guide 작성 (commit) ────┐ ↓
 
 ## 참조
 
-- 전체 plan: [twinkly-splashing-hejlsberg.md](/Users/yeong/.claude/plans/twinkly-splashing-hejlsberg.md)
-- 기존 plan (M-1~M-3-V): [mossy-forging-hejlsberg.md](/Users/yeong/.claude/plans/mossy-forging-hejlsberg.md)
+- 전체 plan: [twinkly-splashing-hejlsberg.md](~/.claude/plans/twinkly-splashing-hejlsberg.md)
+- 기존 plan (M-1~M-3-V): [mossy-forging-hejlsberg.md](~/.claude/plans/mossy-forging-hejlsberg.md)
 - 백엔드 컨벤션: [backend/CLAUDE.md](../../backend/CLAUDE.md)
 - 컴플라이언스: [docs/10-compliance-checklist.md](../10-compliance-checklist.md)

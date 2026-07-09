@@ -338,7 +338,7 @@ def test_export_rejects_raw_and_local_path_literals(tmp_path: Path) -> None:
         input_path_2,
         [
             _review_row(
-                review_decision=_decision(display_name="/Volumes/Corsair EX400U Media/a.jpg")
+                review_decision=_decision(display_name="<EXTERNAL_DRIVE>/a.jpg")
             )
         ],
     )

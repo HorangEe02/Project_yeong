@@ -54,7 +54,7 @@ from src.services.wiki_embedding_targets import (
     known_models,
 )
 
-DEFAULT_ROOT = Path("/Volumes/Corsair EX400U Media/LLM-WIKI")
+DEFAULT_ROOT = Path("<EXTERNAL_DRIVE>/LLM-WIKI")
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
 SOURCE_MANIFEST_VERSION = "llm-wiki-rag-v1"
 

@@ -117,7 +117,7 @@ COVERAGE_FILE=/private/tmp/lemon_p1_coverage \
 
 ### 3. CI Path Freeze
 
-현재 git root는 `/Users/yeong/99_me/00_github`이고 이 프로젝트 prefix는 `03_lemon_healthcare/`다. 따라서 root workflow `.github/workflows/17-lemon-backend-ci.yml`의 path filter와 `defaults.run.working-directory`는 이 prefix를 유지해야 한다.
+현재 git root는 `~/99_me/00_github`이고 이 프로젝트 prefix는 `03_lemon_healthcare/`다. 따라서 root workflow `.github/workflows/17-lemon-backend-ci.yml`의 path filter와 `defaults.run.working-directory`는 이 prefix를 유지해야 한다.
 
 현재 backend CI path:
 

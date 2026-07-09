@@ -99,7 +99,7 @@ Next.js + TypeScript + Tailwind 프로젝트 생성 및 API 타입 자동 생성
 
 #### 1-1: 프로젝트 생성
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD"
 npx create-next-app@latest web --typescript --tailwind --eslint --app --src-dir
 ```
 

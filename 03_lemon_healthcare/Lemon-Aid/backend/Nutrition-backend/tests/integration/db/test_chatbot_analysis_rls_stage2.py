@@ -1,6 +1,6 @@
 """Integration: Stage-2 owner isolation for the run_chatbot RLS seam.
 
-Authority: /Users/yeong/.claude/plans/robust-rolling-valiant.md (Phase C2)
+Authority: ~/.claude/plans/robust-rolling-valiant.md (Phase C2)
 
 ambient-tx Step 8 Phase C2 migrated ``run_chatbot`` (ai_agent.py) to the new
 ``rls_request_transaction_allow_inner_commit`` context manager. Unlike the other

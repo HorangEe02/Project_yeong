@@ -333,7 +333,7 @@ python B1_MiSUMi_대량등록/check_progress.py
 
 > **MPS 메모리 누수 대응:** Apple M4 Pro 24GB에서 MPS 디바이스로 장시간 학습 시 메모리 누수 발생 (RSS 7GB+, 스왑 20GB+). 2 epoch 이상 연속 실행 시 스왑 폭증으로 속도가 3~8시간/epoch까지 저하됨. `yolo_epoch_runner_local.sh`로 **1 epoch마다 프로세스 kill → 60초 메모리 회복 → resume** 방식으로 항상 정상 속도(~53분/epoch)를 유지한다.
 
-> **경로 마이그레이션 (2026-03-03):** 학습 초기에는 외부 드라이브(`/Volumes/Corsair EX300U Media/...`)에서 진행했으나, 드라이브 미연결 상태에서 학습 재개를 위해 로컬 경로(`/Users/yeong/00_work_out/CAD/`)로 마이그레이션 완료. `dataset_misumi.yaml`과 `last.pt` 체크포인트 내부 경로를 모두 패치함.
+> **경로 마이그레이션 (2026-03-03):** 학습 초기에는 외부 드라이브(`<EXTERNAL_DRIVE>/...`)에서 진행했으나, 드라이브 미연결 상태에서 학습 재개를 위해 로컬 경로(`~/00_work_out/CAD/`)로 마이그레이션 완료. `dataset_misumi.yaml`과 `last.pt` 체크포인트 내부 경로를 모두 패치함.
 
 ```bash
 # 실행 방법
@@ -799,11 +799,11 @@ conda activate ml
 ollama serve
 
 # 3) 데모 파이프라인 실행
-cd /Users/yeong/00_work_out/CAD
+cd ~/00_work_out/CAD
 python cad_me/cad_crawling_pipeline.py --mode demo
 
 # 4) Streamlit 웹 UI
-cd /Users/yeong/00_work_out/CAD/main/drawing-llm
+cd ~/00_work_out/CAD/main/drawing-llm
 streamlit run app/streamlit_app.py
 
 # 5) VLM 도면 분석 (CLI)

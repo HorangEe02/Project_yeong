@@ -141,7 +141,7 @@ def main() -> int:
     parser.add_argument(
         "--source",
         default=(
-            "/Volumes/Corsair EX400U Media/00_work_out/00_data_set/pr/"
+            "<EXTERNAL_DRIVE>/00_work_out/00_data_set/pr/"
             "downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver"
         ),
     )

@@ -38,7 +38,7 @@ try:
 except RuntimeError:
     pass  # 이미 설정된 경우
 
-BASE_DIR = Path("/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD")
+BASE_DIR = Path("<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD")
 
 
 class CLIPDrawingDataset(Dataset):

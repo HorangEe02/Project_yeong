@@ -76,7 +76,7 @@
 
 ### 3.1 Path filter 설계
 
-현재 Git repository root는 `/Users/yeong/99_me/00_github`이고, Lemon Healthcare checkout은 그 아래 `03_lemon_healthcare` 디렉터리다. GitHub Actions `paths` 패턴은 repository root 기준으로 평가되므로 backend CI에는 다음 접두어를 포함해야 한다.
+현재 Git repository root는 `~/99_me/00_github`이고, Lemon Healthcare checkout은 그 아래 `03_lemon_healthcare` 디렉터리다. GitHub Actions `paths` 패턴은 repository root 기준으로 평가되므로 backend CI에는 다음 접두어를 포함해야 한다.
 
 ```yaml
 on:

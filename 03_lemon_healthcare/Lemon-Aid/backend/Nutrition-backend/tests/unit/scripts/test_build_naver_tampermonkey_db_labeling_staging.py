@@ -122,7 +122,7 @@ def test_build_staging_rows_rejects_local_absolute_image_path(tmp_path: Path) ->
 def test_build_staging_rows_rejects_local_literal_metadata(tmp_path: Path) -> None:
     """Verify local model or media paths cannot be hashed into staging rows."""
     manifest_path = tmp_path / "manifest.jsonl"
-    row = _manifest_row(product_dir="/Volumes/Corsair EX400U Media/.ollama/models")
+    row = _manifest_row(product_dir="<EXTERNAL_DRIVE>/.ollama/models")
     manifest_path.write_text(json.dumps(row, ensure_ascii=False) + "\n", encoding="utf-8")
 
     with pytest.raises(ValueError, match="local path literal"):

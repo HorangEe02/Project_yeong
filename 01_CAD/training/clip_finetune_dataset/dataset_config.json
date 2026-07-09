@@ -10,8 +10,8 @@
   "precision": "amp",
   "lock_image_tower_epochs": 5,
   "dataset": {
-    "train_csv": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/clip_finetune_dataset/train.csv",
-    "val_csv": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/clip_finetune_dataset/val.csv",
+    "train_csv": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/clip_finetune_dataset/train.csv",
+    "val_csv": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/clip_finetune_dataset/val.csv",
     "total_train": 52491,
     "total_val": 9222
   },

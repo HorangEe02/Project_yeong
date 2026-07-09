@@ -338,7 +338,7 @@ def test_validate_rejects_local_path_literals(tmp_path: Path) -> None:
         [
             _review_row(
                 review_decision=_approved_decision(
-                    display_name="/Volumes/Corsair EX400U Media/a.jpg"
+                    display_name="<EXTERNAL_DRIVE>/a.jpg"
                 )
             )
         ],

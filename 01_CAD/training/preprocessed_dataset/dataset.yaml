@@ -3,7 +3,7 @@
 # Categories: 81
 # Images: 61711 (train 49337 / val 6142 / test 6232)
 
-path: /Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset
+path: <EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset
 train: train
 val: val
 test: test

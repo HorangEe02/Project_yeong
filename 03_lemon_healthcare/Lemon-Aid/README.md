@@ -198,7 +198,7 @@ git switch feat/db-internal-learning-pipeline
 로컬 작업 경로에서 바로 실행하는 경우:
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/Lemon-Aid
+cd ~/99_me/00_github/03_lemon_healthcare/Lemon-Aid
 ```
 
 ### 2. Backend 환경 구성

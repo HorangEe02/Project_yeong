@@ -647,7 +647,7 @@ CSS 변수는 그대로 사용 — `var(--hud-primary)`, `var(--glass-bg)` 등.
 
 #### Step 1: Vite + React + TS 부트스트랩 (다음 작업)
 ```bash
-cd /Users/yeong/99_me/02_AJIN/ajin-ai-assistant-react
+cd ~/99_me/02_AJIN/ajin-ai-assistant-react
 npm create vite@latest frontend -- --template react-ts
 cd frontend
 npm install

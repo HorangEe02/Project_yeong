@@ -32,5 +32,5 @@
 
 ## Artifacts
 
-- JSON: `/Users/yeong/99_me/00_github/04_AJIN/ajin-ai-assistant-react/outputs/supabase-verification/2026-05-20-browser-smoke/route-smoke-results.json`
-- Screenshots: `/Users/yeong/99_me/00_github/04_AJIN/ajin-ai-assistant-react/outputs/supabase-verification/2026-05-20-browser-smoke`
+- JSON: `~/99_me/00_github/04_AJIN/ajin-ai-assistant-react/outputs/supabase-verification/2026-05-20-browser-smoke/route-smoke-results.json`
+- Screenshots: `~/99_me/00_github/04_AJIN/ajin-ai-assistant-react/outputs/supabase-verification/2026-05-20-browser-smoke`

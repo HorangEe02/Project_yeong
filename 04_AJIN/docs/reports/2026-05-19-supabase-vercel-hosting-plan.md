@@ -1,7 +1,7 @@
 # AJIN Supabase + Vercel Hosting Implementation Plan
 
 - 작성일: 2026-05-19
-- 대상 경로: `/Users/yeong/99_me/00_github/04_AJIN/ajin-ai-assistant-react`
+- 대상 경로: `~/99_me/00_github/04_AJIN/ajin-ai-assistant-react`
 - 기준 아키텍처: Vercel은 React/Vite frontend 정적 호스팅, FastAPI backend는 기존 Cloud Run/Docker 운영 경로 유지, Supabase는 Postgres/Storage로 사용
 - Firebase 목표: 최종 완전 제거
 

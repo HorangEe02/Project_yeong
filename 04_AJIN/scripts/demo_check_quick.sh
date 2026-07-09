@@ -33,7 +33,7 @@ for arg in "$@"; do
 done
 
 OLLAMA_URL="${OLLAMA_BASE_URL:-http://localhost:11434}"
-SSD_PATH="/Volumes/Corsair EX400U Media/.ollama/models"
+SSD_PATH="<EXTERNAL_DRIVE>/.ollama/models"
 VERCEL_URL="https://ajin-ai-assistant-frontend.vercel.app/"
 
 PASS_COUNT=0

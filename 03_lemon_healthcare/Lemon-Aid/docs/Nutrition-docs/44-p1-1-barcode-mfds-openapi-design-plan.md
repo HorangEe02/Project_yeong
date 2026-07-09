@@ -790,7 +790,7 @@ Response:
 구현 PR별 기본 검증:
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 .venv/bin/python -m pytest Nutrition-backend/tests/unit/barcode Nutrition-backend/tests/unit/nutrition/test_foodqr_client.py Nutrition-backend/tests/unit/nutrition/test_mfds_client.py -q --no-cov
 .venv/bin/python -m pytest Nutrition-backend/tests/unit/services/test_supplement_barcode_lookup.py -q --no-cov
 .venv/bin/python -m pytest Nutrition-backend/tests/integration/api/test_supplement_barcode_lookup_api.py -q --no-cov
@@ -802,7 +802,7 @@ git diff --check
 실제 FoodQR/C003 smoke는 opt-in:
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 FOODQR_SERVICE_KEY=... RUN_FOODQR_LIVE_SMOKE=1 .venv/bin/python -m pytest Nutrition-backend/tests/integration/mfds/test_foodqr_live_smoke.py -q --no-cov
 MFDS_API_KEY=... RUN_MFDS_LIVE_SMOKE=1 .venv/bin/python -m pytest Nutrition-backend/tests/integration/mfds/test_mfds_live_smoke.py -q --no-cov
 ```
@@ -939,7 +939,7 @@ fail-closed 정책:
 검증:
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 .venv/bin/python -m pytest Nutrition-backend/tests/unit/barcode/test_normalization.py Nutrition-backend/tests/unit/services/test_supplement_barcode_lookup.py Nutrition-backend/tests/integration/api/test_supplement_barcode_lookup_api.py -q --no-cov
 .venv/bin/python -m pytest Nutrition-backend/tests/integration/api/test_supplement_intake_api.py -q --no-cov
 ```

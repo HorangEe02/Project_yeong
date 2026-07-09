@@ -26,10 +26,10 @@
     }
   },
   "outputs": {
-    "yolo_yaml": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/dataset.yaml",
-    "clip_train_csv": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/train.csv",
-    "clip_val_csv": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/val.csv",
-    "clip_test_csv": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/test.csv",
-    "manifest": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/split_manifest.json"
+    "yolo_yaml": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/dataset.yaml",
+    "clip_train_csv": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/train.csv",
+    "clip_val_csv": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/val.csv",
+    "clip_test_csv": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/test.csv",
+    "manifest": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/preprocessed_dataset/split_manifest.json"
   }
 }

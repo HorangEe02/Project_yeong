@@ -22,7 +22,7 @@ P1 이후 AI/OCR/YOLO/학습 기능이 기존 backend 기준선을 깨지 않도
 
 ## 2. 현재 상태 확인
 
-현재 repository root는 `/Users/yeong/99_me/00_github`이고 Lemon Healthcare 프로젝트는 `03_lemon_healthcare` 하위에 있다.
+현재 repository root는 `~/99_me/00_github`이고 Lemon Healthcare 프로젝트는 `03_lemon_healthcare` 하위에 있다.
 
 구현 전 확인 결과:
 

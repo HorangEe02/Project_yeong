@@ -33,7 +33,7 @@ CLOVA→GT 채움을 완료(또는 가능한 만큼 확정) → Ollama 모델 �
 ## 2. 환경 변수 & 불변식 (먼저 셸에 export)
 
 ```bash
-REPO="/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid"
+REPO="<EXTERNAL_DRIVE>/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid"
 BACKEND="$REPO/backend"
 RD="$REPO/outputs/generated/supplement-learning/2026-06-05/operator-review"
 BUNDLE="$RD/ocr-ground-truth-review-bundle"

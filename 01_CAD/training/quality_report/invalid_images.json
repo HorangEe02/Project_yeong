@@ -1,7 +1,7 @@
 [
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0007_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0007_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 100.27MB exceeds 50MB limit",
     "file_size_mb": 100.27,
@@ -10,7 +10,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0043_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0043_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 77.57MB exceeds 50MB limit",
     "file_size_mb": 77.57,
@@ -19,7 +19,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0083_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0083_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 51.98MB exceeds 50MB limit",
     "file_size_mb": 51.98,
@@ -28,7 +28,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0015_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0015_white_scan.png",
     "status": "corrupted",
     "error": "image file is truncated",
     "file_size_mb": 13.38,
@@ -37,7 +37,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0026_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0026_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 160.89MB exceeds 50MB limit",
     "file_size_mb": 160.89,
@@ -46,7 +46,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0058_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0058_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 117.94MB exceeds 50MB limit",
     "file_size_mb": 117.94,
@@ -55,7 +55,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0009_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0009_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 86.81MB exceeds 50MB limit",
     "file_size_mb": 86.81,
@@ -64,7 +64,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0087_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0087_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 57.91MB exceeds 50MB limit",
     "file_size_mb": 57.91,
@@ -73,7 +73,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0092_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0092_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 76.92MB exceeds 50MB limit",
     "file_size_mb": 76.92,
@@ -82,7 +82,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0045_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0045_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 163.27MB exceeds 50MB limit",
     "file_size_mb": 163.27,
@@ -91,7 +91,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0050_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0050_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 126.45MB exceeds 50MB limit",
     "file_size_mb": 126.45,
@@ -100,7 +100,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0090_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0090_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 170.25MB exceeds 50MB limit",
     "file_size_mb": 170.25,
@@ -109,7 +109,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0035_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0035_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 99.17MB exceeds 50MB limit",
     "file_size_mb": 99.17,
@@ -118,7 +118,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0029_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0029_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 102.37MB exceeds 50MB limit",
     "file_size_mb": 102.37,
@@ -127,7 +127,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0065_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0065_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 124.86MB exceeds 50MB limit",
     "file_size_mb": 124.86,
@@ -136,7 +136,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0001_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0001_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 149.63MB exceeds 50MB limit",
     "file_size_mb": 149.63,
@@ -145,7 +145,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0057_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0057_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 226.08MB exceeds 50MB limit",
     "file_size_mb": 226.08,
@@ -154,7 +154,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0042_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0042_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 74.7MB exceeds 50MB limit",
     "file_size_mb": 74.7,
@@ -163,7 +163,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0015_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0015_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 123.47MB exceeds 50MB limit",
     "file_size_mb": 123.47,
@@ -172,7 +172,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0018_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0018_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 99.06MB exceeds 50MB limit",
     "file_size_mb": 99.06,
@@ -181,7 +181,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0033_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0033_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 172.54MB exceeds 50MB limit",
     "file_size_mb": 172.54,
@@ -190,7 +190,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0008_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0008_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 72.77MB exceeds 50MB limit",
     "file_size_mb": 72.77,
@@ -199,7 +199,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0077_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0077_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 182.36MB exceeds 50MB limit",
     "file_size_mb": 182.36,
@@ -208,7 +208,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0006_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0006_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 83.5MB exceeds 50MB limit",
     "file_size_mb": 83.5,
@@ -217,7 +217,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0013_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0013_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 67.2MB exceeds 50MB limit",
     "file_size_mb": 67.2,
@@ -226,7 +226,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0088_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0088_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 161.85MB exceeds 50MB limit",
     "file_size_mb": 161.85,
@@ -235,7 +235,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0068_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0068_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 150.38MB exceeds 50MB limit",
     "file_size_mb": 150.38,
@@ -244,7 +244,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0004_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0004_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 62.48MB exceeds 50MB limit",
     "file_size_mb": 62.48,
@@ -253,7 +253,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0039_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0039_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 55.7MB exceeds 50MB limit",
     "file_size_mb": 55.7,
@@ -262,7 +262,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0075_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0075_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 87.73MB exceeds 50MB limit",
     "file_size_mb": 87.73,
@@ -271,7 +271,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0003_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0003_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 121.01MB exceeds 50MB limit",
     "file_size_mb": 121.01,
@@ -280,7 +280,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0096_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0096_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 93.59MB exceeds 50MB limit",
     "file_size_mb": 93.59,
@@ -289,7 +289,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0016_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0016_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 89.69MB exceeds 50MB limit",
     "file_size_mb": 89.69,
@@ -298,7 +298,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0023_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0023_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 74.25MB exceeds 50MB limit",
     "file_size_mb": 74.25,
@@ -307,7 +307,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0098_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0098_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 78.56MB exceeds 50MB limit",
     "file_size_mb": 78.56,
@@ -316,7 +316,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0086_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0086_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 130.52MB exceeds 50MB limit",
     "file_size_mb": 130.52,
@@ -325,7 +325,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0067_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0067_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 80.04MB exceeds 50MB limit",
     "file_size_mb": 80.04,
@@ -334,7 +334,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0002_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0002_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 51.43MB exceeds 50MB limit",
     "file_size_mb": 51.43,
@@ -343,7 +343,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0017_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0017_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 70.47MB exceeds 50MB limit",
     "file_size_mb": 70.47,
@@ -352,7 +352,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0037_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0037_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 102.82MB exceeds 50MB limit",
     "file_size_mb": 102.82,
@@ -361,7 +361,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0022_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0022_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 164.68MB exceeds 50MB limit",
     "file_size_mb": 164.68,
@@ -370,7 +370,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0053_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0053_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 95.69MB exceeds 50MB limit",
     "file_size_mb": 95.69,
@@ -379,7 +379,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0046_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0046_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 111.02MB exceeds 50MB limit",
     "file_size_mb": 111.02,
@@ -388,7 +388,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0005_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0005_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 61.69MB exceeds 50MB limit",
     "file_size_mb": 61.69,
@@ -397,7 +397,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0049_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0049_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 53.77MB exceeds 50MB limit",
     "file_size_mb": 53.77,
@@ -406,7 +406,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0061_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0061_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 111.71MB exceeds 50MB limit",
     "file_size_mb": 111.71,
@@ -415,7 +415,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0000_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0000_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 105.71MB exceeds 50MB limit",
     "file_size_mb": 105.71,
@@ -424,7 +424,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0025_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0025_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 63.12MB exceeds 50MB limit",
     "file_size_mb": 63.12,
@@ -433,7 +433,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0030_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0030_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 92.08MB exceeds 50MB limit",
     "file_size_mb": 92.08,
@@ -442,7 +442,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0010_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0010_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 62.94MB exceeds 50MB limit",
     "file_size_mb": 62.94,
@@ -451,7 +451,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0073_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0073_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 211.11MB exceeds 50MB limit",
     "file_size_mb": 211.11,
@@ -460,7 +460,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0052_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0052_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 192.92MB exceeds 50MB limit",
     "file_size_mb": 192.92,
@@ -469,7 +469,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0099_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0099_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 121.84MB exceeds 50MB limit",
     "file_size_mb": 121.84,
@@ -478,7 +478,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0031_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0031_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 88.18MB exceeds 50MB limit",
     "file_size_mb": 88.18,
@@ -487,7 +487,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0097_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0097_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 219.08MB exceeds 50MB limit",
     "file_size_mb": 219.08,
@@ -496,7 +496,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0055_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0055_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 189.38MB exceeds 50MB limit",
     "file_size_mb": 189.38,
@@ -505,7 +505,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0048_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0048_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 112.88MB exceeds 50MB limit",
     "file_size_mb": 112.88,
@@ -514,7 +514,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0084_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0084_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 100.64MB exceeds 50MB limit",
     "file_size_mb": 100.64,
@@ -523,7 +523,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0021_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0021_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 70.24MB exceeds 50MB limit",
     "file_size_mb": 70.24,
@@ -532,7 +532,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0060_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0060_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 178.21MB exceeds 50MB limit",
     "file_size_mb": 178.21,
@@ -541,7 +541,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0085_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0085_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 178.12MB exceeds 50MB limit",
     "file_size_mb": 178.12,
@@ -550,7 +550,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0072_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0072_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 158.74MB exceeds 50MB limit",
     "file_size_mb": 158.74,
@@ -559,7 +559,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0011_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0011_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 136.81MB exceeds 50MB limit",
     "file_size_mb": 136.81,
@@ -568,7 +568,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0003_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0003_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 66.98MB exceeds 50MB limit",
     "file_size_mb": 66.98,
@@ -577,7 +577,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0001_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0001_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 110.57MB exceeds 50MB limit",
     "file_size_mb": 110.57,
@@ -586,7 +586,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0062_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0062_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 151.37MB exceeds 50MB limit",
     "file_size_mb": 151.37,
@@ -595,7 +595,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0002_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0002_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 109.83MB exceeds 50MB limit",
     "file_size_mb": 109.83,
@@ -604,7 +604,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0066_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0066_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 150.79MB exceeds 50MB limit",
     "file_size_mb": 150.79,
@@ -613,7 +613,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0012_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0012_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 70.71MB exceeds 50MB limit",
     "file_size_mb": 70.71,
@@ -622,7 +622,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0091_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0091_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 108.12MB exceeds 50MB limit",
     "file_size_mb": 108.12,
@@ -631,7 +631,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0051_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0051_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 93.59MB exceeds 50MB limit",
     "file_size_mb": 93.59,
@@ -640,7 +640,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0054_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0054_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 187.26MB exceeds 50MB limit",
     "file_size_mb": 187.26,
@@ -649,7 +649,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0063_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0063_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 150.22MB exceeds 50MB limit",
     "file_size_mb": 150.22,
@@ -658,7 +658,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0076_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0076_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 101.56MB exceeds 50MB limit",
     "file_size_mb": 101.56,
@@ -667,7 +667,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0089_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0089_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 111.33MB exceeds 50MB limit",
     "file_size_mb": 111.33,
@@ -676,7 +676,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0012_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0012_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 78.13MB exceeds 50MB limit",
     "file_size_mb": 78.13,
@@ -685,7 +685,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0094_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0094_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 63.48MB exceeds 50MB limit",
     "file_size_mb": 63.48,
@@ -694,7 +694,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0056_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0056_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 161.75MB exceeds 50MB limit",
     "file_size_mb": 161.75,
@@ -703,7 +703,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0032_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0032_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 102.66MB exceeds 50MB limit",
     "file_size_mb": 102.66,
@@ -712,7 +712,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0071_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0071_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 100.13MB exceeds 50MB limit",
     "file_size_mb": 100.13,
@@ -721,7 +721,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0059_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0059_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 66.28MB exceeds 50MB limit",
     "file_size_mb": 66.28,
@@ -730,7 +730,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0044_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0044_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 79.69MB exceeds 50MB limit",
     "file_size_mb": 79.69,
@@ -739,7 +739,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0008_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0008_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 108.92MB exceeds 50MB limit",
     "file_size_mb": 108.92,
@@ -748,7 +748,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0019_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0019_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 139.57MB exceeds 50MB limit",
     "file_size_mb": 139.57,
@@ -757,7 +757,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0020_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0020_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 151.05MB exceeds 50MB limit",
     "file_size_mb": 151.05,
@@ -766,7 +766,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0079_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0079_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 107.09MB exceeds 50MB limit",
     "file_size_mb": 107.09,
@@ -775,7 +775,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0009_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0009_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 89.04MB exceeds 50MB limit",
     "file_size_mb": 89.04,
@@ -784,7 +784,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0074_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0074_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 79.48MB exceeds 50MB limit",
     "file_size_mb": 79.48,
@@ -793,7 +793,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0078_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0078_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 70.24MB exceeds 50MB limit",
     "file_size_mb": 70.24,
@@ -802,7 +802,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0034_white_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0034_white_scan.png",
     "status": "too_large_filesize",
     "error": "File size 152.62MB exceeds 50MB limit",
     "file_size_mb": 152.62,
@@ -811,7 +811,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0064_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0064_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 151.07MB exceeds 50MB limit",
     "file_size_mb": 151.07,
@@ -820,7 +820,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0070_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0070_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 70.45MB exceeds 50MB limit",
     "file_size_mb": 70.45,
@@ -829,7 +829,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0069_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0069_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 98.86MB exceeds 50MB limit",
     "file_size_mb": 98.86,
@@ -838,7 +838,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0014_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0014_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 171.21MB exceeds 50MB limit",
     "file_size_mb": 171.21,
@@ -847,7 +847,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0080_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0080_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 116.99MB exceeds 50MB limit",
     "file_size_mb": 116.99,
@@ -856,7 +856,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0095_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0095_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 106.96MB exceeds 50MB limit",
     "file_size_mb": 106.96,
@@ -865,7 +865,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0013_draft_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0013_draft_scan.png",
     "status": "too_large_filesize",
     "error": "File size 114.56MB exceeds 50MB limit",
     "file_size_mb": 114.56,
@@ -874,7 +874,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0082_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0082_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 78.7MB exceeds 50MB limit",
     "file_size_mb": 78.7,
@@ -883,7 +883,7 @@
   },
   {
     "source": "synthetic_enhanced",
-    "path": "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0027_blueprint_scan.png",
+    "path": "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets/synthetic/enhanced_drawings/flange_coupling/flange_coupling_0027_blueprint_scan.png",
     "status": "too_large_filesize",
     "error": "File size 221.07MB exceeds 50MB limit",
     "file_size_mb": 221.07,

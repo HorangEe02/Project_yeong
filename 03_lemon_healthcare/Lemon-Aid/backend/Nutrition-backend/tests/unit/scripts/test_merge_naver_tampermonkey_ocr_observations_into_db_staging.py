@@ -133,7 +133,7 @@ def test_merge_rejects_local_path_literals(tmp_path: Path) -> None:
             _observation_row(
                 llm_parsed_ingredients=[
                     {
-                        "display_name": "/Volumes/Corsair EX400U Media/.ollama/models",
+                        "display_name": "<EXTERNAL_DRIVE>/.ollama/models",
                         "source": "ollama_structured",
                     }
                 ]

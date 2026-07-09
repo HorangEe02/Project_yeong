@@ -301,7 +301,7 @@ def test_apply_review_decisions_rejects_unsafe_decision_payloads(tmp_path: Path)
     local_path = tmp_path / "local-decisions.jsonl"
     local_decision = _decision_row()
     local_payload = dict(local_decision["review_decision"])  # type: ignore[arg-type]
-    local_payload["display_name"] = "/Volumes/Corsair EX400U Media/a.jpg"
+    local_payload["display_name"] = "<EXTERNAL_DRIVE>/a.jpg"
     local_decision["review_decision"] = local_payload
     _write_jsonl(local_path, [local_decision])
 

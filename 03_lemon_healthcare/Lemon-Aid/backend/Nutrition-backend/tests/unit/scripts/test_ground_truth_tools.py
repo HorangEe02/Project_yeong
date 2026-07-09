@@ -224,7 +224,7 @@ class TestValidateGroundTruth:
 
     def test_schema_error_does_not_embed_raw_input_value(self, tmp_path: Path) -> None:
         """Pydantic schema 오류는 raw 입력값 대신 type/loc 만 출력한다."""
-        secret_like_path = "/Volumes/Corsair EX400U Media/private-label.jpg"
+        secret_like_path = "<EXTERNAL_DRIVE>/private-label.jpg"
         self._write_v2(
             tmp_path / "invalid.snapshot_v2.json",
             {

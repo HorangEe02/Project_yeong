@@ -1,6 +1,6 @@
 {
   "generated_at": "2026-05-20T15:47:47.312158+00:00",
-  "manifest": "/Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/data/supplement_images/private_workspace/stage0_naver/manifest-three-tier.jsonl",
+  "manifest": "~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/data/supplement_images/private_workspace/stage0_naver/manifest-three-tier.jsonl",
   "fixture_count": 50,
   "missing_image_count": 0,
   "observation_count": 50,

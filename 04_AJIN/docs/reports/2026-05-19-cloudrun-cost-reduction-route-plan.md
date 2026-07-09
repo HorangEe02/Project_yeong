@@ -1,7 +1,7 @@
 # AJIN Cloud Run Cost Reduction Route Plan
 
 - Date: 2026-05-19
-- Scope: `/Users/yeong/99_me/00_github/04_AJIN/ajin-ai-assistant-react`
+- Scope: `~/99_me/00_github/04_AJIN/ajin-ai-assistant-react`
 - Goal: Reduce normal Cloud Run calls close to zero by moving light routes to Vercel/Supabase first, while keeping heavy FastAPI features on Cloud Run scale-to-zero.
 - Implementation status: Inventory and design only. No route rewrite, Cloud Run update, or API migration was applied in this pass.
 

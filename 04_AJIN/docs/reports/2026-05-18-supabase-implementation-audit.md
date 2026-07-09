@@ -1,7 +1,7 @@
 # AJIN AI Assistant Supabase 연동 및 구현 상태 감사 보고서
 
 - 작성일: 2026-05-18
-- 대상 경로: `/Users/yeong/99_me/00_github/04_AJIN/ajin-ai-assistant-react`
+- 대상 경로: `~/99_me/00_github/04_AJIN/ajin-ai-assistant-react`
 - 요청 Supabase 프로젝트: https://supabase.com/dashboard/project/ycjuzwltwbeudanjykag
 - 감사 관점: 현재 구현 기능, Supabase/Postgres 연동, 보안, 앱 배포 준비도, 문서-코드 일치성
 

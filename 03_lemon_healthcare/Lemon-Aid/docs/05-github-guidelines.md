@@ -31,7 +31,7 @@
 
 ## 1. 폴더 구조 표준
 
-> 실제 Git repository root는 `/Users/yeong/99_me/00_github`이며, GitHub Actions, CODEOWNERS, PR/Issue template는 repository root의 `.github/`에서 관리한다.
+> 실제 Git repository root는 `~/99_me/00_github`이며, GitHub Actions, CODEOWNERS, PR/Issue template는 repository root의 `.github/`에서 관리한다.
 
 ```
 03_lemon_healthcare/
@@ -148,7 +148,7 @@
 - **영양 reference는 공통 폴더로 통합**: KDRIs, MFDS, nutrient code처럼 음식·영양제 분석 모두에서 재사용 가능한 기준 데이터는 `data/nutrition_reference/`에 둔다.
 - **대용량 이미지는 Git LFS 또는 외부 스토리지**: Git에는 manifest, 샘플 fixture, 검증 스크립트만 우선 포함한다.
 - **기능 플래그 기본 OFF**: OCR provider, YOLO, multimodal LLM, image learning, regulated intake는 발주처/동의 게이트 전까지 OFF다.
-- **GitHub 협업 설정은 repository root 유지**: `.github/`는 `/Users/yeong/99_me/00_github/.github/`에 두고, workflow와 CODEOWNERS는 `03_lemon_healthcare/yeong-Lemon-Aid/**` 경로를 바라본다.
+- **GitHub 협업 설정은 repository root 유지**: `.github/`는 `~/99_me/00_github/.github/`에 두고, workflow와 CODEOWNERS는 `03_lemon_healthcare/yeong-Lemon-Aid/**` 경로를 바라본다.
 - **프로젝트 산출물은 내부 통합**: 마스코트, 회의록, 보고서, 수동 생성물, todo-list는 각각 `assets/`, `records/`, `outputs/` 아래로 모아 코드와 같은 제품 루트에서 관리한다.
 
 ---

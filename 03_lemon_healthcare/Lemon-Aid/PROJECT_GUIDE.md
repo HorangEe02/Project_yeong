@@ -2935,7 +2935,7 @@ D5: docs/medical_review.md 의료자문위 질문 초안 + Android Health Connec
 ## 부록 B. yeong-tech 구현 현황 — 현재까지 프로젝트 상태
 
 > 이 페이지는 `yeong-tech` 작업 흐름에서 현재까지 실제 구현된 내용을 빠르게 브리핑하기 위한 현황판이다.
-> 기준 경로는 `/Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid`이며, 2026-05-12 로컬 검증 결과를 반영한다.
+> 기준 경로는 `~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid`이며, 2026-05-12 로컬 검증 결과를 반영한다.
 
 ### B.0 한 줄 결론
 

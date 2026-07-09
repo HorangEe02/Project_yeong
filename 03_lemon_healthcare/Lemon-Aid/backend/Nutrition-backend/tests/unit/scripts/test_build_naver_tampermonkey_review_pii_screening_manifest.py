@@ -94,7 +94,7 @@ def test_build_review_pii_screening_manifest_rejects_unsafe_payloads() -> None:
     with pytest.raises(ValueError, match="product_dir"):
         builder._reject_unsafe_payload({"product_dir": "제품A_123456789"})
     with pytest.raises(ValueError, match="local path"):
-        builder._reject_unsafe_payload({"image_path": "/Volumes/Corsair/raw.jpg"})
+        builder._reject_unsafe_payload({"image_path": "<EXTERNAL_DRIVE>/raw.jpg"})
     with pytest.raises(ValueError, match="local path"):
         builder._reject_unsafe_payload({"image_path": "/private/tmp/raw.jpg"})
 

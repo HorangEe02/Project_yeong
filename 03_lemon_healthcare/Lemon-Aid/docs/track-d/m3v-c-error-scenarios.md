@@ -173,4 +173,4 @@ VALUES ('<user_uuid>', 'data_collection', NOW()), ...;
 - backend rate limit: [deps.py:134-159](../../backend/src/api/deps.py)
 - backend auth 401: [deps.py:94-131](../../backend/src/api/deps.py)
 - 안전 위젯: [shared/widgets/](../../mobile/lib/shared/widgets/)
-- Plan: [twinkly-splashing-hejlsberg.md](/Users/yeong/.claude/plans/twinkly-splashing-hejlsberg.md) Phase M-3-V.C
+- Plan: [twinkly-splashing-hejlsberg.md](~/.claude/plans/twinkly-splashing-hejlsberg.md) Phase M-3-V.C

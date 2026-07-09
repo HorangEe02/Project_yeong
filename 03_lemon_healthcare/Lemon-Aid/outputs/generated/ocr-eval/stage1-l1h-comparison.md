@@ -69,7 +69,7 @@
 ## 재현 명령
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 
 # Stage 1 observation 재실행 (L1-H 적용된 상태)
 RUN_PADDLEOCR_PROBE=1 ENABLE_LOCAL_OCR=true \

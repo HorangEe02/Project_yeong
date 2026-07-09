@@ -223,7 +223,7 @@ such as `launched`, `developer_mode_or_trust_required`, `signing_error`, or
 ## 10. Current Verification Evidence
 
 Verified on 2026-05-25 from
-`/Users/yeong/99_me/00_github/03_lemon_healthcare/Lemon-Aid`:
+`~/99_me/00_github/03_lemon_healthcare/Lemon-Aid`:
 
 | Requirement | Evidence | Result |
 | --- | --- | --- |

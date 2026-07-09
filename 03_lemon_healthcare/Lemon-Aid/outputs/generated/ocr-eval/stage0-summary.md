@@ -1,6 +1,6 @@
 # Stage 0 OCR Baseline 결과 종합 (2026-05-21)
 
-> 본 보고서는 [plan §I Final Roadmap](/Users/yeong/.claude/plans/stateless-sniffing-swan.md)의 Stage 0 게이트 평가용 사용자 검토 자료. 완전 로컬(PaddleOCR + Ollama Vision) 정책으로 영양제/보충제 라벨 OCR의 **현재 인식률 baseline을 처음으로 정량 측정**한 결과를 정리한다.
+> 본 보고서는 [plan §I Final Roadmap](~/.claude/plans/stateless-sniffing-swan.md)의 Stage 0 게이트 평가용 사용자 검토 자료. 완전 로컬(PaddleOCR + Ollama Vision) 정책으로 영양제/보충제 라벨 OCR의 **현재 인식률 baseline을 처음으로 정량 측정**한 결과를 정리한다.
 
 ---
 
@@ -22,7 +22,7 @@
 | paddlepaddle | 3.3.1 (CPU; macOS arm64에 GPU wheel 부재) |
 | 사용 모델 | `PP-OCRv5_server_det` + `korean_PP-OCRv5_mobile_rec` (자동 로드, cache) |
 | Ollama | 로컬 서버 실행 중 — `qwen3.5:9b`, `gemma4:e4b` 등 |
-| Fixture source | `/Volumes/Corsair EX300U Media/.../tampermonkey/naver/` (외장 SSD, 본인 다운로드) |
+| Fixture source | `<EXTERNAL_DRIVE>/.../tampermonkey/naver/` (외장 SSD, 본인 다운로드) |
 | Sample 정책 | `detail_page_first_category_balanced_then_review_fallback`, seed 20260517, scan-limit 60000 |
 | 외부 OCR | 사용 안 함 (완전 로컬 정책) |
 
@@ -113,14 +113,14 @@
 ## 재현 명령
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 
 # 0. PaddleOCR readiness
 .venv/bin/python scripts/probe_paddleocr_runtime.py
 
 # 1. Prepare manifest (외장 SSD 또는 사용자 inbox)
 .venv/bin/python scripts/prepare_supplement_ocr_live_manifest.py \
-  --source-root "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver" \
+  --source-root "<EXTERNAL_DRIVE>/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver" \
   --work-dir "../data/supplement_images/private_workspace/stage0_naver" \
   --sample-size 50 --scan-limit 60000 \
   --min-width 320 --min-height 240 \

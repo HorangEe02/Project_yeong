@@ -24,7 +24,7 @@ curl -sS -X POST https://ajin-ai-assistant-frontend.vercel.app/api/draft/preheat
   -H "Authorization: Bearer $JWT" -m 60
 
 # (4) SPC 데모 시드 (Nelson R1 위반 보장 — §F 시나리오 전제)
-cd /Users/yeong/99_me/02_AJIN/ajin-ai-assistant-react
+cd ~/99_me/02_AJIN/ajin-ai-assistant-react
 python3 scripts/seed_spc_demo.py --process EWP --inject r1
 ```
 

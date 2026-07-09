@@ -20,7 +20,7 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = None  # 큰 이미지도 열 수 있도록
 
 # === 설정 ===
-BASE_DIR = Path("/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets")
+BASE_DIR = Path("<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets")
 OUTPUT_DIR = BASE_DIR / "quality_report"
 
 # 크기 제한: 파일 크기 50MB 이상 또는 해상도 15000px 이상이면 "too_large"

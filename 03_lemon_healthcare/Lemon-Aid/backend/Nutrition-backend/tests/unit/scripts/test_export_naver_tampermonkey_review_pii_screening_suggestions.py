@@ -121,7 +121,7 @@ def test_export_review_pii_screening_suggestions_handles_empty_batch(tmp_path: P
         (_suggestion(attest_no_personal_data_visible=True), "attestation field"),
         (_suggestion(review_note="contains text"), "free-text"),
         (_suggestion(raw_model_response="secret"), "raw_model_response"),
-        (_suggestion(model_id="/Volumes/Corsair/model"), "local path"),
+        (_suggestion(model_id="<EXTERNAL_DRIVE>/model"), "local path"),
         (_suggestion(model_id="/private/tmp/model"), "local path"),
     ],
 )

@@ -31,7 +31,7 @@
 ### Docker (권장, 원클릭)
 
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/app"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/app"
 ./docker-start.sh              # 빌드 + 시작
 ./docker-start.sh --build      # 강제 재빌드
 ./docker-start.sh --down       # 중지
@@ -41,7 +41,7 @@ cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/app"
 ### 로컬 개발 (v5.0+: API + UI 분리)
 
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/app"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/app"
 
 # 동시 실행 (API + Streamlit)
 python run_api.py &                                        # API → http://localhost:8000/docs
@@ -144,7 +144,7 @@ kill $(lsof -t -i:8501)    # Streamlit만 종료
 프로젝트는 **외장 드라이브**에 저장되어 있습니다:
 
 ```
-/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm
+<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm
 ```
 
 > **주의**: 외장 드라이브가 연결된 상태에서만 개발/실행이 가능합니다.
@@ -153,7 +153,7 @@ kill $(lsof -t -i:8501)    # Streamlit만 종료
 ### 3-2. 자동 설치 (setup.sh)
 
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 
 # 자동 설치 (venv 생성 + 의존성 + 디렉토리 + .env)
 chmod +x setup.sh
@@ -163,7 +163,7 @@ chmod +x setup.sh
 ### 3-3. 수동 설치
 
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 
 # 가상환경 생성 및 활성화
 python3 -m venv venv
@@ -217,7 +217,7 @@ streamlit run app/streamlit_app.py
 
 ```bash
 # 프로젝트 폴더로 이동 (외장 드라이브)
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 
 # 빌드 + 시작
 docker compose up -d --build
@@ -752,7 +752,7 @@ print(d[k]['file_path'])
 증상: "No such file or directory" / docker compose 실행 시 "mounts denied"
 
 # 1. 외장 드라이브 마운트 상태 확인
-ls "/Volumes/Corsair EX300U Media/"
+ls "<EXTERNAL_DRIVE>/"
 
 # 2. Docker Desktop 파일 공유 설정 확인 (Settings → Resources → File Sharing)
 #    외장 드라이브 경로가 공유 목록에 포함되어야 함
@@ -858,7 +858,7 @@ YOLO_DET_SHA256=def456...
 
 ```bash
 # === 프로젝트 경로 (외장 드라이브) ===
-PROJECT="/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+PROJECT="<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 cd "$PROJECT"
 
 # === 개발 ===
@@ -898,8 +898,8 @@ print('샘플 경로:', d[k]['file_path'])
 "                                                       # records.json 경로 확인
 
 # === 외장 드라이브 확인 ===
-ls "/Volumes/Corsair EX300U Media/"                    # 드라이브 마운트 확인
-df -h "/Volumes/Corsair EX300U Media/"                 # 드라이브 남은 공간
+ls "<EXTERNAL_DRIVE>/"                    # 드라이브 마운트 확인
+df -h "<EXTERNAL_DRIVE>/"                 # 드라이브 남은 공간
 ```
 
 ---

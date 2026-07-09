@@ -8,7 +8,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-DEFAULT_MODELS_ROOT="/Volumes/Corsair EX300U Media/.ollama/models"
+DEFAULT_MODELS_ROOT="<EXTERNAL_DRIVE>/.ollama/models"
 MODELS_ROOT="${OLLAMA_MODELS_ROOT:-$DEFAULT_MODELS_ROOT}"
 CHECK_ONLY=false
 SKIP_PULL=false
@@ -29,10 +29,10 @@ Options:
 
 Notes:
   Use the parent models directory:
-    /Volumes/Corsair EX300U Media/.ollama/models
+    <EXTERNAL_DRIVE>/.ollama/models
 
   Do not use the manifest leaf:
-    /Volumes/Corsair EX300U Media/.ollama/models/manifests/registry.ollama.ai/library
+    <EXTERNAL_DRIVE>/.ollama/models/manifests/registry.ollama.ai/library
 EOF
 }
 

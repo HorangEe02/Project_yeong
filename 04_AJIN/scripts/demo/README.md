@@ -21,7 +21,7 @@ gcloud config set project ajin-cb
 
 Ollama 모델 루트 검증. `OLLAMA_MODELS`는 manifest leaf가 아니라 `blobs/`와 `manifests/`를 포함하는 models 루트여야 한다.
 ```bash
-scripts/setup_host_ollama.sh --check-only --models-root "/Volumes/Corsair EX300U Media/.ollama/models"
+scripts/setup_host_ollama.sh --check-only --models-root "<EXTERNAL_DRIVE>/.ollama/models"
 ```
 
 Ollama 모델 설치 (최소 권장):

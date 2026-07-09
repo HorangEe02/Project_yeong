@@ -8,12 +8,12 @@
 Lemon-Aid 백엔드의 **LLM-WIKI pgvector 시맨틱 RAG**에, 현재의 `bge-m3`(1024d) 임베딩에 **더해 Gemma 계열 임베딩을 두 번째 모델로 추가**해서, 같은 위키를 두 모델로 임베딩·검색하고 검색 품질을 비교(A/B)할 수 있게 만들어라. (목적: gemma4:e4b가 설명 생성 LLM이라 임베딩도 Gemma 계열로 통일·비교하려는 것.)
 
 ## 현재까지 완료된 것 (먼저 숙지 — 이 컨텍스트는 새 세션에 없음)
-- **경로/실행**: 백엔드 `/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid/backend`. 패키지는 `Nutrition-backend/src`, venv는 `backend/.venv`. 실행은 `backend`에서 `PYTHONPATH=Nutrition-backend ./.venv/bin/python ...`. git root = `Lemon-Aid`.
+- **경로/실행**: 백엔드 `<EXTERNAL_DRIVE>/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid/backend`. 패키지는 `Nutrition-backend/src`, venv는 `backend/.venv`. 실행은 `backend`에서 `PYTHONPATH=Nutrition-backend ./.venv/bin/python ...`. git root = `Lemon-Aid`.
 - **메모리/플랜**: 프로젝트 메모리 `lemon-aid-db-topology.md`, 플랜 `~/.claude/plans/hidden-dreaming-locket.md`에 전체 설계·DB 토폴로지가 기록돼 있음. **반드시 먼저 읽을 것.**
 - **커밋**: 브랜치 `feat/backend-food-nutrition-wiki-rag` (origin=Lemon-Aid-KDT/Lemon-sin, personal=HorangEe02/Project_yeong에 푸시됨). RAG 구현 커밋 = `a421ec3 feat(rag): ...`.
 - **3개 DB**(로컬 Supabase `:56322` postgres/postgres, compose `lemon-aid-db-1` lemon/lemon, 원격 Supabase weips pooler)에 모두 적재·검증 완료: wiki_documents ~583, chunk_embeddings ~12k, entity_wiki_links 96.
 - **스키마(migration 0028, head)**: `wiki_documents`, `wiki_chunks`, `wiki_chunk_embeddings(embedding extensions.vector(1024), embedding_model, embedding_dimensions, uq(chunk_id, embedding_model))`, `entity_wiki_links`. pgvector는 `extensions` 스키마에 설치 → **코사인 연산자는 반드시 `OPERATOR(extensions.<=>)`로 스키마 한정**(compose 등 search_path에 extensions 없는 DB 대응). 차원 컬럼은 **vector(1024) 고정**.
-- **임베딩**: Ollama `bge-m3`(1024d), `POST {ollama_base_url}/api/embed {"model":"bge-m3","input":"..."}`. 위키 = `/Volumes/Corsair EX400U Media/LLM-WIKI`(Obsidian, ~583 md, 닷폴더 제외).
+- **임베딩**: Ollama `bge-m3`(1024d), `POST {ollama_base_url}/api/embed {"model":"bge-m3","input":"..."}`. 위키 = `<EXTERNAL_DRIVE>/LLM-WIKI`(Obsidian, ~583 md, 닷폴더 제외).
 - **스크립트(`backend/scripts/`)**: `ingest_llm_wiki_embeddings.py`(`--model`/`--dimensions` 파라미터화, heading 청킹, content_hash 멱등, 재시도+문서별 실패격리), `seed_entity_wiki_links.py`, `copy_wiki_rag_missing.py`(additive 백필).
 - **검색**: `services/llm_wiki_retrieval.retrieve_llm_wiki_context_db(query, settings, *, entity_keys=())` — 벡터/하이브리드 + entity-link 부스트 + lexical 점수 정규화 + lexical fail-open. 설정(`config.py`): `enable_wiki_vector_rag`(기본 False), `llm_wiki_retrieval_mode`(hybrid), `wiki_embedding_model`(bge-m3), `wiki_embedding_dimensions`(1024).
 

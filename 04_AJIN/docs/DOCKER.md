@@ -10,7 +10,7 @@ Phase 1 통합 docker-compose 구성. Mac (Apple Silicon Metal) → 클라우드
 │                                                              │
 │  Ollama (host install — brew)                                │
 │    :11434  ← Metal GPU 가속                                  │
-│    models root: /Volumes/Corsair EX300U Media/.ollama/models │
+│    models root: <EXTERNAL_DRIVE>/.ollama/models │
 │    models: qwen3.5:9b, qwen3.5:4b, gemma4:e4b, bge-m3        │
 │                                                              │
 │  Docker Desktop (8~12 GB allocated)                          │
@@ -103,7 +103,7 @@ REDIS_URL=redis://redis:6379/0
 PORT=8080
 ```
 
-호스트 Ollama 모델 루트는 컨테이너 env가 아니라 호스트 셋업 단계에서 고정한다. 올바른 값은 `blobs/`와 `manifests/`를 둘 다 포함하는 `/Volumes/Corsair EX300U Media/.ollama/models`이며, `.../manifests/registry.ollama.ai/library` 같은 leaf 경로를 `OLLAMA_MODELS`로 지정하면 안 된다.
+호스트 Ollama 모델 루트는 컨테이너 env가 아니라 호스트 셋업 단계에서 고정한다. 올바른 값은 `blobs/`와 `manifests/`를 둘 다 포함하는 `<EXTERNAL_DRIVE>/.ollama/models`이며, `.../manifests/registry.ollama.ai/library` 같은 leaf 경로를 `OLLAMA_MODELS`로 지정하면 안 된다.
 
 ### 원격 Supabase Docker 실행
 
@@ -129,7 +129,7 @@ make supabase-docker-health
 curl http://localhost:11434/api/tags
 
 # 외장 SSD 모델 루트 검증
-scripts/setup_host_ollama.sh --check-only --models-root "/Volumes/Corsair EX300U Media/.ollama/models"
+scripts/setup_host_ollama.sh --check-only --models-root "<EXTERNAL_DRIVE>/.ollama/models"
 
 # 컨테이너 안에서 확인 (Mac/Windows Docker Desktop 자동 / Linux 는 host-gateway)
 docker compose exec backend curl http://host.docker.internal:11434/api/tags

@@ -132,7 +132,7 @@ def test_export_review_ingest_rejects_raw_fields(tmp_path: Path) -> None:
 def test_export_review_ingest_rejects_local_path_literals(tmp_path: Path) -> None:
     """Verify local operator path literals cannot enter review ingest rows."""
     input_path = tmp_path / "with-ocr.jsonl"
-    _write_jsonl(input_path, [_input_row(notes="/Volumes/Corsair EX400U Media/image.jpg")])
+    _write_jsonl(input_path, [_input_row(notes="<EXTERNAL_DRIVE>/image.jpg")])
 
     with pytest.raises(ValueError, match="local path literal"):
         review_ingest.export_review_ingest_rows(input_path=input_path)

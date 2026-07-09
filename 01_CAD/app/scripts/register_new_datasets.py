@@ -28,7 +28,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from loguru import logger
 
 # === 설정 ===
-STAGED_DIR = Path("/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/data/staged")
+STAGED_DIR = Path("<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/data/staged")
 PROGRESS_FILE = STAGED_DIR / "registration_progress.json"
 NUM_WORKERS = 1     # 단일 프로세스 (records.json/ChromaDB 파일 경합 방지)
 IMAGE_EXTS = {".png", ".jpg", ".jpeg"}

@@ -192,7 +192,7 @@ def test_build_brand_review_batch_triage_rejects_local_path_values(tmp_path: Pat
         [
             _csv_row(
                 "brand_review_1",
-                reviewed_product_name="/Volumes/Corsair EX400U Media/private.png",
+                reviewed_product_name="<EXTERNAL_DRIVE>/private.png",
             )
         ],
     )

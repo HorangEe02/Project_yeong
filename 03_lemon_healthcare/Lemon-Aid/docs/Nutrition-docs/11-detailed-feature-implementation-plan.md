@@ -1,7 +1,7 @@
 # 11. 상세 기능 구현 계획
 
 > 작성일: 2026-05-11
-> 대상 경로: `/Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid`
+> 대상 경로: `~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid`
 > 확인 범위: `docs/*.md` 10개, `docs/Nutrition-docs/dev-guides/*.md` 30개, 루트/백엔드/모바일/데이터 `CLAUDE.md`
 
 ## 1. 현재 상태 요약

@@ -60,7 +60,7 @@ old app state is no longer needed.
 ## 2. Team Collaboration Constraints Applied
 
 The archived team documents under
-`/Users/yeong/99_me/00_github/03_lemon_healthcare/_archive/yeong-Lemon-Aid/docs/team-collaboration`
+`~/99_me/00_github/03_lemon_healthcare/_archive/yeong-Lemon-Aid/docs/team-collaboration`
 were rechecked before this plan.
 
 Rules that matter for this work:

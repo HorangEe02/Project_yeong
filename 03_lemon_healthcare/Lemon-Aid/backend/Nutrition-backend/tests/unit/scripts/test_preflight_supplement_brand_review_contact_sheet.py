@@ -224,7 +224,7 @@ def test_brand_review_contact_sheet_preflight_rejects_unsafe_csv_values(
     csv_path = _write_csv(tmp_path / "brand_product_review-001.review.csv", ["brand_a"])
     text = csv_path.read_text(encoding="utf-8")
     csv_path.write_text(
-        text.replace("source_product_1", "/Volumes/Corsair EX400U Media/private.png"),
+        text.replace("source_product_1", "<EXTERNAL_DRIVE>/private.png"),
         encoding="utf-8",
     )
     summary_path = _write_contact_summary(

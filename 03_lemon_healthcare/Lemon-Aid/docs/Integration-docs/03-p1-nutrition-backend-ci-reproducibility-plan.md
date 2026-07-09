@@ -39,7 +39,7 @@ This document is the detailed design and implementation plan for that work.
 Repository root:
 
 ```text
-/Users/yeong/99_me/00_github
+~/99_me/00_github
 ```
 
 Backend working directory:

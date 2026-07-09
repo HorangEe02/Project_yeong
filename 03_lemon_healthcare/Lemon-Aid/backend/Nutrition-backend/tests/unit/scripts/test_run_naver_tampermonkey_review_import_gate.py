@@ -458,7 +458,7 @@ def test_review_import_gate_rejects_unsafe_decision_payloads(tmp_path: Path) -> 
     _write_jsonl(review_path, [_review_row()])
     unsafe_decision = _decision_row()
     review_decision = dict(unsafe_decision["review_decision"])  # type: ignore[arg-type]
-    review_decision["display_name"] = "/Volumes/Corsair EX400U Media/a.jpg"
+    review_decision["display_name"] = "<EXTERNAL_DRIVE>/a.jpg"
     unsafe_decision["review_decision"] = review_decision
     _write_jsonl(decisions_path, [unsafe_decision])
 

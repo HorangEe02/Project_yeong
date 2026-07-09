@@ -1,7 +1,7 @@
 # AJIN Vercel Deployment Report
 
 - 작성일: 2026-05-19
-- 대상 경로: `/Users/yeong/99_me/00_github/04_AJIN/ajin-ai-assistant-react/frontend`
+- 대상 경로: `~/99_me/00_github/04_AJIN/ajin-ai-assistant-react/frontend`
 - Vercel project: `ajin-ai-assistant-frontend`
 - 배포 방식: Vercel CLI 수동 배포
 

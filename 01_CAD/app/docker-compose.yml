@@ -37,7 +37,7 @@ services:
       - TEXT_WEIGHT=0.6
       - SQLITE_DB_PATH=/app/data/vector_store/records.db
       - RERANKER_ENABLED=true
-      - DRAWING_PATH_REMAP_FROM=/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/data
+      - DRAWING_PATH_REMAP_FROM=${DRAWING_PATH_REMAP_FROM:-}
       - DRAWING_PATH_REMAP_TO=/app/data/external_drawings
     depends_on:
       ollama:

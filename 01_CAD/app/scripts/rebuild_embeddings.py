@@ -61,11 +61,11 @@ def main():
     parser.add_argument("--clip-pretrained", default="datacomp_xl_s13b_b90k")
     parser.add_argument("--clip-finetuned", default="", help="Fine-tuned CLIP 체크포인트")
     parser.add_argument(
-        "--remap-from", default="/Volumes/Corsair EX300U Media/00_work_out/02_ing/CAD/data/",
+        "--remap-from", default="<EXTERNAL_DRIVE>/00_work_out/02_ing/CAD/data/",
         help="파일 경로 치환 원본 접두사",
     )
     parser.add_argument(
-        "--remap-to", default="/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/data/",
+        "--remap-to", default="<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/data/",
         help="파일 경로 치환 대상 접두사",
     )
     args = parser.parse_args()

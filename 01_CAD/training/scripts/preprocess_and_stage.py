@@ -18,7 +18,7 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = None
 
 # === 설정 ===
-BASE_DIR = Path("/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-datasets")
+BASE_DIR = Path("<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-datasets")
 STAGED_DIR = BASE_DIR / "staged"  # 전처리 완료 이미지 출력
 QUALITY_DIR = BASE_DIR / "quality_report"
 

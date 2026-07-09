@@ -185,7 +185,7 @@ def test_export_review_decision_templates_rejects_unsafe_input(
     local_path = tmp_path / "local.jsonl"
     _write_jsonl(
         local_path,
-        [_review_row(ingredient_candidates=[{"display_name": "/Volumes/Corsair/a.jpg"}])],
+        [_review_row(ingredient_candidates=[{"display_name": "<EXTERNAL_DRIVE>/a.jpg"}])],
     )
 
     with pytest.raises(ValueError, match="local path literal"):

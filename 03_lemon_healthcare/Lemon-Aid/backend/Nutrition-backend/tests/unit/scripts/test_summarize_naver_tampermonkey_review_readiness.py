@@ -221,7 +221,7 @@ def test_summarize_review_readiness_rejects_unsafe_inputs(tmp_path: Path) -> Non
     with pytest.raises(ValueError, match="raw_ocr_text"):
         readiness.summarize_review_readiness(input_paths=paths)
 
-    _write_json(paths["review_ingest"], {"source": "/Volumes/Corsair EX400U Media/a.jpg"})
+    _write_json(paths["review_ingest"], {"source": "<EXTERNAL_DRIVE>/a.jpg"})
     with pytest.raises(ValueError, match="local path literal"):
         readiness.summarize_review_readiness(input_paths=paths)
 

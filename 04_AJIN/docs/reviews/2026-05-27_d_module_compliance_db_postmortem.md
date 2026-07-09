@@ -83,7 +83,7 @@ features/compliance/infra/compliance_db.py:17
 ## 6. 해결 절차 (적용된 Option A)
 
 ```bash
-REACT=/Users/yeong/99_me/00_github/04_AJIN/ajin-ai-assistant-react
+REACT=~/99_me/00_github/04_AJIN/ajin-ai-assistant-react
 
 # 1. 백업 (롤백 보존)
 cp -v "$REACT/data/compliance.db" "$REACT/data/compliance.db.broken_2026-05-27"

@@ -10,7 +10,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 
 
-ROOT = Path("/Users/yeong/99_me/00_github/03_lemon_healthcare")
+ROOT = Path("~/99_me/00_github/03_lemon_healthcare")
 OUTPUT_DIR = ROOT / "records/meetings/mentoring-01/output"
 PPTX_PATH = OUTPUT_DIR / "Lemon_Aid_Week1_Integrated_Briefing.pptx"
 BACKUP_PATH = OUTPUT_DIR / "Lemon_Aid_Week1_Integrated_Briefing.before_function_detail.pptx"

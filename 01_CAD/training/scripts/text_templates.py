@@ -6,7 +6,7 @@ Step 4 전처리 파이프라인 전체에서 공용으로 사용
 from pathlib import Path
 
 # === 경로 설정 ===
-BASE_DIR = Path("/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD")
+BASE_DIR = Path("<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD")
 MISUMI_PNG_DIR = BASE_DIR / "CAD_etc" / "data" / "MiSUMi_png"
 BEARING_PNG_DIR = BASE_DIR / "CAD_etc" / "data" / "Unit_bearing_png"
 STAGED_DIR = BASE_DIR / "drawing-datasets" / "staged"

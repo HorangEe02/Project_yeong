@@ -149,7 +149,7 @@ silently mix the two counts.
 
 ### Food Taxonomy
 
-`/Users/yeong/Downloads/food/food_nutrition_taxo59.csv` is mapped into the
+`~/Downloads/food/food_nutrition_taxo59.csv` is mapped into the
 existing food taxonomy schema instead of creating a standalone
 `food_nutrition` table. The SQL file from that folder performs
 `DROP TABLE IF EXISTS food_nutrition`, so it must not be applied directly to

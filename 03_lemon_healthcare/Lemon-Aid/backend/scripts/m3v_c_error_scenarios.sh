@@ -18,7 +18,7 @@
 #
 # Reference:
 #   docs/track-d/m3v-c-error-scenarios.md
-#   /Users/yeong/.claude/plans/twinkly-splashing-hejlsberg.md Phase M-3-V.C
+#   ~/.claude/plans/twinkly-splashing-hejlsberg.md Phase M-3-V.C
 
 set -uo pipefail
 

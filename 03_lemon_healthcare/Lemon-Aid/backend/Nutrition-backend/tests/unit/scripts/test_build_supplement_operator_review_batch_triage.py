@@ -239,7 +239,7 @@ def test_operator_review_batch_triage_marks_unsafe_local_path_invalid(tmp_path: 
             _pii_row(
                 decision={
                     **_cleared_pii_decision(),
-                    "reviewer_id": "/Volumes/Corsair/private",
+                    "reviewer_id": "<EXTERNAL_DRIVE>/private",
                 }
             )
         ],

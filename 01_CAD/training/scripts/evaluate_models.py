@@ -22,7 +22,7 @@ import torch
 import numpy as np
 from PIL import Image
 
-BASE_DIR = Path("/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD")
+BASE_DIR = Path("<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD")
 DATASET_DIR = BASE_DIR / "drawing-datasets" / "preprocessed_dataset"
 CLIP_RUNS_DIR = BASE_DIR / "drawing-datasets" / "training" / "clip_runs"
 CLIP_V2_RUNS_DIR = BASE_DIR / "drawing-datasets" / "training" / "clip_v2_runs"

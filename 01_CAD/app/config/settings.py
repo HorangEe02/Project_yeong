@@ -145,8 +145,8 @@ class Settings(BaseSettings):
     # === 파일 경로 매핑 (Docker용) ===
     # 원본 도면 경로의 접두사(호스트 경로)를 컨테이너 경로로 치환
     # 예: /Volumes/ExtDrive/data → /app/data/sample_drawings
-    drawing_path_remap_from: str = "/Volumes/Corsair EX300U Media/00_work_out/02_ing/CAD/data/"
-    drawing_path_remap_to: str = "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/data/"
+    drawing_path_remap_from: str = "<EXTERNAL_DRIVE>/00_work_out/02_ing/CAD/data/"
+    drawing_path_remap_to: str = "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/data/"
 
     # === 파일 처리 ===
     max_file_size_mb: int = 50

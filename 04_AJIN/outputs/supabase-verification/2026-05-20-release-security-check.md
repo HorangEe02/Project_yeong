@@ -53,7 +53,7 @@
       "summary": "Skipped because no admin health JSON was supplied."
     }
   ],
-  "root": "/Users/yeong/99_me/00_github/04_AJIN/ajin-ai-assistant-react",
+  "root": "~/99_me/00_github/04_AJIN/ajin-ai-assistant-react",
   "summary": {
     "fail": 0,
     "pass": 2,

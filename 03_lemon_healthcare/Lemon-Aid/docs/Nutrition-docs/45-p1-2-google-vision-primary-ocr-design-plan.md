@@ -391,7 +391,7 @@ P1-2 요구는 “신뢰도 0.85 미만 시 CLOVA 폴백”이므로 구현 선�
 기본 CI에는 넣지 않는다.
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 RUN_GOOGLE_VISION_LIVE_SMOKE=1 .venv/bin/python -m pytest Nutrition-backend/tests/integration/ocr/test_google_vision_smoke.py -q --no-cov
 ```
 
@@ -407,7 +407,7 @@ live smoke 산출물은 redacted summary만 허용한다.
 ## 6. 검증 명령
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 .venv/bin/python -m pytest Nutrition-backend/tests/unit/ocr/test_google_vision_provider.py Nutrition-backend/tests/unit/ocr/test_ocr_factory.py Nutrition-backend/tests/unit/services/test_supplement_image_analysis.py Nutrition-backend/tests/unit/test_config.py -q --no-cov
 .venv/bin/python -m pytest Nutrition-backend/tests/integration/api/test_supplement_analyze_google_vision.py -q --no-cov
 .venv/bin/python -m ruff check Nutrition-backend/src/ocr Nutrition-backend/src/services/supplement_image_analysis.py Nutrition-backend/src/services/supplement_parser.py Nutrition-backend/tests/unit/ocr Nutrition-backend/tests/unit/services/test_supplement_image_analysis.py

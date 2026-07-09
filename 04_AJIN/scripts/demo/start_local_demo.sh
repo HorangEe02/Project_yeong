@@ -15,7 +15,7 @@ PROJECT="${PROJECT:-ajin-cb}"
 REGION="${REGION:-asia-northeast3}"
 SERVICE="${SERVICE:-ajin-backend}"
 HOSTING_BASE="${HOSTING_BASE:-https://ajin-cb.web.app}"
-# MODEL_ROOT 자동 탐지: 환경변수 우선 → /Volumes/Corsair *Media/.ollama/models glob →
+# MODEL_ROOT 자동 탐지: 환경변수 우선 → <EXTERNAL_DRIVE>/.ollama/models glob →
 # ~/.ollama/models (system default). 외장 SSD 모델명이 바뀌어도 (EX300U → EX400U 등)
 # 자동 적응. 한 군데도 못 찾으면 빈 문자열 — Step 1 에서 graceful skip.
 _resolve_model_root() {
@@ -24,7 +24,7 @@ _resolve_model_root() {
         return
     fi
     # Corsair 외장 SSD glob (Corsair EX300U / EX400U / 그 외 변형 모두 매칭)
-    for candidate in /Volumes/Corsair*Media/.ollama/models; do
+    for candidate in <EXTERNAL_DRIVE>/.ollama/models; do
         if [[ -d "$candidate" ]]; then
             printf '%s\n' "$candidate"
             return
@@ -117,7 +117,7 @@ else
     echo "    옵션:"
     echo "      1) 'ollama serve' 직접 실행"
     echo "      2) OLLAMA_MODELS_ROOT=<경로> 환경변수 명시"
-    echo "      3) /Volumes/Corsair*Media/.ollama/models 외장 SSD 마운트"
+    echo "      3) <EXTERNAL_DRIVE>/.ollama/models 외장 SSD 마운트"
     exit 1
 fi
 

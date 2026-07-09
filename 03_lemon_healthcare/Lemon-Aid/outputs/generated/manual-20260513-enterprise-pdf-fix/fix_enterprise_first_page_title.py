@@ -13,7 +13,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 
-ROOT = Path("/Users/yeong/99_me/00_github/03_lemon_healthcare")
+ROOT = Path("~/99_me/00_github/03_lemon_healthcare")
 PDF_PATH = ROOT / "records/meetings/mentoring-01/enterprise-task-service-proposal.pdf"
 BACKUP_PATH = ROOT / "records/meetings/mentoring-01/enterprise-task-service-proposal.original.pdf"
 TMP_PATH = ROOT / "outputs/generated/manual-20260513-enterprise-pdf-fix/enterprise-task-service-proposal.fixed.pdf"

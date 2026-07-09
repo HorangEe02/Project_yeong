@@ -1629,7 +1629,7 @@ def test_cli_rejects_unsafe_payload_and_writes_redacted_error(
         {
             "schema_version": "supplement-crawling-image-taxonomy-audit-v1",
             "raw_ocr_text": "sensitive OCR",
-            "note": "/Volumes/Corsair EX400U Media/private-source",
+            "note": "<EXTERNAL_DRIVE>/private-source",
         },
     )
     output_path = tmp_path / "readiness.json"

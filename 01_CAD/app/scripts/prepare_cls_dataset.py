@@ -42,10 +42,10 @@ from pathlib import Path
 # ─────────────────────────────────────────────
 
 MISUMI_ROOT = Path(
-    "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/data/MiSUMi_png"
+    "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/data/MiSUMi_png"
 )
 UNIT_BEARING_ROOT = Path(
-    "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/data/Unit_bearing_png"
+    "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/data/Unit_bearing_png"
 )
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".tiff", ".tif"}
 

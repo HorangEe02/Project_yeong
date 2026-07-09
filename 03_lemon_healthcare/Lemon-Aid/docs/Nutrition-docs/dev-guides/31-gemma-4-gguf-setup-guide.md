@@ -28,7 +28,7 @@ Ollama 텍스트 구조화 파서 후보로 적용하는 절차를 고정한다.
 - `/api/show`는 모델과 vision projector 메타데이터를 읽었다.
 - 그러나 `/api/chat` 생성 smoke는 외장 Ollama model cache의 blob 로드 실패로
   실패했다. 현재 확인된 모델 저장소는
-  `/Volumes/Corsair EX400U Media/.ollama/models` 이다.
+  `<EXTERNAL_DRIVE>/.ollama/models` 이다.
 - 같은 Ollama API에서 `qwen3.5:9b` structured smoke는 성공했다.
 
 따라서 현재 상태는 **설치/메타데이터 인식 OK, Gemma 4 Q4 추론 로드 NG**다.
@@ -166,7 +166,7 @@ curl -sS --max-time 180 http://127.0.0.1:11434/api/chat \
 smoke가 통과한 뒤에만 backend 환경에서 실제 parser를 호출한다.
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 
 OLLAMA_MODEL=hf.co/unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M \
   .venv/bin/python -m pytest \
@@ -179,7 +179,7 @@ OLLAMA_MODEL=hf.co/unsloth/gemma-4-26B-A4B-it-GGUF:UD-Q4_K_M \
 현재 로컬에서 관찰한 실패 범주:
 
 ```text
-unable to load model: /Volumes/Corsair EX400U Media/.ollama/models/blobs/...
+unable to load model: <EXTERNAL_DRIVE>/.ollama/models/blobs/...
 ```
 
 복구는 아래 순서로 진행한다.
@@ -194,8 +194,8 @@ unable to load model: /Volumes/Corsair EX400U Media/.ollama/models/blobs/...
 2. 모델 blob 경로와 외장 볼륨 상태를 확인한다.
 
    ```bash
-   df -h "/Volumes/Corsair EX400U Media"
-   ls -lh "/Volumes/Corsair EX400U Media/.ollama/models/blobs"
+   df -h "<EXTERNAL_DRIVE>"
+   ls -lh "<EXTERNAL_DRIVE>/.ollama/models/blobs"
    ```
 
 3. Ollama 앱 또는 서비스 재시작 후 Q4 smoke를 다시 실행한다.

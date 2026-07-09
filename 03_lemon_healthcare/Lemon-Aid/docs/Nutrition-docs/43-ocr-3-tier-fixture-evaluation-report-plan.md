@@ -289,7 +289,7 @@ Markdown report는 아래 순서로 생성한다.
 현재 경로 기준:
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 .venv/bin/python scripts/evaluate_ocr_three_tier.py \
   --manifest ../data/supplement_images/manifests/fixtures/supplement_labels/manifest.example.jsonl \
   --output-dir /private/tmp/lemon-ocr-eval-smoke
@@ -298,7 +298,7 @@ cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 테스트:
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 .venv/bin/python -m pytest Nutrition-backend/tests/unit/scripts/test_evaluate_ocr_three_tier.py -q --no-cov
 ```
 

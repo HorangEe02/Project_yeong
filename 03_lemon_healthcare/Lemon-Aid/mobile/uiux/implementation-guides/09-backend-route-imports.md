@@ -4,7 +4,7 @@
 
 대상: `user_medications` / `food_records` / `notifications` API 라우트를 팀원 워크트리에서 선별 임포트하고(P1-1), 일일 건강 점수 영속화(보류 결정 #7)의 백엔드 옵션을 정의한다. 이 문서는 백엔드 작업 가이드이며, 프런트 소비 측 작업(홈 복약 카드 P1-2, 복약 알림 P1-5, 추이 차트 P1-8)은 각 화면 가이드에서 다룬다.
 
-- 팀원 워크트리(읽기 전용 스냅샷): `/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_healthcare/external/Lemon-sin-ai-agent-branch`
+- 팀원 워크트리(읽기 전용 스냅샷): `<EXTERNAL_DRIVE>/yeong_offload/99_me/00_github/03_lemon_healthcare/external/Lemon-sin-ai-agent-branch`
 - 로컬 백엔드 루트: `backend/Nutrition-backend` (alembic은 `backend/alembic`)
 - 경로에 공백이 있으므로 모든 셸 명령에서 **항상 따옴표**로 감싼다.
 
@@ -83,8 +83,8 @@ UI 구현 시 토큰은 design_tokens_v2(`AppColor`/`AppText`/`AppSpace`/`AppRad
 작업 디렉토리 변수 (예시):
 
 ```bash
-EXT="/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_healthcare/external/Lemon-sin-ai-agent-branch/backend/Nutrition-backend"
-LOC="/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid/backend/Nutrition-backend"
+EXT="<EXTERNAL_DRIVE>/yeong_offload/99_me/00_github/03_lemon_healthcare/external/Lemon-sin-ai-agent-branch/backend/Nutrition-backend"
+LOC="<EXTERNAL_DRIVE>/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid/backend/Nutrition-backend"
 ```
 
 ### A. 라우트 선별 임포트 (P1-1)
@@ -110,7 +110,7 @@ LOC="/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_health
      ```
 5. [ ] 의존 클로저 검증 — import만으로 닫히는지 확인:
    ```bash
-   cd "/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid/backend" \
+   cd "<EXTERNAL_DRIVE>/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid/backend" \
      && .venv/bin/python -c "from src.api.v1.router import api_router; print(len(api_router.routes))"
    ```
    (PYTHONPATH에 `Nutrition-backend`와 `ai_agent_chat/src` 필요 — 기존 pytest 설정과 동일 조건)
@@ -206,7 +206,7 @@ LOC="/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_health
 
 1. [ ] **임포트 테스트 12개 통과** — 복사한 4파일 우선 실행:
    ```bash
-   cd "/Volumes/Corsair EX400U Media/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid/backend" \
+   cd "<EXTERNAL_DRIVE>/yeong_offload/99_me/00_github/03_lemon_healthcare/Lemon-Aid/backend" \
      && .venv/bin/python -m pytest \
         "Nutrition-backend/tests/integration/api/test_user_medications_api.py" \
         "Nutrition-backend/tests/integration/api/test_food_records_api.py" \

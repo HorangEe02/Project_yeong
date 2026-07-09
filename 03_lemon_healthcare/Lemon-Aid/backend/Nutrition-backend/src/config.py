@@ -38,7 +38,7 @@ DEFAULT_VISION_ROI_ALLOWED_CLASSES = [
 # generic COCO model that fails ``_validate_model_class_contract`` at load, so a
 # trained supplement section detector must replace it before YOLO ROI runs.
 DEFAULT_VISION_CLASSIFIER_MODEL = "yolo26n.pt"
-DEFAULT_LLM_WIKI_PATH = Path("/Volumes/Corsair EX400U Media/LLM-WIKI")
+DEFAULT_LLM_WIKI_PATH = Path("<EXTERNAL_DRIVE>/LLM-WIKI")
 # Deliberately insecure development sentinel; production validation rejects this exact value.
 DEFAULT_PRIVACY_HASH_SECRET = (
     "development-insecure-privacy-hash-secret"  # noqa: S105, RUF100  # pragma: allowlist secret

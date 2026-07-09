@@ -43,7 +43,7 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
       # Phase B — Vertex SA key (read-only, GOOGLE_APPLICATION_CREDENTIALS 가 가리킴)
-      - /Users/yeong/.config/gcloud/ajin-compliance:/secrets:ro
+      - ~/.config/gcloud/ajin-compliance:/secrets:ro
     depends_on:
       redis:
         condition: service_healthy

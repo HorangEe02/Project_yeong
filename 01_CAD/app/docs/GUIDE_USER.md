@@ -87,7 +87,7 @@ CAD Vision을 실행하려면 **Docker Desktop**이 필요합니다.
 
 프로젝트 폴더를 전달받은 후 외장 드라이브에 저장합니다.
 
-현재 저장 위치: `/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm`
+현재 저장 위치: `<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm`
 
 > **중요**: 프로젝트가 외장 드라이브에 저장되어 있으므로, 실행 전에 반드시 **외장 드라이브가 연결**되어 있어야 합니다.
 
@@ -104,7 +104,7 @@ CAD Vision을 실행하려면 **Docker Desktop**이 필요합니다.
 
 ```bash
 # 프로젝트 폴더로 이동 (외장 드라이브)
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 
 # 실행 (최초 설치 시 5~15분 소요)
 ./scripts/docker-start.sh
@@ -165,7 +165,7 @@ cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
 3. **터미널에서 실행 스크립트를 실행합니다**:
 
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 ./scripts/docker-start.sh
 ```
 
@@ -247,7 +247,7 @@ AI가 업로드한 도면을 분석하여 정보를 추출합니다.
 ### 방법 1: 터미널에서 종료
 
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 docker compose down
 ```
 
@@ -305,7 +305,7 @@ docker compose down
 2. 🔴 오프라인이면 아래 명령어를 **순서대로** 실행:
 
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 
 # Ollama 컨테이너 재시작
 docker compose restart ollama
@@ -329,7 +329,7 @@ docker compose restart app
 2. **반복 실패 시** 아래 명령어로 Ollama 재시작:
 
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 docker compose restart ollama
 ```
 
@@ -388,14 +388,14 @@ docker compose restart ollama
 
 ```bash
 # 1. 컨테이너 + 볼륨 삭제
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 docker compose down -v
 
 # 2. Docker 이미지 삭제
 docker image rm drawing-llm-app
 
 # 3. 프로젝트 폴더 삭제
-rm -rf "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+rm -rf "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 ```
 
 ---
@@ -408,7 +408,7 @@ rm -rf "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-
 2. 터미널에서 아래 명령어로 확인:
 
 ```bash
-ls "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+ls "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 ```
 
 파일 목록이 보이면 정상입니다. "No such file or directory" 오류가 나오면 드라이브가 마운트되지 않은 것입니다.
@@ -424,7 +424,7 @@ ls "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
 
 1. 먼저 **Docker 컨테이너를 종료**합니다:
 ```bash
-cd "/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD/drawing-llm"
+cd "<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD/drawing-llm"
 docker compose down
 ```
 2. Finder에서 외장 드라이브 옆의 ⏏ **추출 버튼**을 클릭

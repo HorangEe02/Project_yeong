@@ -27,7 +27,7 @@ from collections import Counter
 # category_details.py에서 메타데이터 import
 from category_details import CATEGORY_DETAILS, get_aliases, get_features, get_applications
 
-BASE_DIR = Path("/Volumes/Corsair EX300U Media/00_work_out/01_complete/me/01_CAD")
+BASE_DIR = Path("<EXTERNAL_DRIVE>/00_work_out/01_complete/me/01_CAD")
 DATASET_DIR = BASE_DIR / "drawing-datasets" / "preprocessed_dataset"
 
 # === 캡션 템플릿 (16개) ===

@@ -64,7 +64,7 @@
 
 ### Tier 4 — 만성질환 우선 카테고리 (B형 페르소나 차별화) — 16개
 
-> ⚠️ Tier 4 fixture 는 **외장 SSD** (`/Volumes/Corsair EX300U Media/.../tampermonkey/naver/`) 의 미활용 카테고리에서 신규 수집한다. fixture_id 는 `naver-chronic-NNNN` 형식으로 새로 할당. 수집 명령은 §5.4 참조.
+> ⚠️ Tier 4 fixture 는 **외장 SSD** (`<EXTERNAL_DRIVE>/.../tampermonkey/naver/`) 의 미활용 카테고리에서 신규 수집한다. fixture_id 는 `naver-chronic-NNNN` 형식으로 새로 할당. 수집 명령은 §5.4 참조.
 
 | # | fixture_id (예) | category | 만성질환 타겟 | 매트릭스 권장 |
 | --- | --- | --- | --- | --- |
@@ -194,7 +194,7 @@
 ### 5.1 신규 fixture 의 skeleton 생성 (자동)
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 
 .venv/bin/python scripts/label_ground_truth.py \
   --fixture-id naver-live-0024 \
@@ -209,7 +209,7 @@ cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 
 1. 이미지 열기:
    ```bash
-   open "/Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/data/supplement_images/private_workspace/stage0_naver/images/naver-live-0024.jpg"
+   open "~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/data/supplement_images/private_workspace/stage0_naver/images/naver-live-0024.jpg"
    ```
 2. V2 파일 열기:
    ```
@@ -232,7 +232,7 @@ cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 ### 5.3 검증
 
 ```bash
-cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
 
 # 단일 fixture schema 검증
 .venv/bin/python -c "
@@ -259,7 +259,7 @@ Tier 4 는 외장 SSD 의 새 카테고리에서 16 fixture 를 신규 수집해
 
 ```bash
 .venv/bin/python scripts/prepare_supplement_ocr_live_manifest.py \
-  --source-root "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver" \
+  --source-root "<EXTERNAL_DRIVE>/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver" \
   --work-dir ../data/supplement_images/private_workspace/stage0_naver_chronic \
   --sample-size 16 \
   --category-filter "오메가3,코엔자임Q10,혈관_낫토_폴리코사놀,식이섬유,비타민D,비타민K,스트레스_아쉬와간다,수면_멜라토닌" \
@@ -274,7 +274,7 @@ Tier 4 는 외장 SSD 의 새 카테고리에서 16 fixture 를 신규 수집해
 
 ```bash
 .venv/bin/python scripts/prepare_supplement_ocr_live_manifest.py \
-  --source-root "/Volumes/Corsair EX300U Media/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver" \
+  --source-root "<EXTERNAL_DRIVE>/00_work_out/00_data_set/pr/downloads_tampermonkey/lemon-aid/_inbox/tampermonkey/naver" \
   --work-dir ../data/supplement_images/private_workspace/stage0_naver_chronic \
   --sample-size 16 \
   --chronic-disease-priority \
@@ -386,7 +386,7 @@ Tier 4 는 외장 SSD 의 새 카테고리에서 16 fixture 를 신규 수집해
    - `cer_ko_avg`, `cer_en_avg`, `wer_ko_avg`, `wer_en_avg` (한/영 분리 CER/WER, **신규**)
 4. 재현 명령:
    ```bash
-   cd /Users/yeong/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
+   cd ~/99_me/00_github/03_lemon_healthcare/yeong-Lemon-Aid/backend
    RUN_PADDLEOCR_PROBE=1 ENABLE_LOCAL_OCR=true \
    LOCAL_OCR_USE_DOC_ORIENTATION_CLASSIFY=true \
    LOCAL_OCR_USE_TEXTLINE_ORIENTATION=false \
