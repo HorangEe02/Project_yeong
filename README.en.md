@@ -146,6 +146,18 @@
 
 ---
 
+## 🗂 Repository Layout Convention
+
+| Folder | Structure |
+|--------|-----------|
+| `01_CAD` · `04_AJIN` | project content directly under the numbered folder |
+| `02_MediWay` | intro README + app root `mediway/` |
+| `03_lemon_healthcare` | intro README + commissioned deliverable `Lemon-Aid/` (deliverable folder keeps its original name) |
+
+**License** — repository-wide viewing-purpose copyright notice ([LICENSE](./LICENSE)); `04_AJIN` carries its own [MIT](./04_AJIN/LICENSE).
+
+---
+
 ## 🔗 Links
 
 | | |
