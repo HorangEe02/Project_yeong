@@ -1,0 +1,8 @@
+# 01_CAD 학습 파이프라인 의존성 (scripts/ 의 import 기준)
+# 런타임(검색 엔진) 의존성은 ../app/requirements.txt 참조
+torch>=2.0
+numpy>=1.24
+Pillow>=10.0
+open-clip-torch>=2.24   # train_clip*.py (CLIP fine-tuning)
+torch-geometric>=2.4    # train_gnn.py (GIN 구조 임베딩)
+tqdm>=4.66

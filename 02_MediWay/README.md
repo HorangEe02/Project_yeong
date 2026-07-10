@@ -101,9 +101,10 @@ npm test
     │   ├── pages/          # 라우트 단위 페이지 (25)
     │   ├── components/     # UI 컴포넌트
     │   ├── services/       # 비즈니스 로직 (auth, pathfinding, visitPlan, …)
-    │   ├── contexts/       # React Context
     │   ├── hooks/          # 커스텀 훅
     │   ├── types/          # TypeScript 타입
+    │   ├── utils/          # 유틸리티 (csv, password 등)
+    │   ├── config/         # Firebase 설정
     │   ├── data/           # 병원 정적 데이터 (POI, 층도면, 네비 그래프)
     │   └── stores/         # Zustand 스토어
     ├── functions/          # Firebase Cloud Functions (Kakao · Naver OAuth)
