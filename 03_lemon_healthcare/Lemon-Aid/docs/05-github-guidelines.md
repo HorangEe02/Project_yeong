@@ -929,11 +929,11 @@ VS Code 추천 확장:
 
 ## 🔗 함께 제공되는 설정 파일
 
-- [.github/PULL_REQUEST_TEMPLATE.md](../../../.github/PULL_REQUEST_TEMPLATE.md)
-- [.github/ISSUE_TEMPLATE/bug_report.md](../../../.github/ISSUE_TEMPLATE/bug_report.md)
-- [.github/ISSUE_TEMPLATE/feature_request.md](../../../.github/ISSUE_TEMPLATE/feature_request.md)
-- [.github/workflows/17-lemon-backend-ci.yml](../../../.github/workflows/17-lemon-backend-ci.yml)
-- [.github/workflows/17-lemon-mobile-ci.yml](../../../.github/workflows/17-lemon-mobile-ci.yml)
-- [.github/workflows/17-lemon-docs-ci.yml](../../../.github/workflows/17-lemon-docs-ci.yml)
+- `.github/PULL_REQUEST_TEMPLATE.md`
+- `.github/ISSUE_TEMPLATE/bug_report.md`
+- `.github/ISSUE_TEMPLATE/feature_request.md`
+- `.github/workflows/17-lemon-backend-ci.yml`
+- `.github/workflows/17-lemon-mobile-ci.yml`
+- `.github/workflows/17-lemon-docs-ci.yml`
 - [.gitignore](../.gitignore)
 - [.pre-commit-config.yaml](../.pre-commit-config.yaml)

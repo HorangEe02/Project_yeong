@@ -9,7 +9,7 @@
 - **대상 화면**: 하단 탭 4번째 '분석' = **오늘의 분석** (라우트 `/shell/score`, figma S-09).
 - **P0 완료(as-built)**: 점수 탭 → 오늘의 분석 전환(`88c3ef4b`), `GET /dashboard/summary`의 `health_score` 링/등급/코멘트 표시, `POST /ai-agent/daily-coaching` 실천 리스트 + 일자 캐시 + 승인 안내, 레몬봇 딥링크, 면책 푸터. 본 문서에서는 **간결한 참조로만** 다룬다.
 - **이번 가이드의 본편(잔여 작업)**:
-  - **(a)** 4주 추이 차트 잠금 해제 — 점수 영속 백엔드 작업 명세(보류 결정 #7, [근거](../../../outputs/todo-list/2026-06-11/2026-06-11-daily-health-score-decisions.md))
+  - **(a)** 4주 추이 차트 잠금 해제 — 점수 영속 백엔드 작업 명세(보류 결정 #7, `근거`)
   - **(b)** 실천 리스트 체크 영속화 (현재 세션 메모리)
   - **(c)** 날짜 칩 과거 일자 조회 (점수는 당일 재계산 한계 명시)
   - **(d)** 등급별 링/칩 색상 규칙 (label → success/warning/danger 토큰)
@@ -56,7 +56,7 @@
 
 - 링 트랙(배경)은 현행 유지, 진행 색만 위 규칙 적용. 도넛 중앙 숫자는 `AppColor.ink` 유지.
 - `label`이 null/미지(서버 신규 값)일 때 폴백: `AppColor.brand` (현행 색).
-- 점수 산식·라벨 경계는 백엔드 단일 소유([daily-health-score-decisions.md](../../../outputs/todo-list/2026-06-11/2026-06-11-daily-health-score-decisions.md) §확정 산식 — `final = round(0.6×활동 + 0.4×영양)`, 0~100 clamp, 한 축 결손 시 가중치 재정규화, 둘 다 결손 시 `not_ready`). **모바일은 label 문자열만 소비하고 점수→색 재계산 금지.**
+- 점수 산식·라벨 경계는 백엔드 단일 소유(`daily-health-score-decisions.md` §확정 산식 — `final = round(0.6×활동 + 0.4×영양)`, 0~100 clamp, 한 축 결손 시 가중치 재정규화, 둘 다 결손 시 `not_ready`). **모바일은 label 문자열만 소비하고 점수→색 재계산 금지.**
 
 ---
 

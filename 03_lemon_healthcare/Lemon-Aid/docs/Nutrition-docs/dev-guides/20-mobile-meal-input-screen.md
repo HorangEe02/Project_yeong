@@ -917,6 +917,6 @@ LLM 인식이 100% 정확하지 않으므로, **수정 UI를 누구나 쉽게 �
 
 ## 🔗 관련 문서
 
-- [`/mobile/CLAUDE.md`](../../mobile/CLAUDE.md)
+- [`/mobile/CLAUDE.md`](../../../mobile/CLAUDE.md)
 - 이전: [`19-mobile-goal-analysis-screen.md`](./19-mobile-goal-analysis-screen.md)
 - 다음: [`21-mobile-feedback-ui.md`](./21-mobile-feedback-ui.md)

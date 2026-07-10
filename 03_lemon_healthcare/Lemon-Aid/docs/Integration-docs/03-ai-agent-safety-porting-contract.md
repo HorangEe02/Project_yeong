@@ -3,7 +3,7 @@
 > Status: contract-first integration baseline
 > 작성일: 2026-05-28
 > 기준 브랜치: `feat/ai-agent-backend-integration`
-> 기준 문서: [45-development-dependency-split.md](../Nutrition-docs/45-development-dependency-split.md)
+> 기준 문서: `45-development-dependency-split.md`
 > 상세 의료정보 DB 계약: [04-medical-source-db-contract.md](./04-medical-source-db-contract.md)
 
 ## 목적

@@ -475,8 +475,8 @@ bmr = calculate_bmr(weight_kg, height_cm, age, sex)
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
 - [`/docs/Nutrition-docs/07-core-algorithm.md §3.8`](../07-core-algorithm.md)
 - 이전 작업: [`03-bmr-tdee.md`](./03-bmr-tdee.md)
 - 다음 작업: [`05-kdris-lookup.md`](./05-kdris-lookup.md)

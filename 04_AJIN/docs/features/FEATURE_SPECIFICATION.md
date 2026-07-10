@@ -61,7 +61,7 @@
 # 기능 A: 인원 검색 및 조직도
 
 > **영문 라벨**: `EMPLOYEE SEARCH & ORG CHART`
-> **페이지 파일**: [ui/page_search.py](../../ui/page_search.py) (690줄)
+> **페이지 파일**: `ui/page_search.py` (690줄)
 > **백엔드**: [backend/routers/employee.py](../../backend/routers/employee.py)
 > **기능 모듈**: [features/search/](../../features/search/)
 > **SILLI 부합성**: 업무 효율화
@@ -172,7 +172,7 @@
 | 부서 별칭 | [features/search/employee/search.py](../../features/search/employee/) | **48종** |
 | 부서 레지스트리 | [core/department_config.py](../../core/) | **30개 부서** |
 | 사업장 DB | [data/facility_db/plants.json](../../data/facility_db/) | **19개소** |
-| ChromaDB (employee_profiles) | [vectorstore/](../../vectorstore/) | 329건 임베딩 |
+| ChromaDB (employee_profiles) | `vectorstore/` | 329건 임베딩 |
 | ML 의도 학습 데이터 | [data/intent_ml/](../../data/) | **1,500건** |
 
 > **주의**: 실제 649명 대비 시뮬레이션은 약 50%. 실제 도입 시 전체 데이터 시딩 필요.
@@ -255,7 +255,7 @@
 # 기능 B: 문서 검색 및 작성
 
 > **영문 라벨**: `DOCUMENT SEARCH & DRAFTING`
-> **페이지 파일**: [ui/page_draft.py](../../ui/page_draft.py) (940줄) + [ui/doc_search_panel.py](../../ui/doc_search_panel.py) (608줄)
+> **페이지 파일**: `ui/page_draft.py` (940줄) + `ui/doc_search_panel.py` (608줄)
 > **백엔드**: [backend/routers/draft.py](../../backend/routers/draft.py), [backend/routers/search.py](../../backend/routers/search.py)
 > **기능 모듈**: [features/draft/](../../features/draft/) (23 파일)
 > **SILLI 부합성**: 업무 효율화 + 품질 개선
@@ -456,7 +456,7 @@
 # 기능 C: AI 업무 도우미
 
 > **영문 라벨**: `AI WORK ASSISTANT`
-> **페이지 파일**: [ui/page_onboarding.py](../../ui/page_onboarding.py) (1,896줄 — **최대 페이지**)
+> **페이지 파일**: `ui/page_onboarding.py` (1,896줄 — **최대 페이지**)
 > **백엔드**: [backend/routers/onboarding.py](../../backend/routers/onboarding.py)
 > **기능 모듈**: [features/onboarding/](../../features/onboarding/) (19 파일)
 > **SILLI 부합성**: 생산성 향상 (핵심 취지)
@@ -714,7 +714,7 @@ data: {"done": true}
 # 기능 D: 법규/규정 모니터링
 
 > **영문 라벨**: `COMPLIANCE MONITORING`
-> **페이지 파일**: [ui/page_compliance.py](../../ui/page_compliance.py) (2,144줄 — 두 번째로 큰 페이지)
+> **페이지 파일**: `ui/page_compliance.py` (2,144줄 — 두 번째로 큰 페이지)
 > **백엔드**: [backend/routers/compliance.py](../../backend/routers/compliance.py)
 > **기능 모듈**: [features/compliance/](../../features/compliance/) (33 파일)
 > **SILLI 부합성**: 안전성 향상 + 투자비 절감
@@ -738,7 +738,7 @@ data: {"done": true}
 ### D-2-1. 9종 크롤러 (v3.5 정리)
 | # | 크롤러 | 대상 | 위치 |
 |:--:|---|---|---|
-| 1 | ISO Crawler | ISO 14001 / 45001 | [iso_crawler.py](../../features/compliance/iso_crawler.py) (19KB) |
+| 1 | ISO Crawler | ISO 14001 / 45001 | [iso_crawler.py](../../features/compliance/crawlers/iso_crawler.py) (19KB) |
 | 2 | MSDS Crawler | 화학물질안전보건자료 | [msds_crawler.py](../../features/compliance/) (28KB) |
 | 3 | EU Regulation Crawler | REACH, RoHS, ELV | [eu_regulation_crawler.py](../../features/compliance/) (17KB) |
 | 4 | Domestic Law Crawler | 산안법, 화관법, 환경법 | [domestic_law_crawler.py](../../features/compliance/) (23KB) |
@@ -928,7 +928,7 @@ data: {"done": true}
 # 기능 E: 인사 관리
 
 > **영문 라벨**: `HR ADMIN MANAGEMENT`
-> **페이지 파일**: [ui/page_admin.py](../../ui/page_admin.py) (1,314줄)
+> **페이지 파일**: `ui/page_admin.py` (1,314줄)
 > **백엔드**: [backend/routers/auth.py](../../backend/routers/auth.py) + 인사 관련 직접 호출
 > **기능 모듈**: [features/admin/](../../features/admin/) (2 파일) + [core/auth/](../../core/auth/) (10 파일)
 > **SILLI 부합성**: 투자비 절감 (보안 자동화)
@@ -1038,7 +1038,7 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 | **CSV** | UTF-8 BOM (`utf-8-sig`) |
 | **XLSX** | openpyxl, 시트명 "로그인이력" |
 
-위치: `_render_login_history_with_export()` ([ui/page_admin.py:625](../../ui/page_admin.py))
+위치: `_render_login_history_with_export()` (`ui/page_admin.py:625`)
 
 ### E-2-10. 부서 매핑 확장 (v3.3)
 - 부서 접두어 매핑 17개 → **30개** (전체 독립부서 커버)
@@ -1153,7 +1153,7 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 # 기능 F: 설비/공정 AI 어시스턴트
 
 > **영문 라벨**: `EQUIPMENT & PROCESS AI`
-> **페이지 파일**: [ui/page_equipment.py](../../ui/page_equipment.py) (1,628줄)
+> **페이지 파일**: `ui/page_equipment.py` (1,628줄)
 > **기능 모듈**: [features/equipment/](../../features/equipment/) (22 파일)
 > **SILLI 부합성**: 품질 개선 + 안전성 향상 (제조업 AI의 핵심)
 
@@ -1467,7 +1467,7 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 | `glossary` | 용어집 297항목 | BGE-M3 |
 | `equipment_manuals` | 설비 매뉴얼 (예정) | BGE-M3 |
 
-위치: [vectorstore/](../../vectorstore/) `chroma.sqlite3` 5.4MB + 6 collection
+위치: `vectorstore/` `chroma.sqlite3` 5.4MB + 6 collection
 
 ## G-3. 보안 인프라
 

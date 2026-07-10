@@ -546,5 +546,5 @@ if __name__ == "__main__":
 
 - 이전: [`22-demo-scenarios.md`](./22-demo-scenarios.md)
 - 다음: [`24-demo-day-rehearsal.md`](./24-demo-day-rehearsal.md)
-- [`/docs/Nutrition-docs/02-personas-and-scenarios.md`](../02-personas-and-scenarios.md)
-- [`/docs/Nutrition-docs/04-success-metrics-and-differentiation.md`](../04-success-metrics-and-differentiation.md)
+- `/docs/Nutrition-docs/02-personas-and-scenarios.md`
+- `/docs/Nutrition-docs/04-success-metrics-and-differentiation.md`

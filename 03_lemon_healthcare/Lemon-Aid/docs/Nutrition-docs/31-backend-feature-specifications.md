@@ -50,7 +50,7 @@ backend/src/  (98개 .py)
 
 **구현 결정**: 서양 BMI(정상 < 25) 가 아닌 **한국·아시아 BMI**(정상 < 23) 적용. WHO Asia-Pacific 기준(2000) + 대한비만학회(KSSO) 권고. 함수형(pure function)으로 작성해 테스트·재현 용이.
 
-**핵심 상수** ([bmi.py](../backend/src/algorithms/bmi.py)):
+**핵심 상수** ([bmi.py](../../backend/Nutrition-backend/src/algorithms/bmi.py)):
 - `UNDERWEIGHT_CUTOFF = 18.5`
 - `OVERWEIGHT_CUTOFF = 23.0`  ← 아시아 기준
 - `OBESE_1_CUTOFF = 25.0`
@@ -74,7 +74,7 @@ backend/src/  (98개 .py)
 - **v3 (백분위)**: 동일 연령대 표본 ≥30 일 때만 상위 10·20% 보너스. 표본 부족 시 비활성화로 fairness 보호.
 - **v4 (만성질환)**: HHS/CDC 권고 기반 가중치(당뇨/고혈압 +0.10, 심혈관/관절 +0.15). "질환 개선 점수"가 아닌 "참고 지표" 표기 강제.
 
-**핵심 상수** ([activity.py](../backend/src/algorithms/activity.py)): `BASE_STEPS=8000`, `ACHIEVEMENT_CAP=1.2`, `MAX_V1_SCORE_AT_CAP=83.33`.
+**핵심 상수** ([activity.py](../../backend/Nutrition-backend/src/algorithms/activity.py)): `BASE_STEPS=8000`, `ACHIEVEMENT_CAP=1.2`, `MAX_V1_SCORE_AT_CAP=83.33`.
 
 **컴플라이언스**: docs/13 §3 EvidenceLevel(A/B/C) 표기. v4 가중치는 Level C 프로젝트 휴리스틱으로 명시.
 
@@ -88,7 +88,7 @@ backend/src/  (98개 .py)
 
 **구현 결정**: Harris-Benedict 대신 Mifflin 채택 — 한국인 코호트에서 ±5% 이내 정확도, 식약처 권고 식. 활동계수는 걸음수 4단계로 분리(`sedentary` 1.2 ~ `very_active` 1.9).
 
-**인터페이스** ([metabolism.py](../backend/src/algorithms/metabolism.py)):
+**인터페이스** ([metabolism.py](../../backend/Nutrition-backend/src/algorithms/metabolism.py)):
 - `calculate_bmr(weight_kg, height_cm, age, sex) -> float`
 - `calculate_tdee(bmr, daily_steps) -> float`
 
@@ -106,7 +106,7 @@ backend/src/  (98개 .py)
 
 **구현 결정**: 회사 가이드 PPTX 의 7-step 흐름(BMR → TDEE → 일일수지 → 누적 → 보정 → 예측)을 그대로 구현. 감량 보정 0.85 / 증량 0.95 는 회사 가이드 재현용. 단기(<90일) 정확도는 충분하나, 장기는 한계 명시.
 
-**상수** ([weight.py](../backend/src/prediction/weight.py)): `KCAL_PER_KG_FAT=7700.0`, `LONG_TERM_WARNING_DAYS=90`.
+**상수** ([weight.py](../../backend/Nutrition-backend/src/prediction/weight.py)): `KCAL_PER_KG_FAT=7700.0`, `LONG_TERM_WARNING_DAYS=90`.
 
 **컴플라이언스**: 90일 이상 예측 시 경고 메시지 부착. "예상 변화"로 표현.
 
@@ -124,13 +124,13 @@ backend/src/  (98개 .py)
 - Forbes 식으로 FFM 변화 분배 (`FORBES_C_ENERGY_PARTITION_KG`).
 - 최대 365일 시뮬레이션 cap, 컴파트먼트 < 0.1kg 종료 조건.
 
-**선택 로직** ([selector.py](../backend/src/prediction/selector.py)):
+**선택 로직** ([selector.py](../../backend/Nutrition-backend/src/prediction/selector.py)):
 - `WeightPredictionEngine.STATIC_7STEP`: 짧은 기간 단순 예측
 - `WeightPredictionEngine.HALL_LITE`: 3개월+ 동적 예측 (≥18세 성인)
 - `WeightPredictionEngine.AUTO`: 90일 미만은 정적, 이상은 Hall-lite 자동 선택
 - Hall-lite 실패 시 7-step fallback (graceful degradation)
 
-**신체구성 추정** ([body_composition.py](../backend/src/prediction/body_composition.py)):
+**신체구성 추정** ([body_composition.py](../../backend/Nutrition-backend/src/prediction/body_composition.py)):
 - Deurenberg 1991 식(BMI + 나이 + 성별 → 체지방률)
 - 측정값(`measured`)·시뮬레이션(`simulated`) 분기 가능
 
@@ -150,7 +150,7 @@ backend/src/  (98개 .py)
 - DB 마이그레이션 대신 CSV 직접 로드 — Phase 1 단순화, O(1) 조회.
 - `REFERENCE_TYPE_PRIORITY` 로 RDA/AI/EAR/UL 등 우선순위 정렬.
 - `kdris_data_version` 환경변수로 2020-sample / 2025 분기.
-- `kdris_manifest_path` 로 데이터 출처·검증일 메타데이터 분리 ([source_manifest.py](../backend/src/nutrition/source_manifest.py)).
+- `kdris_manifest_path` 로 데이터 출처·검증일 메타데이터 분리 ([source_manifest.py](../../backend/Nutrition-backend/src/nutrition/source_manifest.py)).
 
 **컴플라이언스**: production 환경에서는 `kdris_data_version=2025` + `allow_sample_kdris=false` 강제(`config.py` validator).
 
@@ -363,7 +363,7 @@ backend/src/  (98개 .py)
 **기술 스택**: SQLAlchemy AsyncSession, `OllamaSupplementParser`, HMAC owner subject.
 
 **구현 결정**:
-- **owner_subject_hash 로 PII 격리**: 사용자 이메일/ID 가 아닌 HMAC pseudonym 으로 DB 컬럼 저장 ([security/subjects.py](../backend/src/security/subjects.py)).
+- **owner_subject_hash 로 PII 격리**: 사용자 이메일/ID 가 아닌 HMAC pseudonym 으로 DB 컬럼 저장 ([security/subjects.py](../../backend/Nutrition-backend/src/security/subjects.py)).
 - **낮은 신뢰도 경고**: `OCR_LOW_CONFIDENCE_THRESHOLD = Decimal("0.80")` 미만이면 사용자 확인 메시지 강제 부착.
 - **확인 워닝**: "Structured OCR parsing is a preview. Review and confirm every field before saving" — 자동 저장 금지.
 
@@ -375,7 +375,7 @@ backend/src/  (98개 .py)
 
 **구현 결정**:
 - 등록은 사용자 확인 이후에만 가능 — 자동 저장 차단.
-- `match_supplement_product` ([supplement_matching.py](../backend/src/services/supplement_matching.py)) 로 식약처 DB 자동 매칭.
+- `match_supplement_product` ([supplement_matching.py](../../backend/Nutrition-backend/src/services/supplement_matching.py)) 로 식약처 DB 자동 매칭.
 - 사용자별 `UserSupplement` + `UserSupplementIngredient` 트리 구조로 ORM 저장.
 
 ---

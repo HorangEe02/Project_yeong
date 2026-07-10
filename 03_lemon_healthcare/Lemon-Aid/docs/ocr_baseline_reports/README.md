@@ -7,12 +7,12 @@
 
 | 컴포넌트 | 경로 | 상태 |
 |----------|------|------|
-| 메트릭 모듈 (CER/WER/exact/field-match) | [`backend/src/ocr/metrics.py`](../../backend/src/ocr/metrics.py) | ✅ 31 unit tests passed |
-| 듀얼 언어 어댑터 | [`backend/src/ocr/multilingual_adapter.py`](../../backend/src/ocr/multilingual_adapter.py) | ✅ 9 unit tests passed |
-| 필드 추출기 | [`backend/src/ocr/field_extractor.py`](../../backend/src/ocr/field_extractor.py) | ✅ 20 unit tests + 60/60 round-trip |
-| 합성 데이터셋 생성기 | [`scripts/synth_label_dataset.py`](../../scripts/synth_label_dataset.py) | ✅ 60장 (ko/en/mixed) 생성 |
-| 실사 샘플링 (외장 드라이브) | [`scripts/sample_real_labels.py`](../../scripts/sample_real_labels.py) | ✅ 43 카테고리 × 2장 = 86장 샘플링 |
-| 벤치마크 러너 | [`backend/tests/e2e/test_ocr_accuracy.py`](../../backend/tests/e2e/test_ocr_accuracy.py) | ✅ collection 통과 (3 parametrized) |
+| 메트릭 모듈 (CER/WER/exact/field-match) | [`backend/src/ocr/metrics.py`](../../backend/Nutrition-backend/src/ocr/metrics.py) | ✅ 31 unit tests passed |
+| 듀얼 언어 어댑터 | [`backend/src/ocr/multilingual_adapter.py`](../../backend/Nutrition-backend/src/ocr/multilingual_adapter.py) | ✅ 9 unit tests passed |
+| 필드 추출기 | [`backend/src/ocr/field_extractor.py`](../../backend/Nutrition-backend/src/ocr/field_extractor.py) | ✅ 20 unit tests + 60/60 round-trip |
+| 합성 데이터셋 생성기 | `scripts/synth_label_dataset.py` | ✅ 60장 (ko/en/mixed) 생성 |
+| 실사 샘플링 (외장 드라이브) | `scripts/sample_real_labels.py` | ✅ 43 카테고리 × 2장 = 86장 샘플링 |
+| 벤치마크 러너 | `backend/tests/e2e/test_ocr_accuracy.py` | ✅ collection 통과 (3 parametrized) |
 
 ## 2. 데이터셋 현황
 

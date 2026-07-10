@@ -209,5 +209,5 @@ coverage mechanism이 아니다.
 
 - [03-ai-agent-safety-porting-contract.md](./03-ai-agent-safety-porting-contract.md)
 - [04-medical-source-db-contract.md](./04-medical-source-db-contract.md)
-- [dev-guides/31-medical-knowledge-layer.md](../Nutrition-docs/dev-guides/31-medical-knowledge-layer.md)
-- [45-development-dependency-split.md](../Nutrition-docs/45-development-dependency-split.md)
+- `dev-guides/31-medical-knowledge-layer.md`
+- `45-development-dependency-split.md`

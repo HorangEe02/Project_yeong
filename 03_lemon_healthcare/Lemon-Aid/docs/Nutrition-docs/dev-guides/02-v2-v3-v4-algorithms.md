@@ -326,8 +326,8 @@ def calculate_disease_multiplier(diseases: list[str]) -> float:
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
 - [`/docs/Nutrition-docs/07-core-algorithm.md §3.3~§3.5`](../07-core-algorithm.md)
 - 이전 작업: [`01-bmi-and-v1-algorithm.md`](./01-bmi-and-v1-algorithm.md)
 - 다음 작업: [`03-bmr-tdee.md`](./03-bmr-tdee.md)

@@ -431,7 +431,7 @@ SYS_MEM: 사용자가 8D 보고서 생성을 요청...
 - **타입**: stroke 기반 (`fill="none"`, `stroke-width="1.5"`)
 - **색상**: `currentColor` (텍스트 색상 자동 상속)
 - **모서리**: `stroke-linecap="round"`
-- **정의 파일**: [icons.py](../../ui/icons.py)
+- **정의 파일**: `icons.py`
 
 ### 7-2. 아이콘 카탈로그 (16종)
 | 키 | 용도 | 형태 |
@@ -481,7 +481,7 @@ SYS_MEM: 사용자가 8D 보고서 생성을 요청...
 ### 8-4. 테마별 자산 전환
 | 자산 | 라이트 | 다크 |
 |---|---|---|
-| 로고 SVG | [ajin_logo_light.svg](../../ui/assets/ajin_logo_light.svg) (텍스트 `#2C241A`) | `ajin_logo.svg` (텍스트 `#fff`) |
+| 로고 SVG | `ajin_logo_light.svg` (텍스트 `#2C241A`) | `ajin_logo.svg` (텍스트 `#fff`) |
 | Plotly 폰트 색 | `#2C241A` | `#E8E1D5` |
 | Plotly 호버 bg | `#FFFFFF` | `#1c2636` |
 | 호버 보더 색 | `#C88A00` | `#f9a70d` |
@@ -495,7 +495,7 @@ SYS_MEM: 사용자가 8D 보고서 생성을 요청...
 
 ## 9. 페이지별 상세 디자인 사양
 
-### 9-1. 로그인 페이지 ([page_login.py](../../ui/page_login.py), 610줄)
+### 9-1. 로그인 페이지 (`page_login.py`, 610줄)
 ```
 ┌──────────────────────────────────────┐
 │                                      │
@@ -524,7 +524,7 @@ SYS_MEM: 사용자가 8D 보고서 생성을 요청...
 - **계정 잠금**: 5회 실패 → 30분 잠금 안내
 - **테마**: 전체 사이트 테마 동일 적용 (테마별 로고 전환)
 
-### 9-2. 대시보드 ([page_dashboard.py](../../ui/page_dashboard.py), 266줄)
+### 9-2. 대시보드 (`page_dashboard.py`, 266줄)
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  대시보드                                          v3.5     │
@@ -551,7 +551,7 @@ SYS_MEM: 사용자가 8D 보고서 생성을 요청...
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 9-3. A. 인원 검색 ([page_search.py](../../ui/page_search.py), 690줄)
+### 9-3. A. 인원 검색 (`page_search.py`, 690줄)
 - **상단**: 시맨틱 검색 입력 바 (FTS5/SQL 라벨 형식)
 - **검색 이력**: 최근 5건 바로가기 칩 (`#abc123` 클릭 시 재검색)
 - **5종 정렬 셀렉터**: 관련도순/이름/부서/직급/사업장
@@ -559,7 +559,7 @@ SYS_MEM: 사용자가 8D 보고서 생성을 요청...
 - **하단**: 조직도 (HTML/CSS 카드형, 부서별 트리)
 - **권한**: 타부서 email은 `***@***` 마스킹 (3-Tier 가시성)
 
-### 9-4. B. 문서 검색/작성 ([page_draft.py](../../ui/page_draft.py), 940줄)
+### 9-4. B. 문서 검색/작성 (`page_draft.py`, 940줄)
 3탭 구조: 내부용 / 외부용 / 문서 이력
 - **탭 바**: 영문+한글 (`INTERNAL 내부용` / `EXTERNAL 외부용`) + 골드 밑줄 (활성)
 - **입력**: 자유 텍스트 + 어조(공식적/친근한/긴급) + 문서유형 셀렉터
@@ -568,7 +568,7 @@ SYS_MEM: 사용자가 8D 보고서 생성을 요청...
 - **버전 비교 diff**: 유사도% + 추가/삭제/변경 줄 수 + HTML 하이라이트
 - **CC 추천 박스**: 필수/권장/선택 3색상
 
-### 9-5. C. AI 업무 도우미 ([page_onboarding.py](../../ui/page_onboarding.py), 1896줄) — **최대 페이지**
+### 9-5. C. AI 업무 도우미 (`page_onboarding.py`, 1896줄) — **최대 페이지**
 ChatGPT 스타일 챗 인터페이스 + HUD 테마.
 ```
 ┌─────────────────────────────────────────────────┐
@@ -599,7 +599,7 @@ ChatGPT 스타일 챗 인터페이스 + HUD 테마.
 - **퀴즈 / SOP**: 시스템 메시지 형태로 단계별 카드 출력
 - **스트리밍 중 네비게이션 차단**: 사이드바 모듈 버튼 disabled (`(응답 생성 중...)` 표시)
 
-### 9-6. D. 법규 모니터링 ([page_compliance.py](../../ui/page_compliance.py), 2144줄)
+### 9-6. D. 법규 모니터링 (`page_compliance.py`, 2144줄)
 **4탭 구조 (v3.5)**:
 1. 법규 모니터 (6서브탭)
 2. **법규 업데이트** (메인 탭으로 승격) — 시나리오 TOP-3 + 변경 감지 + CSV 내보내기
@@ -612,7 +612,7 @@ ChatGPT 스타일 챗 인터페이스 + HUD 테마.
 - **영향 네트워크**: Plotly Network — 규제 → 시설 → 부서/제품 노드 그래프
 - **사업장 지도**: Folium + OpenStreetMap (19개소 마커)
 
-### 9-7. E. 인사 관리 ([page_admin.py](../../ui/page_admin.py), 1314줄)
+### 9-7. E. 인사 관리 (`page_admin.py`, 1314줄)
 **6탭 (Tier 4) / 4탭 (Tier 3)** — v3.5에서 이력→보안 통합
 1. 사용자 (인라인 편집 7항목)
 2. 생성 (3단계 위저드)
@@ -625,7 +625,7 @@ ChatGPT 스타일 챗 인터페이스 + HUD 테마.
 - **보안 감사**: 무차별 대입 / 야간 접근 / 비활성 계정 탐지 — 위험 카드 색상 코딩
 - **인력 통계**: 본부별/직급별/성별/사업장별/근속연수 — 7종 Plotly 차트 + 히트맵
 
-### 9-8. F. 설비/공정 AI ([page_equipment.py](../../ui/page_equipment.py), 1628줄)
+### 9-8. F. 설비/공정 AI (`page_equipment.py`, 1628줄)
 **3탭 구조 (v3.3)**: OVERVIEW / 매뉴얼 검색 / 점검 이력
 - **OVERVIEW 6서브탭**: 종합 현황 / SPC 분석 / 에러 검색 / 금형 / 점검 / 수리 이력
 - **SPC 분석**: Nelson 8 Rules 위반 하이라이트 + Plotly 관리도 + Annotation
@@ -634,7 +634,7 @@ ChatGPT 스타일 챗 인터페이스 + HUD 테마.
 - **에러 검색**: TF-IDF 증상→에러코드 매칭 + 이력 DB 685건 + Markov 통합
 - **데이터 관리**: 통계적 데이터 생성기 + CSV 업로드 인터페이스 (Expander 내부)
 
-### 9-9. 프로필 페이지 ([page_profile.py](../../ui/page_profile.py), 199줄)
+### 9-9. 프로필 페이지 (`page_profile.py`, 199줄)
 사용자 정보 카드 — 사진/이름/사번/부서/직급/이메일/입사일/마지막 로그인.
 
 ---
@@ -677,7 +677,7 @@ ChatGPT 스타일 챗 인터페이스 + HUD 테마.
 
 ## 11. 데이터 시각화 (Plotly)
 
-### 11-1. 공통 테마 ([plotly_theme.py](../../ui/plotly_theme.py))
+### 11-1. 공통 테마 (`plotly_theme.py`)
 모든 Plotly 차트는 `apply_theme(fig)` 호출 — 테마 자동 전환.
 ```python
 {
@@ -910,39 +910,39 @@ module.exports = {
 
 | 파일 | 라인 | 역할 |
 |---|---:|---|
-| [hud_style.py](../../ui/hud_style.py) | **1,421** | 메인 CSS 인젝션 + 테마 함수 |
-| [page_compliance.py](../../ui/page_compliance.py) | **2,144** | 법규 페이지 (4탭, 9 크롤러) |
-| [page_onboarding.py](../../ui/page_onboarding.py) | **1,896** | AI 도우미 (스트리밍, 비전, SOP) |
-| [page_equipment.py](../../ui/page_equipment.py) | **1,628** | 설비/공정 (SPC, 에러 검색) |
-| [page_admin.py](../../ui/page_admin.py) | **1,314** | 인사 관리 (6탭) |
-| [page_draft.py](../../ui/page_draft.py) | **940** | 문서 작성 (3탭, 7포맷) |
-| [page_search.py](../../ui/page_search.py) | **690** | 인원 검색 (시맨틱) |
-| [page_login.py](../../ui/page_login.py) | **610** | 로그인 + 비밀번호 변경 |
-| [doc_search_panel.py](../../ui/doc_search_panel.py) | **608** | 문서 검색 패널 |
-| [page_dashboard.py](../../ui/page_dashboard.py) | **266** | 대시보드 |
-| [page_profile.py](../../ui/page_profile.py) | **199** | 프로필 |
-| [hud_left_panel.py](../../ui/hud_left_panel.py) | **186** | 좌측 사이드바 |
-| [hud_right_panel.py](../../ui/hud_right_panel.py) | **153** | 우측 시스템 분석 |
-| [components.py](../../ui/components.py) | **127** | 공통 헬퍼 |
-| [hud_layout.py](../../ui/hud_layout.py) | **104** | 레이아웃 매니저 |
-| [hud_top_bar.py](../../ui/hud_top_bar.py) | **96** | 상단 상태 바 |
-| [hud_center_panel.py](../../ui/hud_center_panel.py) | **92** | 중앙 패널 헬퍼 |
-| [icons.py](../../ui/icons.py) | **84** | SVG 아이콘 16종 |
-| [hud_tokens.py](../../ui/hud_tokens.py) | **77** | 디자인 토큰 정의 |
-| [plotly_theme.py](../../ui/plotly_theme.py) | **44** | Plotly 테마 적용 |
+| `hud_style.py` | **1,421** | 메인 CSS 인젝션 + 테마 함수 |
+| `page_compliance.py` | **2,144** | 법규 페이지 (4탭, 9 크롤러) |
+| `page_onboarding.py` | **1,896** | AI 도우미 (스트리밍, 비전, SOP) |
+| `page_equipment.py` | **1,628** | 설비/공정 (SPC, 에러 검색) |
+| `page_admin.py` | **1,314** | 인사 관리 (6탭) |
+| `page_draft.py` | **940** | 문서 작성 (3탭, 7포맷) |
+| `page_search.py` | **690** | 인원 검색 (시맨틱) |
+| `page_login.py` | **610** | 로그인 + 비밀번호 변경 |
+| `doc_search_panel.py` | **608** | 문서 검색 패널 |
+| `page_dashboard.py` | **266** | 대시보드 |
+| `page_profile.py` | **199** | 프로필 |
+| `hud_left_panel.py` | **186** | 좌측 사이드바 |
+| `hud_right_panel.py` | **153** | 우측 시스템 분석 |
+| `components.py` | **127** | 공통 헬퍼 |
+| `hud_layout.py` | **104** | 레이아웃 매니저 |
+| `hud_top_bar.py` | **96** | 상단 상태 바 |
+| `hud_center_panel.py` | **92** | 중앙 패널 헬퍼 |
+| `icons.py` | **84** | SVG 아이콘 16종 |
+| `hud_tokens.py` | **77** | 디자인 토큰 정의 |
+| `plotly_theme.py` | **44** | Plotly 테마 적용 |
 | **합계** | **12,679** | |
 
 ## 부록 B. 디자인 시스템 핵심 자산 위치
 
 | 자산 | 경로 |
 |---|---|
-| 디자인 토큰 (Python) | [ui/hud_tokens.py](../../ui/hud_tokens.py) |
-| 메인 CSS 함수 | [ui/hud_style.py](../../ui/hud_style.py) |
-| 로고 (다크) | [ui/assets/ajin_logo.svg](../../ui/assets/ajin_logo.svg) |
-| 로고 (라이트) | [ui/assets/ajin_logo_light.svg](../../ui/assets/ajin_logo_light.svg) |
-| 아이콘 정의 | [ui/icons.py](../../ui/icons.py) |
-| Plotly 테마 | [ui/plotly_theme.py](../../ui/plotly_theme.py) |
-| 레이아웃 매니저 | [ui/hud_layout.py](../../ui/hud_layout.py) |
+| 디자인 토큰 (Python) | `ui/hud_tokens.py` |
+| 메인 CSS 함수 | `ui/hud_style.py` |
+| 로고 (다크) | `ui/assets/ajin_logo.svg` |
+| 로고 (라이트) | `ui/assets/ajin_logo_light.svg` |
+| 아이콘 정의 | `ui/icons.py` |
+| Plotly 테마 | `ui/plotly_theme.py` |
+| 레이아웃 매니저 | `ui/hud_layout.py` |
 
 ## 부록 C. 영문 + 한글 라벨 사전
 

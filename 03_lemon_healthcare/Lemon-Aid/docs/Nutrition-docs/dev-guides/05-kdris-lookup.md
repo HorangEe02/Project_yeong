@@ -39,7 +39,7 @@ data/
 
 ## 📐 데이터 명세
 
-> 🔍 **출처**: [docs/Nutrition-docs/09-data-catalog.md §3.1](../09-data-catalog.md), [data/CLAUDE.md](../../data/CLAUDE.md), [docs/Nutrition-docs/13-algorithm-literature-evidence.md](../13-algorithm-literature-evidence.md)
+> 🔍 **출처**: [docs/Nutrition-docs/09-data-catalog.md §3.1](../09-data-catalog.md), `data/CLAUDE.md`, [docs/Nutrition-docs/13-algorithm-literature-evidence.md](../13-algorithm-literature-evidence.md)
 
 ### 근거 보강
 
@@ -642,9 +642,9 @@ class PostgresKDRIsRepository(KDRIsRepository):
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
-- [`/data/CLAUDE.md`](../../data/CLAUDE.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
+- `/data/CLAUDE.md`
 - [`/docs/Nutrition-docs/09-data-catalog.md §3.1`](../09-data-catalog.md)
 - 이전 작업: [`04-weight-prediction-7step.md`](./04-weight-prediction-7step.md)
 - 다음 단계 (Phase 2): 부족 영양소 진단 (별도 작성 예정)

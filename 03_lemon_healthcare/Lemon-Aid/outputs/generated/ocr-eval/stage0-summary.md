@@ -1,6 +1,6 @@
 # Stage 0 OCR Baseline 결과 종합 (2026-05-21)
 
-> 본 보고서는 [plan §I Final Roadmap](~/.claude/plans/stateless-sniffing-swan.md)의 Stage 0 게이트 평가용 사용자 검토 자료. 완전 로컬(PaddleOCR + Ollama Vision) 정책으로 영양제/보충제 라벨 OCR의 **현재 인식률 baseline을 처음으로 정량 측정**한 결과를 정리한다.
+> 본 보고서는 `plan §I Final Roadmap`의 Stage 0 게이트 평가용 사용자 검토 자료. 완전 로컬(PaddleOCR + Ollama Vision) 정책으로 영양제/보충제 라벨 OCR의 **현재 인식률 baseline을 처음으로 정량 측정**한 결과를 정리한다.
 
 ---
 

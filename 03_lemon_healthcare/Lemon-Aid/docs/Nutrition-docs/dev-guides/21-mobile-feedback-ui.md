@@ -769,8 +769,8 @@ RefreshIndicator(
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/mobile/CLAUDE.md`](../../mobile/CLAUDE.md)
+- `/CLAUDE.md`
+- [`/mobile/CLAUDE.md`](../../../mobile/CLAUDE.md)
 - [`/docs/Nutrition-docs/10-compliance-checklist.md`](../10-compliance-checklist.md) — 알림 동의
 - 이전: [`20-mobile-meal-input-screen.md`](./20-mobile-meal-input-screen.md)
 - **Phase 4 시작 (W10 — 인수인계·발표)**: 별도 가이드 또는 발표 자료

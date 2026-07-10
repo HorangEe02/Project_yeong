@@ -803,8 +803,8 @@ final durationMin = pointsInZone.length / 4;  // 15초 간격 가정
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/mobile/CLAUDE.md`](../../mobile/CLAUDE.md)
+- `/CLAUDE.md`
+- [`/mobile/CLAUDE.md`](../../../mobile/CLAUDE.md)
 - [`/docs/Nutrition-docs/09-data-catalog.md §6`](../09-data-catalog.md) — HealthKit·Health Connect 카탈로그
 - [`/docs/Nutrition-docs/10-compliance-checklist.md §5.2`](../10-compliance-checklist.md) — 별도 동의
 - 이전: [`11-mobile-camera-screen.md`](./11-mobile-camera-screen.md)

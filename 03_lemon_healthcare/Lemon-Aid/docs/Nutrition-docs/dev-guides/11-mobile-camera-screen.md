@@ -750,8 +750,8 @@ return switch (state) {
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/mobile/CLAUDE.md`](../../mobile/CLAUDE.md)
+- `/CLAUDE.md`
+- [`/mobile/CLAUDE.md`](../../../mobile/CLAUDE.md)
 - [`/docs/Nutrition-docs/10-compliance-checklist.md §5.2`](../10-compliance-checklist.md) — 권한 정책
 - 이전: [`10-mobile-flutter-setup.md`](./10-mobile-flutter-setup.md)
 - 다음: [`12-mobile-healthkit-integration.md`](./12-mobile-healthkit-integration.md)

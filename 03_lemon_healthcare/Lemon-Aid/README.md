@@ -420,7 +420,7 @@ python -m pytest -q --no-cov
 | Nutrition | [`docs/Nutrition-docs/`](./docs/Nutrition-docs/) |
 | Food | [`docs/Food-docs/`](./docs/Food-docs/) |
 | Chat | [`docs/Chat-docs/`](./docs/Chat-docs/) |
-| Backend structure | [`backend/README.md`](./backend/README.md) |
+| Backend structure | [`backend/README.md`](backend/Nutrition-backend/README.md) |
 | Nutrition backend | [`backend/Nutrition-backend/README.md`](./backend/Nutrition-backend/README.md) |
 
 ---

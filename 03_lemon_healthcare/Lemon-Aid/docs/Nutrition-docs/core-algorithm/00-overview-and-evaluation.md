@@ -2,7 +2,7 @@
 
 > **문서 정보**
 > 버전: v1.0 | 작성일: 2026-05-26 | 상태: 평가 완료, 수정안 제시
-> 대상 원문: [`docs/Nutrition-docs/07-core-algorithm.md`](../docs/Nutrition-docs/07-core-algorithm.md) (v1.1)
+> 대상 원문: [`docs/Nutrition-docs/07-core-algorithm.md`](../07-core-algorithm.md) (v1.1)
 > 본 폴더의 7개 상세 문서 + 1개 흡연·음주 종합 + 1개 참고문헌 일람으로 구성
 
 ---

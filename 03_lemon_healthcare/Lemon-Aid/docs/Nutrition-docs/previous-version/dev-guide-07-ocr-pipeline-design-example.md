@@ -1,6 +1,6 @@
 # dev-guides/07 — OCR 파이프라인 (Cloud Vision + CLOVA 백업)
 
-> **Phase**: 2 | **선행 작업**: [`00-setup-environment.md`](./00-setup-environment.md) | **예상 소요**: 4~5시간
+> **Phase**: 2 | **선행 작업**: [`00-setup-environment.md`](../dev-guides/00-setup-environment.md) | **예상 소요**: 4~5시간
 
 ---
 
@@ -1053,9 +1053,9 @@ CLOVA의 응답은 Google Vision과 형식이 다르므로 **Adapter 내에서 �
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md) (Adapter 패턴)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md` (Adapter 패턴)
 - [`/docs/Nutrition-docs/06-tech-stack.md`](../06-tech-stack.md)
 - [`/docs/Nutrition-docs/09-data-catalog.md §5.1, §5.2`](../09-data-catalog.md)
-- 이전: [`06-deficient-nutrient-diagnosis.md`](./06-deficient-nutrient-diagnosis.md)
-- 다음: [`08-llm-supplement-parsing.md`](./08-llm-supplement-parsing.md)
+- 이전: [`06-deficient-nutrient-diagnosis.md`](../dev-guides/06-deficient-nutrient-diagnosis.md)
+- 다음: [`08-llm-supplement-parsing.md`](../dev-guides/08-llm-supplement-parsing.md)

@@ -168,9 +168,9 @@ VALUES ('<user_uuid>', 'data_collection', NOW()), ...;
 
 ## 5. 참조
 
-- mobile notifier `_mapDioError`: [supplement_notifier.dart:80-106](../../mobile/lib/features/supplement/presentation/providers/supplement_notifier.dart)
-- 권한 다이얼로그: [supplement_capture_screen.dart:120-148](../../mobile/lib/features/supplement/presentation/screens/supplement_capture_screen.dart)
-- backend rate limit: [deps.py:134-159](../../backend/src/api/deps.py)
-- backend auth 401: [deps.py:94-131](../../backend/src/api/deps.py)
+- mobile notifier `_mapDioError`: `supplement_notifier.dart:80-106`
+- 권한 다이얼로그: [supplement_capture_screen.dart:120-148](../../mobile/flutter_app/lib/features/supplement/presentation/supplement_capture_screen.dart)
+- backend rate limit: `deps.py:134-159`
+- backend auth 401: `deps.py:94-131`
 - 안전 위젯: [shared/widgets/](../../mobile/lib/shared/widgets/)
-- Plan: [twinkly-splashing-hejlsberg.md](~/.claude/plans/twinkly-splashing-hejlsberg.md) Phase M-3-V.C
+- Plan: `twinkly-splashing-hejlsberg.md` Phase M-3-V.C

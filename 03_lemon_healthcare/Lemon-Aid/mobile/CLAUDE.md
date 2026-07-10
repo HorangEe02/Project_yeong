@@ -620,8 +620,8 @@ class Spacing {
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../CLAUDE.md) — 프로젝트 루트 컨텍스트
-- [`/backend/CLAUDE.md`](../backend/CLAUDE.md) — 백엔드 API 패턴
+- `/CLAUDE.md` — 프로젝트 루트 컨텍스트
+- `/backend/CLAUDE.md` — 백엔드 API 패턴
 - [`/docs/Nutrition-docs/06-tech-stack.md`](../docs/Nutrition-docs/06-tech-stack.md) — Flutter 기술 의사결정
 - [`/docs/Nutrition-docs/10-compliance-checklist.md`](../docs/Nutrition-docs/10-compliance-checklist.md) — 면책 고지·권한 정책
 

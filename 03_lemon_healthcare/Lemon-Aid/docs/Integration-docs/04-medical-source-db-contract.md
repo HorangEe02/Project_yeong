@@ -4,8 +4,8 @@
 > 작성일: 2026-05-28
 > 기준 브랜치: `feat/ai-agent-backend-integration`
 > 상위 안전 계약: [03-ai-agent-safety-porting-contract.md](./03-ai-agent-safety-porting-contract.md)
-> 관련 설계: [45-development-dependency-split.md](../Nutrition-docs/45-development-dependency-split.md),
-> [dev-guides/31-medical-knowledge-layer.md](../Nutrition-docs/dev-guides/31-medical-knowledge-layer.md)
+> 관련 설계: `45-development-dependency-split.md`,
+> `dev-guides/31-medical-knowledge-layer.md`
 
 ## 1. 목적
 

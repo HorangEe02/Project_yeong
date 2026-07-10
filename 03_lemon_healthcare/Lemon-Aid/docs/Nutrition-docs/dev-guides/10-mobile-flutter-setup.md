@@ -771,7 +771,7 @@ ColorScheme.fromSeed(seedColor: AppColors.primary)
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/mobile/CLAUDE.md`](../../mobile/CLAUDE.md) — 이 작업의 기반 문서
+- `/CLAUDE.md`
+- [`/mobile/CLAUDE.md`](../../../mobile/CLAUDE.md) — 이 작업의 기반 문서
 - [`/docs/Nutrition-docs/06-tech-stack.md`](../06-tech-stack.md)
 - 다음: [`11-mobile-camera-screen.md`](./11-mobile-camera-screen.md)

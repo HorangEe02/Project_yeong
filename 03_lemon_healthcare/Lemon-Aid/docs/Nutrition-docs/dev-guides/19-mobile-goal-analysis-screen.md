@@ -679,6 +679,6 @@ GoRoute(
 
 ## 🔗 관련 문서
 
-- [`/mobile/CLAUDE.md`](../../mobile/CLAUDE.md)
+- [`/mobile/CLAUDE.md`](../../../mobile/CLAUDE.md)
 - 이전: [`18-mobile-deficient-screen.md`](./18-mobile-deficient-screen.md)
 - 다음: [`20-mobile-meal-input-screen.md`](./20-mobile-meal-input-screen.md)

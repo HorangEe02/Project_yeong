@@ -396,6 +396,6 @@ uvicorn src.main:app --reload --port 8000
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
 - 다음 작업: [`01-bmi-and-v1-algorithm.md`](./01-bmi-and-v1-algorithm.md)

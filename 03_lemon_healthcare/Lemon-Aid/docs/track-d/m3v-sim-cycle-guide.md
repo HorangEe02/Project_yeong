@@ -22,7 +22,7 @@
 | E | 칼슘 | `local-calcium-0001.jpg` | 영문 비중 높음 |
 
 **저장 위치**: `backend/tests/fixtures/supplement_labels/`
-**라이선스**: 본인 촬영 권장. 외부 출처는 [README.md](../../backend/tests/fixtures/supplement_labels/README.md) 가이드 따름.
+**라이선스**: 본인 촬영 권장. 외부 출처는 `README.md` 가이드 따름.
 
 ---
 
@@ -210,8 +210,8 @@ git commit -m "docs(track-d): M-3-V.B sim cycle results $(date +%Y-%m-%d) — <P
 
 ## 6. 참조
 
-- M-3-V.A timeout 분리: [twinkly-splashing-hejlsberg.md](~/.claude/plans/twinkly-splashing-hejlsberg.md) Phase M-3-V.A
-- 백엔드 supplement endpoint: [backend/src/api/v1/supplements.py](../../backend/src/api/v1/supplements.py)
-- 모바일 supplement notifier: [mobile/lib/features/supplement/presentation/providers/supplement_notifier.dart](../../mobile/lib/features/supplement/presentation/providers/supplement_notifier.dart)
+- M-3-V.A timeout 분리: `twinkly-splashing-hejlsberg.md` Phase M-3-V.A
+- 백엔드 supplement endpoint: [backend/src/api/v1/supplements.py](../../backend/Nutrition-backend/src/api/v1/supplements.py)
+- 모바일 supplement notifier: `mobile/lib/features/supplement/presentation/providers/supplement_notifier.dart`
 - 안전 위젯: [mobile/lib/shared/widgets/](../../mobile/lib/shared/widgets/)
 - 컴플라이언스: [docs/10-compliance-checklist.md](../10-compliance-checklist.md)

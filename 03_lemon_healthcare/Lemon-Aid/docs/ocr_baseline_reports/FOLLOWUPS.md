@@ -50,7 +50,7 @@
 
 ### F-5. PR-M1 follow-up — /predictions, /activity 라우터 검토
 
-- **상황**: 현재 워크트리에 두 라우터 없음. 향후 추가 시 [`test_route_auth_contract.py`](../../backend/tests/integration/api/test_route_auth_contract.py) 가드가 자동 검출
+- **상황**: 현재 워크트리에 두 라우터 없음. 향후 추가 시 `test_route_auth_contract.py` 가드가 자동 검출
 - **변경**: 새 라우터 추가 PR 에서 `Depends(get_current_user)` 부착 확인
 - **예상 작업**: 라우터 추가 PR 내에서 동시 처리
 

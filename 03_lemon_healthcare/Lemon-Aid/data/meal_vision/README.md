@@ -32,5 +32,5 @@ AI Hub 음식 데이터셋은 별도 이용 약관이 있다. 학습 결과물�
 
 ## 참조
 
-- [`/docs/dev-guides/16-meal-recognition.md`](../../docs/dev-guides/16-meal-recognition.md)
-- [`/docs/superpowers/plans/2026-05-11-meal-recognition-gcv-yolov8.md`](../../docs/superpowers/plans/2026-05-11-meal-recognition-gcv-yolov8.md)
+- [`/docs/dev-guides/16-meal-recognition.md`](../../docs/Nutrition-docs/dev-guides/16-meal-recognition.md)
+- `/docs/superpowers/plans/2026-05-11-meal-recognition-gcv-yolov8.md`

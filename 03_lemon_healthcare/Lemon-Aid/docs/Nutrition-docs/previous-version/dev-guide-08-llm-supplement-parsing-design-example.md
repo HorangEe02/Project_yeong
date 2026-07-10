@@ -1,6 +1,6 @@
 # dev-guides/08 — LLM 영양제 파싱 (Ollama 로컬 LLM)
 
-> **Phase**: 2 | **선행 작업**: [`07-ocr-pipeline.md`](./07-ocr-pipeline.md) | **예상 소요**: 4~5시간
+> **Phase**: 2 | **선행 작업**: [`07-ocr-pipeline.md`](../dev-guides/07-ocr-pipeline.md) | **예상 소요**: 4~5시간
 
 > **현재 구현 상태(2026-05-13)**: 실제 런타임은 `src/llm/ollama.py`의
 > `OllamaSupplementParser`와 `src/services/supplement_image_analysis.py`를 사용한다.
@@ -826,15 +826,15 @@ ingredient_name_ko,ingredient_name_en,nutrient_code
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
-- [`/data/CLAUDE.md`](../../data/CLAUDE.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
+- `/data/CLAUDE.md`
 - [`/docs/Nutrition-docs/09-data-catalog.md §5.3, §5.4`](../09-data-catalog.md)
 - [`/docs/Nutrition-docs/12-local-llm-ollama-migration.md`](../12-local-llm-ollama-migration.md)
 - [`/docs/Nutrition-docs/13-algorithm-literature-evidence.md`](../13-algorithm-literature-evidence.md)
 - [`/docs/Nutrition-docs/10-compliance-checklist.md §10`](../10-compliance-checklist.md)
-- 이전: [`07-ocr-pipeline.md`](./07-ocr-pipeline.md)
-- 다음: [`09-supplement-registration-api.md`](./09-supplement-registration-api.md)
+- 이전: [`07-ocr-pipeline.md`](../dev-guides/07-ocr-pipeline.md)
+- 다음: [`09-supplement-registration-api.md`](../dev-guides/09-supplement-registration-api.md)
 
 ## 📚 사용 근거
 

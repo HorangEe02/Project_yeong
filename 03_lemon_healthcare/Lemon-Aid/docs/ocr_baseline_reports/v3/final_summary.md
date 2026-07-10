@@ -99,17 +99,17 @@
 
 | 항목 | 파일 | 상태 |
 |------|------|------|
-| OCR 메트릭 (CER/WER/exact/field) | [`backend/src/ocr/metrics.py`](../../backend/src/ocr/metrics.py) | ✅ 31 unit tests |
-| 다국어 듀얼 어댑터 | [`backend/src/ocr/multilingual_adapter.py`](../../backend/src/ocr/multilingual_adapter.py) | ✅ 9 unit tests |
-| 필드 추출기 | [`backend/src/ocr/field_extractor.py`](../../backend/src/ocr/field_extractor.py) | ✅ 20 unit tests + 60/60 round-trip |
-| 텍스트 정규화 (한·영 공백, μ/α 단위) | [`backend/src/ocr/text_normalizer.py`](../../backend/src/ocr/text_normalizer.py) | ✅ 18 unit tests |
-| 전처리 강화 (autocontrast + sharpness) | [`backend/src/ocr/preprocessor.py::enhance_for_ocr`](../../backend/src/ocr/preprocessor.py) | ✅ 4 unit tests |
-| YOLO 라벨 검출기 | [`backend/src/vision/yolo_label_detector.py`](../../backend/src/vision/yolo_label_detector.py) | ✅ 12 unit tests |
-| PaddleOCRAdapter (mobile/lite 옵션) | [`backend/src/ocr/paddleocr_adapter.py`](../../backend/src/ocr/paddleocr_adapter.py) | ✅ 8 unit tests |
-| 합성 라벨 생성기 | [`scripts/synth_label_dataset.py`](../../scripts/synth_label_dataset.py) | ✅ 60장 생성 |
-| 실사 샘플링 + 부트스트랩 | [`scripts/sample_real_labels.py`](../../scripts/sample_real_labels.py) + [`scripts/bootstrap_real_labels.py`](../../scripts/bootstrap_real_labels.py) | ✅ 86장 샘플링 + 39장 pseudo-label + 7장 사람 검수 |
-| e2e 벤치마크 러너 (env: USE_ROI / MOBILE_DET / LIGHTWEIGHT / TIMEOUT_SEC / LABELED_ONLY) | [`backend/tests/e2e/test_ocr_accuracy.py`](../../backend/tests/e2e/test_ocr_accuracy.py) | ✅ |
-| SPKI 핀 추출 스크립트 | [`scripts/extract_spki_pin.sh`](../../scripts/extract_spki_pin.sh) | ✅ |
+| OCR 메트릭 (CER/WER/exact/field) | [`backend/src/ocr/metrics.py`](../../../backend/Nutrition-backend/src/ocr/metrics.py) | ✅ 31 unit tests |
+| 다국어 듀얼 어댑터 | [`backend/src/ocr/multilingual_adapter.py`](../../../backend/Nutrition-backend/src/ocr/multilingual_adapter.py) | ✅ 9 unit tests |
+| 필드 추출기 | [`backend/src/ocr/field_extractor.py`](../../../backend/Nutrition-backend/src/ocr/field_extractor.py) | ✅ 20 unit tests + 60/60 round-trip |
+| 텍스트 정규화 (한·영 공백, μ/α 단위) | [`backend/src/ocr/text_normalizer.py`](../../../backend/Nutrition-backend/src/ocr/text_normalizer.py) | ✅ 18 unit tests |
+| 전처리 강화 (autocontrast + sharpness) | `backend/src/ocr/preprocessor.py::enhance_for_ocr` | ✅ 4 unit tests |
+| YOLO 라벨 검출기 | `backend/src/vision/yolo_label_detector.py` | ✅ 12 unit tests |
+| PaddleOCRAdapter (mobile/lite 옵션) | `backend/src/ocr/paddleocr_adapter.py` | ✅ 8 unit tests |
+| 합성 라벨 생성기 | `scripts/synth_label_dataset.py` | ✅ 60장 생성 |
+| 실사 샘플링 + 부트스트랩 | `scripts/sample_real_labels.py` + `scripts/bootstrap_real_labels.py` | ✅ 86장 샘플링 + 39장 pseudo-label + 7장 사람 검수 |
+| e2e 벤치마크 러너 (env: USE_ROI / MOBILE_DET / LIGHTWEIGHT / TIMEOUT_SEC / LABELED_ONLY) | `backend/tests/e2e/test_ocr_accuracy.py` | ✅ |
+| SPKI 핀 추출 스크립트 | `scripts/extract_spki_pin.sh` | ✅ |
 | 백엔드 전용 venv | `backend/.venv/` | ✅ langchain 충돌 격리 |
 
 **백엔드 unit 테스트**: 234 (시작) → **336 passed** (102 신규, 회귀 0)

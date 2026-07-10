@@ -1015,8 +1015,8 @@ Phase 3 (W8-W9) 에서는 Hall 모델 적용, 5종 출력 완성, 사용자 피�
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/mobile/CLAUDE.md`](../../mobile/CLAUDE.md)
+- `/CLAUDE.md`
+- [`/mobile/CLAUDE.md`](../../../mobile/CLAUDE.md)
 - [`/docs/Nutrition-docs/07-core-algorithm.md`](../07-core-algorithm.md) — 산출식 출력 명세
 - [`/docs/Nutrition-docs/10-compliance-checklist.md §2.3`](../10-compliance-checklist.md) — 면책 고지
 - 이전: [`12-mobile-healthkit-integration.md`](./12-mobile-healthkit-integration.md)

@@ -765,7 +765,7 @@ UI에서는:
 
 - [`/docs/Nutrition-docs/07-core-algorithm.md §6.1`](../07-core-algorithm.md)
 - [`/docs/Nutrition-docs/13-algorithm-literature-evidence.md`](../13-algorithm-literature-evidence.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
+- `/backend/CLAUDE.md`
 - 이전: [`13-mobile-dashboard.md`](./13-mobile-dashboard.md)
 - 다음: [`15-goal-based-analysis.md`](./15-goal-based-analysis.md)
 

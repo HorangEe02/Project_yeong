@@ -371,8 +371,8 @@ BMR_WEIGHT_COEF: Final[float] = 10.0
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
 - [`/docs/Nutrition-docs/07-core-algorithm.md §3.6, §3.7`](../07-core-algorithm.md)
 - 이전 작업: [`02-v2-v3-v4-algorithms.md`](./02-v2-v3-v4-algorithms.md)
 - 다음 작업: [`04-weight-prediction-7step.md`](./04-weight-prediction-7step.md)

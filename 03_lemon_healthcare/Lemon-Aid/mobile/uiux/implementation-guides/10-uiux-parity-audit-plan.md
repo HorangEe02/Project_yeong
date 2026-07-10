@@ -2,7 +2,7 @@
 
 > Figma `03_UI_Design`(page `0:1`) ↔ 현재 빌드(`feat/ai-agent-chat-import` @ `7196cb7b`) 화면 대조 결과와,
 > 미적용 항목을 Android(Pixel 10 Pro)·iOS(iPhone 17 Pro, iOS 26.5) 빌드에 반영하기 위한 실행 가이드.
-> frame id는 [`mobile/uiux/figma/_frames_index.md`](../figma/_frames_index.md) 기준.
+> frame id는 `mobile/uiux/figma/_frames_index.md` 기준.
 
 ---
 

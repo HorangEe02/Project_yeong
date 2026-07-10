@@ -61,9 +61,9 @@
 # 기능 A: 인원 검색 및 조직도
 
 > **영문 라벨**: `EMPLOYEE SEARCH & ORG CHART`
-> **페이지 파일**: [ui/page_search.py](../../ui/page_search.py) (690줄)
-> **백엔드**: [backend/routers/employee.py](../../backend/routers/employee.py)
-> **기능 모듈**: [features/search/](../../features/search/)
+> **페이지 파일**: `ui/page_search.py` (690줄)
+> **백엔드**: [backend/routers/employee.py](../../../backend/routers/employee.py)
+> **기능 모듈**: [features/search/](../../../features/search/)
 > **SILLI 부합성**: 업무 효율화
 
 ## A-1. 비즈니스 가치
@@ -95,13 +95,13 @@
 - **목적**: 사용자 질의가 "인원 검색" / "문서 검색" / "에러코드" / "법규" 등 어떤 의도인지 분류
 - **응답**: **5ms** (LLM 호출 불필요)
 - **신뢰도 임계치**: 70%+ 시 즉시 반환, 미만 시 LLM 폴백
-- **위치**: [features/search/ml_intent_classifier.py](../../features/search/ml_intent_classifier.py), [features/search/intent_router.py](../../features/search/intent_router.py)
+- **위치**: [features/search/ml_intent_classifier.py](../../../features/search/ml_intent_classifier.py), [features/search/intent_router.py](../../../features/search/intent_router.py)
 
 ### A-2-3. 검색 이력 + 5종 정렬 (v3.1 신규)
 - **이력**: 세션 기반 최근 20건 저장 (검색어 + 결과 수 + 타임스탬프)
 - **바로가기**: 최근 5건을 칩(chip) 형태로 표시 → 클릭 시 재실행
 - **정렬 옵션**: 관련도순 / 이름순 / 부서순 / 직급순 / 사업장순
-- **위치**: [features/search/employee/search_history.py](../../features/search/employee/)
+- **위치**: [features/search/employee/search_history.py](../../../features/search/employee/)
 
 ### A-2-4. FTS5 전문 검색 (v3.0)
 - **토크나이저**: `unicode61` (한글 정규화)
@@ -119,17 +119,17 @@
 | **PARTIAL** | 타 부서 | 이메일 마스킹 (`***@***.com`), 전화번호 숨김 |
 | **HIDDEN** | INACTIVE 계정 | 검색 결과에서 제외 |
 
-구현: [core/auth/visibility.py](../../core/auth/visibility.py) — `determine_visibility(user, target_dept, target_role)` + `filter_employee_fields()`
+구현: [core/auth/visibility.py](../../../core/auth/visibility.py) — `determine_visibility(user, target_dept, target_role)` + `filter_employee_fields()`
 
 ### A-2-7. HTML/CSS 카드형 조직도
 - **전체 조직도**: 회사 전체 → 본부 → 부서 → 인원 트리
 - **부서별 조직도**: 특정 부서 1개의 인원 카드 그리드
 - **카드 정보**: 이니셜 아바타 + 이름 + 직급 + 내선 + 이메일 (가시성 적용)
 - **렌더링**: 순수 HTML/CSS (Plotly 미사용 → 빠른 렌더링)
-- **위치**: [features/search/employee/org_chart.py](../../features/search/employee/)
+- **위치**: [features/search/employee/org_chart.py](../../../features/search/employee/)
 
 ### A-2-8. 사업장 지도 (Folium)
-- **데이터**: [data/facility_db/plants.json](../../data/facility_db/) v4.0 — 19개소 (국내 12 + 해외 7)
+- **데이터**: [data/facility_db/plants.json](../../../data/facility_db/) v4.0 — 19개소 (국내 12 + 해외 7)
 - **지도**: Folium + OpenStreetMap
 - **마커 정보**: 사업장명 + 주소 + 인증 (IATF 16949 등) + 주요 공정
 - **상호작용**: 마커 클릭 → 팝업 정보
@@ -137,7 +137,7 @@
 ### A-2-9. 교차 네비게이션 (Feature Bridge, v3.0)
 검색 결과 카드에 **"이메일 작성"** / **"문서 작성"** 버튼 → 기능 B로 컨텍스트 이동.
 - 예: 김민수 부장 카드 → "이메일 작성" 클릭 → 기능 B로 이동 + 수신자 자동 입력
-- 위치: [core/feature_bridge.py](../../core/feature_bridge.py)
+- 위치: [core/feature_bridge.py](../../../core/feature_bridge.py)
 
 ## A-3. 사용자 흐름 (User Flow)
 
@@ -168,12 +168,12 @@
 
 | 항목 | 위치 | 규모 |
 |---|---|---|
-| 사원 DB (시뮬레이션) | [data/employees.db](../../data/) (SQLite) | **329명** (27부서) |
-| 부서 별칭 | [features/search/employee/search.py](../../features/search/employee/) | **48종** |
-| 부서 레지스트리 | [core/department_config.py](../../core/) | **30개 부서** |
-| 사업장 DB | [data/facility_db/plants.json](../../data/facility_db/) | **19개소** |
-| ChromaDB (employee_profiles) | [vectorstore/](../../vectorstore/) | 329건 임베딩 |
-| ML 의도 학습 데이터 | [data/intent_ml/](../../data/) | **1,500건** |
+| 사원 DB (시뮬레이션) | [data/employees.db](../../../data/) (SQLite) | **329명** (27부서) |
+| 부서 별칭 | [features/search/employee/search.py](../../../features/search/employee/) | **48종** |
+| 부서 레지스트리 | [core/department_config.py](../../../core/) | **30개 부서** |
+| 사업장 DB | [data/facility_db/plants.json](../../../data/facility_db/) | **19개소** |
+| ChromaDB (employee_profiles) | `vectorstore/` | 329건 임베딩 |
+| ML 의도 학습 데이터 | [data/intent_ml/](../../../data/) | **1,500건** |
 
 > **주의**: 실제 649명 대비 시뮬레이션은 약 50%. 실제 도입 시 전체 데이터 시딩 필요.
 
@@ -255,9 +255,9 @@
 # 기능 B: 문서 검색 및 작성
 
 > **영문 라벨**: `DOCUMENT SEARCH & DRAFTING`
-> **페이지 파일**: [ui/page_draft.py](../../ui/page_draft.py) (940줄) + [ui/doc_search_panel.py](../../ui/doc_search_panel.py) (608줄)
-> **백엔드**: [backend/routers/draft.py](../../backend/routers/draft.py), [backend/routers/search.py](../../backend/routers/search.py)
-> **기능 모듈**: [features/draft/](../../features/draft/) (23 파일)
+> **페이지 파일**: `ui/page_draft.py` (940줄) + `ui/doc_search_panel.py` (608줄)
+> **백엔드**: [backend/routers/draft.py](../../../backend/routers/draft.py), [backend/routers/search.py](../../../backend/routers/search.py)
+> **기능 모듈**: [features/draft/](../../../features/draft/) (23 파일)
 > **SILLI 부합성**: 업무 효율화 + 품질 개선
 
 ## B-1. 비즈니스 가치
@@ -283,7 +283,7 @@
 | **임베딩** | BGE-M3 (1024차원) |
 | **검색 전략** | 사용자 요청 → 같은 doc_type 2~3건 retrieve → LLM 프롬프트에 few-shot 예시 주입 |
 | **효과** | "아진 톤"으로 제목·서두·본문 패턴 일관성 확보 |
-| **위치** | [features/draft/fewshot_rag.py](../../features/draft/) |
+| **위치** | [features/draft/fewshot_rag.py](../../../features/draft/) |
 
 ### B-2-2. 문서 유형 13종 (Doc Type Config)
 | 카테고리 | 문서 유형 |
@@ -294,12 +294,12 @@
 | **인사** | 휴가 신청서, 사직원 |
 | **양식** | 견적서, 출장 보고서 |
 
-위치: [features/draft/doc_type_config.py](../../features/draft/) (36KB, 약 1000줄 — 각 유형별 메타·필드·프롬프트·CC 규칙)
+위치: [features/draft/doc_type_config.py](../../../features/draft/) (36KB, 약 1000줄 — 각 유형별 메타·필드·프롬프트·CC 규칙)
 
 ### B-2-3. 가중치 BM25 검색 (v3.0)
 - **알고리즘**: BM25 + 필드별 가중치 (title 3.0 / doc_type 2.0 / part_name 2.0 / content 1.0)
 - **필터**: 문서 유형 / 파트명 / 날짜 범위
-- **위치**: [features/draft/search_engine.py](../../features/draft/), [features/search/searcher.py](../../features/search/) (HybridSearcher 통합)
+- **위치**: [features/draft/search_engine.py](../../../features/draft/), [features/search/searcher.py](../../../features/search/) (HybridSearcher 통합)
 
 ### B-2-4. 문서 품질 자동 평가 (v3.1 신규)
 | 평가 기준 | 점수 | 평가 방법 |
@@ -311,13 +311,13 @@
 | **톤** | 15점 | 어조 일관성 (공식 ↔ 친근) |
 | **합계** | 100점 | + 개선 포인트 자동 생성 |
 
-위치: [features/draft/doc_quality_scorer.py](../../features/draft/) (9KB, 약 250줄)
+위치: [features/draft/doc_quality_scorer.py](../../../features/draft/) (9KB, 약 250줄)
 
 ### B-2-5. 버전 비교 diff (v3.1 신규)
 - **diff 알고리즘**: Python `difflib`
 - **출력**: 유사도 비율 (%) + 추가/삭제/변경 줄 수 + HTML 하이라이트 (녹색 추가, 빨강 삭제, 노랑 변경)
 - **저장**: SQLite `draft_versions.db` — 모든 버전 자동 저장
-- **위치**: [features/draft/doc_diff.py](../../features/draft/), [features/draft/version_db.py](../../features/draft/)
+- **위치**: [features/draft/doc_diff.py](../../../features/draft/), [features/draft/version_db.py](../../../features/draft/)
 
 ### B-2-6. CC 자동 추천 (v3.1 신규)
 - **규칙**: 문서유형별 필수/권장/선택 CC 10종
@@ -325,11 +325,11 @@
   - 8D Report → **필수**: 품질보증팀, 생산기술팀 / **권장**: 품질본부장 / **선택**: 영업
   - PPAP → **필수**: OEM SQ팀, 영업 / **권장**: 품질보증팀
 - **UI**: 3색상 카드 표시 (필수=빨강, 권장=주황, 선택=회색)
-- **위치**: [features/draft/cc_recommender.py](../../features/draft/)
+- **위치**: [features/draft/cc_recommender.py](../../../features/draft/)
 
 ### B-2-7. 양식 카탈로그 11종
 - **양식**: APQP, MSDS, 정기 보고서, 회의록, 8D 양식, ECN 양식 등
-- **위치**: [features/draft/template_catalog.py](../../features/draft/) + [data/templates/](../../data/templates/)
+- **위치**: [features/draft/template_catalog.py](../../../features/draft/) + [data/templates/](../../../data/templates/)
 - **렌더링**: Jinja2 템플릿 → 변수 대입 → DOCX/PDF/ODT 변환
 
 ### B-2-8. 7포맷 내보내기 (v3.5 확장)
@@ -343,7 +343,7 @@
 | **TXT** | 기본 | 단순 텍스트 |
 | **복사** | clipboard | 즉시 붙여넣기 |
 
-위치: [features/draft/docx_exporter.py](../../features/draft/), [pdf_exporter.py](../../features/draft/), [tabular_exporter.py](../../features/draft/) (v3.5 신규)
+위치: [features/draft/docx_exporter.py](../../../features/draft/), [pdf_exporter.py](../../../features/draft/), [tabular_exporter.py](../../../features/draft/) (v3.5 신규)
 
 ### B-2-9. 마크다운 → CSV/XLSX 자동 변환 (v3.5 신규)
 - **파싱 전략 3단계**:
@@ -394,11 +394,11 @@
 
 | 항목 | 위치 | 규모 |
 |---|---|---|
-| 사내 문서 | [data/documents/](../../data/) | 8D, ECN, PPAP, 이메일, 회의록 다수 |
-| Jinja2 템플릿 | [data/templates/](../../data/templates/) | 11종 (보고서·이메일·참고 양식) |
+| 사내 문서 | [data/documents/](../../../data/) | 8D, ECN, PPAP, 이메일, 회의록 다수 |
+| Jinja2 템플릿 | [data/templates/](../../../data/templates/) | 11종 (보고서·이메일·참고 양식) |
 | Few-shot 인덱싱 | ChromaDB `draft_fewshot_samples` | **584건** |
-| 문서 버전 DB | [data/draft_versions.db](../../data/) | 사용자 모든 버전 자동 저장 |
-| 양식 참고 파일 | [data/templates/reference/](../../data/templates/) | 4종 (v2.6 추가) |
+| 문서 버전 DB | [data/draft_versions.db](../../../data/) | 사용자 모든 버전 자동 저장 |
+| 양식 참고 파일 | [data/templates/reference/](../../../data/templates/) | 4종 (v2.6 추가) |
 
 ## B-5. 백엔드 API
 
@@ -456,9 +456,9 @@
 # 기능 C: AI 업무 도우미
 
 > **영문 라벨**: `AI WORK ASSISTANT`
-> **페이지 파일**: [ui/page_onboarding.py](../../ui/page_onboarding.py) (1,896줄 — **최대 페이지**)
-> **백엔드**: [backend/routers/onboarding.py](../../backend/routers/onboarding.py)
-> **기능 모듈**: [features/onboarding/](../../features/onboarding/) (19 파일)
+> **페이지 파일**: `ui/page_onboarding.py` (1,896줄 — **최대 페이지**)
+> **백엔드**: [backend/routers/onboarding.py](../../../backend/routers/onboarding.py)
+> **기능 모듈**: [features/onboarding/](../../../features/onboarding/) (19 파일)
 > **SILLI 부합성**: 생산성 향상 (핵심 취지)
 
 ## C-1. 비즈니스 가치
@@ -486,14 +486,14 @@
 | **메타데이터** | model 이름, 응답 속도 (tokens/sec), 토큰 수 |
 | **네비게이션 차단** | 스트리밍 중 사이드바 모듈 버튼 disabled (v3.4) — 의도치 않은 페이지 이탈 방지 |
 
-위치: [features/onboarding/stream_response.py](../../features/onboarding/), [backend/sse.py](../../backend/sse.py)
+위치: [features/onboarding/stream_response.py](../../../features/onboarding/), [backend/sse.py](../../../backend/sse.py)
 
 ### C-2-2. 컨텍스트 최적화 (v3.1 신규)
 - **모드별 토큰 예산**:
   - **온보딩(교육)**: 3,000자 컨텍스트 (상세 설명 우선)
   - **업무(즉답)**: 2,000자 컨텍스트 (간결한 답변)
 - **중복 청크 제거**: ChromaDB retrieve 결과에서 90% 이상 유사 청크 dedup
-- **위치**: [features/onboarding/context_optimizer.py](../../features/onboarding/)
+- **위치**: [features/onboarding/context_optimizer.py](../../../features/onboarding/)
 
 ### C-2-3. SOP 단계별 가이드 (v3.4 — 8종)
 | # | SOP | 카테고리 |
@@ -508,7 +508,7 @@
 | 8 | 안전 점검 | 업무 프로세스 |
 
 각 SOP는 **체크리스트** + **주의사항** + **단계별 진행률 바** + **퀴즈 재학습 경로** 포함.
-위치: [features/onboarding/sop_guide.py](../../features/onboarding/) (22KB, 약 600줄)
+위치: [features/onboarding/sop_guide.py](../../../features/onboarding/) (22KB, 약 600줄)
 
 ### C-2-4. 협업 시나리오 5종 (v3.4 신규)
 | # | 시나리오 | 트리거 |
@@ -520,14 +520,14 @@
 | 5 | 안전 사고 위험 → 점검 | "안전 점검 어떻게 해?" |
 
 LLM 호출 없이 **즉시 응답** — 협업 단계, 담당 부서, 양식 위치, 마감 기한 명시.
-위치: [features/onboarding/collaboration_guide.py](../../features/onboarding/) (9KB, 약 250줄)
+위치: [features/onboarding/collaboration_guide.py](../../../features/onboarding/) (9KB, 약 250줄)
 
 ### C-2-5. 대화형 퀴즈 자동 생성 (v3.1 + v3.4)
 - **유형**: SOP 4지선다 / 용어집 4지선다
 - **자동 생성**: SOP 단계에서 학습 종료 시 → 퀴즈 3~5문항 자동 출제
 - **재학습**: 오답 시 `related_step` 메타데이터로 "Step N 다시 보기" 버튼 → 해당 SOP 단계로 이동
 - **정답 해설**: 정답·오답 모두 근거 포함 답변
-- **위치**: [features/onboarding/quiz_engine.py](../../features/onboarding/)
+- **위치**: [features/onboarding/quiz_engine.py](../../../features/onboarding/)
 
 ### C-2-6. 듀얼 모드 (v3.0)
 | 모드 | 응답 스타일 | 컨텍스트 | 사용 시점 |
@@ -547,32 +547,32 @@ UI: 페이지 상단 토글 (`[교육] [업무]`).
 | "SPC 상태?" (v3.4) | spc_dashboard 호출 | 5공정 Cpk 즉시 표시 |
 | "REACH 규제 현황?" (v3.4) | compliance scenario 호출 | 시나리오 카드 |
 
-위치: [features/onboarding/work_actions.py](../../features/onboarding/) (13KB, 약 350줄)
+위치: [features/onboarding/work_actions.py](../../../features/onboarding/) (13KB, 약 350줄)
 
 ### C-2-8. 부서 라우터 (v3.0 + v3.3)
 - **31개 부서 프로필**: 각 부서의 핵심 업무·자주 묻는 질문·관련 SOP
 - **부서 자동 선택 (v3.3)**: 로그인 사용자 소속 부서를 selectbox 기본값으로 자동 설정
 - **부서 변경 권한**: SYS_ADMIN / HR_ADMIN만 다른 부서 컨텍스트로 변경 가능
-- **위치**: [features/onboarding/department_router.py](../../features/onboarding/) (26KB, 약 700줄)
+- **위치**: [features/onboarding/department_router.py](../../../features/onboarding/) (26KB, 약 700줄)
 
 ### C-2-9. 용어집 매처 (Glossary Matcher)
 - **용어집**: **297항목** (21파일, 4종 JSON 형식)
 - **파서 호환**: Type A/B/C/D 4종 JSON 구조 호환 (v2.6 Type D 파서 수정)
 - **사용**: LLM 프롬프트에 관련 용어 자동 주입 + 답변에서 용어 자동 하이라이트
-- **위치**: [features/onboarding/glossary_matcher.py](../../features/onboarding/), [data/knowledge_base/glossary/](../../data/knowledge_base/)
+- **위치**: [features/onboarding/glossary_matcher.py](../../../features/onboarding/), [data/knowledge_base/glossary/](../../../data/knowledge_base/)
 
 ### C-2-10. 대화 요약 메모리 (v3.0)
 - **트리거**: 컨텍스트가 모델 한계 80% 도달 시
 - **요약**: LLM이 직전 6턴 대화 → 200자 요약
 - **저장**: session_state — 다음 턴부터 요약 텍스트만 컨텍스트에 포함
-- **위치**: [features/onboarding/conversation_memory.py](../../features/onboarding/)
+- **위치**: [features/onboarding/conversation_memory.py](../../../features/onboarding/)
 
 ### C-2-11. 비전 모델 (Gemma 4)
 - **트리거**: 사용자가 이미지 첨부 시
 - **모델**: Gemma 4 멀티모달 (latest/e2b/26b)
 - **용도**: 도면 분석, 부품 사진 식별, 차트 해석
 - **API**: `POST /api/onboarding/chat/vision` — multipart form-data
-- **위치**: [core/llm_client.py](../../core/) `invoke_vision()` + [auto_select_vision_model()](../../core/)
+- **위치**: [core/llm_client.py](../../../core/) `invoke_vision()` + [auto_select_vision_model()](../../../core/)
 
 ### C-2-12. 파일 업로드 (20+ 확장자)
 | 카테고리 | 확장자 |
@@ -596,7 +596,7 @@ UI: 페이지 상단 토글 (`[교육] [업무]`).
 - **저장**: SQLite `feedback.db`
 - **확인 메시지**: 녹색 (도움됨) / 주황 (아쉬움)
 - **분석**: Feature E 분석 탭에서 부서별 만족도 통계로 활용
-- **위치**: [features/onboarding/feedback_db.py](../../features/onboarding/)
+- **위치**: [features/onboarding/feedback_db.py](../../../features/onboarding/)
 
 ### C-2-15. 빠른 질문 데모 (v3.4 신규)
 생산기술팀 6개 데모 질문 — SOP/협업 트리거.
@@ -640,11 +640,11 @@ UI: 페이지 상단 토글 (`[교육] [업무]`).
 
 | 항목 | 위치 | 규모 |
 |---|---|---|
-| 용어집 | [data/knowledge_base/glossary/](../../data/knowledge_base/) | **297항목** (21파일) |
-| SOP | [data/knowledge_base/sop/](../../data/knowledge_base/) | 6종 (+ 8종 in-code) |
-| 부서별 가이드 | [data/knowledge_base/department_guides/](../../data/knowledge_base/) | 31개 부서 |
-| 피드백 DB | [data/feedback.db](../../data/) | 누적 사용자 평가 |
-| ML 의도 학습 | [data/intent_ml/](../../data/) | 1,500건 |
+| 용어집 | [data/knowledge_base/glossary/](../../../data/knowledge_base/) | **297항목** (21파일) |
+| SOP | [data/knowledge_base/sop/](../../../data/knowledge_base/) | 6종 (+ 8종 in-code) |
+| 부서별 가이드 | [data/knowledge_base/department_guides/](../../../data/knowledge_base/) | 31개 부서 |
+| 피드백 DB | [data/feedback.db](../../../data/) | 누적 사용자 평가 |
+| ML 의도 학습 | [data/intent_ml/](../../../data/) | 1,500건 |
 
 ## C-5. 백엔드 API
 
@@ -714,9 +714,9 @@ data: {"done": true}
 # 기능 D: 법규/규정 모니터링
 
 > **영문 라벨**: `COMPLIANCE MONITORING`
-> **페이지 파일**: [ui/page_compliance.py](../../ui/page_compliance.py) (2,144줄 — 두 번째로 큰 페이지)
-> **백엔드**: [backend/routers/compliance.py](../../backend/routers/compliance.py)
-> **기능 모듈**: [features/compliance/](../../features/compliance/) (33 파일)
+> **페이지 파일**: `ui/page_compliance.py` (2,144줄 — 두 번째로 큰 페이지)
+> **백엔드**: [backend/routers/compliance.py](../../../backend/routers/compliance.py)
+> **기능 모듈**: [features/compliance/](../../../features/compliance/) (33 파일)
 > **SILLI 부합성**: 안전성 향상 + 투자비 절감
 
 ## D-1. 비즈니스 가치
@@ -738,17 +738,17 @@ data: {"done": true}
 ### D-2-1. 9종 크롤러 (v3.5 정리)
 | # | 크롤러 | 대상 | 위치 |
 |:--:|---|---|---|
-| 1 | ISO Crawler | ISO 14001 / 45001 | [iso_crawler.py](../../features/compliance/iso_crawler.py) (19KB) |
-| 2 | MSDS Crawler | 화학물질안전보건자료 | [msds_crawler.py](../../features/compliance/) (28KB) |
-| 3 | EU Regulation Crawler | REACH, RoHS, ELV | [eu_regulation_crawler.py](../../features/compliance/) (17KB) |
-| 4 | Domestic Law Crawler | 산안법, 화관법, 환경법 | [domestic_law_crawler.py](../../features/compliance/) (23KB) |
-| 5 | OEM Quality Crawler | IATF 16949, PPAP, FMEA | [oem_quality_crawler.py](../../features/compliance/) (33KB) |
-| 6 | APQP Crawler | APQP 단계별 요구사항 | [apqp_crawler.py](../../features/compliance/) (26KB) |
-| 7 | Carbon ESG Crawler | 탄소 배출 / ESG 지표 | [carbon_esg_crawler.py](../../features/compliance/) (33KB) |
-| 8 | EV Battery Crawler | EV 배터리 규제 (UN R100) | [ev_battery_crawler.py](../../features/compliance/) (31KB) |
-| 9 | Global Trade Crawler | 관세, FTA, 무역 규제 | [global_trade_crawler.py](../../features/compliance/) (32KB) |
+| 1 | ISO Crawler | ISO 14001 / 45001 | [iso_crawler.py](../../../features/compliance/crawlers/iso_crawler.py) (19KB) |
+| 2 | MSDS Crawler | 화학물질안전보건자료 | [msds_crawler.py](../../../features/compliance/) (28KB) |
+| 3 | EU Regulation Crawler | REACH, RoHS, ELV | [eu_regulation_crawler.py](../../../features/compliance/) (17KB) |
+| 4 | Domestic Law Crawler | 산안법, 화관법, 환경법 | [domestic_law_crawler.py](../../../features/compliance/) (23KB) |
+| 5 | OEM Quality Crawler | IATF 16949, PPAP, FMEA | [oem_quality_crawler.py](../../../features/compliance/) (33KB) |
+| 6 | APQP Crawler | APQP 단계별 요구사항 | [apqp_crawler.py](../../../features/compliance/) (26KB) |
+| 7 | Carbon ESG Crawler | 탄소 배출 / ESG 지표 | [carbon_esg_crawler.py](../../../features/compliance/) (33KB) |
+| 8 | EV Battery Crawler | EV 배터리 규제 (UN R100) | [ev_battery_crawler.py](../../../features/compliance/) (31KB) |
+| 9 | Global Trade Crawler | 관세, FTA, 무역 규제 | [global_trade_crawler.py](../../../features/compliance/) (32KB) |
 
-(US Trade Crawler 별도 — [us_trade_crawler.py](../../features/compliance/) 트럼프 관세 전용)
+(US Trade Crawler 별도 — [us_trade_crawler.py](../../../features/compliance/) 트럼프 관세 전용)
 
 **v3.5 인코딩 수정**: 모든 크롤러 UTF-8 명시 + `_safe_truncate()` 멀티바이트 안전 잘림.
 
@@ -760,7 +760,7 @@ data: {"done": true}
 | **긴급도** | 30점 | 시행일까지 D-day, 적용 범위 |
 
 총 **100점**. 점수별 카테고리: CRITICAL(80+) / HIGH(60~79) / MEDIUM(40~59) / LOW(<40).
-위치: [features/compliance/risk_scorer.py](../../features/compliance/)
+위치: [features/compliance/risk_scorer.py](../../../features/compliance/)
 
 ### D-2-3. 데모 시나리오 3종 (v3.4 신규)
 | 시나리오 | 점수 | 카테고리 | 핵심 |
@@ -770,7 +770,7 @@ data: {"done": true}
 | **REACH 신규 SVHC** | **52점** | MEDIUM | EU 신규 우려물질 등재 → 부품 재인증 |
 
 각 시나리오는 **오프라인 실행** 가능 (네트워크 없이 내장 데이터로 시연).
-위치: [features/compliance/demo_scenario_engine.py](../../features/compliance/) (13KB, 약 350줄)
+위치: [features/compliance/demo_scenario_engine.py](../../../features/compliance/) (13KB, 약 350줄)
 
 ### D-2-4. 데드라인 타임라인 (v3.1 신규)
 - **시각화**: Plotly 간트 차트 + 잔여 일수 표시
@@ -779,14 +779,14 @@ data: {"done": true}
   - **HIGH** (D-30 이내): `#E8A317` 주황
   - **MEDIUM** (D-90 이내): `#2980B9` 파랑
   - **LOW** (D-90 초과): `#5C4E3C` 회색
-- **위치**: [features/compliance/timeline_builder.py](../../features/compliance/)
+- **위치**: [features/compliance/timeline_builder.py](../../../features/compliance/)
 
 ### D-2-5. 관세 시뮬레이터 (v3.1 신규)
 - **슬라이더**: 0% ~ 50% 관세율
 - **품목**: 6종 (CCH, OBC, 범퍼빔, 도어, 볼시트, EV 배터리 케이스)
 - **계산**: 슬라이더 변경 → 실시간 원가 영향 (Plotly Bar 차트)
 - **샘플**: 25% 관세 시 JOON INC 공급분 약 **400억 원** 추가 부담
-- **위치**: [features/compliance/tariff_simulator.py](../../features/compliance/)
+- **위치**: [features/compliance/tariff_simulator.py](../../../features/compliance/)
 
 ### D-2-6. 규제 변경 자동 감지 (v3.1 신규)
 - **방식**: 크롤링 전후 JSON diff (snapshot)
@@ -794,27 +794,27 @@ data: {"done": true}
 - **저장**: SQLite `compliance_changes.db`
 - **확인 처리**: 사용자가 "확인" 클릭 → status `confirmed` 변경
 - **CSV 내보내기**: 변경 이력 다운로드
-- **위치**: [features/compliance/change_detector.py](../../features/compliance/)
+- **위치**: [features/compliance/change_detector.py](../../../features/compliance/)
 
 ### D-2-7. 규제 영향 네트워크 (v3.1 신규)
 - **시각화**: Plotly Network 그래프
 - **노드**: 규제 → 시설(19개소) → 부서/제품
 - **엣지**: 영향 관계 + 가중치
 - **상호작용**: 노드 클릭 → 상세 정보 팝업 + Feature Bridge (관련 부서로 이동)
-- **위치**: [features/compliance/impact_network.py](../../features/compliance/), [impact_analyzer.py](../../features/compliance/)
+- **위치**: [features/compliance/impact_network.py](../../../features/compliance/), [impact_analyzer.py](../../../features/compliance/)
 
 ### D-2-8. AI 리스크 분류 (v3.1 신규)
 - **모델**: TF-IDF + RandomForest
 - **학습 데이터**: 450건 (HIGH/MEDIUM/LOW)
 - **출력**: 리스크 레벨 + 관련 부서 + 영향 시설 + 대응 기한
-- **위치**: [features/compliance/regulation_classifier.py](../../features/compliance/)
+- **위치**: [features/compliance/regulation_classifier.py](../../../features/compliance/)
 
 ### D-2-9. 부서 기반 접근 제어 (v3.3)
 **허용 7개 부서**:
 - 품질보증팀, 환경안전팀, 법무팀, 구매팀, 해외영업팀, 생산기술팀, 경영기획팀
 
 위 외 부서는 **사이드바 메뉴 자체에서 숨김** + 페이지 진입 방어 코드.
-구현: `is_menu_visible(slug, dept, role)` ([core/auth/permissions.py](../../core/auth/permissions.py))
+구현: `is_menu_visible(slug, dept, role)` ([core/auth/permissions.py](../../../core/auth/permissions.py))
 
 ### D-2-10. 4탭 구조 (v3.5 개편)
 | 탭 | 서브탭 |
@@ -869,13 +869,13 @@ data: {"done": true}
 
 | 항목 | 위치 | 규모 |
 |---|---|---|
-| 시나리오 JSON | [data/scenarios/](../../data/scenarios/) | 9종 (TOP-3 데모 포함) |
-| 데모 시나리오 | [data/demo_scenarios/](../../data/) | 3종 (오프라인 실행 가능) |
-| 크롤링 결과 | [data/crawled/](../../data/) | 9 크롤러 × snapshot |
-| 변경 이력 DB | [data/compliance_changes.db](../../data/) | 누적 변경 |
-| 규제 ML 학습 | [data/regulation_ml/](../../data/) | **450건** |
-| 시설 DB | [data/facility_db/plants.json](../../data/) | 19개소 |
-| 규제 문서 | [data/compliance_docs/](../../data/) | DOCX/PDF 변환 |
+| 시나리오 JSON | [data/scenarios/](../../../data/scenarios/) | 9종 (TOP-3 데모 포함) |
+| 데모 시나리오 | [data/demo_scenarios/](../../../data/) | 3종 (오프라인 실행 가능) |
+| 크롤링 결과 | [data/crawled/](../../../data/) | 9 크롤러 × snapshot |
+| 변경 이력 DB | [data/compliance_changes.db](../../../data/) | 누적 변경 |
+| 규제 ML 학습 | [data/regulation_ml/](../../../data/) | **450건** |
+| 시설 DB | [data/facility_db/plants.json](../../../data/) | 19개소 |
+| 규제 문서 | [data/compliance_docs/](../../../data/) | DOCX/PDF 변환 |
 
 ## D-5. 백엔드 API
 
@@ -928,9 +928,9 @@ data: {"done": true}
 # 기능 E: 인사 관리
 
 > **영문 라벨**: `HR ADMIN MANAGEMENT`
-> **페이지 파일**: [ui/page_admin.py](../../ui/page_admin.py) (1,314줄)
-> **백엔드**: [backend/routers/auth.py](../../backend/routers/auth.py) + 인사 관련 직접 호출
-> **기능 모듈**: [features/admin/](../../features/admin/) (2 파일) + [core/auth/](../../core/auth/) (10 파일)
+> **페이지 파일**: `ui/page_admin.py` (1,314줄)
+> **백엔드**: [backend/routers/auth.py](../../../backend/routers/auth.py) + 인사 관련 직접 호출
+> **기능 모듈**: [features/admin/](../../../features/admin/) (2 파일) + [core/auth/](../../../core/auth/) (10 파일)
 > **SILLI 부합성**: 투자비 절감 (보안 자동화)
 
 ## E-1. 비즈니스 가치
@@ -958,7 +958,7 @@ data: {"done": true}
 | **2** | 일반 직원 | `EMPLOYEE` | 본인 정보 + 검색·문서 작성 |
 | **1** | 비활성 | `INACTIVE` | 모든 접근 차단 |
 
-위치: [core/auth/rbac.py](../../core/auth/), [core/auth/permissions.py](../../core/auth/) (22KB, 28개 세부 권한)
+위치: [core/auth/rbac.py](../../../core/auth/), [core/auth/permissions.py](../../../core/auth/) (22KB, 28개 세부 권한)
 
 ### E-2-2. 28개 세부 권한 (v3.0)
 주요 권한 키:
@@ -976,7 +976,7 @@ data: {"done": true}
 | **토큰 수명** | Access 1시간, Refresh 7일 |
 | **세션 저장** | 서버사이드 (`/data/.sessions/`) + 쿠키 (`HttpOnly; Secure; SameSite`) |
 | **계정 잠금** | 5회 실패 → 30분 잠금 |
-| **위치** | [core/auth/jwt_handler.py](../../core/auth/), [password.py](../../core/auth/), [session_store.py](../../core/auth/) |
+| **위치** | [core/auth/jwt_handler.py](../../../core/auth/), [password.py](../../../core/auth/), [session_store.py](../../../core/auth/) |
 
 ### E-2-4. 비밀번호 정책 (v3.3 강화)
 | 조건 | 검증 |
@@ -990,7 +990,7 @@ data: {"done": true}
 | 비밀번호 이력 (최근 3개) 재사용 금지 | ✓ |
 
 UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
-위치: [core/auth/password.py](../../core/auth/)
+위치: [core/auth/password.py](../../../core/auth/)
 
 ### E-2-5. 보안 감사 (v3.1 — 3종 감지)
 | 감지 | 트리거 | 액션 |
@@ -999,13 +999,13 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 | **야간 접근** | 22:00 ~ 06:00 로그인 | 주황 카드 + HR_ADMIN 알림 |
 | **비활성 계정** | 90일 미접속 | 회색 카드 + 자동 비활성화 옵션 |
 
-위치: [features/admin/security_monitor.py](../../features/admin/) (9KB)
+위치: [features/admin/security_monitor.py](../../../features/admin/) (9KB)
 
 ### E-2-6. AI 활용 분석 (v3.1 신규)
 - **메트릭**: 기능별 사용량 / 부서별 빈도 / 시간대별 사용 / 활성 사용자 (DAU/WAU/MAU)
 - **시각화**: 부서 × 기능 히트맵 + DAU 추이 라인 차트
 - **ROI 산출**: 추정 절감 시간 (분/일) × 시간당 인건비 = 비용 절감 추정
-- **위치**: [features/admin/usage_analytics.py](../../features/admin/) (10KB)
+- **위치**: [features/admin/usage_analytics.py](../../../features/admin/) (10KB)
 
 > **참고 (V3.4 점검)**: AI가 AI ROI를 계산하는 자기 참조성 우려 — 데모에서 "경영진 보고용 대시보드"로 포지셔닝 권장.
 
@@ -1038,7 +1038,7 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 | **CSV** | UTF-8 BOM (`utf-8-sig`) |
 | **XLSX** | openpyxl, 시트명 "로그인이력" |
 
-위치: `_render_login_history_with_export()` ([ui/page_admin.py:625](../../ui/page_admin.py))
+위치: `_render_login_history_with_export()` (`ui/page_admin.py:625`)
 
 ### E-2-10. 부서 매핑 확장 (v3.3)
 - 부서 접두어 매핑 17개 → **30개** (전체 독립부서 커버)
@@ -1058,7 +1058,7 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 ### E-2-13. 감사 로그 (audit.db)
 모든 API 호출 기록:
 - 엔드포인트 + 메소드 + 시각 + 사용자 + 상세 + 상태 코드
-- 위치: [data/audit.db](../../data/), [backend/auth_middleware.py](../../backend/) `log_api_access()`
+- 위치: [data/audit.db](../../../data/), [backend/auth_middleware.py](../../../backend/) `log_api_access()`
 
 ### E-2-14. 테스트 계정 33명
 | 본부 | 계정 수 |
@@ -1102,11 +1102,11 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 
 | 항목 | 위치 | 규모 |
 |---|---|---|
-| 사용자 DB | [data/auth.db](../../data/) | 33명 (테스트), bcrypt 해시 |
-| 감사 로그 DB | [data/audit.db](../../data/) | 모든 API 호출 |
-| 세션 저장소 | [data/.sessions/](../../data/) | 서버사이드 JWT |
+| 사용자 DB | [data/auth.db](../../../data/) | 33명 (테스트), bcrypt 해시 |
+| 감사 로그 DB | [data/audit.db](../../../data/) | 모든 API 호출 |
+| 세션 저장소 | [data/.sessions/](../../../data/) | 서버사이드 JWT |
 | 비밀번호 이력 | `password_history` 테이블 | 사용자당 최근 3개 |
-| JWT secret | [data/.jwt_secret](../../data/) | 서버 시작 시 자동 생성 |
+| JWT secret | [data/.jwt_secret](../../../data/) | 서버 시작 시 자동 생성 |
 
 ## E-5. 백엔드 API
 
@@ -1153,8 +1153,8 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 # 기능 F: 설비/공정 AI 어시스턴트
 
 > **영문 라벨**: `EQUIPMENT & PROCESS AI`
-> **페이지 파일**: [ui/page_equipment.py](../../ui/page_equipment.py) (1,628줄)
-> **기능 모듈**: [features/equipment/](../../features/equipment/) (22 파일)
+> **페이지 파일**: `ui/page_equipment.py` (1,628줄)
+> **기능 모듈**: [features/equipment/](../../../features/equipment/) (22 파일)
 > **SILLI 부합성**: 품질 개선 + 안전성 향상 (제조업 AI의 핵심)
 
 ## F-1. 비즈니스 가치
@@ -1180,8 +1180,8 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 | **총 건수** | **201건** |
 | **장비 유형** | 7종 (프레스, 용접, CNC, 사출, 도장, 검사, 컨베이어) |
 | **필드** | 코드 / 설명 / 원인 / 조치 / 부품 / 심각도 / 평균 복구시간 |
-| **저장** | SQLite [data/equipment/error_codes.db](../../data/equipment/) |
-| **위치** | [features/equipment/error_code_db.py](../../features/equipment/) |
+| **저장** | SQLite [data/equipment/error_codes.db](../../../data/equipment/) |
+| **위치** | [features/equipment/error_code_db.py](../../../features/equipment/) |
 
 ### F-2-2. ML 에러 검색 (v3.1 + v3.4 강화)
 | 항목 | 사양 |
@@ -1192,19 +1192,19 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 | **이력 DB** | **685건** (`error_history.db`) — 발생 빈도 가중치 |
 | **응답 시간** | **<50ms** |
 | **피드백** | 👍/👎 → `search_feedback.db` |
-| **위치** | [features/equipment/ml_error_search.py](../../features/equipment/) (24KB) |
+| **위치** | [features/equipment/ml_error_search.py](../../../features/equipment/) (24KB) |
 
 ### F-2-3. 에러 인과 규칙 (v3.1 신규)
 - **카테고리**: **25개** (균열, 마모, 누수, 과열, 진동, 전기, 유압 등)
 - **인과 규칙**: 70+ (예: "유압 누수 → 압력 저하 → 성형 불량")
-- **위치**: [features/equipment/error_causality.py](../../features/equipment/) (10KB)
+- **위치**: [features/equipment/error_causality.py](../../../features/equipment/) (10KB)
 
 ### F-2-4. Markov 연쇄 고장 예측 (v3.1 신규)
 - **모델**: Markov Chain (25 상태 × 25 상태 전이 행렬)
 - **DFS 깊이**: 3단계 (즉각 → 1차 → 2차 영향)
 - **출력**: 후속 발생 예상 에러 + 확률 + 권장 사전 조치
 - **응답**: <30ms
-- **위치**: [features/equipment/markov_predictor.py](../../features/equipment/) (15KB)
+- **위치**: [features/equipment/markov_predictor.py](../../../features/equipment/) (15KB)
 
 ### F-2-5. SPC Nelson 8 Rules (v3.1 + v3.4)
 **관리도 이상 패턴 8가지 자동 감지**:
@@ -1224,13 +1224,13 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 - 차트 Annotation — 위반 위치에 풍선·음영 자동 표시
 - 5공정 건강 대시보드 (CCH/OBC/범퍼빔/도어/볼시트) — 신호등 + Cpk + 위반 수
 
-위치: [features/equipment/spc_realtime.py](../../features/equipment/) (20KB)
+위치: [features/equipment/spc_realtime.py](../../../features/equipment/) (20KB)
 
 ### F-2-6. ML SPC 이상 탐지 (v3.1 신규)
 - **모델**: Isolation Forest (sklearn)
 - **학습 데이터**: 합성 시계열 **10,000건** (5공정)
 - **이동 윈도우 Cpk 예측**: 50샘플 윈도우 → Cpk 추세 → 다음 100샘플 예측
-- **위치**: [features/equipment/spc_ml_predictor.py](../../features/equipment/) (22KB)
+- **위치**: [features/equipment/spc_ml_predictor.py](../../../features/equipment/) (22KB)
 
 ### F-2-7. SPC 데이터 생성기 (v3.5 신규)
 | 시나리오 | 효과 |
@@ -1242,7 +1242,7 @@ UI: 6개 조건 실시간 강도 표시 (체크박스 점등).
 | 진동 패턴 | 주기적 변동 |
 
 CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
-위치: [features/equipment/spc_data_generator.py](../../features/equipment/) (7KB)
+위치: [features/equipment/spc_data_generator.py](../../../features/equipment/) (7KB)
 
 ### F-2-8. XGBoost 금형 수명 예측 (v3.1 신규)
 | 항목 | 사양 |
@@ -1252,8 +1252,8 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 | **학습 데이터** | **500건** (배스터브 곡선 시뮬) |
 | **출력** | 잔여 수명(타) + 교체 예상일 + 리스크 레벨(LOW/MED/HIGH) |
 | **응답** | <50ms |
-| **금형 DB** | **25건** ([data/equipment/mold_lifecycle.db](../../data/equipment/)) |
-| **위치** | [features/equipment/mold_ml_predictor.py](../../features/equipment/) (20KB) |
+| **금형 DB** | **25건** ([data/equipment/mold_lifecycle.db](../../../data/equipment/)) |
+| **위치** | [features/equipment/mold_ml_predictor.py](../../../features/equipment/) (20KB) |
 
 ### F-2-9. MTBF 예측 정비 엔진 (v3.3 신규)
 - **MTBF**: Mean Time Between Failures
@@ -1263,7 +1263,7 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
   - 다음 정비 예상일
   - 위험도 분류 (LOW/MED/HIGH)
   - 비용 TOP 5 (수리 비용 누적 상위)
-- **위치**: [features/equipment/maintenance_predictor.py](../../features/equipment/) (12KB)
+- **위치**: [features/equipment/maintenance_predictor.py](../../../features/equipment/) (12KB)
 
 ### F-2-10. 에러 발생 이력 DB (v3.4 신규)
 | 항목 | 사양 |
@@ -1272,7 +1272,7 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 | **심각도** | LOW (10분) / MEDIUM (30분) / HIGH (2시간) / CRITICAL (8시간) |
 | **복구 시간** | 심각도별 차등 |
 | **빈도 가중치** | 자주 발생한 에러 → 검색 결과 상위 |
-| **위치** | [features/equipment/error_history_db.py](../../features/equipment/) |
+| **위치** | [features/equipment/error_history_db.py](../../../features/equipment/) |
 
 ### F-2-11. 점검 체크리스트 (v3.0)
 | 장비 | 주기 | 템플릿 수 |
@@ -1283,7 +1283,7 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 | **합계** | | **9** |
 
 체크 결과는 `inspection_logs` 테이블에 저장 + 미달 시 알림.
-위치: [features/equipment/inspection_db.py](../../features/equipment/)
+위치: [features/equipment/inspection_db.py](../../../features/equipment/)
 
 ### F-2-12. OVERVIEW 통합 대시보드 (v3.1)
 **5하위탭** (v3.4):
@@ -1296,12 +1296,12 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 | **ML 엔진** | 7종 ML 모델 상태 |
 
 ### F-2-13. 매뉴얼 RAG (v3.0)
-- **데이터**: [data/equipment/manuals/](../../data/equipment/) (PDF 인덱싱)
+- **데이터**: [data/equipment/manuals/](../../../data/equipment/) (PDF 인덱싱)
 - **3하위탭**:
   - 에러코드 (검색 + 필터)
   - 증상 가이드 (39 동의어 + 카테고리)
   - AI 질의 (LLM + RAG)
-- **위치**: [features/equipment/manual_rag.py](../../features/equipment/)
+- **위치**: [features/equipment/manual_rag.py](../../../features/equipment/)
 
 ### F-2-14. 부서 기반 접근 제어 (v3.3)
 **허용 14개 부서**:
@@ -1366,16 +1366,16 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 
 | 항목 | 위치 | 규모 |
 |---|---|---|
-| 에러코드 DB | [data/equipment/error_codes.db](../../data/equipment/) | **201건 / 7장비** |
-| 에러 발생 이력 | [data/equipment/error_history.db](../../data/equipment/) | **685건** |
-| 금형 DB | [data/equipment/mold_lifecycle.db](../../data/equipment/) | **25건** |
-| 점검 템플릿 | [data/equipment/inspection.db](../../data/equipment/) | **9 (3장비×3주기)** |
-| 도면 DB | [data/equipment/drawings.db](../../data/equipment/) | 15건 (v3.3 UI 삭제, 코드 잔류) |
-| SPC 합성 시계열 | [data/spc_ml/](../../data/) | **10,000건 / 5공정** |
-| SPC 샘플 CSV | [data/spc_samples/](../../data/) | 5공정 |
-| 금형 학습 데이터 | [data/mold_ml/](../../data/) | **500건** |
-| Markov 시퀀스 | [data/markov_ml/](../../data/) | 시퀀스 데이터 |
-| 매뉴얼 PDF | [data/equipment/manuals/](../../data/equipment/) | (실제 매뉴얼 인덱싱 필요) |
+| 에러코드 DB | [data/equipment/error_codes.db](../../../data/equipment/) | **201건 / 7장비** |
+| 에러 발생 이력 | [data/equipment/error_history.db](../../../data/equipment/) | **685건** |
+| 금형 DB | [data/equipment/mold_lifecycle.db](../../../data/equipment/) | **25건** |
+| 점검 템플릿 | [data/equipment/inspection.db](../../../data/equipment/) | **9 (3장비×3주기)** |
+| 도면 DB | [data/equipment/drawings.db](../../../data/equipment/) | 15건 (v3.3 UI 삭제, 코드 잔류) |
+| SPC 합성 시계열 | [data/spc_ml/](../../../data/) | **10,000건 / 5공정** |
+| SPC 샘플 CSV | [data/spc_samples/](../../../data/) | 5공정 |
+| 금형 학습 데이터 | [data/mold_ml/](../../../data/) | **500건** |
+| Markov 시퀀스 | [data/markov_ml/](../../../data/) | 시퀀스 데이터 |
+| 매뉴얼 PDF | [data/equipment/manuals/](../../../data/equipment/) | (실제 매뉴얼 인덱싱 필요) |
 
 ## F-5. 백엔드 API
 현재 Streamlit이 직접 호출하는 구조 — React 마이그레이션 시 다음 API 추가 필요:
@@ -1455,7 +1455,7 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 | search (요약) | qwen3.5:4b | qwen3.5:9b |
 | vision | gemma4:latest | gemma4:e2b |
 
-위치: [core/llm_client.py](../../core/) `auto_select_model()` + `_PREFERRED_FALLBACKS`
+위치: [core/llm_client.py](../../../core/) `auto_select_model()` + `_PREFERRED_FALLBACKS`
 
 ## G-2. 벡터 DB (ChromaDB)
 
@@ -1467,7 +1467,7 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 | `glossary` | 용어집 297항목 | BGE-M3 |
 | `equipment_manuals` | 설비 매뉴얼 (예정) | BGE-M3 |
 
-위치: [vectorstore/](../../vectorstore/) `chroma.sqlite3` 5.4MB + 6 collection
+위치: `vectorstore/` `chroma.sqlite3` 5.4MB + 6 collection
 
 ## G-3. 보안 인프라
 
@@ -1483,11 +1483,11 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 - LLM 프롬프트 인젝션 방어
 - 길이 제한 (5,000자)
 - 위험 패턴 제거 (`<script>`, `eval()`, 경로 순회)
-- 위치: [core/security.py](../../core/)
+- 위치: [core/security.py](../../../core/)
 
 ### G-3-3. 감사 로그
 - 모든 인증·문서 생성·검색 호출 기록
-- 위치: [data/audit.db](../../data/), [backend/auth_middleware.py](../../backend/) `log_api_access()`
+- 위치: [data/audit.db](../../../data/), [backend/auth_middleware.py](../../../backend/) `log_api_access()`
 
 ## G-4. 외부 노출 (현재 ngrok)
 
@@ -1498,7 +1498,7 @@ CSV 업로드 인터페이스 + 샘플 재생성 (50~2000샘플).
 - **사이드바 표시**: "ON-PREMISE" 환경
 
 ### G-4-2. CORS 화이트리스트
-[backend/config.py](../../backend/config.py):
+[backend/config.py](../../../backend/config.py):
 ```python
 CORS_ORIGINS = [
     "http://localhost:8502",
@@ -1514,7 +1514,7 @@ CORS_ORIGINS = [
 # 기능 간 교차 네비게이션 (Feature Bridge)
 
 ## H-1. 개요
-[core/feature_bridge.py](../../core/) — 기능 간 컨텍스트 이동 + 자동 입력.
+[core/feature_bridge.py](../../../core/) — 기능 간 컨텍스트 이동 + 자동 입력.
 
 ## H-2. 매핑 표
 | 출발 | 도착 | 트리거 | 자동 입력 |
@@ -1594,10 +1594,10 @@ CORS_ORIGINS = [
 **검수 필요**:
 - 부록 A의 라인 수 추정치는 실제 grep -r 으로 정확히 확인 필요
 - 부록 D의 보강 항목은 본선 데모 전 우선순위에 따라 처리
-- React 마이그레이션 시 백엔드 API 갭 분석 필요 ([WEB_DESIGN_SPECIFICATION.md](../design/WEB_DESIGN_SPECIFICATION.md) 참조)
+- React 마이그레이션 시 백엔드 API 갭 분석 필요 ([WEB_DESIGN_SPECIFICATION.md](../../../docs/design/WEB_DESIGN_SPECIFICATION.md) 참조)
 
 **관련 문서**:
-- [WEB_DESIGN_SPECIFICATION.md](../design/WEB_DESIGN_SPECIFICATION.md) — 디자인 시스템 사양
-- [README.md](../../README.md) — 전체 프로젝트 개요
-- [V3.5_UPDATE_REPORT.md](../reports/V3.5_UPDATE_REPORT.md) — 최신 업데이트
-- [V3.4_FEATURE_REVIEW.md](../reports/V3.4_FEATURE_REVIEW.md) — 기능 점검 보고서
+- [WEB_DESIGN_SPECIFICATION.md](../../../docs/design/WEB_DESIGN_SPECIFICATION.md) — 디자인 시스템 사양
+- [README.md](../../../README.md) — 전체 프로젝트 개요
+- [V3.5_UPDATE_REPORT.md](../../../docs/reports/V3.5_UPDATE_REPORT.md) — 최신 업데이트
+- [V3.4_FEATURE_REVIEW.md](../../../docs/reports/V3.4_FEATURE_REVIEW.md) — 기능 점검 보고서

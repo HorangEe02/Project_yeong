@@ -644,6 +644,6 @@ testGoldens('Deficient nutrients screen golden', (tester) async {
 
 ## 🔗 관련 문서
 
-- [`/mobile/CLAUDE.md`](../../mobile/CLAUDE.md)
+- [`/mobile/CLAUDE.md`](../../../mobile/CLAUDE.md)
 - 이전: [`17-feedback-and-notifications.md`](./17-feedback-and-notifications.md)
 - 다음: [`19-mobile-goal-analysis-screen.md`](./19-mobile-goal-analysis-screen.md)

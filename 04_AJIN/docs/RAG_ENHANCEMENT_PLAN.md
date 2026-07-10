@@ -67,8 +67,8 @@ citation_enforcer (사후 인용 검증)
 
 #### 출처·근거
 - 공식: [BAAI/bge-reranker-v2-m3](https://huggingface.co/BAAI/bge-reranker-v2-m3) (568M params, MIT license, 100+ languages)
-- Wiki: [bge-m3.md L103](file://<EXTERNAL_DRIVE>/LLM-WIKI/wiki/entities/bge-m3.md) — "Reranker 짝: BGE Reranker (BAAI/bge-reranker-v2-m3): top-K 재정렬"
-- 권장 패턴: [rag-variants.md L99](file://<EXTERNAL_DRIVE>/LLM-WIKI/wiki/concepts/rag-variants.md) — "[Reranker] cross-encoder로 top-K 재정렬"
+- Wiki: `bge-m3.md L103` — "Reranker 짝: BGE Reranker (BAAI/bge-reranker-v2-m3): top-K 재정렬"
+- 권장 패턴: `rag-variants.md L99` — "[Reranker] cross-encoder로 top-K 재정렬"
 
 #### 도입 방식
 - **선택지 A (정공)**: `FlagEmbedding.FlagReranker` 직접 import (CloudRun 컨테이너 내 모델 로드)
@@ -118,12 +118,12 @@ RERANKER_USE_FP16 = os.getenv("RERANKER_USE_FP16", "true").lower() == "true"
 
 #### 출처·근거
 - 공식: [Yan et al. 2024, arXiv:2401.15884](https://arxiv.org/abs/2401.15884) — "Corrective Retrieval Augmented Generation"
-- Wiki: [rag-variants.md L28-34](file://<EXTERNAL_DRIVE>/LLM-WIKI/wiki/concepts/rag-variants.md) — "Retrieval evaluator → confidence score → web search 보강"
+- Wiki: `rag-variants.md L28-34` — "Retrieval evaluator → confidence score → web search 보강"
 - 2024 구현: [LangGraph CRAG 튜토리얼](https://www.datacamp.com/tutorial/corrective-rag-crag) — confidence ∈ {Correct, Incorrect, Ambiguous}
 
 #### AJIN 환경 적응
 원논문은 부적합 시 **web search fallback** 이지만, AJIN 은:
-- 사내 KB + KOSHA/법령 corpus만 신뢰 → 외부 web search 금지 ([CLAUDE.md](../CLAUDE.md) 규정 4번 "Firebase/외부 추가 의존 금지")
+- 사내 KB + KOSHA/법령 corpus만 신뢰 → 외부 web search 금지 (`CLAUDE.md` 규정 4번 "Firebase/외부 추가 의존 금지")
 - 따라서 AJIN CRAG = **evaluator + 차단 + 부서 안내** (no web fallback)
 
 #### 3-Tier Confidence 로직 (AJIN 변형) — **결정: incorrect 강제 차단**
@@ -224,7 +224,7 @@ CRAG_LLM_JUDGE_ENABLED = os.getenv("CRAG_LLM_JUDGE_ENABLED", "false").lower() ==
   - NaturalQuestions: 4× 압축 + **21.4%p 성능 향상**
   - LooGLE: **비용 94% 감소**
   - 10k 토큰: **1.4–2.6× latency 개선**
-- Wiki: [context-compression.md L23-29](file://<EXTERNAL_DRIVE>/LLM-WIKI/wiki/concepts/context-compression.md)
+- Wiki: `context-compression.md L23-29`
 
 #### 도입 방식
 ```python

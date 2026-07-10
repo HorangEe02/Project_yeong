@@ -45,7 +45,7 @@
 ### 1.3 공통 운영 정책 (재확인)
 
 - 환자 식별 정보는 **반드시 로컬 호스트**(`127.0.0.1` / `localhost` / `::1`) 만 허용 — [docs/12 §2](./12-local-llm-ollama-migration.md)
-- 외부 LLM(클라우드)은 `allow_external_llm=false` 기본 — [config.py:223~224](../backend/src/config.py)
+- 외부 LLM(클라우드)은 `allow_external_llm=false` 기본 — [config.py:223~224](../../backend/Nutrition-backend/src/config.py)
 - 모든 서빙 엔진은 [docs/33 Tier 3](./33-three-tier-ocr-pipeline-implementation-guide.md) 의 시스템 프롬프트(`OLLAMA_VISION_ASSIST_SYSTEM_PROMPT`)와 동일한 의료 표현 금지 규칙을 따른다.
 
 ---
@@ -128,7 +128,7 @@ OLLAMA_TEMPERATURE=0
 ALLOW_EXTERNAL_LLM=false
 ```
 
-→ Adapter: [`backend/src/llm/ollama.py`](../backend/src/llm/ollama.py) 의 `OllamaSupplementParser` + `backend/src/llm/ollama_vision.py` 가 그대로 사용. 코드 변경 없음.
+→ Adapter: [`backend/src/llm/ollama.py`](../../backend/Nutrition-backend/src/llm/ollama.py) 의 `OllamaSupplementParser` + `backend/src/llm/ollama_vision.py` 가 그대로 사용. 코드 변경 없음.
 
 ### 2.6 smoke 테스트
 
@@ -216,7 +216,7 @@ MLX-LM 을 운영하려면 신규 Adapter 추가가 필요. 본 가이드는 후
   - `LLM_PROVIDER=mlx_openai`
   - `MLX_BASE_URL=http://127.0.0.1:8081`
   - `MLX_VISION_BASE_URL=http://127.0.0.1:8082`
-- Adapter 인터페이스는 `OllamaSupplementParser` 와 동일한 시그니처 ([`backend/src/llm/base.py`](../backend/src/llm/base.py))
+- Adapter 인터페이스는 `OllamaSupplementParser` 와 동일한 시그니처 ([`backend/src/llm/base.py`](../../backend/Nutrition-backend/src/llm/base.py))
 
 ### 3.6 한계·주의
 
@@ -410,7 +410,7 @@ backend/src/llm/
 - [ ] MLX preview 성능 비교는 32GB 초과 Apple Silicon에서 별도 측정
 - [ ] `ollama pull qwen3.5:9b && ollama pull gemma4:e4b` (Gemma 4 Q4 후보는 가이드 31 smoke gate 통과 후 `OLLAMA_MODEL`만 override)
 - [ ] §2.6 smoke 테스트 통과
-- [ ] [`backend/.env.example`](../backend/.env.example) → `.env` 복사 + Service Account JSON 경로 입력 ([docs/33 §4.4](./33-three-tier-ocr-pipeline-implementation-guide.md))
+- [ ] [`backend/.env.example`](../../backend/.env.example) → `.env` 복사 + Service Account JSON 경로 입력 ([docs/33 §4.4](./33-three-tier-ocr-pipeline-implementation-guide.md))
 - [ ] `pytest backend/tests` 그린
 
 **Windows:**
@@ -457,7 +457,7 @@ backend/src/llm/
 | --- | --- | --- |
 | `Settings.allow_external_llm` 가드 발동 | production 환경에서 외부 LLM 호출 시도 | 기본 `false` 유지, 비식별 환경에서만 명시 활성 |
 | Pydantic JSON 검증 실패 반복 | LLM 응답이 schema 위반 | retry 1회 후 사용자 수정 화면 escalation ([docs/12 §6](./12-local-llm-ollama-migration.md)) |
-| 의료 표현 출력 감지 | system prompt 미적용 | [`backend/src/llm/ollama_vision.py`](../backend/src/llm/ollama_vision.py) 의 `OLLAMA_VISION_ASSIST_SYSTEM_PROMPT` 재사용 |
+| 의료 표현 출력 감지 | system prompt 미적용 | [`backend/src/llm/ollama_vision.py`](../../backend/Nutrition-backend/src/llm/ollama_vision.py) 의 `OLLAMA_VISION_ASSIST_SYSTEM_PROMPT` 재사용 |
 
 ---
 

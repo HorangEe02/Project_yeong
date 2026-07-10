@@ -354,8 +354,8 @@ if age < 1 or age > 120:
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
 - [`/docs/Nutrition-docs/07-core-algorithm.md §3.1, §3.2`](../07-core-algorithm.md)
 - 이전 작업: [`00-setup-environment.md`](./00-setup-environment.md)
 - 다음 작업: [`02-v2-v3-v4-algorithms.md`](./02-v2-v3-v4-algorithms.md)

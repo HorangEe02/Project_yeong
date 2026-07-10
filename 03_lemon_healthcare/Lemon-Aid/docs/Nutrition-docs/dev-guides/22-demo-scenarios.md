@@ -563,7 +563,7 @@ if __name__ == "__main__":
 
 ## 🔗 관련 문서
 
-- [`/docs/Nutrition-docs/02-personas-and-scenarios.md`](../02-personas-and-scenarios.md) — 페르소나 정의
-- [`/docs/Nutrition-docs/04-success-metrics-and-differentiation.md`](../04-success-metrics-and-differentiation.md) — 차별화
+- `/docs/Nutrition-docs/02-personas-and-scenarios.md` — 페르소나 정의
+- `/docs/Nutrition-docs/04-success-metrics-and-differentiation.md` — 차별화
 - [`/docs/Nutrition-docs/10-compliance-checklist.md`](../10-compliance-checklist.md) — 시연 시 컴플라이언스
 - 다음: [`23-presentation-deck.md`](./23-presentation-deck.md)

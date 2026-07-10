@@ -25,8 +25,8 @@
 > - [20-agent-chatbot-retrieval-eval-implementation-log.md](./20-agent-chatbot-retrieval-eval-implementation-log.md)
 > - [21-agent-chatbot-structured-output-implementation-log.md](./21-agent-chatbot-structured-output-implementation-log.md)
 > - [22-agent-chatbot-source-ui-observability-implementation-log.md](./22-agent-chatbot-source-ui-observability-implementation-log.md)
-> - [31-medical-knowledge-layer.md](../Nutrition-docs/dev-guides/31-medical-knowledge-layer.md)
-> - [45-development-dependency-split.md](../Nutrition-docs/45-development-dependency-split.md)
+> - `31-medical-knowledge-layer.md`
+> - `45-development-dependency-split.md`
 
 ## 1. 결론
 

@@ -842,9 +842,9 @@ def generate_message(...) -> str:
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
-- [`/data/CLAUDE.md`](../../data/CLAUDE.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
+- `/data/CLAUDE.md`
 - [`/docs/Nutrition-docs/07-core-algorithm.md §4.3`](../07-core-algorithm.md)
 - [`/docs/Nutrition-docs/10-compliance-checklist.md §10`](../10-compliance-checklist.md)
 - 이전: [`05-kdris-lookup.md`](./05-kdris-lookup.md)

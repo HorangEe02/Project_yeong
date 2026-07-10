@@ -1,6 +1,6 @@
 # dev-guides/09 — 영양제 등록 API (FastAPI 통합)
 
-> **Phase**: 2 | **선행 작업**: [`07-ocr-pipeline.md`](./07-ocr-pipeline.md), [`08-llm-supplement-parsing.md`](./08-llm-supplement-parsing.md) | **예상 소요**: 3~4시간
+> **Phase**: 2 | **선행 작업**: [`07-ocr-pipeline.md`](../dev-guides/07-ocr-pipeline.md), [`08-llm-supplement-parsing.md`](../dev-guides/08-llm-supplement-parsing.md) | **예상 소요**: 3~4시간
 
 > **현재 구현 상태(2026-05-13)**: 실제 등록 흐름은 `src/services/supplement_intake.py`,
 > `src/services/supplement_parser.py`, `src/services/supplement_registration.py`,
@@ -794,7 +794,7 @@ app.dependency_overrides[get_ocr_pipeline] = lambda: MockOCRPipeline()
 
 ## 🔗 관련 문서
 
-- [`/CLAUDE.md`](../../CLAUDE.md)
-- [`/backend/CLAUDE.md`](../../backend/CLAUDE.md)
-- 이전: [`08-llm-supplement-parsing.md`](./08-llm-supplement-parsing.md)
-- 다음: [`10-mobile-flutter-setup.md`](./10-mobile-flutter-setup.md)
+- `/CLAUDE.md`
+- `/backend/CLAUDE.md`
+- 이전: [`08-llm-supplement-parsing.md`](../dev-guides/08-llm-supplement-parsing.md)
+- 다음: [`10-mobile-flutter-setup.md`](../dev-guides/10-mobile-flutter-setup.md)

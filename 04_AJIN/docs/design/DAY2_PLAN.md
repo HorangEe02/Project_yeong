@@ -167,7 +167,7 @@ export function evaluatePolicy(password: string): {
 **파일**:
 - [src/routes/login.tsx](../../frontend/src/routes/login.tsx) 에러 분기 추가
 - [src/components/ui/ErrorAlert.tsx](../../frontend/src/components/ui/ErrorAlert.tsx) 신규
-- [src/hooks/useCountdown.ts](../../frontend/src/hooks/useCountdown.ts) 신규 (잠금 타이머)
+- `src/hooks/useCountdown.ts` 신규 (잠금 타이머)
 
 **i18n 추가 키** (`ko/common.json`, `en/common.json`):
 ```json
@@ -201,7 +201,7 @@ export function evaluatePolicy(password: string): {
 - 성공 시 → Dashboard로 이동 (정상 로그인 흐름)
 
 **파일**:
-- [src/components/auth/ChangePasswordModal.tsx](../../frontend/src/components/auth/ChangePasswordModal.tsx) 신규
+- `src/components/auth/ChangePasswordModal.tsx` 신규
 - [src/api/auth.ts](../../frontend/src/api/auth.ts) 신규 (auth API 분리)
 
 **모달 구조**:
@@ -538,7 +538,7 @@ export const ALARMS = [
 ];
 ```
 
-[src/api/mock/seed/recentDrafts.ts](../../frontend/src/api/mock/seed/recentDrafts.ts) — 최근 작성 5건:
+`src/api/mock/seed/recentDrafts.ts` — 최근 작성 5건:
 ```ts
 export const RECENT_DRAFTS = [
   { id: '8D-2026-042', type: '8D Report', title: '8D-2026-042 초안', status: 'draft', updatedAt: '2026-04-26T22:30:00+09:00' },
@@ -547,7 +547,7 @@ export const RECENT_DRAFTS = [
 ];
 ```
 
-[src/api/mock/seed/scenarios.ts](../../frontend/src/api/mock/seed/scenarios.ts) — 법규 시나리오 3종:
+`src/api/mock/seed/scenarios.ts` — 법규 시나리오 3종:
 ```ts
 export const SCENARIOS = [
   { id: 'KOR-OSHA-2026', score: 85, severity: 'CRITICAL', dDay: 30, title: '산안법 안전거리', summary: '300mm → 400mm', impactedSites: ['본사', '천안1', '천안2'] },
@@ -556,7 +556,7 @@ export const SCENARIOS = [
 ];
 ```
 
-[src/api/mock/seed/sopProgress.ts](../../frontend/src/api/mock/seed/sopProgress.ts) — SOP 진행 (사용자별):
+`src/api/mock/seed/sopProgress.ts` — SOP 진행 (사용자별):
 ```ts
 export const SOP_PROGRESS: Record<string, { sopId: string; step: number; total: number }> = {
   'PE-0019': { sopId: 'press-tryout', step: 3, total: 7 },
