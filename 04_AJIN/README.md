@@ -275,6 +275,23 @@ ISO 27001 + 개인정보보호법 + IATF 16949 컴플라이언스 정책 정합.
 
 ---
 
+## 루트 구성 파일 가이드
+
+배포 이력이 많은 프로젝트라 루트에 구성 파일이 여럿 있습니다. 용도는 다음과 같습니다.
+
+| 파일 | 용도 |
+|------|------|
+| `docker-compose.yml` | 기본 로컬 스택 (backend + frontend + redis + reverse proxy) |
+| `docker-compose.celery.yml` | 비동기 작업 스택 (redis + celery worker/beat + flower) |
+| `docker-compose.postgres.yml` | PostgreSQL 데이터베이스 단독 구성 |
+| `docker-compose.supabase.yml` | Supabase 연동 시 backend + frontend 구성 |
+| `docker-compose.cloud.yml` | 클라우드 LLM 스택 (ollama large/fast 2계열 + backend) |
+| `Dockerfile` / `Dockerfile.worker` | API 서버(slim/full 통합) / Celery worker·beat·flower 공통 이미지 |
+| `requirements.txt` | 전체 로컬 개발 의존성 |
+| `requirements-cloudrun.txt` / `-full.txt` | Cloud Run 경량 / 전체 배포 의존성 |
+| `.env.example` / `.env.docker.example` | 로컬 / 도커 환경변수 템플릿 |
+| `.gcloudignore` / `.gcloudignore-full` | Cloud Run 업로드 제외 목록 (경량 / 전체) |
+
 ## 변경 이력 요약
 
 전체 이력은 [CHANGELOG.md](CHANGELOG.md). 최근 마일스톤:
