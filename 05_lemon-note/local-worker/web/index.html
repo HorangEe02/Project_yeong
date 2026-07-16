@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>회의녹음챗 — 녹음 · 전사 · 요약</title>
+<meta name="description" content="회의를 녹음하거나 업로드하면 전사와 요약을 자동으로 생성하고, 검토·수정·공유까지 한 곳에서 처리하는 데모 도구입니다." />
+<link rel="icon" href="data:," />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app-shell" id="app-shell" data-route="new">
+
+  <nav class="icon-rail" aria-label="주요 메뉴">
+    <a href="#/meetings" class="rail-logo" aria-label="회의녹음챗 홈">
+      <svg width="18" height="18" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect class="rail-logo-bar" x="2" y="8" width="3.2" height="10" rx="1.4" fill="#fff"/>
+        <rect class="rail-logo-bar" x="7.4" y="4" width="3.2" height="14" rx="1.4" fill="#fff"/>
+        <rect class="rail-logo-bar" x="12.8" y="1" width="3.2" height="17" rx="1.4" fill="#fff"/>
+        <rect class="rail-logo-bar" x="18.2" y="6" width="3.2" height="12" rx="1.4" fill="#fff"/>
+      </svg>
+    </a>
+    <div class="rail-nav" id="rail-nav">
+      <a href="#/new" class="rail-btn" data-nav="new" title="새 회의" aria-label="새 회의 녹음 또는 업로드">
+        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" aria-hidden="true"><rect x="7" y="2.5" width="5" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.2 9a5.3 5.3 0 0010.6 0M9.5 15.8v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </a>
+      <a href="#/meetings" class="rail-btn" data-nav="meetings" title="회의 목록" aria-label="회의 목록">
+        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" aria-hidden="true"><circle cx="3.4" cy="5" r="1.3" fill="currentColor"/><circle cx="3.4" cy="9.5" r="1.3" fill="currentColor"/><circle cx="3.4" cy="14" r="1.3" fill="currentColor"/><path d="M7.5 5h8M7.5 9.5h8M7.5 14h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </a>
+    </div>
+    <div class="rail-spacer"></div>
+    <button type="button" class="rail-btn rail-settings" id="rail-settings-btn" title="설정" aria-label="설정 (준비 중)">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="2.6" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.8v2M9 14.2v2M16.2 9h-2M3.8 9h-2M14.1 3.9l-1.4 1.4M5.3 12.7l-1.4 1.4M14.1 14.1l-1.4-1.4M5.3 5.3L3.9 3.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </nav>
+
+  <aside class="col-list" id="col-list" aria-label="회의 목록"></aside>
+
+  <main class="col-center" id="col-center" aria-live="polite"></main>
+
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="col-right" id="col-right" aria-label="참석자 및 요약">
+    <button type="button" class="drawer-close-btn" id="drawer-close-btn" aria-label="패널 닫기">✕</button>
+    <div class="col-right-content" id="col-right-content"></div>
+  </aside>
+
+</div>
+
+<div class="toast-stack" id="toast-stack" aria-live="assertive" aria-atomic="false"></div>
+
+<!-- 범용 확인 다이얼로그 -->
+<dialog id="confirm-dialog" class="modal">
+  <div class="modal-pad">
+    <div class="modal-title" id="confirm-dialog-title">확인</div>
+    <div class="modal-body" id="confirm-dialog-body"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="confirm-dialog-cancel">취소</button>
+      <button type="button" class="btn btn-danger" id="confirm-dialog-ok">확인</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Slack 공유 미리보기 다이얼로그 -->
+<dialog id="slack-dialog" class="modal modal-wide">
+  <div class="modal-pad">
+    <div class="modal-title">Slack 공유 미리보기</div>
+    <div class="modal-body">아래 내용이 지정한 채널로 전송됩니다. 실제 전송 전 마지막으로 확인하세요.</div>
+    <div class="field mt-16">
+      <label class="field-label" for="slack-channel-input">채널 라벨 <span class="field-hint">(데모에서는 표시용이며, 실제 전송 채널은 서버의 Webhook 설정을 따릅니다)</span></label>
+      <input type="text" id="slack-channel-input" class="input" placeholder="예: #product" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="slack-preview-text">전송될 메시지</label>
+      <div class="share-preview-block" id="slack-preview-text"></div>
+    </div>
+    <div id="slack-result-area"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn btn-ghost" id="slack-dialog-cancel">닫기</button>
+      <button type="button" class="btn btn-primary" id="slack-dialog-send">Slack으로 전송</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
