@@ -196,8 +196,28 @@ Slack 공유 → 음성 Range 스트리밍(206) → **녹음 달력·날짜 필�
 
 > `SET TIME ZONE` 은 바인드 파라미터를 못 받으므로 함수형 `set_config()` 를 쓴다(인젝션 안전).
 
-**남은 것**: 음성/내보내기 **파일**은 여전히 로컬 디스크에 저장된다. Supabase Storage 로 옮기려면
-`providers/storage.py` 에 SupabaseStorageProvider 를 추가하면 된다(인터페이스는 이미 분리되어 있다).
+### 파일 저장을 Supabase Storage 로 (라이브 검증 완료)
+
+```bash
+# DB + 파일 모두 Supabase (완전 서버 모드)
+DB_BACKEND=postgres STORAGE_PROVIDER=supabase ./run.sh
+```
+
+`STORAGE_PROVIDER=local`(기본, `./data` 디스크) ↔ `supabase`(비공개 버킷 `meeting-files`)를 교체한다.
+경로 규칙은 문서와 동일하게 `users/{user_id}/meetings/{meeting_id}/…` 를 object key 로 쓴다.
+
+- **비공개 버킷**이므로 서버측 `service_role` 키로만 접근한다(클라이언트에 URL을 노출하지 않는다).
+- **Range 스트리밍은 서버가 프록시**한다 — Supabase Storage 에 Range 요청을 대신 보내고 클라이언트에는
+  기존과 동일한 `206 Partial Content` + `Content-Range` 를 돌려준다. 덕분에 **발화 클릭 재생(seek)이
+  저장 위치와 무관하게 그대로 동작**하고, API 계약도 바뀌지 않는다.
+- 추가 의존성 없음(표준 라이브러리 `urllib` 사용).
+
+**검증**: 업로드 → 파이프라인 → Range 스트리밍(`206`, 요청 구간 바이트 **정확 일치**) → 전체 스트리밍
+(원본과 바이트 동일) → 내보내기 생성·다운로드(한글 파일명 UTF-8) 통과. Supabase Storage 에 실제 객체
+기록 확인 후 정리. `STORAGE_PROVIDER=local` 회귀도 재검증 완료.
+
+> Provider 를 바꾸면 **이전에 저장된 파일은 이전 저장소 경로를 가리킨다**(DB 의 `storage_path` 에 그대로
+> 남는다). 전환 시점 이후 업로드분부터 새 저장소를 사용한다. 기존 파일 마이그레이션은 별도 작업이다.
 
 > 참고: RLS가 켜져 있고 정책이 없으므로 anon/publishable 키로는 데이터가 보이지 않는다(service_role 또는
 > DATABASE_URL 직접 연결만 접근). 사용자별 접근을 열려면 Supabase Auth 연동 + `auth.uid()` 기반 정책을 추가한다.

@@ -86,4 +86,9 @@ SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 SUPABASE_CONFIGURED = bool(SUPABASE_URL and SUPABASE_ANON_KEY)
 
+# 파일 저장 위치: local(기본, 디스크) | supabase(Supabase Storage 비공개 버킷)
+# supabase 는 서버측 service_role 키가 필요하다(버킷이 비공개이므로).
+STORAGE_PROVIDER = os.getenv("STORAGE_PROVIDER", "local").strip().lower()
+SUPABASE_BUCKET = os.getenv("SUPABASE_BUCKET", "meeting-files").strip()
+
 DATA_ROOT.mkdir(parents=True, exist_ok=True)
