@@ -5,6 +5,7 @@ docs/api-spec.md 계약을 따르며, 데모 편의를 위한 소수 추가 필�
 """
 import json
 import os
+import urllib.parse
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -572,7 +573,15 @@ def download_export(export_id: str):
             return _err(404, "export_not_found", "내보내기 파일을 찾을 수 없습니다.")
         media = "text/markdown" if row["format"] == "md" else "text/plain"
         filename = f"{row['mtitle']}.{row['format']}"
-        return FileResponse(row["storage_path"], media_type=media, filename=filename)
+        data = storage.read_all(row["storage_path"])
+        if data is None:
+            return _err(404, "export_not_found", "내보내기 파일을 찾을 수 없습니다.")
+        # 저장 위치(local/supabase) 무관하게 Provider 로 읽어 동일하게 첨부 응답한다.
+        quoted = urllib.parse.quote(filename)
+        return Response(
+            content=data, media_type=f"{media}; charset=utf-8",
+            headers={"Content-Disposition":
+                     f"attachment; filename*=UTF-8''{quoted}"})
     finally:
         conn.close()
 
@@ -632,10 +641,13 @@ def stream_file(recording_file_id: str, request: Request):
     finally:
         conn.close()
 
-    if not path or not os.path.exists(path):
+    # 저장 위치(local/supabase)와 무관하게 Provider 를 통해 읽는다.
+    # Supabase Storage 는 비공개 버킷이므로 서버가 Range 요청을 대신 수행해
+    # 클라이언트에는 동일한 206 응답 계약을 유지한다.
+    file_size = storage.size(path)
+    if file_size is None:
         return _err(404, "file_not_found", "음성 파일이 존재하지 않습니다.")
 
-    file_size = os.path.getsize(path)
     range_header = request.headers.get("range")
 
     if range_header and range_header.startswith("bytes="):
@@ -649,20 +661,20 @@ def stream_file(recording_file_id: str, request: Request):
         end = min(end, file_size - 1)
         if start > end:
             start = 0
-        length = end - start + 1
-        with open(path, "rb") as f:
-            f.seek(start)
-            data = f.read(length)
+        data = storage.read_range(path, start, end)
+        if data is None:
+            return _err(404, "file_not_found", "음성 파일이 존재하지 않습니다.")
         return Response(content=data, status_code=206, media_type=mime, headers={
             "Content-Range": f"bytes {start}-{end}/{file_size}",
             "Accept-Ranges": "bytes",
-            "Content-Length": str(length),
+            "Content-Length": str(len(data)),
         })
 
-    with open(path, "rb") as f:
-        data = f.read()
+    data = storage.read_all(path)
+    if data is None:
+        return _err(404, "file_not_found", "음성 파일이 존재하지 않습니다.")
     return Response(content=data, status_code=200, media_type=mime, headers={
-        "Accept-Ranges": "bytes", "Content-Length": str(file_size)})
+        "Accept-Ranges": "bytes", "Content-Length": str(len(data))})
 
 
 # ============================ Health & static ============================
@@ -677,6 +689,7 @@ def health():
             "supabase_configured": config.SUPABASE_CONFIGURED,
             "supabase_url": config.SUPABASE_URL or None,
             "db_backend": config.DB_BACKEND,  # sqlite(기본) | postgres(Supabase)
+            "storage_provider": storage.name,  # local(기본) | supabase
             "auth_enabled": config.AUTH_ENABLED}
 
 
