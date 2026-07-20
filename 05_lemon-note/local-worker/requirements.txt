@@ -1,0 +1,11 @@
+# --- 데모 MVP(Stub) 실행에 필요한 최소 의존성 (전부 무료) ---
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+
+# --- 실제 로컬 모델로 교체할 때만 추가로 설치 (데모에서는 불필요) ---
+# faster-whisper>=1.0        # ASR_PROVIDER=faster_whisper (한국어 전사, 검증됨)
+# sherpa-onnx>=1.13          # 화자 구분(오픈 모델, HF 토큰 불필요) — scripts/setup_diarization.sh
+# pyannote.audio>=3.1        # 화자 구분(대안, HF 토큰 필요)
+# psycopg[binary]>=3.1       # Supabase Postgres 직접 연결 검증(scripts/verify_supabase_db.py)
+# (요약은 Ollama를 별도 프로세스로 실행 → SUMMARY_PROVIDER=ollama, 추가 pip 불필요)

@@ -1,0 +1,43 @@
+# === 비밀값 (절대 커밋 금지) — .env.example 은 커밋됨 ===
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+# (.env.example / *.env.example 은 위 패턴에 걸리지 않으므로 커밋됨)
+
+# === Python ===
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# === 런타임 데이터 / 원본 음성 / 내보내기 / SQLite ===
+data/
+**/data/
+*.sqlite3
+*.sqlite3.*
+*.db
+*.db-wal
+*.db-shm
+
+# === 모델 가중치 / 다운로드 모델 (용량 큼) ===
+models/
+**/models/
+*.onnx
+*.pt
+*.pth
+*.bin
+
+# === 로그 / 캐시 ===
+*.log
+logs/
+.cache/
+
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
