@@ -173,10 +173,31 @@ curl -s localhost:8710/v1/health # supabase_configured / supabase_url 확인
 ./.venv/bin/python scripts/verify_supabase_db.py     # public 테이블·행수 출력하면 연결 성공
 ```
 
-**현재 상태**: worker 실행 DB는 로컬 MVP용 **SQLite** 그대로다(`db_backend: sqlite`). 위 연결은 스키마·연결
-검증까지 완료된 상태이며, **worker의 읽기/쓰기를 Supabase Postgres로 전환**하려면 `db.py`(SQLite 전용 SQL)를
-psycopg 기반 Postgres 백엔드로 확장하고 `providers/storage.py`에 SupabaseStorageProvider(음성/내보내기 파일)를
-붙이면 된다. API·스키마 변경 없이 저장 위치만 이전된다(문서의 local_mac → server_gpu 전략). 이는 별도 구현 단계다.
+### Postgres 백엔드로 실행 (라이브 검증 완료)
+
+```bash
+DB_BACKEND=postgres ./run.sh          # DATABASE_URL 이 채워져 있어야 한다
+```
+
+`DB_BACKEND=sqlite`(기본)와 `postgres` 중 선택한다. **API·스키마·프론트는 그대로**이고 저장 위치만 바뀐다.
+
+**라이브 스모크테스트 결과 (실제 Supabase Postgres 17.6):** 업로드 → 파이프라인(전사·요약) →
+목록/상세/세그먼트 → 텍스트 보정·북마크 → 화자명 일괄 변경 → 요약 사용자 버전(v2) → MD 내보내기·다운로드 →
+Slack 공유 → 음성 Range 스트리밍(206) → **녹음 달력·날짜 필터**까지 전 구간 통과. 12개 테이블에 실제 데이터
+기록 확인(세그먼트 36행 등) 후 정리.
+
+**전환 과정에서 발견·수정한 실제 버그 3건** — 모두 라이브 실행에서만 드러나는 것들:
+
+| 버그 | 원인 | 수정 |
+| --- | --- | --- |
+| 파이프라인 `TypeError` | postgres 는 `recorded_at` 을 **datetime 객체**로 돌려주는데 `_parse_dt` 가 문자열로 가정해 `.replace("Z",…)` 호출 → `datetime.replace(year=…)` 로 해석 | `summary.py::_parse_dt` 가 datetime/str 양쪽 처리 |
+| 소유권 검사 404 | psycopg 가 uuid 컬럼을 **`UUID` 객체**로 돌려줘 문자열 `user_id` 와 비교 실패 | `main.py::_same_id()` 로 문자열 정규화 비교 |
+| 시각이 9시간 밀림 | postgres 는 `timestamptz` 를 **세션 타임존(기본 UTC)** 으로 렌더링 → 달력·내보내기 시각 오류, 자정 근처는 날짜 그룹핑까지 어긋남 | 연결 시 `set_config('timezone', …)` 로 로컬 타임존 지정(`PG_TIMEZONE` 로 override) |
+
+> `SET TIME ZONE` 은 바인드 파라미터를 못 받으므로 함수형 `set_config()` 를 쓴다(인젝션 안전).
+
+**남은 것**: 음성/내보내기 **파일**은 여전히 로컬 디스크에 저장된다. Supabase Storage 로 옮기려면
+`providers/storage.py` 에 SupabaseStorageProvider 를 추가하면 된다(인터페이스는 이미 분리되어 있다).
 
 > 참고: RLS가 켜져 있고 정책이 없으므로 anon/publishable 키로는 데이터가 보이지 않는다(service_role 또는
 > DATABASE_URL 직접 연결만 접근). 사용자별 접근을 열려면 Supabase Auth 연동 + `auth.uid()` 기반 정책을 추가한다.
