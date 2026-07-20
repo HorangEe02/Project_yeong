@@ -9,12 +9,19 @@ from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 
 
-def _parse_dt(value: Optional[str]) -> datetime:
+def _parse_dt(value) -> datetime:
+    """recorded_at 정규화.
+
+    sqlite 백엔드는 ISO 문자열, postgres(psycopg) 백엔드는 datetime 객체를 돌려준다.
+    문자열로만 가정하면 datetime.replace(year=..., month=...) 로 해석되어 TypeError 가 난다.
+    """
+    if isinstance(value, datetime):
+        return value
     if not value:
         return datetime.now(timezone.utc).astimezone()
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (ValueError, TypeError):
         return datetime.now(timezone.utc).astimezone()
 
 

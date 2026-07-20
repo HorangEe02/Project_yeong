@@ -63,6 +63,12 @@ def _as_dt(value) -> datetime:
         return datetime.now().astimezone()
 
 
+def _same_id(a, b) -> bool:
+    """ID 비교. postgres(psycopg)는 uuid 컬럼을 UUID 객체로 돌려주므로 문자열로 정규화한다.
+    (sqlite 는 TEXT 라 그대로 문자열)"""
+    return str(a) == str(b)
+
+
 def _day_bounds(date_str: str):
     """'YYYY-MM-DD' → (그날 00:00, 다음날 00:00) 로컬 ISO 문자열."""
     d = datetime.fromisoformat(date_str).replace(
@@ -76,7 +82,7 @@ def _get_meeting(conn, meeting_id, user_id):
     row = conn.execute(
         "SELECT * FROM meetings WHERE id=? AND deleted_at IS NULL", (meeting_id,)
     ).fetchone()
-    if not row or row["user_id"] != user_id:
+    if not row or not _same_id(row["user_id"], user_id):
         raise HTTPException(status_code=404, detail={"error": {
             "code": "meeting_not_found", "message": "회의를 찾을 수 없습니다."}})
     return row
@@ -562,7 +568,7 @@ def download_export(export_id: str):
         row = conn.execute("SELECT e.*, m.user_id AS owner, m.title AS mtitle "
                            "FROM exports e JOIN meetings m ON m.id=e.meeting_id "
                            "WHERE e.id=?", (export_id,)).fetchone()
-        if not row or row["owner"] != user_id or not row["storage_path"]:
+        if not row or not _same_id(row["owner"], user_id) or not row["storage_path"]:
             return _err(404, "export_not_found", "내보내기 파일을 찾을 수 없습니다.")
         media = "text/markdown" if row["format"] == "md" else "text/plain"
         filename = f"{row['mtitle']}.{row['format']}"
@@ -619,7 +625,7 @@ def stream_file(recording_file_id: str, request: Request):
         row = conn.execute("SELECT r.*, m.user_id AS owner FROM recording_files r "
                            "JOIN meetings m ON m.id=r.meeting_id WHERE r.id=?",
                            (recording_file_id,)).fetchone()
-        if not row or row["owner"] != user_id:
+        if not row or not _same_id(row["owner"], user_id):
             return _err(404, "file_not_found", "음성 파일을 찾을 수 없습니다.")
         path = row["storage_path"]
         mime = row["mime_type"] or "application/octet-stream"

@@ -12,7 +12,9 @@ psycopg 위에 얹어, `?` 플레이스홀더를 psycopg 의 `%s` 로 번역한�
 행을 돌려주므로 양쪽 모두 `row["col"]` 로 읽을 수 있다.
 """
 import json
+import os
 import uuid
+from datetime import datetime, timedelta
 
 from . import config
 
@@ -55,11 +57,43 @@ def enc_bool(b):
     return bool(b) if BACKEND == "postgres" else (1 if b else 0)
 
 
+def _local_timezone() -> str:
+    """Postgres 세션 타임존으로 쓸 값.
+
+    postgres 는 timestamptz 를 '세션 타임존'으로 렌더링한다(기본 UTC).
+    sqlite 백엔드는 원본 ISO 문자열(+09:00 등)을 그대로 보존하므로,
+    두 백엔드가 같은 로컬 시각을 보이도록 세션 타임존을 로컬로 맞춘다.
+    (안 맞추면 달력·내보내기 시각이 UTC로 밀리고, 자정 근처 녹음은 날짜 그룹핑까지 어긋난다)
+    """
+    tz = os.getenv("PG_TIMEZONE", "").strip()
+    if tz:
+        return tz
+    # /etc/localtime 심볼릭 링크에서 IANA 이름 추출 (macOS/Linux)
+    try:
+        link = os.path.realpath("/etc/localtime")
+        if "zoneinfo/" in link:
+            return link.split("zoneinfo/", 1)[1]
+    except OSError:
+        pass
+    # 마지막 수단: 현재 UTC 오프셋
+    off = datetime.now().astimezone().utcoffset() or timedelta(0)
+    total = int(off.total_seconds())
+    sign = "+" if total >= 0 else "-"
+    total = abs(total)
+    return f"{sign}{total // 3600:02d}:{(total % 3600) // 60:02d}"
+
+
 def connect():
     if BACKEND == "postgres":
         import psycopg
         from psycopg.rows import dict_row
-        return _PgConn(psycopg.connect(config.DATABASE_URL, row_factory=dict_row))
+        conn = psycopg.connect(config.DATABASE_URL, row_factory=dict_row)
+        with conn.cursor() as cur:
+            # SET TIME ZONE 은 유틸리티 명령이라 바인드 파라미터를 못 받는다.
+            # set_config() 는 함수라 파라미터 바인딩이 되므로 인젝션 걱정 없이 안전하다.
+            cur.execute("SELECT set_config('timezone', %s, false)", (_local_timezone(),))
+        conn.commit()
+        return _PgConn(conn)
     import sqlite3
     c = sqlite3.connect(str(config.DB_PATH), timeout=30)
     c.row_factory = sqlite3.Row
