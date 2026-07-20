@@ -5,7 +5,7 @@
 > **Production-grade AI projects — client-commissioned, competition, and self-directed**
 >
 > As a statistics-trained data scientist, alongside my KDT coursework ([KNU_KDT_12th](https://github.com/HorangEe02/KNU_KDT_12th)) I built
-> a **multimodal AI search engine, a healthcare platform, and a manufacturing-domain AI assistant** —
+> a **multimodal AI search engine, a healthcare platform, a manufacturing-domain AI assistant, and an on-device speech AI** —
 > end to end from planning through modeling, backend, frontend, and deployment (solo or in collaboration).
 > The goal is never just a model, but a **real, working product**.
 
@@ -26,6 +26,7 @@
 | **[02](#-02_mediway--hospital-wayfinding--senior-accessibility-web-app)** | **MediWay** | In-hospital patient wayfinding + multi-tenant SaaS + senior-accessibility web app | Self-directed | React · TypeScript · Firebase · Dijkstra · WAI-ARIA |
 | **[03](#-03_lemon_healthcare--lemon-aid-food--supplement-ai-analysis-service-platform)** | **Lemon AID** | An AI service platform that analyzes food, supplement labels, and activity data together | Client-commissioned | FastAPI · Flutter · PostgreSQL/TimescaleDB · Cloud Vision · Ollama |
 | **[04](#-04_ajin--ajin-compliance--manufacturing-domain-ai-assistant)** | **AJIN Compliance** | An AI console that handles 6 business domains for 650 employees of a manufacturer in one screen · [static view](https://dist-two-omega-62.vercel.app/) | Competition (awarded) | FastAPI · React · Ollama/Vertex Gemini · ChromaDB RAG · Redis |
+| **[05](#-05_lemon-note--lemon-note--local-first-ai-meeting-notes)** | **Lemon-note** | Record → speaker-diarized transcription → summary & schedule extraction, entirely on-device at **$0 runtime cost** | Self-directed | faster-whisper · sherpa-onnx · Ollama(gemma4/qwen3.5) · FastAPI · SQLite/Supabase |
 
 ---
 
@@ -131,6 +132,29 @@
 
 ---
 
+## 🎙 05_lemon-note — Lemon-note · Local-First AI Meeting Notes
+
+> **"Record, get a speaker-by-speaker transcript, click any utterance to play from that exact moment, and review/edit the summary and schedule candidates yourself — all locally, at $0 runtime cost."**
+> *Self-directed — requirements analysis → design docs → multi-dimensional design review → demo MVP → real local-model migration*
+
+| Item | Details |
+|------|---------|
+| **Pipeline** | Record/upload → audio normalization → speaker-diarized transcription → structured summary → review/edit → export & Slack share |
+| **ASR** | **faster-whisper** (small/medium/large-v3) · PyAV decoding, so **no ffmpeg needed** · hotword biasing |
+| **Diarization** | **sherpa-onnx** (open models, no HF token required) · pyannote optional · speaker assignment by turn-overlap |
+| **Summary LLM** | Ollama `gemma4:e4b` / `qwen3.5` — emits decisions, action items, and schedule candidates as structured JSON **with source-segment evidence**. Hardened against reasoning-model `<think>` blocks |
+| **Provider abstraction** | Transcription, summary, storage, and diarization sit behind interfaces → swap `stub ↔ real model` and `local ↔ server` **without touching the API or schema** |
+| **Data** | SQLite (local default) / **dual Supabase Postgres backend** (psycopg native types) · RLS on every table · original-immutability, recording consent, audit log, soft delete |
+| **Frontend** | **Vanilla HTML/CSS/JS** (no build step, no CDN, works offline) · Figma chat-UI-kit based — transcript rendered as per-speaker chat bubbles, click-to-seek via HTTP Range streaming |
+| **Performance** | On an Apple M4 Pro, a 48s Korean clip → medium transcription ≈19s + summary ≈10s (**≈31s end to end**) |
+| **Status** | Local demo — `./run.sh` runs instantly in stub mode (zero model downloads); flip env vars to switch to real models |
+
+**Portfolio highlights** — a fully **local, $0-runtime** on-device speech-AI pipeline · **provider abstraction** enabling stub↔real↔server swaps · a self-run **multi-dimensional design review (20 findings)** folded back into the code · consent/retention/audit design for a service handling voice biometrics
+
+📂 [05_lemon-note](./05_lemon-note) · 📄 [Detailed README](./05_lemon-note/local-worker/README.md) · 📋 [Design review — 20 findings](./05_lemon-note/docs/design-review-findings.md) · 🗂 [Design docs](./05_lemon-note/docs)
+
+---
+
 ## 🧰 Combined Tech Stack
 
 | Area | Technologies |
@@ -139,9 +163,10 @@
 | **Deep learning · CV** | PyTorch · YOLOv8 (cls/det) · OpenCLIP ViT-L/14 · PaddleOCR · Google Cloud Vision |
 | **GNN** | PyTorch Geometric · GIN (Graph Isomorphism Network) |
 | **Search · RAG** | ChromaDB (multi-channel vector DB) · E5-multilingual · Cross-encoder Reranker · multimodal RAG |
-| **LLM** | Ollama (qwen3.5 · exaone · gemma4) · Vertex AI Gemini · hybrid router · hallucination verification |
-| **Backend** | FastAPI (REST·SSE·OpenAPI) · Firebase (RTDB·Auth·Functions) · PostgreSQL · TimescaleDB · Redis · SQLite |
-| **Frontend · Mobile** | Next.js 16 · React 18/19 · Tailwind · Three.js · Vite · Zustand · Leaflet · Flutter |
+| **LLM** | Ollama (qwen3.5 · exaone · gemma4) · Vertex AI Gemini · hybrid router · hallucination verification · JSON-constrained reasoning models |
+| **Speech AI** | faster-whisper (CTranslate2 int8) · sherpa-onnx speaker diarization · pyannote · PyAV audio decoding |
+| **Backend** | FastAPI (REST·SSE·OpenAPI) · Firebase (RTDB·Auth·Functions) · PostgreSQL · TimescaleDB · Redis · SQLite · Supabase (Postgres·RLS) |
+| **Frontend · Mobile** | Next.js 16 · React 18/19 · Tailwind · Three.js · Vite · Zustand · Leaflet · Flutter · Vanilla JS (build-free) |
 | **Infra · Quality** | Docker Compose · Cloud Run · Firebase Hosting · Supabase · pytest (540+) · Vitest · RBAC · Security Rules |
 
 ---
@@ -153,6 +178,7 @@
 | `01_CAD` · `04_AJIN` | project content directly under the numbered folder |
 | `02_MediWay` | intro README + app root `mediway/` |
 | `03_lemon_healthcare` | intro README + commissioned deliverable `Lemon-Aid/` (deliverable folder keeps its original name) |
+| `05_lemon-note` | intro README + design docs `docs/` + app root `local-worker/` (FastAPI worker + `web/` frontend) |
 
 **License** — repository-wide viewing-purpose copyright notice ([LICENSE](./LICENSE)); `04_AJIN` carries its own [MIT](./04_AJIN/LICENSE).
 
@@ -162,7 +188,7 @@
 
 | | |
 |------|------|
-| **This repo** | Client-commissioned, competition, and self-directed projects (CAD Vision · MediWay · Lemon AID · AJIN) |
+| **This repo** | Client-commissioned, competition, and self-directed projects (CAD Vision · MediWay · Lemon AID · AJIN · Lemon-note) |
 | **KDT Cohort 12 portfolio** | [HorangEe02/KNU_KDT_12th](https://github.com/HorangEe02/KNU_KDT_12th) — 13 course projects |
 | **Notion portfolio** | [Open](https://www.notion.so/31879104c6f38039a53cfaa4b64ef712) |
 | **Email** | catlife9029@gmail.com |
