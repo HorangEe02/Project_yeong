@@ -117,7 +117,8 @@ HF_TOKEN=hf_xxx DIARIZER=pyannote ASR_PROVIDER=faster_whisper ... ./run.sh
 | --- | --- | --- |
 | POST | `/jobs` | 녹음 업로드 + 처리 job 생성 |
 | GET | `/jobs/{id}` | 처리 상태 폴링 |
-| GET | `/meetings` | 회의 목록(status/q/limit/cursor) |
+| GET | `/meetings` | 회의 목록(status/q/**date**/limit/cursor) |
+| GET | `/meetings/calendar` | 녹음 달력 — 월별 날짜별 녹음 건수·총 길이·시간대(`year`/`month`) |
 | GET | `/meetings/{id}` | 회의 상세 |
 | PATCH | `/meetings/{id}` | 제목 수정 |
 | DELETE | `/meetings/{id}` | soft delete |

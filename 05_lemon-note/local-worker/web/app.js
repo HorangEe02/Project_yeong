@@ -65,7 +65,9 @@
     empty: '<svg width="48" height="48" viewBox="0 0 52 52" fill="none"><rect x="6" y="6" width="40" height="40" rx="12" stroke="currentColor" stroke-width="2"/><path d="M26 16v14M20 26a6 6 0 0012 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     plus: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     users: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5.5" r="2.3" stroke="currentColor" stroke-width="1.4"/><path d="M1.6 13c.5-2.4 2.3-3.8 4.4-3.8s3.9 1.4 4.4 3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="6" r="1.8" stroke="currentColor" stroke-width="1.3"/><path d="M10.6 9.6c1.7.2 3 1.4 3.4 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
-    back: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L4 8l6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    back: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L4 8l6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    chevronRight: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    calendar: '<svg width="17" height="17" viewBox="0 0 19 19" fill="none"><rect x="2.5" y="4" width="14" height="12.5" rx="2.3" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.8h14" stroke="currentColor" stroke-width="1.5"/><path d="M6.3 2.2v3M12.7 2.2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="5.6" y="10.1" width="2.7" height="2.7" rx="0.6" fill="currentColor"/></svg>'
   };
 
   /* ==========================================================================
@@ -362,6 +364,9 @@
     listMeetings: function (params) {
       return apiRequest('/meetings' + buildQuery(params), { method: 'GET' });
     },
+    getCalendar: function (params) {
+      return apiRequest('/meetings/calendar' + buildQuery(params), { method: 'GET' });
+    },
     getMeeting: function (id) {
       return apiRequest('/meetings/' + encodeURIComponent(id), { method: 'GET' });
     },
@@ -412,6 +417,15 @@
       return { name: 'detail', meetingId: decodeURIComponent(parts[1]), tab: tab };
     }
     if (parts[0] === 'meetings') return { name: 'list' };
+    if (parts[0] === 'calendar') {
+      var y = parseInt(parts[1], 10);
+      var m = parseInt(parts[2], 10);
+      return {
+        name: 'calendar',
+        year: (isFinite(y) && y > 1970) ? y : null,
+        month: (isFinite(m) && m >= 1 && m <= 12) ? m : null
+      };
+    }
     return { name: 'new' };
   }
 
@@ -425,7 +439,7 @@
 
   function updateRailActive(route) {
     document.querySelectorAll('.rail-btn[data-nav]').forEach(function (a) { a.classList.remove('is-active'); });
-    var key = route.name === 'new' ? 'new' : 'meetings';
+    var key = route.name === 'new' ? 'new' : (route.name === 'calendar' ? 'calendar' : 'meetings');
     var el = document.querySelector('.rail-btn[data-nav="' + key + '"]');
     if (el) el.classList.add('is-active');
   }
@@ -465,6 +479,9 @@
       document.title = '회의 목록 — 회의녹음챗';
       renderCenterEmpty(colCenterEl);
       renderRightTips(colRightContentEl, 'list');
+    } else if (route.name === 'calendar') {
+      document.title = '녹음 달력 — 회의녹음챗';
+      currentCleanup = renderCalendarView(colCenterEl, colRightContentEl, route.year, route.month);
     } else {
       document.title = '회의 상세 — 회의녹음챗';
       currentCleanup = renderMeetingDetailView(colCenterEl, colRightContentEl, route.meetingId, route.tab);
@@ -1957,7 +1974,284 @@
 
 
   /* ==========================================================================
-     9. 초기화
+     9. 가운데 + 오른쪽 컬럼: 녹음 달력
+     ======================================================================= */
+
+  function renderCalendarView(centerEl, rightEl, initYear, initMonth) {
+    var todayD = new Date();
+    var todayKey = todayD.getFullYear() + '-' + pad2(todayD.getMonth() + 1) + '-' + pad2(todayD.getDate());
+
+    var viewYear = initYear || todayD.getFullYear();
+    var viewMonth = initMonth || (todayD.getMonth() + 1);
+    var selectedDate = null;
+    var monthData = null;
+    var cancelled = false;
+    var requestToken = 0;
+
+    function pad2(n) { return String(n).padStart(2, '0'); }
+
+    function dateKey(y, m, d) { return y + '-' + pad2(m) + '-' + pad2(d); }
+    function daysInMonth(y, m) { return new Date(y, m, 0).getDate(); }
+    function firstWeekday(y, m) { return new Date(y, m - 1, 1).getDay(); }
+
+    function formatDateHeading(dateStr) {
+      var p = dateStr.split('-').map(Number);
+      var d = new Date(p[0], p[1] - 1, p[2]);
+      return p[0] + '.' + pad2(p[1]) + '.' + pad2(p[2]) + ' (' + DOW[d.getDay()] + ')';
+    }
+
+    function findDayInfo(dateStr) {
+      var days = (monthData && monthData.days) || [];
+      for (var i = 0; i < days.length; i++) { if (days[i].date === dateStr) return days[i]; }
+      return null;
+    }
+
+    /* ---- 정적 셸 (한 번만 렌더링) ---- */
+    centerEl.innerHTML =
+      '<div class="col-center-scroll"><div class="cal-page view-fade">' +
+        '<div class="cal-header-top">' +
+          '<div>' +
+            '<span class="page-eyebrow">CALENDAR</span>' +
+            '<h1 class="page-title">녹음 달력</h1>' +
+            '<p class="page-sub">날짜를 선택하면 그날 녹음한 회의를 확인할 수 있습니다.</p>' +
+          '</div>' +
+          '<button type="button" class="btn btn-ghost btn-icon info-toggle-btn" id="cal-info-toggle" title="이번 달 통계 보기" aria-label="이번 달 통계 보기">' + ICONS.users + '</button>' +
+        '</div>' +
+
+        '<div class="cal-nav">' +
+          '<button type="button" class="cal-nav-btn" id="cal-prev" aria-label="이전 달">' + ICONS.back + '</button>' +
+          '<span class="cal-nav-title" id="cal-nav-title"></span>' +
+          '<button type="button" class="cal-nav-btn" id="cal-next" aria-label="다음 달">' + ICONS.chevronRight + '</button>' +
+          '<button type="button" class="btn btn-subtle btn-sm" id="cal-today-btn" style="margin-left:auto">오늘</button>' +
+        '</div>' +
+
+        '<div class="card cal-grid-card">' +
+          '<div class="cal-weekdays">' + DOW.map(function (d) { return '<span>' + d + '</span>'; }).join('') + '</div>' +
+          '<div class="cal-grid" id="cal-grid"></div>' +
+        '</div>' +
+
+        '<div id="cal-empty-note-wrap"></div>' +
+
+        '<div class="cal-day-detail" id="cal-day-detail"></div>' +
+      '</div></div>';
+
+    rightEl.innerHTML = '<div class="cal-right-loading text-muted text-sm">불러오는 중…</div>';
+
+    var navTitleEl = centerEl.querySelector('#cal-nav-title');
+    var gridEl = centerEl.querySelector('#cal-grid');
+    var emptyNoteEl = centerEl.querySelector('#cal-empty-note-wrap');
+    var dayDetailEl = centerEl.querySelector('#cal-day-detail');
+    var infoToggleBtn = centerEl.querySelector('#cal-info-toggle');
+    var prevBtn = centerEl.querySelector('#cal-prev');
+    var nextBtn = centerEl.querySelector('#cal-next');
+    var todayBtn = centerEl.querySelector('#cal-today-btn');
+
+    /* ---- 달 이동 ---- */
+    function goToMonth(y, m) {
+      while (m < 1) { m += 12; y -= 1; }
+      while (m > 12) { m -= 12; y += 1; }
+      viewYear = y; viewMonth = m;
+      selectedDate = null;
+      loadMonth();
+    }
+    prevBtn.addEventListener('click', function () { goToMonth(viewYear, viewMonth - 1); });
+    nextBtn.addEventListener('click', function () { goToMonth(viewYear, viewMonth + 1); });
+    todayBtn.addEventListener('click', function () {
+      viewYear = todayD.getFullYear();
+      viewMonth = todayD.getMonth() + 1;
+      selectedDate = null;
+      loadMonth(function () { selectDate(todayKey, true); });
+    });
+    infoToggleBtn.addEventListener('click', function () { openDrawer(); });
+
+    /* ---- 월간 그리드 렌더링 ---- */
+    function renderGrid() {
+      var map = {};
+      (monthData.days || []).forEach(function (d) { map[d.date] = d; });
+      var total = daysInMonth(viewYear, viewMonth);
+      var lead = firstWeekday(viewYear, viewMonth);
+      var cells = [];
+      for (var i = 0; i < lead; i++) cells.push('<div class="cal-day cal-day--blank" aria-hidden="true"></div>');
+      for (var day = 1; day <= total; day++) {
+        var key = dateKey(viewYear, viewMonth, day);
+        var info = map[key];
+        var classes = ['cal-day'];
+        if (key === todayKey) classes.push('is-today');
+        if (key === selectedDate) classes.push('is-selected');
+        var inner = '<span class="cal-day-num">' + day + '</span>';
+        if (info && info.items && info.items.length) {
+          classes.push('has-rec');
+          if (info.count > 1) inner += '<span class="cal-day-count">' + info.count + '건</span>';
+          var barBlocks = info.items.map(function (it) {
+            var left = Math.max(0, Math.min(100, (it.start_minute / 1440) * 100));
+            var width = Math.max(0, ((it.end_minute - it.start_minute) / 1440) * 100);
+            return '<span class="cal-day-bar-block" style="left:' + left.toFixed(2) + '%;width:' + width.toFixed(2) + '%"></span>';
+          }).join('');
+          inner += '<div class="cal-day-bar">' + barBlocks + '</div>';
+          var chipItems = info.items.slice(0, 2);
+          var chipsHtml = chipItems.map(function (it) { return '<span class="cal-time-chip">' + esc(it.start_hm) + '</span>'; }).join('');
+          if (info.items.length > 2) chipsHtml += '<span class="cal-time-chip-more">+' + (info.items.length - 2) + '</span>';
+          inner += '<div class="cal-day-chips">' + chipsHtml + '</div>';
+        }
+        var label = info ? (key + ' 녹음 ' + info.count + '건') : (key + ' 녹음 없음');
+        cells.push('<button type="button" class="' + classes.join(' ') + '" data-date="' + key + '" aria-label="' + esc(label) + '" aria-pressed="' + (key === selectedDate ? 'true' : 'false') + '">' + inner + '</button>');
+      }
+      var trailing = (7 - ((lead + total) % 7)) % 7;
+      for (var t = 0; t < trailing; t++) cells.push('<div class="cal-day cal-day--blank" aria-hidden="true"></div>');
+      gridEl.innerHTML = cells.join('');
+
+      if (!monthData.days || !monthData.days.length) {
+        emptyNoteEl.innerHTML = '<div class="cal-empty-note">' + ICONS.empty + '<span>이번 달에는 녹음된 회의가 없습니다.</span></div>';
+      } else {
+        emptyNoteEl.innerHTML = '';
+      }
+    }
+
+    /* ---- 선택한 날짜: 24시간 타임라인 + 회의 카드 ---- */
+    function renderDayDetail() {
+      if (!selectedDate) {
+        dayDetailEl.innerHTML = '<div class="cal-day-empty">달력에서 날짜를 선택하면 그날의 24시간 녹음 타임라인을 볼 수 있습니다.</div>';
+        return;
+      }
+      var info = findDayInfo(selectedDate);
+      var items = info ? info.items.slice().sort(function (a, b) { return a.start_minute - b.start_minute; }) : [];
+      if (!items.length) {
+        dayDetailEl.innerHTML =
+          '<div class="cal-day-detail-head"><h2>' + esc(formatDateHeading(selectedDate)) + '</h2></div>' +
+          '<div class="cal-day-empty">이 날짜에는 녹음된 회의가 없습니다.</div>';
+        return;
+      }
+      var axisHtml = [0, 3, 6, 9, 12, 15, 18, 21, 24].map(function (h) { return '<span>' + h + '시</span>'; }).join('');
+      var rowsHtml = items.map(function (it) {
+        var left = Math.max(0, Math.min(100, (it.start_minute / 1440) * 100));
+        var width = Math.max(0, ((it.end_minute - it.start_minute) / 1440) * 100);
+        return (
+          '<button type="button" class="cal-timeline-row" data-id="' + esc(it.meeting_id) + '" aria-label="' + esc(it.title || '제목 없음') + ' 회의 열기, ' + esc(it.start_hm) + '부터 ' + esc(it.end_hm) + '까지">' +
+            '<div class="cal-timeline-track"><div class="cal-timeline-block" style="left:' + left.toFixed(2) + '%;width:' + width.toFixed(2) + '%"></div></div>' +
+            '<div class="cal-timeline-row-label"><b>' + esc(it.title || '(제목 없음)') + '</b><span>' + esc(it.start_hm) + '~' + esc(it.end_hm) + '</span></div>' +
+          '</button>'
+        );
+      }).join('');
+      var totalDur = items.reduce(function (sum, it) { return sum + (it.duration_ms || 0); }, 0);
+      var cardsHtml = items.map(function (it) {
+        var chips = statusChipHtml(it.status) + (it.has_summary ? '<span class="chip chip-indigo">요약</span>' : '');
+        return (
+          '<button type="button" class="cal-meeting-card" data-id="' + esc(it.meeting_id) + '">' +
+            '<div class="cal-meeting-card-top">' +
+              '<span class="cal-meeting-card-title">' + esc(it.title || '(제목 없음)') + '</span>' +
+              '<span class="cal-meeting-card-time mono">' + esc(it.start_hm) + '~' + esc(it.end_hm) + '</span>' +
+            '</div>' +
+            '<div class="cal-meeting-card-chips">' + chips + '<span class="cal-meeting-card-dur mono">' + formatDuration(it.duration_ms) + '</span></div>' +
+          '</button>'
+        );
+      }).join('');
+      dayDetailEl.innerHTML =
+        '<div class="cal-day-detail-head"><h2>' + esc(formatDateHeading(selectedDate)) + '</h2><span class="cal-day-detail-count mono">' + items.length + '건 · ' + formatDuration(totalDur) + '</span></div>' +
+        '<div class="card cal-timeline"><div class="cal-timeline-axis">' + axisHtml + '</div><div class="cal-timeline-rows">' + rowsHtml + '</div></div>' +
+        '<div class="cal-day-meetings">' + cardsHtml + '</div>';
+    }
+
+    /* ---- 오른쪽 컬럼: 이번 달 통계 + 선택한 날짜 요약 ---- */
+    function renderRightPanel() {
+      var days = monthData.days || [];
+      var totalCount = monthData.total_count != null ? monthData.total_count : days.reduce(function (s, d) { return s + d.count; }, 0);
+      var totalMs = days.reduce(function (s, d) { return s + (d.total_duration_ms || 0); }, 0);
+      var html =
+        '<div class="right-section-head"><span class="right-section-title">이번 달 통계</span></div>' +
+        '<div class="cal-stats-grid">' +
+          '<div class="cal-stat-card"><span class="cal-stat-label">총 녹음 건수</span><span class="cal-stat-value mono">' + totalCount + '건</span></div>' +
+          '<div class="cal-stat-card"><span class="cal-stat-label">총 녹음 시간</span><span class="cal-stat-value mono">' + formatDuration(totalMs) + '</span></div>' +
+          '<div class="cal-stat-card"><span class="cal-stat-label">녹음한 날짜 수</span><span class="cal-stat-value mono">' + days.length + '일</span></div>' +
+        '</div>' +
+        '<div class="right-section-head"><span class="right-section-title">선택한 날짜</span></div>';
+
+      if (!selectedDate) {
+        html += '<p class="text-muted text-sm">달력에서 날짜를 선택하면 그날 요약이 여기에 표시됩니다.</p>';
+      } else {
+        var info = findDayInfo(selectedDate);
+        var items = info ? info.items.slice().sort(function (a, b) { return a.start_minute - b.start_minute; }) : [];
+        var dayDur = items.reduce(function (s, it) { return s + (it.duration_ms || 0); }, 0);
+        html +=
+          '<div class="cal-day-summary-card">' +
+            '<div class="cal-day-summary-date">' + esc(formatDateHeading(selectedDate)) + '</div>' +
+            '<div class="cal-day-summary-count">' + (items.length ? (items.length + '건 · ' + formatDuration(dayDur)) : '녹음 없음') + '</div>' +
+            (items.length ? ('<div class="cal-day-summary-list">' + items.map(function (it) {
+              return '<button type="button" class="cal-day-summary-item" data-id="' + esc(it.meeting_id) + '"><span class="mono">' + esc(it.start_hm) + '</span><span>' + esc(it.title || '(제목 없음)') + '</span></button>';
+            }).join('') + '</div>') : '') +
+          '</div>';
+      }
+      rightEl.innerHTML = html;
+    }
+
+    /* ---- 날짜 선택 ---- */
+    function selectDate(dateStr, silent) {
+      selectedDate = dateStr;
+      gridEl.querySelectorAll('.cal-day[data-date]').forEach(function (c) {
+        var on = c.dataset.date === dateStr;
+        c.classList.toggle('is-selected', on);
+        c.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      renderDayDetail();
+      renderRightPanel();
+      if (!silent) dayDetailEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    /* ---- 월 데이터 로드 ---- */
+    function loadMonth(onDone) {
+      navTitleEl.textContent = viewYear + '년 ' + viewMonth + '월';
+      gridEl.innerHTML = Array.from({ length: 35 }).map(function () {
+        return '<div class="list-skeleton-row" style="height:74px;margin:0;border-radius:10px"></div>';
+      }).join('');
+      emptyNoteEl.innerHTML = '';
+      dayDetailEl.innerHTML = '';
+      rightEl.innerHTML = '<div class="cal-right-loading text-muted text-sm">불러오는 중…</div>';
+
+      var myToken = ++requestToken;
+      API.getCalendar({ year: viewYear, month: viewMonth }).then(function (res) {
+        if (cancelled || myToken !== requestToken) return;
+        monthData = res;
+        var hash = '#/calendar/' + viewYear + '/' + viewMonth;
+        if (location.hash !== hash) history.replaceState(null, '', hash);
+        renderGrid();
+        renderDayDetail();
+        renderRightPanel();
+        if (onDone) onDone();
+      }).catch(function (err) {
+        if (cancelled || myToken !== requestToken) return;
+        gridEl.innerHTML = '';
+        emptyNoteEl.innerHTML = emptyStateHtml('달력을 불러오지 못했습니다', err.message || '');
+        rightEl.innerHTML = '<p class="text-muted text-sm">통계를 불러오지 못했습니다.</p>';
+        toast(err.message || '달력을 불러오지 못했습니다.', 'error');
+      });
+    }
+
+    /* ---- 클릭 위임 (날짜 셀 · 타임라인 행 · 회의 카드 · 요약 목록) ---- */
+    function handleCalendarClick(e) {
+      var dayCell = e.target.closest('.cal-day[data-date]');
+      if (dayCell) { selectDate(dayCell.dataset.date); return; }
+      var idEl = e.target.closest('[data-id]');
+      if (idEl) { navigate('#/meetings/' + encodeURIComponent(idEl.dataset.id)); }
+    }
+    centerEl.addEventListener('click', handleCalendarClick);
+    rightEl.addEventListener('click', handleCalendarClick);
+
+    /* ---- 최초 로드: 이번 달이면 오늘 날짜가 있을 때 자동 선택 ---- */
+    loadMonth(function () {
+      if (!selectedDate && viewYear === todayD.getFullYear() && viewMonth === (todayD.getMonth() + 1) && findDayInfo(todayKey)) {
+        selectDate(todayKey, true);
+      }
+    });
+
+    return function cleanup() {
+      cancelled = true;
+      centerEl.removeEventListener('click', handleCalendarClick);
+      rightEl.removeEventListener('click', handleCalendarClick);
+    };
+  }
+
+
+  /* ==========================================================================
+     10. 초기화
      ======================================================================= */
 
   document.addEventListener('DOMContentLoaded', function () {

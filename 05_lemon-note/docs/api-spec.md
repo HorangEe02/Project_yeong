@@ -75,6 +75,7 @@ Query:
 | --- | --- |
 | `status` | job 또는 meeting 상태 필터 |
 | `q` | 제목/전사 텍스트 검색 |
+| `date` | `YYYY-MM-DD`. 해당 날짜에 녹음한 회의만 반환(녹음 달력에서 날짜 선택 시 사용) |
 | `limit` | 기본 20 |
 | `cursor` | 다음 페이지 cursor |
 
@@ -96,6 +97,54 @@ Response `200`
   "next_cursor": null
 }
 ```
+
+## GET /meetings/calendar
+
+녹음 달력용 월 단위 집계. 해당 월에서 **녹음이 있는 날짜만** 반환한다.
+
+> 라우팅 주의: 이 경로는 반드시 `/meetings/{meeting_id}` 보다 먼저 등록해야 한다.
+> 그렇지 않으면 `calendar` 가 `meeting_id` 로 해석된다.
+
+Query:
+
+| 이름 | 설명 |
+| --- | --- |
+| `year` | 기본값: 현재 연도 |
+| `month` | `1`~`12`. 기본값: 현재 월. 범위를 벗어나면 `422 invalid_month` |
+
+Response `200`
+
+```json
+{
+  "year": 2026,
+  "month": 7,
+  "total_count": 6,
+  "days": [
+    {
+      "date": "2026-07-16",
+      "count": 2,
+      "total_duration_ms": 96000,
+      "items": [
+        {
+          "meeting_id": "meeting_01",
+          "title": "제품 MVP 회의",
+          "recorded_at": "2026-07-16T10:00:00+09:00",
+          "duration_ms": 47700,
+          "status": "ready_for_review",
+          "has_summary": true,
+          "start_hm": "10:00",
+          "end_hm": "10:00",
+          "start_minute": 600,
+          "end_minute": 601
+        }
+      ]
+    }
+  ]
+}
+```
+
+`start_minute` / `end_minute` 는 자정 기준 분(0~1440)으로, 하루 24시간 타임라인에 녹음 구간을
+배치하는 데 쓴다. 날짜 그룹핑은 `recorded_at` 의 로컬 날짜 기준이다.
 
 ## GET /meetings/{meeting_id}
 
