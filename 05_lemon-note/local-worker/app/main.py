@@ -5,6 +5,7 @@ docs/api-spec.md 계약을 따르며, 데모 편의를 위한 소수 추가 필�
 """
 import json
 import os
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import (BackgroundTasks, FastAPI, File, Form, Header, HTTPException,
@@ -50,6 +51,25 @@ def require_user(authorization: Optional[str] = Header(default=None)) -> str:
 def _err(status, code, message, details=None):
     return JSONResponse(status_code=status, content={
         "error": {"code": code, "message": message, "details": details or {}}})
+
+
+def _as_dt(value) -> datetime:
+    """recorded_at 정규화. postgres는 datetime, sqlite는 ISO 문자열로 돌아온다."""
+    if isinstance(value, datetime):
+        return value
+    try:
+        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (ValueError, TypeError):
+        return datetime.now().astimezone()
+
+
+def _day_bounds(date_str: str):
+    """'YYYY-MM-DD' → (그날 00:00, 다음날 00:00) 로컬 ISO 문자열."""
+    d = datetime.fromisoformat(date_str).replace(
+        hour=0, minute=0, second=0, microsecond=0)
+    tz = datetime.now().astimezone().tzinfo
+    start = d.replace(tzinfo=d.tzinfo or tz)
+    return start.isoformat(), (start + timedelta(days=1)).isoformat()
 
 
 def _get_meeting(conn, meeting_id, user_id):
@@ -199,7 +219,9 @@ def retry_job(meeting_id: str, background: BackgroundTasks, body: dict = None):
 # ============================ Meetings ============================
 @app.get(P + "/meetings")
 def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
+                  date: Optional[str] = None,
                   limit: int = 20, cursor: Optional[str] = None):
+    """회의 목록. `date=YYYY-MM-DD` 를 주면 그 날짜에 녹음한 회의만 반환한다."""
     user_id = config.DEFAULT_USER_ID
     limit = max(1, min(100, limit))
     offset = 0
@@ -212,6 +234,13 @@ def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
     try:
         where = ["m.user_id=?", "m.deleted_at IS NULL"]
         params = [user_id]
+        if date:
+            try:
+                d_start, d_end = _day_bounds(date)
+            except ValueError:
+                return _err(422, "invalid_date", "date 는 YYYY-MM-DD 형식이어야 합니다.")
+            where.append("m.recorded_at >= ? AND m.recorded_at < ?")
+            params += [d_start, d_end]
         if status:
             where.append("m.status=?")
             params.append(status)
@@ -237,6 +266,64 @@ def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
         } for r in rows]
         next_cursor = str(offset + limit) if has_more else None
         return {"items": items, "next_cursor": next_cursor}
+    finally:
+        conn.close()
+
+
+# 주의: 이 라우트는 반드시 "/meetings/{meeting_id}" 보다 먼저 등록되어야 한다.
+# (그렇지 않으면 "calendar" 가 meeting_id 로 해석된다)
+@app.get(P + "/meetings/calendar")
+def meetings_calendar(year: Optional[int] = None, month: Optional[int] = None):
+    """녹음 달력: 해당 월의 '날짜별 녹음 건수 · 총 길이 · 시간대 목록'.
+
+    각 item 의 start_minute/end_minute(0~1440)은 하루 24시간 타임라인 렌더링용이다.
+    """
+    user_id = config.DEFAULT_USER_ID
+    now = datetime.now().astimezone()
+    y = year or now.year
+    mo = month or now.month
+    if not (1 <= mo <= 12):
+        return _err(422, "invalid_month", "month 는 1~12 사이여야 합니다.")
+
+    tz = now.tzinfo
+    start = datetime(y, mo, 1, tzinfo=tz)
+    end = datetime(y + (1 if mo == 12 else 0), 1 if mo == 12 else mo + 1, 1, tzinfo=tz)
+
+    conn = db.connect()
+    try:
+        rows = conn.execute(
+            "SELECT m.*, "
+            "EXISTS(SELECT 1 FROM summary_versions sv WHERE sv.meeting_id=m.id) AS has_summary "
+            "FROM meetings m WHERE m.user_id=? AND m.deleted_at IS NULL "
+            "AND m.recorded_at >= ? AND m.recorded_at < ? "
+            "ORDER BY m.recorded_at ASC",
+            (user_id, start.isoformat(), end.isoformat()),
+        ).fetchall()
+
+        days = {}
+        for r in rows:
+            dt = _as_dt(r["recorded_at"])
+            key = dt.date().isoformat()
+            dur = int(r["duration_ms"] or 0)
+            day = days.setdefault(key, {
+                "date": key, "count": 0, "total_duration_ms": 0, "items": []})
+            day["count"] += 1
+            day["total_duration_ms"] += dur
+            end_dt = dt + timedelta(milliseconds=dur)
+            start_min = dt.hour * 60 + dt.minute
+            day["items"].append({
+                "meeting_id": r["id"], "title": r["title"],
+                "recorded_at": dt.isoformat(), "duration_ms": dur,
+                "status": r["status"], "has_summary": bool(r["has_summary"]),
+                "start_hm": dt.strftime("%H:%M"), "end_hm": end_dt.strftime("%H:%M"),
+                "start_minute": start_min,
+                "end_minute": min(24 * 60, start_min + max(1, dur // 60000)),
+            })
+        return {
+            "year": y, "month": mo,
+            "total_count": sum(d["count"] for d in days.values()),
+            "days": [days[k] for k in sorted(days)],
+        }
     finally:
         conn.close()
 
