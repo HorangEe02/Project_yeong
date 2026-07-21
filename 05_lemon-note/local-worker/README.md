@@ -216,8 +216,14 @@ DB_BACKEND=postgres STORAGE_PROVIDER=supabase ./run.sh
 (원본과 바이트 동일) → 내보내기 생성·다운로드(한글 파일명 UTF-8) 통과. Supabase Storage 에 실제 객체
 기록 확인 후 정리. `STORAGE_PROVIDER=local` 회귀도 재검증 완료.
 
-> Provider 를 바꾸면 **이전에 저장된 파일은 이전 저장소 경로를 가리킨다**(DB 의 `storage_path` 에 그대로
-> 남는다). 전환 시점 이후 업로드분부터 새 저장소를 사용한다. 기존 파일 마이그레이션은 별도 작업이다.
+기존 로컬 파일 이전(신규 업로드와 동일한 key 규칙, 멱등):
+
+```bash
+./.venv/bin/python scripts/migrate_files_to_supabase.py            # dry-run(기본)
+./.venv/bin/python scripts/migrate_files_to_supabase.py --apply    # 실제 이전 + storage_path 갱신
+```
+
+로컬 원본은 지우지 않으므로, 이전 후 확인이 끝나면 `data/` 를 직접 정리하면 된다.
 
 > 참고: RLS가 켜져 있고 정책이 없으므로 anon/publishable 키로는 데이터가 보이지 않는다(service_role 또는
 > DATABASE_URL 직접 연결만 접근). 사용자별 접근을 열려면 Supabase Auth 연동 + `auth.uid()` 기반 정책을 추가한다.
