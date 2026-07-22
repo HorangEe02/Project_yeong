@@ -8,6 +8,19 @@ def fmt_ms(ms) -> str:
     return f"{s // 60:02d}:{s % 60:02d}"
 
 
+def fmt_when(value) -> str:
+    """녹음 일시 표시. postgres 는 timestamptz 를 UTC 로 돌려줄 수 있어 로컬로 변환한다."""
+    from datetime import datetime
+    if not isinstance(value, datetime):
+        try:
+            value = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        except (ValueError, TypeError):
+            return str(value or "")
+    if value.tzinfo:
+        value = value.astimezone()
+    return value.strftime("%Y-%m-%d %H:%M")
+
+
 def _seg_display_text(seg: dict) -> str:
     return seg.get("corrected_text") or seg.get("text") or ""
 
@@ -20,7 +33,7 @@ def build_markdown(meeting: dict, summary: dict, segments: list,
                    include_transcript: bool = True) -> str:
     lines = []
     lines.append(f"# {meeting.get('title', '회의')}\n")
-    lines.append(f"- 녹음 일시: {meeting.get('recorded_at', '')}")
+    lines.append(f"- 녹음 일시: {fmt_when(meeting.get('recorded_at'))}")
     lines.append(f"- 회의 길이: {fmt_ms(meeting.get('duration_ms'))}")
     lines.append(f"- 처리 상태: {meeting.get('status', '')}\n")
 
@@ -72,7 +85,7 @@ def build_txt(meeting: dict, summary: dict, segments: list,
               include_transcript: bool = True) -> str:
     lines = []
     lines.append(f"[{meeting.get('title', '회의')}]")
-    lines.append(f"녹음 일시: {meeting.get('recorded_at', '')}")
+    lines.append(f"녹음 일시: {fmt_when(meeting.get('recorded_at'))}")
     lines.append(f"회의 길이: {fmt_ms(meeting.get('duration_ms'))}")
     lines.append("")
 
