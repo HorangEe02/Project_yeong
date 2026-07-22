@@ -43,23 +43,24 @@
   var TAB_SLUGS = ['transcript', 'summary', 'todos', 'calendar', 'export'];
   var RIGHT_TAB_SLUGS = ['summary', 'todos', 'calendar', 'export'];
 
+  // 옅은 배경 + 짙은 전경 쌍. 한 글자짜리 아바타라도 텍스트이므로 대비 4.5:1 을 넘긴다.
   var AVATAR_PALETTE = [
-    { bg: '#EDEBFF', fg: '#615EF0' },
-    { bg: '#FDEAF0', fg: '#E1447F' },
-    { bg: '#FCEEDB', fg: '#C97A2B' },
-    { bg: '#E3F8EA', fg: '#2F9E5F' },
-    { bg: '#E7F3FE', fg: '#2F86D9' },
-    { bg: '#F1F2F4', fg: '#6B7280' }
+    { bg: '#FFF0A8', fg: '#7A4F00' },
+    { bg: '#FDEAF0', fg: '#A81E55' },
+    { bg: '#FCEEDB', fg: '#8F5C08' },
+    { bg: '#E3F8EA', fg: '#1D6A40' },
+    { bg: '#E7F3FE', fg: '#1B639F' },
+    { bg: '#F1F2F4', fg: '#5F6672' }
   ];
 
   var ICONS = {
     search: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
-    check: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7.2l3 3 6-6.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    check: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7.2l3 3 6-6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     star: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.3l1.9 4.2 4.6.5-3.4 3.2.9 4.6L8 11.6l-4 2.2.9-4.6-3.4-3.2 4.6-.5L8 1.3z"/></svg>',
     edit: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M9.8 2.3l2.9 2.9-7.3 7.3-3.3.4.4-3.3 7.3-7.3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
     trash: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2.5 4.2h10M5.8 4.2V2.8c0-.4.3-.7.7-.7h3c.4 0 .7.3.7.7v1.4M6 7v4M9 7v4M3.5 4.2l.6 8c0 .5.5.9 1 .9h5.8c.5 0 1-.4 1-.9l.6-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    play: '<svg width="17" height="17" viewBox="0 0 17 17" fill="#fff"><path d="M5 3.2v10.6l9-5.3-9-5.3z"/></svg>',
-    pause: '<svg width="17" height="17" viewBox="0 0 17 17" fill="#fff"><rect x="4" y="3" width="3.2" height="11" rx="1"/><rect x="9.8" y="3" width="3.2" height="11" rx="1"/></svg>',
+    play: '<svg width="17" height="17" viewBox="0 0 17 17" fill="currentColor"><path d="M5 3.2v10.6l9-5.3-9-5.3z"/></svg>',
+    pause: '<svg width="17" height="17" viewBox="0 0 17 17" fill="currentColor"><rect x="4" y="3" width="3.2" height="11" rx="1"/><rect x="9.8" y="3" width="3.2" height="11" rx="1"/></svg>',
     skipBack: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3a5 5 0 11-4.6 3" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M2.6 2.6v3.2h3.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="8" y="10.4" font-size="5.2" fill="#fff" text-anchor="middle" font-family="sans-serif">10</text></svg>',
     skipFwd: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3a5 5 0 104.6 3" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M13.4 2.6v3.2h-3.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="8" y="10.4" font-size="5.2" fill="#fff" text-anchor="middle" font-family="sans-serif">10</text></svg>',
     empty: '<svg width="48" height="48" viewBox="0 0 52 52" fill="none"><rect x="6" y="6" width="40" height="40" rx="12" stroke="currentColor" stroke-width="2"/><path d="M26 16v14M20 26a6 6 0 0012 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
@@ -511,7 +512,7 @@
 
     function itemChipsHtml(m) {
       var html = statusChipHtml(m.status);
-      if (m.has_summary) html += '<span class="chip chip-indigo">요약</span>';
+      if (m.has_summary) html += '<span class="chip chip-brand">요약</span>';
       if (m.shared_count > 0) html += '<span class="chip chip-gray">공유 ' + m.shared_count + '</span>';
       return html;
     }
@@ -2137,7 +2138,7 @@
       }).join('');
       var totalDur = items.reduce(function (sum, it) { return sum + (it.duration_ms || 0); }, 0);
       var cardsHtml = items.map(function (it) {
-        var chips = statusChipHtml(it.status) + (it.has_summary ? '<span class="chip chip-indigo">요약</span>' : '');
+        var chips = statusChipHtml(it.status) + (it.has_summary ? '<span class="chip chip-brand">요약</span>' : '');
         return (
           '<button type="button" class="cal-meeting-card" data-id="' + esc(it.meeting_id) + '">' +
             '<div class="cal-meeting-card-top">' +
