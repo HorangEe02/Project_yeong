@@ -40,6 +40,10 @@ SUMMARY_PROVIDER = os.getenv("SUMMARY_PROVIDER", "stub").strip()
 # Stub 파이프라인 단계별 지연(초) — 상태 폴링을 눈에 보이게
 STUB_STAGE_DELAY = float(os.getenv("STUB_STAGE_DELAY", "0.7"))
 
+# 파이프라인을 요청 안에서 동기 실행할지. 서버리스(Vercel)는 응답을 보낸 뒤
+# 백그라운드 태스크 실행이 보장되지 않으므로 1 로 둔다(stub 이라 즉시 끝난다).
+SYNC_PIPELINE = os.getenv("SYNC_PIPELINE", "0") == "1"
+
 # Slack
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "").strip()
 SLACK_SIMULATE = os.getenv("SLACK_SIMULATE", "1") == "1"
