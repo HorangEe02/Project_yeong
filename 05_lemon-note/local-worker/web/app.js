@@ -708,7 +708,10 @@
             '<label class="dropzone" id="nm-dropzone">' +
               '<strong>클릭하거나 파일을 끌어다 놓으세요</strong>' +
               '기존에 녹음된 음성 파일 (m4a, aac, webm, wav 등)' +
-              '<input type="file" id="nm-file-input" accept="audio/*" />' +
+              /* Android 파일 선택기는 audio/* 만으로 m4a·webm 을 못 고르는 경우가 있어
+                 서버가 허용하는 확장자를 함께 준다(iOS/iPadOS 는 audio/* 로 충분). */
+              '<input type="file" id="nm-file-input" ' +
+                'accept="audio/*,.m4a,.aac,.mp3,.wav,.webm,.ogg,.mp4" />' +
             '</label>' +
 
             '<div class="preview-card" id="nm-preview" style="display:none">' +

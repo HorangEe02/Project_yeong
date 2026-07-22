@@ -467,12 +467,22 @@ dialog.modal::backdrop { background: rgba(15, 18, 34, 0.5); backdrop-filter: blu
 .preview-meta b { color: var(--ink-800); font-family: var(--font-mono); font-weight: 600; }
 
 .dropzone {
+  /* label 은 기본이 inline 이라 display 를 지정하지 않으면 자식 <strong>(display:block) 때문에
+     인라인 박스가 쪼개져 테두리·텍스트가 상자 밖으로 흘러나온다(웹·모바일 공통). */
+  display: block; position: relative; width: 100%; box-sizing: border-box;
   border: 1.5px dashed var(--border-strong); border-radius: var(--radius-md); padding: 22px; text-align: center;
   cursor: pointer; transition: border-color .15s var(--ease), background-color .15s var(--ease);
   color: var(--ink-500); font-size: 13px; background: var(--surface);
+  overflow-wrap: anywhere; word-break: keep-all;   /* 좁은 화면에서 한국어 줄바꿈 */
+  -webkit-tap-highlight-color: transparent;
 }
 .dropzone:hover, .dropzone.is-dragover { border-color: var(--indigo-500); background: var(--indigo-50); color: var(--indigo-700); }
-.dropzone input { display: none; }
+/* display:none 인 file input 은 일부 모바일 브라우저에서 라벨 탭으로 picker 가 안 열린다.
+   화면에서만 숨기고 접근성·클릭 대상은 살려 둔다. */
+.dropzone input {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); border: 0; white-space: nowrap;
+}
 .dropzone strong { color: var(--ink-800); display: block; font-size: 13.5px; margin-bottom: 3px; }
 
 .tips-card { display: flex; flex-direction: column; gap: 14px; }
