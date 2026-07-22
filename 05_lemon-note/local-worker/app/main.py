@@ -64,6 +64,14 @@ def _as_dt(value) -> datetime:
         return datetime.now().astimezone()
 
 
+def _enqueue(background, job_id, meeting_id):
+    """파이프라인 실행. 서버리스는 응답 후 백그라운드 실행이 보장되지 않아 동기로 돌린다."""
+    if config.SYNC_PIPELINE:
+        pipeline.run_pipeline(job_id, meeting_id)
+    else:
+        background.add_task(pipeline.run_pipeline, job_id, meeting_id)
+
+
 def _same_id(a, b) -> bool:
     """ID 비교. postgres(psycopg)는 uuid 컬럼을 UUID 객체로 돌려주므로 문자열로 정규화한다.
     (sqlite 는 TEXT 라 그대로 문자열)"""
@@ -166,7 +174,7 @@ async def create_job(
     finally:
         conn.close()
 
-    background.add_task(pipeline.run_pipeline, job_id, meeting_id)
+    _enqueue(background, job_id, meeting_id)
     return {"job_id": job_id, "meeting_id": meeting_id, "status": "uploaded",
             "created_at": now}
 
@@ -219,7 +227,7 @@ def retry_job(meeting_id: str, background: BackgroundTasks, body: dict = None):
         job_id = job["id"]
     finally:
         conn.close()
-    background.add_task(pipeline.run_pipeline, job_id, meeting_id)
+    _enqueue(background, job_id, meeting_id)
     return {"job_id": job_id, "meeting_id": meeting_id, "status": "uploaded"}
 
 
