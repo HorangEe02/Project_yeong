@@ -55,13 +55,18 @@ def _err(status, code, message, details=None):
 
 
 def _as_dt(value) -> datetime:
-    """recorded_at 정규화. postgres는 datetime, sqlite는 ISO 문자열로 돌아온다."""
-    if isinstance(value, datetime):
-        return value
-    try:
-        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
-    except (ValueError, TypeError):
-        return datetime.now().astimezone()
+    """저장된 시각 → 프로세스 로컬 타임존의 datetime.
+
+    postgres 는 datetime, sqlite 는 ISO 문자열로 돌아온다. postgres 는 timestamptz 를
+    세션 타임존으로 렌더링하는데, Supabase 풀러(6543)는 transaction 모드라 세션 설정이
+    유지되지 않는다(UTC 로 돌아옴). 그래서 표시 직전에 파이썬에서 로컬로 변환한다.
+    """
+    if not isinstance(value, datetime):
+        try:
+            value = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        except (ValueError, TypeError):
+            return datetime.now().astimezone()
+    return value.astimezone() if value.tzinfo else value
 
 
 def _enqueue(background, job_id, meeting_id):

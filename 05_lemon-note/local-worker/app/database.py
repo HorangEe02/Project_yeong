@@ -65,7 +65,9 @@ def _local_timezone() -> str:
     두 백엔드가 같은 로컬 시각을 보이도록 세션 타임존을 로컬로 맞춘다.
     (안 맞추면 달력·내보내기 시각이 UTC로 밀리고, 자정 근처 녹음은 날짜 그룹핑까지 어긋난다)
     """
-    tz = os.getenv("PG_TIMEZONE", "").strip()
+    # PG_TIMEZONE > TZ > /etc/localtime > UTC 오프셋.
+    # 서버리스(Vercel) 컨테이너는 로컬 타임존이 UTC 라 자동감지만으로는 시각이 밀린다.
+    tz = os.getenv("PG_TIMEZONE", "").strip() or os.getenv("TZ", "").strip()
     if tz:
         return tz
     # /etc/localtime 심볼릭 링크에서 IANA 이름 추출 (macOS/Linux)
