@@ -61,8 +61,13 @@
     trash: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2.5 4.2h10M5.8 4.2V2.8c0-.4.3-.7.7-.7h3c.4 0 .7.3.7.7v1.4M6 7v4M9 7v4M3.5 4.2l.6 8c0 .5.5.9 1 .9h5.8c.5 0 1-.4 1-.9l.6-8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     play: '<svg width="17" height="17" viewBox="0 0 17 17" fill="currentColor"><path d="M5 3.2v10.6l9-5.3-9-5.3z"/></svg>',
     pause: '<svg width="17" height="17" viewBox="0 0 17 17" fill="currentColor"><rect x="4" y="3" width="3.2" height="11" rx="1"/><rect x="9.8" y="3" width="3.2" height="11" rx="1"/></svg>',
-    skipBack: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3a5 5 0 11-4.6 3" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M2.6 2.6v3.2h3.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="8" y="10.4" font-size="5.2" fill="#fff" text-anchor="middle" font-family="sans-serif">10</text></svg>',
-    skipFwd: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3a5 5 0 104.6 3" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M13.4 2.6v3.2h-3.2" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><text x="8" y="10.4" font-size="5.2" fill="#fff" text-anchor="middle" font-family="sans-serif">10</text></svg>',
+    // 되감기/빨리감기의 "10" 은 <text> 로 그리면 사용자 폰트에 따라 자리가 밀린다 → 패스로 직접 그린다.
+    skipBack: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M6.34 6.34A8 8 0 1 0 12 4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><polyline points="6.34 2.9 6.34 6.34 9.78 6.34" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.3 12.2 9.3 11.2 9.3 16" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="13.4" cy="13.6" rx="1.7" ry="2.4" stroke="currentColor" stroke-width="2.1"/></svg>',
+    skipFwd: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M17.66 6.34A8 8 0 1 1 12 4" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17.66 2.9 17.66 6.34 14.22 6.34" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.3 12.2 9.3 11.2 9.3 16" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="13.4" cy="13.6" rx="1.7" ry="2.4" stroke="currentColor" stroke-width="2.1"/></svg>',
+    close: '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    record: '<svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="4.4"/></svg>',
+    docEdit: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12.4 7.8v5a1.4 1.4 0 01-1.4 1.4H4.6a1.4 1.4 0 01-1.4-1.4V3.2a1.4 1.4 0 011.4-1.4h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.3 1.5l2.4 2.4-4.7 4.7-2.9.5.5-2.9 4.7-4.7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>',
+    docText: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9.3 1.8H4.6a1.4 1.4 0 00-1.4 1.4v9.6a1.4 1.4 0 001.4 1.4h6.8a1.4 1.4 0 001.4-1.4V5.3L9.3 1.8z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9.2 2v3.3h3.5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5.7 8.7h4.6M5.7 11.2h3.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
     empty: '<svg width="48" height="48" viewBox="0 0 52 52" fill="none"><rect x="6" y="6" width="40" height="40" rx="12" stroke="currentColor" stroke-width="2"/><path d="M26 16v14M20 26a6 6 0 0012 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     plus: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     users: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5.5" r="2.3" stroke="currentColor" stroke-width="1.4"/><path d="M1.6 13c.5-2.4 2.3-3.8 4.4-3.8s3.9 1.4 4.4 3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="6" r="1.8" stroke="currentColor" stroke-width="1.3"/><path d="M10.6 9.6c1.7.2 3 1.4 3.4 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
@@ -246,7 +251,7 @@
       error: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 5v4M8 11h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
       info: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 7.2v3.8M8 5.2h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
     }[type] || '';
-    el.innerHTML = '<span class="toast-icon">' + iconSvg + '</span><span>' + esc(message) + '</span><button type="button" class="toast-close" aria-label="닫기">✕</button>';
+    el.innerHTML = '<span class="toast-icon">' + iconSvg + '</span><span>' + esc(message) + '</span><button type="button" class="toast-close" aria-label="닫기">' + ICONS.close + '</button>';
     stack.appendChild(el);
     var removed = false;
     function remove() {
@@ -667,7 +672,7 @@
         '</div>' +
         '<div class="level-meter" id="nm-meter">' + levelBarsHtml + '</div>' +
         '<div class="record-controls">' +
-          '<button type="button" class="btn btn-primary" id="nm-btn-start">● 녹음 시작</button>' +
+          '<button type="button" class="btn btn-primary" id="nm-btn-start">' + ICONS.record + '<span>녹음 시작</span></button>' +
           '<button type="button" class="btn btn-ghost" id="nm-btn-pause" style="display:none">일시정지</button>' +
           '<button type="button" class="btn btn-primary" id="nm-btn-resume" style="display:none">재개</button>' +
           '<button type="button" class="btn btn-danger" id="nm-btn-stop" style="display:none">정지</button>' +
@@ -1282,8 +1287,8 @@
 
         '<div class="rtab-panel" data-rpanel="export">' +
           '<div class="export-grid">' +
-            '<div class="export-option"><div class="export-option-title">📝 Markdown 내보내기</div><p>요약, 결정사항, 할 일, 일정 후보, 전체 전사가 포함된 .md 파일을 생성합니다.</p><button type="button" class="btn btn-primary btn-sm" id="md-export-md">Markdown 내보내기</button></div>' +
-            '<div class="export-option"><div class="export-option-title">📄 TXT 내보내기</div><p>메신저나 이메일에 바로 붙여넣기 좋은 일반 텍스트 파일을 생성합니다.</p><button type="button" class="btn btn-primary btn-sm" id="md-export-txt">TXT 내보내기</button></div>' +
+            '<div class="export-option"><div class="export-option-title">' + ICONS.docEdit + '<span>Markdown 내보내기</span></div><p>요약, 결정사항, 할 일, 일정 후보, 전체 전사가 포함된 .md 파일을 생성합니다.</p><button type="button" class="btn btn-primary btn-sm" id="md-export-md">Markdown 내보내기</button></div>' +
+            '<div class="export-option"><div class="export-option-title">' + ICONS.docText + '<span>TXT 내보내기</span></div><p>메신저나 이메일에 바로 붙여넣기 좋은 일반 텍스트 파일을 생성합니다.</p><button type="button" class="btn btn-primary btn-sm" id="md-export-txt">TXT 내보내기</button></div>' +
           '</div>' +
           '<div class="right-section-head"><span class="right-section-title">Slack 공유</span></div>' +
           '<div class="field"><label class="field-label" for="md-slack-channel-inline">채널 라벨 <span class="field-hint">(선택, 표시용)</span></label><input type="text" class="input" id="md-slack-channel-inline" placeholder="예: #product" /></div>' +
@@ -1681,7 +1686,7 @@
                   (c.confidence !== null && c.confidence !== undefined ? confidencePillHtml(c.confidence) : '') +
                   '<select class="select" data-field="status">' + statusOptionsHtml(CAL_STATUS_OPTIONS, c.status) + '</select>' +
                 '</span>' +
-                '<button type="button" class="btn btn-ghost btn-sm" data-action="calendar-link">📅 캘린더 링크</button>' +
+                '<button type="button" class="btn btn-ghost btn-sm" data-action="calendar-link">' + ICONS.calendar + '<span>캘린더 링크</span></button>' +
               '</div>' +
             '</div>'
           );
