@@ -76,6 +76,14 @@
 
 ---
 
+## 미리보기 · 배포 (Vercel, 무료)
+
+프론트엔드(`local-worker/web/`)는 **빌드 없는 정적 파일 + 해시 라우팅**이라 Vercel Hobby(무료)로 그대로 배포된다.
+
+- Vercel → Add New Project → 이 레포 Import → **Root Directory = `05_lemon-note/local-worker/web`**, Framework Preset = **Other**(빌드/설치 명령 없음) → Deploy
+- 첫 화면(녹음 UI)은 브라우저에서 바로 동작한다. 목록/달력 등 백엔드 호출은 정적 배포엔 서버가 없어 비활성이다(04_AJIN 정적 화면과 동일 방식).
+- **AI 전사·요약은 로컬 모델(faster-whisper·Ollama)** 이라 Vercel에서 돌리지 않는다 → 요금이 발생하지 않는다. 완전 동작은 로컬 `./run.sh`.
+
 ## 실행
 
 ```bash
