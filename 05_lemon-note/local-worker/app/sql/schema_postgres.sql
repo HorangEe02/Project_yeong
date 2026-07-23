@@ -202,3 +202,29 @@ create index if not exists summary_versions_meeting_version_idx on summary_versi
 create index if not exists exports_meeting_idx on exports(meeting_id, created_at desc);
 create index if not exists share_logs_meeting_idx on share_logs(meeting_id, created_at desc);
 create index if not exists audit_logs_meeting_idx on audit_logs(meeting_id, created_at desc);
+
+
+-- ---------------------------------------------------------------------------
+-- Row Level Security
+--
+-- 이 앱은 서버(FastAPI)가 service_role 키로만 DB 에 접근한다. service_role 은
+-- RLS 를 우회하므로 앱 동작에는 영향이 없다.
+-- RLS 를 켜고 정책을 두지 않으면 anon/authenticated 키로는 아무것도 읽지 못한다
+-- (deny-all). 이 파일에 이 구문이 없으면 새 환경에 스키마를 부으면 RLS 가 꺼진
+-- 채로 생성돼, 공개된 anon 키만으로 전 회의록이 열린다.
+-- 라이브 DB(2026-07-23 확인)는 13개 테이블 모두 RLS on / policy 0 상태이며,
+-- 아래 구문은 그 상태를 코드로 고정한 것이다.
+-- ---------------------------------------------------------------------------
+alter table profiles enable row level security;
+alter table meetings enable row level security;
+alter table jobs enable row level security;
+alter table recording_files enable row level security;
+alter table transcript_segments enable row level security;
+alter table speaker_aliases enable row level security;
+alter table summary_versions enable row level security;
+alter table summary_decisions enable row level security;
+alter table action_items enable row level security;
+alter table calendar_candidates enable row level security;
+alter table exports enable row level security;
+alter table share_logs enable row level security;
+alter table audit_logs enable row level security;
