@@ -1004,3 +1004,74 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   position: absolute; inset: 0; width: 100%; height: 100%;
   margin: 0; background: none; opacity: 0; cursor: pointer;
 }
+
+/* ----------------------------------------------------------------------
+   17. 사용자 하이라이트 · 공유 링크
+   ------------------------------------------------------------------- */
+.msg-text { -webkit-user-select: text; user-select: text; }
+mark.user-hl {
+  background: var(--brand-100); color: var(--ink-900);
+  padding: 0 1px; border-radius: 3px; cursor: pointer;
+  box-shadow: inset 0 -1px 0 var(--brand-deep);
+}
+mark.user-hl:hover { background: var(--brand-50); }
+/* 파형 마커: 북마크(노랑) vs 하이라이트(청록)로 구분 */
+.wave-marker--hl::before { background: #2CA8E0; }
+.wave-marker--hl::after { background: #2CA8E0; }
+
+.share-link-row {
+  display: flex; align-items: center; gap: 8px; padding: 9px 0;
+  font-size: 12px; color: var(--ink-600);
+}
+.share-link-row + .share-link-row { border-top: 1px solid var(--border); }
+.share-link-meta { flex: 1; min-width: 0; }
+.share-link-url {
+  font-family: var(--font-mono); font-size: 11px; color: var(--ink-900);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.share-link-sub { font-size: 10.5px; color: var(--ink-400); margin-top: 2px; }
+.share-badge {
+  flex: none; font-size: 10px; font-weight: 800; padding: 1px 6px;
+  border-radius: var(--radius-full); background: var(--brand-100); color: var(--brand-900);
+}
+.share-badge--expired { background: var(--red-100); color: var(--red-700); }
+
+/* ----------------------------------------------------------------------
+   18. 공유 페이지 (/s/{token}) — 앱 셸과 무관한 독립 문서
+   ------------------------------------------------------------------- */
+body.share-body { overflow: auto; background: var(--surface-alt); }
+.share-page { max-width: 720px; margin: 0 auto; padding: 28px 18px 60px; }
+.share-loading { padding: 60px 0; text-align: center; color: var(--ink-500); }
+.share-card {
+  background: var(--surface); border-radius: var(--radius-xl);
+  border: 1px solid var(--border); padding: 26px 24px;
+  box-shadow: var(--shadow-sm);
+}
+.share-gate { max-width: 380px; margin: 60px auto; text-align: center; }
+.share-gate h1 { font-size: 19px; font-weight: 800; margin-bottom: 8px; }
+.share-gate p { font-size: 13.5px; color: var(--ink-500); margin-bottom: 16px; }
+.share-gate .input { margin-bottom: 10px; }
+.share-head { border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 20px; }
+.share-head h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+.share-meta { font-size: 12px; color: var(--ink-500); margin-top: 6px; }
+.share-note {
+  display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 700;
+  padding: 3px 9px; border-radius: var(--radius-full);
+  background: var(--brand-50); color: var(--brand-900);
+}
+.share-section { margin-bottom: 26px; }
+.share-section h2 { font-size: 15px; font-weight: 800; margin-bottom: 10px; }
+.share-section h3 { font-size: 13px; font-weight: 800; margin: 16px 0 6px; color: var(--ink-700); }
+.share-section p { font-size: 14px; line-height: 1.7; color: var(--ink-700); }
+.share-count { font-size: 11.5px; font-weight: 600; color: var(--ink-400); margin-left: 4px; }
+.share-list { padding-left: 18px; list-style: disc; }
+.share-list li { font-size: 13.5px; line-height: 1.7; color: var(--ink-700); }
+.share-seg { padding: 10px 0; border-top: 1px solid var(--border); }
+.share-seg-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
+.share-speaker { font-size: 12.5px; font-weight: 800; color: var(--brand-900); }
+.share-seg-time { font-size: 11px; color: var(--ink-400); }
+.share-seg-text { font-size: 14px; line-height: 1.7; color: var(--ink-700); }
+.share-footer {
+  border-top: 1px solid var(--border); padding-top: 14px; margin-top: 10px;
+  font-size: 11.5px; color: var(--ink-400); text-align: center;
+}

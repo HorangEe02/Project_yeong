@@ -102,7 +102,31 @@ CREATE TABLE IF NOT EXISTS summary_versions (
   UNIQUE (meeting_id, version)
 );
 
-CREATE TABLE IF NOT EXISTS meeting_bookmarks (
+CREATE TABLE IF NOT EXISTS transcript_highlights (
+    id TEXT PRIMARY KEY,
+    meeting_id TEXT NOT NULL,
+    segment_id TEXT NOT NULL,
+    start_offset INTEGER NOT NULL,
+    end_offset INTEGER NOT NULL,
+    note TEXT,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS share_links (
+    id TEXT PRIMARY KEY,
+    meeting_id TEXT NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    password_hash TEXT,
+    include_transcript INTEGER NOT NULL DEFAULT 1,
+    expires_at TEXT NOT NULL,
+    revoked_at TEXT,
+    access_count INTEGER NOT NULL DEFAULT 0,
+    failed_attempts INTEGER NOT NULL DEFAULT 0,
+    last_accessed_at TEXT,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS meeting_bookmarks (
     id TEXT PRIMARY KEY,
     meeting_id TEXT NOT NULL,
     at_ms INTEGER NOT NULL,
@@ -193,7 +217,9 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE INDEX IF NOT EXISTS meetings_user_recorded_idx ON meetings(user_id, recorded_at DESC);
 CREATE INDEX IF NOT EXISTS jobs_meeting_idx ON jobs(meeting_id);
 CREATE INDEX IF NOT EXISTS segments_meeting_time_idx ON transcript_segments(meeting_id, start_ms);
-CREATE INDEX IF NOT EXISTS meeting_bookmarks_meeting_idx ON meeting_bookmarks(meeting_id, at_ms);
+CREATE INDEX IF NOT EXISTS transcript_highlights_segment_idx ON transcript_highlights(segment_id, start_offset);
+  CREATE INDEX IF NOT EXISTS share_links_token_idx ON share_links(token_hash);
+  CREATE INDEX IF NOT EXISTS meeting_bookmarks_meeting_idx ON meeting_bookmarks(meeting_id, at_ms);
   CREATE INDEX IF NOT EXISTS summary_sections_version_idx ON summary_sections(summary_version_id, section_index);
   CREATE INDEX IF NOT EXISTS summary_versions_meeting_version_idx ON summary_versions(meeting_id, version DESC);
 CREATE INDEX IF NOT EXISTS exports_meeting_idx ON exports(meeting_id, created_at DESC);
