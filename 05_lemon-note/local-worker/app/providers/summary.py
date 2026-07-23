@@ -45,8 +45,35 @@ class StubSummaryProvider:
         cal_start = (base + timedelta(days=7)).replace(hour=10, minute=0, second=0, microsecond=0)
         cal_end = cal_start + timedelta(minutes=30)
         title = context.get("title") or "제품 MVP 회의"
+
+        # 구간 요약(sections): 전사를 3등분해 각 구간의 실제 시작·끝 시각을 붙인다.
+        # stub 이라 문구는 고정이지만 타임스탬프는 실제 세그먼트에서 가져와,
+        # UI 의 "요약 → 해당 시점 재생" 동작을 그대로 검증할 수 있게 한다.
+        sections = []
+        if segments:
+            n = len(segments)
+            chunks = [segments[0:max(1, n // 3)],
+                      segments[max(1, n // 3):max(2, 2 * n // 3)],
+                      segments[max(2, 2 * n // 3):]]
+            labels = [("도입 · 배경", "회의 목적과 지난 논의 경과를 공유했다."),
+                      ("논의 · 결정", "처리 아키텍처와 데이터 보존 방침을 정했다."),
+                      ("마무리 · 다음 단계", "담당자와 마감일을 정하고 다음 점검 일정을 잡았다.")]
+            for i, ch in enumerate(chunks):
+                if not ch:
+                    continue
+                heading, text = labels[min(i, len(labels) - 1)]
+                sections.append({
+                    "start_ms": ch[0].get("start_ms"),
+                    "end_ms": ch[-1].get("end_ms"),
+                    "heading": heading,
+                    "text": text,
+                    "source_segment_ids": [s.get("id") for s in ch if s.get("id")][:3],
+                })
+
         return {
             "title": f"{title} 요약",
+            "keywords": ["MVP 범위", "로컬 Worker", "전사 정확도", "요약 버전", "일정 후보"],
+            "sections": sections,
             "summary": ("이번 회의에서는 MVP 범위와 처리 아키텍처, 일정을 논의했다. "
                         "초기에는 Mac 로컬 Worker로 전사와 요약을 처리하고, 서버 준비 후 "
                         "동일한 API 계약을 유지한 채 서버 Worker로 이전하기로 했다."),
@@ -98,6 +125,8 @@ class OllamaSummaryProvider:
 
         schema_hint = (
             '{"title": str, "summary": str, '
+            '"keywords": [str], '
+            '"sections": [{"heading": str, "text": str, "start_index": int, "end_index": int}], '
             '"decisions": [{"text": str, "source_indices": [int]}], '
             '"action_items": [{"owner": str|null, "task": str, "due_date": "YYYY-MM-DD"|null, '
             '"source_indices": [int], "confidence": float}], '
@@ -108,6 +137,10 @@ class OllamaSummaryProvider:
             "너는 한국어 회의록 요약 도우미다. 아래 전사를 읽고 회의 요약을 만든다.\n"
             f"오늘 날짜는 {today} 이다. 상대적 날짜(다음 주 수요일 등)는 이 기준으로 절대 날짜로 변환한다.\n"
             "각 항목의 근거가 된 발화는 전사 앞의 [번호]를 source_indices 배열(정수)로 표기한다.\n"
+            "keywords: 회의를 대표하는 핵심어 5~8개. 명사구로 짧게. 일반어(회의, 논의)는 제외한다.\n"
+            "sections: 회의를 흐름에 따라 3~6개 구간으로 나누고 각 구간을 한두 문장으로 요약한다.\n"
+            "  start_index/end_index 는 그 구간에 해당하는 전사 [번호]의 처음과 끝이다.\n"
+            "  시각(분:초)을 직접 쓰지 마라 — 번호만 정확히 주면 서버가 시각을 계산한다.\n"
             "반드시 아래 JSON 스키마로만 답하고, 다른 설명은 쓰지 않는다.\n"
             f"스키마: {schema_hint}\n\n"
             f"전사:\n{transcript}"
@@ -140,11 +173,12 @@ class OllamaSummaryProvider:
                 "title": (context.get("title") or "회의") + " 요약",
                 "summary": (self._strip_think(raw)[:1500] if raw
                             else "요약 생성에 실패했습니다. 재시도해 주세요."),
+                "keywords": [], "sections": [],
                 "decisions": [], "action_items": [], "calendar_candidates": [],
                 "_raw_model_output": raw,
             }
 
-        return self._normalize(parsed, ids, context)
+        return self._normalize(parsed, ids, context, segments)
 
     @staticmethod
     def _strip_think(text: str) -> str:
@@ -180,13 +214,44 @@ class OllamaSummaryProvider:
                 out.append(ids[i])
         return out
 
-    def _normalize(self, parsed: dict, ids: list, context: dict) -> dict:
+    def _normalize(self, parsed: dict, ids: list, context: dict,
+                   segments: Optional[List[dict]] = None) -> dict:
         title = parsed.get("title") or ((context.get("title") or "회의") + " 요약")
         result = {
             "title": title,
             "summary": parsed.get("summary", ""),
+            "keywords": [], "sections": [],
             "decisions": [], "action_items": [], "calendar_candidates": [],
         }
+        seen_kw = set()
+        for k in parsed.get("keywords", []) or []:
+            k = (k or "").strip() if isinstance(k, str) else ""
+            if k and k.lower() not in seen_kw:
+                seen_kw.add(k.lower())
+                result["keywords"].append(k)
+        result["keywords"] = result["keywords"][:8]
+
+        segs = segments or []
+        for sec in parsed.get("sections", []) or []:
+            text = (sec.get("text") or "").strip()
+            if not text:
+                continue
+            # 시각은 LLM 이 준 인덱스로 실제 세그먼트에서 유도한다.
+            # LLM 이 분:초를 직접 쓰게 하면 지어내기 쉽다(source_indices 와 같은 이유).
+            si, ei = sec.get("start_index"), sec.get("end_index")
+            si = si if isinstance(si, int) else None
+            ei = ei if isinstance(ei, int) else si
+            if si is None or not (0 <= si < len(segs)):
+                continue
+            if ei is None or not (0 <= ei < len(segs)) or ei < si:
+                ei = si
+            result["sections"].append({
+                "heading": (sec.get("heading") or "").strip(),
+                "text": text,
+                "start_ms": segs[si].get("start_ms"),
+                "end_ms": segs[ei].get("end_ms"),
+                "source_segment_ids": self._map_indices(list(range(si, min(ei + 1, si + 3))), ids),
+            })
         for d in parsed.get("decisions", []) or []:
             text = (d.get("text") or "").strip()
             if not text:

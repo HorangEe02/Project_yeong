@@ -1189,8 +1189,11 @@
       var summaryRes = results[2];
       summaryState = summaryRes ? Object.assign({}, summaryRes) : {
         summary_version_id: null, version: 0, source: null,
-        title: meeting.title || '', summary: '', decisions: [], action_items: [], calendar_candidates: []
+        title: meeting.title || '', summary: '', keywords: [], sections: [],
+        decisions: [], action_items: [], calendar_candidates: []
       };
+      summaryState.keywords = summaryState.keywords || [];
+      summaryState.sections = summaryState.sections || [];
       summaryState.decisions = summaryState.decisions || [];
       summaryState.action_items = summaryState.action_items || [];
       summaryState.calendar_candidates = summaryState.calendar_candidates || [];
@@ -1268,6 +1271,24 @@
           '<div class="card-head"><div class="summary-version-chip" id="md-summary-version-chip"></div></div>' +
           '<div class="field"><label class="field-label" for="md-summary-title">요약 제목</label><input type="text" class="input" id="md-summary-title" value="' + esc(summaryState.title) + '" /></div>' +
           '<div class="field"><label class="field-label" for="md-summary-body">요약 본문</label><textarea class="textarea" id="md-summary-body" rows="6">' + esc(summaryState.summary) + '</textarea></div>' +
+          (summaryState.keywords.length
+            ? '<div class="field"><label class="field-label">주요 키워드</label><div class="kw-wrap">' +
+              summaryState.keywords.map(function (k) { return '<span class="kw-chip">' + esc(k) + '</span>'; }).join('') +
+              '</div></div>'
+            : '') +
+          (summaryState.sections.length
+            ? '<div class="field"><label class="field-label">구간 요약 <span class="field-hint">시각을 누르면 그 지점부터 재생됩니다</span></label>' +
+              '<ol class="sec-list">' + summaryState.sections.map(function (s) {
+                return '<li class="sec-item">' +
+                  '<button type="button" class="sec-time mono" data-action="seek-section" data-start="' + (s.start_ms || 0) + '">' +
+                    ICONS.play + '<span>' + formatDuration(s.start_ms || 0) + '</span>' +
+                  '</button>' +
+                  '<div class="sec-body">' +
+                    (s.heading ? '<div class="sec-heading">' + esc(s.heading) + '</div>' : '') +
+                    '<div class="sec-text">' + esc(s.text) + '</div>' +
+                  '</div></li>';
+              }).join('') + '</ol></div>'
+            : '') +
           '<div class="field"><label class="field-label">결정사항</label><div id="md-decisions-list"></div><button type="button" class="btn btn-subtle btn-sm add-row-btn" id="md-add-decision">+ 결정사항 추가</button></div>' +
           '<div class="save-bar"><button type="button" class="btn btn-primary btn-block" id="md-save-summary-1">변경사항 저장</button><span class="save-bar-status" id="md-summary-save-status"><span class="dot"></span>저장됨</span></div>' +
         '</div>' +
@@ -1804,6 +1825,10 @@
         var action = btn.dataset.action;
         var segRow, seg;
         switch (action) {
+          case 'seek-section':
+            // 구간 요약의 시각 → 해당 지점부터 재생. 전사 말풍선의 seek 과 같은 경로를 쓴다.
+            seekAndPlay(parseInt(btn.dataset.start, 10) || 0);
+            return;
           case 'seek':
             segRow = btn.closest('.msg-row');
             if (segRow) seekAndPlay(Number(segRow.dataset.startMs));
