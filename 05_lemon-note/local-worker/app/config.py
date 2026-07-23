@@ -33,6 +33,12 @@ WRITE_PROTECTED = os.getenv("WRITE_PROTECTED", "1") == "1"
 # 업로드 상한 — 무인증 공개 엔드포인트라 상한이 없으면 무료 티어를 태울 수 있다.
 MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
 
+# 시간당 전체 업로드 건수 상한(레이트리밋). 0 이면 무제한.
+# IP 별이 아니라 전역인 이유: IP 를 저장하면 그 자체가 개인정보이고, 서버리스라
+# 프로세스 메모리에 카운터를 둘 수 없다. 기존 jobs 테이블 카운트만으로 처리한다.
+# 데모 한 사람이 쓰기엔 넉넉하고, 무료 티어를 태우는 반복 업로드는 막는 값.
+MAX_JOBS_PER_HOUR = int(os.getenv("MAX_JOBS_PER_HOUR", "60"))
+
 # CORS 허용 오리진. 쉼표로 구분. "*" 를 쓰면 전체 허용(로컬 개발 기본값).
 _origins = os.getenv("ALLOWED_ORIGINS", "*").strip()
 ALLOWED_ORIGINS = ["*"] if _origins == "*" else [o.strip() for o in _origins.split(",") if o.strip()]
