@@ -241,3 +241,18 @@ alter table calendar_candidates enable row level security;
 alter table exports enable row level security;
 alter table share_logs enable row level security;
 alter table audit_logs enable row level security;
+
+-- ---------------------------------------------------------------------------
+-- 전역 검색 인덱스 (pg_trgm)
+--
+-- 한국어는 교착어라 to_tsvector('simple') 로는 "업데이트하고" 가 "업데이트" 검색에
+-- 걸리지 않는다. 부분 일치(ILIKE '%q%')가 실질적으로 유일하게 쓸 만한 방식이고,
+-- pg_trgm GIN 이 그 부분 일치를 인덱싱한다.
+-- ---------------------------------------------------------------------------
+create extension if not exists pg_trgm;
+create index if not exists meetings_title_trgm_idx on meetings using gin (title gin_trgm_ops);
+create index if not exists transcript_segments_text_trgm_idx on transcript_segments using gin (text gin_trgm_ops);
+create index if not exists transcript_segments_corrected_trgm_idx on transcript_segments using gin (corrected_text gin_trgm_ops);
+create index if not exists summary_versions_summary_trgm_idx on summary_versions using gin (summary gin_trgm_ops);
+create index if not exists summary_versions_title_trgm_idx on summary_versions using gin (title gin_trgm_ops);
+create index if not exists summary_sections_text_trgm_idx on summary_sections using gin (text gin_trgm_ops);

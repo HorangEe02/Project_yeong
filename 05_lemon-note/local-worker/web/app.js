@@ -503,6 +503,7 @@
     var scrollEl, searchInput, filterSelect, loadMoreWrap, loadMoreBtn, countEl;
     var items = [];
     var nextCursor = null;
+    var lastQuery = '';   // 검색 결과 스니펫의 강조에 쓴다(itemHtml 이 fetchList 보다 먼저 정의돼 있어 별도 보관)
     var activeId = null;
 
     var STATUS_FILTER_OPTIONS = [
@@ -532,6 +533,17 @@
             '<div class="list-item-top"><span class="list-item-title">' + esc(title) + '</span><span class="list-item-time mono">' + esc(shortDate(m.recorded_at)) + '</span></div>' +
             '<div class="list-item-sub mono">' + esc(formatDateTime(m.recorded_at, { dateOnly: true })) + ' · ' + esc(formatDuration(m.duration_ms)) + '</div>' +
             '<div class="list-item-chips">' + itemChipsHtml(m) + '</div>' +
+            // 검색 중일 때만: 왜 이 회의가 결과에 떴는지 스니펫과 출처로 보여준다.
+            ((m.matches && m.matches.length)
+              ? '<div class="match-list">' + m.matches.map(function (mt) {
+                  return '<div class="match-row">' +
+                    '<span class="match-src match-src--' + esc(mt.source) + '">' + esc(mt.label) + '</span>' +
+                    (mt.start_ms != null
+                      ? '<span class="match-time mono">' + esc(formatDuration(mt.start_ms)) + '</span>' : '') +
+                    '<span class="match-text">' + highlightMatch(mt.text, lastQuery) + '</span>' +
+                  '</div>';
+                }).join('') + '</div>'
+              : '') +
           '</div>' +
           '<button type="button" class="list-item-delete" data-action="delete" title="삭제" aria-label="회의 삭제">' + ICONS.trash + '</button>' +
         '</div>'
@@ -556,9 +568,10 @@
 
     function fetchList(reset) {
       if (reset) { items = []; nextCursor = null; renderItems(true); }
+      lastQuery = searchInput.value.trim() || '';
       var params = {
         status: filterSelect.value || '',
-        q: searchInput.value.trim() || '',
+        q: lastQuery,
         limit: 20,
         cursor: reset ? '' : (nextCursor || '')
       };
@@ -589,7 +602,7 @@
           '<button type="button" class="list-compose-btn" id="lc-compose" title="새 회의" aria-label="새 회의">' + ICONS.plus + '</button>' +
         '</div>' +
         '<div class="list-toolbar">' +
-          '<div class="list-search-wrap">' + ICONS.search + '<input type="text" class="input" id="lc-search" placeholder="제목 또는 화자 검색" /></div>' +
+          '<div class="list-search-wrap">' + ICONS.search + '<input type="text" class="input" id="lc-search" placeholder="제목 · 전사 · 요약 전체 검색" /></div>' +
           '<select class="select list-filter-select" id="lc-filter">' +
             STATUS_FILTER_OPTIONS.map(function (o) { return '<option value="' + esc(o[0]) + '">' + esc(o[1]) + '</option>'; }).join('') +
           '</select>' +

@@ -293,6 +293,53 @@ def retry_job(meeting_id: str, background: BackgroundTasks, body: dict = None):
 
 
 # ============================ Meetings ============================
+
+def _snippet(text: str, q: str, width: int = 46) -> str:
+    """매치 지점 주변만 잘라낸다. 앞뒤가 잘리면 … 을 붙인다."""
+    if not text:
+        return ""
+    i = text.lower().find(q.lower())
+    if i < 0:
+        return text[:width * 2].strip()
+    start = max(0, i - width // 2)
+    end = min(len(text), i + len(q) + width)
+    out = text[start:end].strip()
+    return ("…" if start > 0 else "") + out + ("…" if end < len(text) else "")
+
+
+def _search_matches(conn, meeting_id: str, q: str, title: str, limit: int = 3) -> list:
+    """검색어가 어디에 걸렸는지(제목/전사/요약/구간) 스니펫과 함께 돌려준다.
+
+    클로바 노트가 '음성기록 결과 / 메모 결과' 라벨을 보여주는 것과 같은 목적 —
+    왜 이 회의가 결과에 떴는지 사용자가 바로 알 수 있어야 한다.
+    """
+    like = f"%{q}%"
+    out = []
+    if title and q.lower() in title.lower():
+        out.append({"source": "title", "label": "제목", "text": _snippet(title, q), "start_ms": None})
+    for r in conn.execute(
+            "SELECT start_ms, text, corrected_text FROM transcript_segments "
+            "WHERE meeting_id=? AND (text LIKE ? OR corrected_text LIKE ?) "
+            "ORDER BY start_ms LIMIT ?", (meeting_id, like, like, limit)).fetchall():
+        body = r["corrected_text"] or r["text"] or ""
+        out.append({"source": "transcript", "label": "전사",
+                    "text": _snippet(body, q), "start_ms": r["start_ms"]})
+    sv = conn.execute(
+        "SELECT id, summary FROM summary_versions WHERE meeting_id=? "
+        "ORDER BY version DESC LIMIT 1", (meeting_id,)).fetchone()
+    if sv:
+        if sv["summary"] and q.lower() in sv["summary"].lower():
+            out.append({"source": "summary", "label": "요약",
+                        "text": _snippet(sv["summary"], q), "start_ms": None})
+        for r in conn.execute(
+                "SELECT start_ms, heading, text FROM summary_sections "
+                "WHERE summary_version_id=? AND (text LIKE ? OR heading LIKE ?) "
+                "ORDER BY section_index LIMIT ?", (sv["id"], like, like, limit)).fetchall():
+            body = r["text"] or r["heading"] or ""
+            out.append({"source": "section", "label": "구간 요약",
+                        "text": _snippet(body, q), "start_ms": r["start_ms"]})
+    return out[:5]
+
 @app.get(P + "/meetings")
 def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
                   date: Optional[str] = None,
@@ -321,11 +368,20 @@ def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
             where.append("m.status=?")
             params.append(status)
         if q:
+            # 제목 · 전사 · 요약 본문 · 구간 요약을 모두 훑는다.
+            # 한국어는 교착어라 형태소 분석 없이는 부분 일치가 사실상 유일한 선택이고,
+            # postgres 에는 pg_trgm GIN 인덱스가 있어 이 LIKE 가 인덱스를 탄다.
             where.append(
-                "(m.title LIKE ? OR m.id IN (SELECT meeting_id FROM transcript_segments "
-                "WHERE text LIKE ? OR corrected_text LIKE ?))")
+                "(m.title LIKE ?"
+                " OR m.id IN (SELECT meeting_id FROM transcript_segments"
+                "             WHERE text LIKE ? OR corrected_text LIKE ?)"
+                " OR m.id IN (SELECT meeting_id FROM summary_versions"
+                "             WHERE title LIKE ? OR summary LIKE ?)"
+                " OR m.id IN (SELECT sv.meeting_id FROM summary_sections ss"
+                "             JOIN summary_versions sv ON sv.id = ss.summary_version_id"
+                "             WHERE ss.text LIKE ? OR ss.heading LIKE ?))")
             like = f"%{q}%"
-            params += [like, like, like]
+            params += [like] * 7
         sql = (
             "SELECT m.*, "
             "EXISTS(SELECT 1 FROM summary_versions sv WHERE sv.meeting_id=m.id) AS has_summary, "
@@ -340,6 +396,9 @@ def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
             "duration_ms": r["duration_ms"], "status": r["status"],
             "has_summary": bool(r["has_summary"]), "shared_count": r["shared_count"],
         } for r in rows]
+        if q:
+            for it in items:
+                it["matches"] = _search_matches(conn, it["meeting_id"], q, it["title"])
         next_cursor = str(offset + limit) if has_more else None
         return {"items": items, "next_cursor": next_cursor}
     finally:

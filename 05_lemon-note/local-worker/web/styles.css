@@ -951,3 +951,28 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
 .sec-body { min-width: 0; }
 .sec-heading { font-size: 12.5px; font-weight: 800; color: var(--ink-900); margin-bottom: 2px; }
 .sec-text { font-size: 13px; color: var(--ink-600); line-height: 1.6; overflow-wrap: anywhere; }
+
+/* ----------------------------------------------------------------------
+   15. 전역 검색 결과 — 매치 스니펫 + 출처 라벨
+   ------------------------------------------------------------------- */
+.match-list { display: flex; flex-direction: column; gap: 4px; margin-top: 7px; }
+.match-row {
+  display: flex; align-items: baseline; gap: 6px;
+  font-size: 11.5px; line-height: 1.5; color: var(--ink-600);
+}
+.match-src {
+  flex: none; font-size: 10px; font-weight: 800; padding: 1px 6px;
+  border-radius: var(--radius-full); background: var(--surface-sunken); color: var(--ink-500);
+}
+.match-src--title { background: var(--brand-100); color: var(--brand-900); }
+.match-src--transcript { background: #e7f3fe; color: #1b639f; }
+.match-src--summary { background: var(--green-100); color: var(--green-700); }
+.match-src--section { background: var(--brand-50); color: var(--brand-900); }
+.match-time { flex: none; font-size: 10.5px; color: var(--ink-400); }
+.match-text {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.match-text mark {
+  background: var(--brand-100); color: var(--brand-900);
+  font-weight: 700; padding: 0 1px; border-radius: 3px;
+}
