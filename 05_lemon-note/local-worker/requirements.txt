@@ -1,9 +1,9 @@
 # --- 데모 MVP(Stub) 실행에 필요한 최소 의존성 (전부 무료) ---
 # Vercel 서버리스 배포도 이 파일을 그대로 쓴다(모델 패키지가 없어 용량 제한 안에 들어간다).
-fastapi>=0.110
-uvicorn[standard]>=0.29
-python-multipart>=0.0.9
-psycopg[binary]>=3.1        # DB_BACKEND=postgres (Supabase) — Vercel 배포에 필요
+fastapi==0.128.8
+uvicorn[standard]==0.39.0
+python-multipart==0.0.20
+psycopg[binary]==3.2.13        # DB_BACKEND=postgres (Supabase) — Vercel 배포에 필요
 
 # --- 실제 로컬 모델로 교체할 때만 추가로 설치 (데모에서는 불필요) ---
 # faster-whisper>=1.0        # ASR_PROVIDER=faster_whisper (한국어 전사, 검증됨)
