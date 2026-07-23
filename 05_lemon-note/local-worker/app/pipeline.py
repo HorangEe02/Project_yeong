@@ -75,9 +75,25 @@ def run_pipeline(job_id: str, meeting_id: str) -> None:
             row["id"] = seg_id
             row["segment_index"] = i
             seg_rows.append(row)
+        # 녹음 중 찍은 북마크를 전사 세그먼트에 매핑한다.
+        # 북마크는 '중요한 말이 나온 직후' 누르는 경우가 많아, 그 시각을 포함하는
+        # 세그먼트가 없으면 바로 앞 세그먼트를 표시한다.
+        marked = 0
+        for bm in conn.execute(
+                "SELECT at_ms FROM meeting_bookmarks WHERE meeting_id=? ORDER BY at_ms",
+                (meeting_id,)).fetchall():
+            at = bm["at_ms"]
+            hit = next((r for r in seg_rows if r["start_ms"] <= at <= r["end_ms"]), None)
+            if hit is None:
+                prev = [r for r in seg_rows if r["start_ms"] <= at]
+                hit = prev[-1] if prev else (seg_rows[0] if seg_rows else None)
+            if hit is not None:
+                conn.execute("UPDATE transcript_segments SET bookmarked=? WHERE id=?",
+                             (database.enc_bool(True), hit["id"]))
+                marked += 1
         conn.commit()
         db.audit(conn, meeting["user_id"], meeting_id, "transcription_completed",
-                 {"segments": len(seg_rows)})
+                 {"segments": len(seg_rows), "bookmarks_mapped": marked})
         time.sleep(config.STUB_STAGE_DELAY)
 
         # 3) 요약

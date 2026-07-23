@@ -159,6 +159,8 @@ async def create_job(
     language: str = Form("ko"),
     hotwords: Optional[str] = Form(None),
     recording_consent_confirmed: str = Form("false"),
+    # 녹음 중 찍은 북마크(밀리초 배열 JSON). 웹 레코더가 보낸다.
+    bookmarks: Optional[str] = Form(None),
 ):
     # 데모: 단일 로컬 사용자 (AUTH_ENABLED 시 별도 인증 레이어로 확장)
     user_id = config.DEFAULT_USER_ID
@@ -244,6 +246,11 @@ async def create_job(
                VALUES (?,?,?,?,?,?)""",
             (job_id, meeting_id, "uploaded", 0.0, now, now),
         )
+        for at_ms in _parse_bookmarks(bookmarks):
+            conn.execute(
+                "INSERT INTO meeting_bookmarks (id,meeting_id,at_ms,label,created_at) VALUES (?,?,?,?,?)",
+                (db.new_id("bm_"), meeting_id, at_ms, None, now),
+            )
         conn.commit()
         db.audit(conn, user_id, meeting_id, "meeting_created",
                  {"source_device": source_device, "consent": consent})
@@ -575,6 +582,75 @@ def delete_meeting(meeting_id: str, _: str = Depends(require_write)):
 
 
 # ============================ Segments ============================
+
+def _parse_bookmarks(raw) -> list:
+    """녹음 중 북마크(밀리초 배열)를 정규화. 잘못된 값은 조용히 버린다."""
+    if not raw:
+        return []
+    try:
+        data = json.loads(raw)
+    except (ValueError, TypeError):
+        return []
+    if not isinstance(data, list):
+        return []
+    out = []
+    for v in data:
+        try:
+            ms = int(v)
+        except (ValueError, TypeError):
+            continue
+        if 0 <= ms <= 24 * 60 * 60 * 1000:
+            out.append(ms)
+    return sorted(set(out))[:200]
+
+
+@app.get(P + "/meetings/{meeting_id}/bookmarks")
+def list_bookmarks(meeting_id: str):
+    conn = db.connect()
+    try:
+        m = _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID)
+        if m is None:
+            return _err(404, "meeting_not_found", "회의를 찾을 수 없습니다.")
+        rows = conn.execute(
+            "SELECT id, at_ms, label FROM meeting_bookmarks WHERE meeting_id=? ORDER BY at_ms",
+            (meeting_id,)).fetchall()
+        return {"items": [{"id": r["id"], "at_ms": r["at_ms"], "label": r["label"]} for r in rows]}
+    finally:
+        conn.close()
+
+
+@app.post(P + "/meetings/{meeting_id}/bookmarks", status_code=201)
+def add_bookmark(meeting_id: str, body: dict, _: str = Depends(require_write)):
+    conn = db.connect()
+    try:
+        m = _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID)
+        if m is None:
+            return _err(404, "meeting_not_found", "회의를 찾을 수 없습니다.")
+        try:
+            at_ms = int((body or {}).get("at_ms"))
+        except (ValueError, TypeError):
+            return _err(422, "invalid_at_ms", "북마크 시각이 올바르지 않습니다.")
+        bm_id = db.new_id("bm_")
+        conn.execute(
+            "INSERT INTO meeting_bookmarks (id,meeting_id,at_ms,label,created_at) VALUES (?,?,?,?,?)",
+            (bm_id, meeting_id, at_ms, (body or {}).get("label"), db.now_iso()))
+        conn.commit()
+        return {"id": bm_id, "at_ms": at_ms, "label": (body or {}).get("label")}
+    finally:
+        conn.close()
+
+
+@app.delete(P + "/meetings/{meeting_id}/bookmarks/{bookmark_id}")
+def delete_bookmark(meeting_id: str, bookmark_id: str, _: str = Depends(require_write)):
+    conn = db.connect()
+    try:
+        conn.execute("DELETE FROM meeting_bookmarks WHERE id=? AND meeting_id=?",
+                     (bookmark_id, meeting_id))
+        conn.commit()
+        return {"ok": True}
+    finally:
+        conn.close()
+
 @app.get(P + "/meetings/{meeting_id}/segments")
 def get_segments(meeting_id: str):
     user_id = config.DEFAULT_USER_ID
