@@ -41,3 +41,5 @@ logs/
 Thumbs.db
 .vscode/
 .idea/
+
+# (보호 설정 검증용 임시 줄 — 이 PR 직후 제거)
