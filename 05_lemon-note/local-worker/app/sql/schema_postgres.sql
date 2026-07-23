@@ -119,6 +119,17 @@ create table if not exists summary_versions (
   unique (meeting_id, version)
 );
 
+create table if not exists summary_sections (
+  id uuid primary key default gen_random_uuid(),
+  summary_version_id uuid not null references summary_versions(id) on delete cascade,
+  section_index integer not null,
+  start_ms integer,
+  end_ms integer,
+  heading text,
+  text text not null,
+  source_segment_ids uuid[] not null default '{}'
+);
+
 create table if not exists summary_decisions (
   id uuid primary key default gen_random_uuid(),
   summary_version_id uuid not null references summary_versions(id) on delete cascade,
@@ -198,6 +209,7 @@ create table if not exists audit_logs (
 create index if not exists meetings_user_recorded_idx on meetings(user_id, recorded_at desc);
 create index if not exists jobs_meeting_idx on jobs(meeting_id);
 create index if not exists transcript_segments_meeting_time_idx on transcript_segments(meeting_id, start_ms);
+create index if not exists summary_sections_version_idx on summary_sections(summary_version_id, section_index);
 create index if not exists summary_versions_meeting_version_idx on summary_versions(meeting_id, version desc);
 create index if not exists exports_meeting_idx on exports(meeting_id, created_at desc);
 create index if not exists share_logs_meeting_idx on share_logs(meeting_id, created_at desc);
@@ -222,6 +234,7 @@ alter table recording_files enable row level security;
 alter table transcript_segments enable row level security;
 alter table speaker_aliases enable row level security;
 alter table summary_versions enable row level security;
+alter table summary_sections enable row level security;
 alter table summary_decisions enable row level security;
 alter table action_items enable row level security;
 alter table calendar_candidates enable row level security;

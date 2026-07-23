@@ -41,6 +41,18 @@ def build_markdown(meeting: dict, summary: dict, segments: list,
         lines.append("## 요약\n")
         lines.append(f"{summary.get('summary', '')}\n")
 
+        keywords = summary.get("keywords") or []
+        if keywords:
+            lines.append("**주요 키워드:** " + " · ".join(keywords) + "\n")
+
+        sections = summary.get("sections") or []
+        if sections:
+            lines.append("## 구간 요약\n")
+            for s in sections:
+                head = s.get("heading") or ""
+                lines.append(f"- `{fmt_ms(s.get('start_ms'))}` **{head}** {s.get('text', '')}".replace("** ", "** ", 1))
+            lines.append("")
+
         decisions = summary.get("decisions") or []
         if decisions:
             lines.append("## 결정사항\n")
@@ -93,6 +105,16 @@ def build_txt(meeting: dict, summary: dict, segments: list,
         lines.append("■ 요약")
         lines.append(summary.get("summary", ""))
         lines.append("")
+        if summary.get("keywords"):
+            lines.append("■ 주요 키워드")
+            lines.append(" · ".join(summary["keywords"]))
+            lines.append("")
+        if summary.get("sections"):
+            lines.append("■ 구간 요약")
+            for s in summary["sections"]:
+                head = f"[{s.get('heading')}] " if s.get("heading") else ""
+                lines.append(f"[{fmt_ms(s.get('start_ms'))}] {head}{s.get('text', '')}")
+            lines.append("")
         if summary.get("decisions"):
             lines.append("■ 결정사항")
             for d in summary["decisions"]:

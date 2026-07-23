@@ -925,3 +925,29 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
 @media (max-width: 420px) {
   .stepper-step .stepper-label { display: none; }
 }
+
+/* ----------------------------------------------------------------------
+   14. 주요 키워드 · 구간 요약 (타임스탬프 앵커)
+   ------------------------------------------------------------------- */
+.kw-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+.kw-chip {
+  font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: var(--radius-full);
+  background: var(--brand-50); color: var(--brand-900); border: 1px solid var(--brand-100);
+  white-space: nowrap;
+}
+
+.sec-list { display: flex; flex-direction: column; gap: 2px; }
+.sec-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; }
+.sec-item + .sec-item { border-top: 1px solid var(--border); }
+.sec-time {
+  flex: none; display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: var(--radius-full); border: 1px solid var(--brand-100);
+  background: var(--brand-50); color: var(--brand-900);
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  transition: background-color .14s var(--ease), border-color .14s var(--ease);
+}
+.sec-time:hover { background: var(--brand-100); border-color: var(--brand-700); }
+.sec-time:focus-visible { outline: 2px solid var(--brand-700); outline-offset: 2px; }
+.sec-body { min-width: 0; }
+.sec-heading { font-size: 12.5px; font-weight: 800; color: var(--ink-900); margin-bottom: 2px; }
+.sec-text { font-size: 13px; color: var(--ink-600); line-height: 1.6; overflow-wrap: anywhere; }

@@ -102,7 +102,18 @@ CREATE TABLE IF NOT EXISTS summary_versions (
   UNIQUE (meeting_id, version)
 );
 
-CREATE TABLE IF NOT EXISTS summary_decisions (
+CREATE TABLE IF NOT EXISTS summary_sections (
+    id TEXT PRIMARY KEY,
+    summary_version_id TEXT NOT NULL,
+    section_index INTEGER NOT NULL,
+    start_ms INTEGER,
+    end_ms INTEGER,
+    heading TEXT,
+    text TEXT NOT NULL,
+    source_segment_ids TEXT NOT NULL DEFAULT '[]'
+  );
+
+  CREATE TABLE IF NOT EXISTS summary_decisions (
   id TEXT PRIMARY KEY,
   summary_version_id TEXT NOT NULL,
   decision_index INTEGER NOT NULL,
@@ -174,7 +185,8 @@ CREATE TABLE IF NOT EXISTS audit_logs (
 CREATE INDEX IF NOT EXISTS meetings_user_recorded_idx ON meetings(user_id, recorded_at DESC);
 CREATE INDEX IF NOT EXISTS jobs_meeting_idx ON jobs(meeting_id);
 CREATE INDEX IF NOT EXISTS segments_meeting_time_idx ON transcript_segments(meeting_id, start_ms);
-CREATE INDEX IF NOT EXISTS summary_versions_meeting_version_idx ON summary_versions(meeting_id, version DESC);
+CREATE INDEX IF NOT EXISTS summary_sections_version_idx ON summary_sections(summary_version_id, section_index);
+  CREATE INDEX IF NOT EXISTS summary_versions_meeting_version_idx ON summary_versions(meeting_id, version DESC);
 CREATE INDEX IF NOT EXISTS exports_meeting_idx ON exports(meeting_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS share_logs_meeting_idx ON share_logs(meeting_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS audit_logs_meeting_idx ON audit_logs(meeting_id, created_at DESC);
@@ -266,6 +278,15 @@ def store_summary_version(conn, meeting_id, result, source, created_by=None,
          s(result.get("summary")), database.enc_json(result),
          raw_model_output, created_by, now),
     )
+    for i, sec in enumerate(result.get("sections", []) or []):
+        conn.execute(
+            """INSERT INTO summary_sections
+               (id,summary_version_id,section_index,start_ms,end_ms,heading,text,source_segment_ids)
+               VALUES (?,?,?,?,?,?,?,?)""",
+            (new_id("sec_"), sv_id, i, sec.get("start_ms"), sec.get("end_ms"),
+             s(sec.get("heading")), s(sec.get("text")),
+             database.enc_array(sec.get("source_segment_ids", []))),
+        )
     for i, d in enumerate(result.get("decisions", []) or []):
         conn.execute(
             "INSERT INTO summary_decisions (id,summary_version_id,decision_index,text,source_segment_ids) VALUES (?,?,?,?,?)",
@@ -325,12 +346,28 @@ def load_summary_version(conn, sv_row) -> dict:
             (sv_id,),
         ).fetchall()
     ]
+    sections = [
+        {"start_ms": r["start_ms"], "end_ms": r["end_ms"],
+         "heading": r["heading"], "text": r["text"],
+         "source_segment_ids": database.dec_array(r["source_segment_ids"])}
+        for r in conn.execute(
+            "SELECT * FROM summary_sections WHERE summary_version_id=? ORDER BY section_index",
+            (sv_id,),
+        ).fetchall()
+    ]
+    # 키워드는 raw_json 에 둔다. 기존 테이블에 컬럼을 추가하면 마이그레이션이 필요한데
+    # 이 앱에는 마이그레이션 경로가 없다(CREATE TABLE IF NOT EXISTS 뿐). raw_json 은
+    # 이미 LLM 결과 전체를 담고 있어 추가 비용이 0이다.
+    raw = database.dec_json(sv_row["raw_json"]) or {}
+    keywords = [k for k in (raw.get("keywords") or []) if isinstance(k, str) and k.strip()]
     return {
         "summary_version_id": sv_id,
         "version": sv_row["version"],
         "source": sv_row["source"],
         "title": sv_row["title"],
         "summary": sv_row["summary"],
+        "keywords": keywords,
+        "sections": sections,
         "decisions": decisions,
         "action_items": action_items,
         "calendar_candidates": calendar_candidates,
