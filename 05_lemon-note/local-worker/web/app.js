@@ -1722,7 +1722,19 @@
       audioEl.addEventListener('ended', function () { updatePlayIcon(false); });
       /* 전사에서 텍스트를 고르면 그 자리에서 하이라이트한다.
          이미 하이라이트된 부분을 클릭하면 해제한다. */
-      centerEl.addEventListener('mouseup', function (e) {
+      /* 터치 기기는 mouseup 이 안 오거나 늦게 온다. touchend 를 함께 듣되
+         같은 제스처가 두 번 처리되지 않게 짧은 시간 잠근다. */
+      var lastSelectAt = 0;
+      function onSelectEnd(e) {
+        var now = Date.now();
+        if (now - lastSelectAt < 350) return;
+        lastSelectAt = now;
+        handleSelectionGesture(e);
+      }
+      centerEl.addEventListener('mouseup', onSelectEnd);
+      centerEl.addEventListener('touchend', onSelectEnd);
+
+      function handleSelectionGesture(e) {
         var mark = e.target.closest && e.target.closest('mark.user-hl');
         if (mark && (window.getSelection() || {}).isCollapsed !== false) {
           var hlId = mark.dataset.hl;
@@ -1747,7 +1759,7 @@
           renderWaveHighlights();
           toast('하이라이트했습니다', 'success');
         }).catch(function (err) { toast(err.message || '하이라이트하지 못했습니다.', 'error'); });
-      });
+      }
 
       /* 하이라이트도 파형 마커로 보여준다(북마크와 색만 다르다). */
       function renderWaveHighlights() {
