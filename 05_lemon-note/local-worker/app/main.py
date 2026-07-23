@@ -53,11 +53,12 @@ def _startup():
 
 # --- 인증 (데모: 토큰 미설정 시 통과) ---
 def require_write(authorization: Optional[str] = Header(default=None)) -> str:
-    """수정·삭제 라우트 게이트.
+    """회의 자체를 바꾸는 라우트 게이트(제목·전사·요약 수정, 회의 삭제, 외부 전송).
 
-    이 앱은 공개 데모라 읽기와 업로드는 열어 두지만, 파괴적 작업까지 열면
-    인터넷의 누구나 남의 회의록을 지우거나 고칠 수 있다.
-    토큰이 설정돼 있으면 그 토큰을, 없고 WRITE_PROTECTED 면 차단한다.
+    북마크·하이라이트·공유 링크는 여기 걸지 않는다. 본인이 올린 내용에 대한
+    '추가 주석'이지 남의 데이터를 파괴하는 조작이 아니고, 공개 데모에서 막으면
+    기능 자체를 쓸 수 없게 된다. 그쪽은 require_user 로 — 토큰이 설정되면
+    똑같이 인증을 요구하고, 데모에서는 열린다.
     """
     if config.AUTH_ENABLED:
         return require_user(authorization)
@@ -547,6 +548,7 @@ def get_meeting(meeting_id: str):
                      "stream_url": f"{P}/recording-files/{rec['id']}/stream"}
         return {
             "meeting_id": m["id"], "title": m["title"], "recorded_at": m["recorded_at"],
+            "language": m["language"],
             "duration_ms": m["duration_ms"], "status": m["status"], "audio": audio,
             "summary_version_id": sv["id"] if sv else None,
         }
@@ -623,7 +625,7 @@ def list_bookmarks(meeting_id: str):
 
 
 @app.post(P + "/meetings/{meeting_id}/bookmarks", status_code=201)
-def add_bookmark(meeting_id: str, body: dict, _: str = Depends(require_write)):
+def add_bookmark(meeting_id: str, body: dict, _: str = Depends(require_user)):
     conn = db.connect()
     try:
         m = _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID)
@@ -644,7 +646,7 @@ def add_bookmark(meeting_id: str, body: dict, _: str = Depends(require_write)):
 
 
 @app.delete(P + "/meetings/{meeting_id}/bookmarks/{bookmark_id}")
-def delete_bookmark(meeting_id: str, bookmark_id: str, _: str = Depends(require_write)):
+def delete_bookmark(meeting_id: str, bookmark_id: str, _: str = Depends(require_user)):
     conn = db.connect()
     try:
         conn.execute("DELETE FROM meeting_bookmarks WHERE id=? AND meeting_id=?",
@@ -673,7 +675,7 @@ def list_highlights(meeting_id: str):
 
 
 @app.post(P + "/meetings/{meeting_id}/highlights", status_code=201)
-def add_highlight(meeting_id: str, body: dict, _: str = Depends(require_write)):
+def add_highlight(meeting_id: str, body: dict, _: str = Depends(require_user)):
     conn = db.connect()
     try:
         if _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID) is None:
@@ -708,7 +710,7 @@ def add_highlight(meeting_id: str, body: dict, _: str = Depends(require_write)):
 
 
 @app.delete(P + "/meetings/{meeting_id}/highlights/{highlight_id}")
-def delete_highlight(meeting_id: str, highlight_id: str, _: str = Depends(require_write)):
+def delete_highlight(meeting_id: str, highlight_id: str, _: str = Depends(require_user)):
     conn = db.connect()
     try:
         conn.execute("DELETE FROM transcript_highlights WHERE id=? AND meeting_id=?",
@@ -1051,7 +1053,7 @@ def _verify_password(pw: str, stored: str) -> bool:
 
 
 @app.post(P + "/meetings/{meeting_id}/share-links", status_code=201)
-def create_share_link(meeting_id: str, body: dict, _: str = Depends(require_write)):
+def create_share_link(meeting_id: str, body: dict, _: str = Depends(require_user)):
     body = body or {}
     try:
         days = int(body.get("expires_in_days", 30))
@@ -1063,6 +1065,12 @@ def create_share_link(meeting_id: str, body: dict, _: str = Depends(require_writ
     try:
         if _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID) is None:
             return _err(404, "meeting_not_found", "회의를 찾을 수 없습니다.")
+        active = conn.execute(
+            "SELECT COUNT(*) AS n FROM share_links WHERE meeting_id=? AND revoked_at IS NULL",
+            (meeting_id,)).fetchone()
+        if (active["n"] if active else 0) >= 20:
+            return _err(429, "too_many_links",
+                        "유효한 공유 링크가 너무 많습니다. 쓰지 않는 링크를 폐기해 주세요.")
         token = secrets.token_urlsafe(32)
         pw = (body.get("password") or "").strip()
         link_id = db.new_id("shr_")
@@ -1104,7 +1112,7 @@ def list_share_links(meeting_id: str):
 
 
 @app.delete(P + "/meetings/{meeting_id}/share-links/{link_id}")
-def revoke_share_link(meeting_id: str, link_id: str, _: str = Depends(require_write)):
+def revoke_share_link(meeting_id: str, link_id: str, _: str = Depends(require_user)):
     conn = db.connect()
     try:
         conn.execute("UPDATE share_links SET revoked_at=? WHERE id=? AND meeting_id=?",
