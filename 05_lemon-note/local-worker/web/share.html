@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <!-- 공유 페이지는 검색엔진에 남으면 안 된다. 링크를 아는 사람만 보는 것이 전제다. -->
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="referrer" content="no-referrer" />
+  <title>공유된 회의록 — 회의녹음챗</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="share-body">
+  <main class="share-page" id="share-root">
+    <div class="share-loading">불러오는 중…</div>
+  </main>
+
+  <script>
+  (function () {
+    'use strict';
+    var root = document.getElementById('share-root');
+    var token = location.pathname.replace(/^\/s\//, '').split(/[?#]/)[0];
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function fmtMs(ms) {
+      if (ms == null) return '--:--';
+      var s = Math.floor(ms / 1000);
+      return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    }
+    function fmtWhen(v) {
+      if (!v) return '';
+      var d = new Date(v);
+      return isNaN(d) ? String(v).slice(0, 16).replace('T', ' ')
+        : d.toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    function askPassword(message) {
+      root.innerHTML =
+        '<div class="share-card share-gate">' +
+          '<h1>보호된 회의록</h1>' +
+          '<p>' + esc(message || '이 링크는 비밀번호로 보호되어 있습니다.') + '</p>' +
+          '<input type="password" id="pw" class="input" placeholder="비밀번호" autocomplete="current-password" />' +
+          '<button type="button" class="btn btn-primary btn-block" id="go">열기</button>' +
+        '</div>';
+      var pw = document.getElementById('pw');
+      function submit() { load(pw.value); }
+      document.getElementById('go').addEventListener('click', submit);
+      pw.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
+      pw.focus();
+    }
+
+    function fail(msg) {
+      root.innerHTML = '<div class="share-card share-gate"><h1>열 수 없는 링크</h1><p>' + esc(msg) + '</p></div>';
+    }
+
+    function render(d) {
+      var segs = d.segments || [];
+      var sum = d.summary || null;
+      root.innerHTML =
+        '<div class="share-card">' +
+          '<div class="share-head">' +
+            '<h1>' + esc(d.title || '회의록') + '</h1>' +
+            '<div class="share-meta mono">' + esc(fmtWhen(d.recorded_at)) +
+              (d.duration_ms ? ' · ' + esc(fmtMs(d.duration_ms)) : '') + '</div>' +
+            '<div class="share-note">읽기 전용 공유 · ' +
+              esc(String(d.expires_at || '').slice(0, 10)) + ' 만료</div>' +
+          '</div>' +
+          (sum ? (
+            '<section class="share-section">' +
+              '<h2>요약</h2>' +
+              '<p>' + esc(sum.summary || '') + '</p>' +
+              ((sum.keywords || []).length
+                ? '<div class="kw-wrap">' + sum.keywords.map(function (k) {
+                    return '<span class="kw-chip">' + esc(k) + '</span>'; }).join('') + '</div>'
+                : '') +
+              ((sum.sections || []).length
+                ? '<ol class="sec-list">' + sum.sections.map(function (s) {
+                    return '<li class="sec-item">' +
+                      '<span class="sec-time mono">' + esc(fmtMs(s.start_ms)) + '</span>' +
+                      '<div class="sec-body">' +
+                        (s.heading ? '<div class="sec-heading">' + esc(s.heading) + '</div>' : '') +
+                        '<div class="sec-text">' + esc(s.text) + '</div></div></li>';
+                  }).join('') + '</ol>'
+                : '') +
+              ((sum.decisions || []).length
+                ? '<h3>결정사항</h3><ul class="share-list">' + sum.decisions.map(function (x) {
+                    return '<li>' + esc(x.text) + '</li>'; }).join('') + '</ul>'
+                : '') +
+              ((sum.action_items || []).length
+                ? '<h3>할 일</h3><ul class="share-list">' + sum.action_items.map(function (a) {
+                    return '<li>' + esc(a.task) + (a.owner ? ' — ' + esc(a.owner) : '') +
+                      (a.due_date ? ' (' + esc(a.due_date) + ')' : '') + '</li>'; }).join('') + '</ul>'
+                : '') +
+            '</section>'
+          ) : '') +
+          (segs.length ? (
+            '<section class="share-section">' +
+              '<h2>전사 <span class="share-count">' + segs.length + '개 발화</span></h2>' +
+              segs.map(function (s) {
+                return '<div class="share-seg">' +
+                  '<div class="share-seg-head"><span class="share-speaker">' + esc(s.speaker || '') + '</span>' +
+                  '<span class="mono share-seg-time">' + esc(fmtMs(s.start_ms)) + '</span></div>' +
+                  '<div class="share-seg-text">' + esc(s.text || '') + '</div></div>';
+              }).join('') +
+            '</section>'
+          ) : '') +
+          '<footer class="share-footer">회의녹음챗으로 생성된 회의록입니다.</footer>' +
+        '</div>';
+    }
+
+    function load(password) {
+      var headers = {};
+      if (password) headers['X-Share-Password'] = password;
+      fetch('/v1/shared/' + encodeURIComponent(token), { headers: headers })
+        .then(function (r) {
+          return r.json().then(function (body) { return { status: r.status, body: body }; });
+        })
+        .then(function (res) {
+          var code = ((res.body || {}).error || {}).code;
+          if (res.status === 200) return render(res.body);
+          if (code === 'password_required') return askPassword();
+          if (code === 'invalid_password') return askPassword('비밀번호가 올바르지 않습니다.');
+          fail(((res.body || {}).error || {}).message || '링크가 없거나 만료되었습니다.');
+        })
+        .catch(function () { fail('불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'); });
+    }
+
+    if (!token) fail('잘못된 링크입니다.');
+    else load(null);
+  })();
+  </script>
+</body>
+</html>

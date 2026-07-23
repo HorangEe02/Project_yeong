@@ -3,8 +3,11 @@
 정적 프론트엔드(web/)를 같은 서버에서 서빙하고, REST API를 /v1 아래로 노출한다.
 docs/api-spec.md 계약을 따르며, 데모 편의를 위한 소수 추가 필드/엔드포인트가 있다.
 """
+import hashlib
+import hmac
 import json
 import os
+import secrets
 import urllib.parse
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -651,6 +654,70 @@ def delete_bookmark(meeting_id: str, bookmark_id: str, _: str = Depends(require_
     finally:
         conn.close()
 
+
+@app.get(P + "/meetings/{meeting_id}/highlights")
+def list_highlights(meeting_id: str):
+    conn = db.connect()
+    try:
+        if _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID) is None:
+            return _err(404, "meeting_not_found", "회의를 찾을 수 없습니다.")
+        rows = conn.execute(
+            "SELECT id, segment_id, start_offset, end_offset, note "
+            "FROM transcript_highlights WHERE meeting_id=? ORDER BY segment_id, start_offset",
+            (meeting_id,)).fetchall()
+        return {"items": [{"id": r["id"], "segment_id": r["segment_id"],
+                           "start_offset": r["start_offset"], "end_offset": r["end_offset"],
+                           "note": r["note"]} for r in rows]}
+    finally:
+        conn.close()
+
+
+@app.post(P + "/meetings/{meeting_id}/highlights", status_code=201)
+def add_highlight(meeting_id: str, body: dict, _: str = Depends(require_write)):
+    conn = db.connect()
+    try:
+        if _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID) is None:
+            return _err(404, "meeting_not_found", "회의를 찾을 수 없습니다.")
+        body = body or {}
+        seg_id = str(body.get("segment_id") or "")
+        try:
+            s = int(body.get("start_offset")); e = int(body.get("end_offset"))
+        except (ValueError, TypeError):
+            return _err(422, "invalid_range", "하이라이트 범위가 올바르지 않습니다.")
+        if s < 0 or e <= s:
+            return _err(422, "invalid_range", "하이라이트 범위가 올바르지 않습니다.")
+        seg = conn.execute(
+            "SELECT id, text, corrected_text FROM transcript_segments WHERE id=? AND meeting_id=?",
+            (seg_id, meeting_id)).fetchone()
+        if seg is None:
+            return _err(404, "segment_not_found", "해당 발화를 찾을 수 없습니다.")
+        # 오프셋이 실제 본문 길이를 벗어나면 저장하지 않는다(렌더 시 깨진다).
+        body_text = seg["corrected_text"] or seg["text"] or ""
+        if e > len(body_text):
+            return _err(422, "range_out_of_bounds", "하이라이트 범위가 발화 길이를 벗어납니다.")
+        hl_id = db.new_id("hl_")
+        conn.execute(
+            "INSERT INTO transcript_highlights "
+            "(id,meeting_id,segment_id,start_offset,end_offset,note,created_at) VALUES (?,?,?,?,?,?,?)",
+            (hl_id, meeting_id, seg_id, s, e, body.get("note"), db.now_iso()))
+        conn.commit()
+        return {"id": hl_id, "segment_id": seg_id, "start_offset": s, "end_offset": e,
+                "note": body.get("note")}
+    finally:
+        conn.close()
+
+
+@app.delete(P + "/meetings/{meeting_id}/highlights/{highlight_id}")
+def delete_highlight(meeting_id: str, highlight_id: str, _: str = Depends(require_write)):
+    conn = db.connect()
+    try:
+        conn.execute("DELETE FROM transcript_highlights WHERE id=? AND meeting_id=?",
+                     (highlight_id, meeting_id))
+        conn.commit()
+        return {"ok": True}
+    finally:
+        conn.close()
+
 @app.get(P + "/meetings/{meeting_id}/segments")
 def get_segments(meeting_id: str):
     user_id = config.DEFAULT_USER_ID
@@ -946,6 +1013,172 @@ def stream_file(recording_file_id: str, request: Request):
 
 
 # ============================ Health & static ============================
+
+# ============================ 공유 링크 ============================
+#
+# /v1 는 공개 데모라 무인증이다. 공유 링크를 그 위에 그대로 얹으면 "보호되는 것처럼
+# 보이지만 실제로는 아무나 보는" 상태가 된다. 그래서 공유는 다음을 지킨다:
+#   1) /v1/shared/{token} 은 토큰 자체가 인가 근거다. 다른 /v1 라우트의 개방성에
+#      의존하지 않으므로, 나중에 LOCAL_API_TOKEN 으로 앱을 잠가도 그대로 동작한다.
+#   2) 토큰 평문은 저장하지 않는다(발급 시 1회만 노출). DB 가 새도 링크가 열리지 않는다.
+#   3) 비밀번호는 pbkdf2(솔트+10만 반복). 비교는 타이밍 안전 비교를 쓴다.
+#   4) 만료·폐기·실패횟수를 서버가 강제한다. 응답에는 해당 회의 외 어떤 것도 담지 않는다.
+_SHARE_MAX_FAILS = 10
+_SHARE_TTL_DAYS = {7, 30, 90, 180, 365}
+
+
+def _hash_token(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def _hash_password(pw: str) -> str:
+    salt = secrets.token_bytes(16)
+    iters = 100_000
+    dk = hashlib.pbkdf2_hmac("sha256", pw.encode("utf-8"), salt, iters)
+    return f"pbkdf2${iters}${salt.hex()}${dk.hex()}"
+
+
+def _verify_password(pw: str, stored: str) -> bool:
+    try:
+        algo, iters, salt_hex, hash_hex = stored.split("$")
+        if algo != "pbkdf2":
+            return False
+        dk = hashlib.pbkdf2_hmac("sha256", (pw or "").encode("utf-8"),
+                                 bytes.fromhex(salt_hex), int(iters))
+        return hmac.compare_digest(dk.hex(), hash_hex)
+    except (ValueError, TypeError):
+        return False
+
+
+@app.post(P + "/meetings/{meeting_id}/share-links", status_code=201)
+def create_share_link(meeting_id: str, body: dict, _: str = Depends(require_write)):
+    body = body or {}
+    try:
+        days = int(body.get("expires_in_days", 30))
+    except (ValueError, TypeError):
+        days = 30
+    if days not in _SHARE_TTL_DAYS:
+        return _err(422, "invalid_expiry", "유효기간은 7·30·90·180·365일 중에서 고르세요.")
+    conn = db.connect()
+    try:
+        if _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID) is None:
+            return _err(404, "meeting_not_found", "회의를 찾을 수 없습니다.")
+        token = secrets.token_urlsafe(32)
+        pw = (body.get("password") or "").strip()
+        link_id = db.new_id("shr_")
+        expires = datetime.now(timezone.utc) + timedelta(days=days)
+        conn.execute(
+            "INSERT INTO share_links (id,meeting_id,token_hash,password_hash,include_transcript,"
+            "expires_at,created_at) VALUES (?,?,?,?,?,?,?)",
+            (link_id, meeting_id, _hash_token(token),
+             _hash_password(pw) if pw else None,
+             database.enc_bool(bool(body.get("include_transcript", True))),
+             expires, db.now_iso()))
+        conn.commit()
+        db.audit(conn, config.DEFAULT_USER_ID, meeting_id, "share_link_created",
+                 {"expires_in_days": days, "password": bool(pw)})
+        # 평문 토큰은 이 응답에서 딱 한 번만 나간다. 저장하지 않는다.
+        return {"id": link_id, "token": token, "path": f"/s/{token}",
+                "expires_at": expires.isoformat(), "has_password": bool(pw)}
+    finally:
+        conn.close()
+
+
+@app.get(P + "/meetings/{meeting_id}/share-links")
+def list_share_links(meeting_id: str):
+    conn = db.connect()
+    try:
+        rows = conn.execute(
+            "SELECT id, expires_at, revoked_at, access_count, last_accessed_at, "
+            "password_hash, include_transcript FROM share_links "
+            "WHERE meeting_id=? ORDER BY created_at DESC", (meeting_id,)).fetchall()
+        # token_hash 는 절대 내보내지 않는다.
+        return {"items": [{
+            "id": r["id"], "expires_at": r["expires_at"], "revoked_at": r["revoked_at"],
+            "access_count": r["access_count"], "last_accessed_at": r["last_accessed_at"],
+            "has_password": bool(r["password_hash"]),
+            "include_transcript": bool(r["include_transcript"]),
+        } for r in rows]}
+    finally:
+        conn.close()
+
+
+@app.delete(P + "/meetings/{meeting_id}/share-links/{link_id}")
+def revoke_share_link(meeting_id: str, link_id: str, _: str = Depends(require_write)):
+    conn = db.connect()
+    try:
+        conn.execute("UPDATE share_links SET revoked_at=? WHERE id=? AND meeting_id=?",
+                     (db.now_iso(), link_id, meeting_id))
+        conn.commit()
+        return {"ok": True}
+    finally:
+        conn.close()
+
+
+def _resolve_share(conn, token: str, password: Optional[str]):
+    """토큰을 검증하고 (share_row, error_response) 를 돌려준다.
+
+    존재하지 않음·만료·폐기를 모두 같은 404 로 응답한다 — 토큰이 '있긴 한데
+    만료됐다'는 사실 자체가 정보이기 때문이다.
+    """
+    row = conn.execute("SELECT * FROM share_links WHERE token_hash=?",
+                       (_hash_token(token or ""),)).fetchone()
+    gone = _err(404, "share_not_found", "링크가 없거나 만료되었습니다.")
+    if row is None or row["revoked_at"]:
+        return None, gone
+    if _as_dt(row["expires_at"]) < datetime.now(timezone.utc).astimezone():
+        return None, gone
+    if row["failed_attempts"] >= _SHARE_MAX_FAILS:
+        return None, _err(429, "too_many_attempts",
+                          "비밀번호 시도가 너무 많습니다. 링크 소유자에게 재발급을 요청하세요.")
+    if row["password_hash"]:
+        if not password:
+            return None, _err(401, "password_required", "비밀번호가 필요합니다.")
+        if not _verify_password(password, row["password_hash"]):
+            conn.execute("UPDATE share_links SET failed_attempts=failed_attempts+1 WHERE id=?",
+                         (row["id"],))
+            conn.commit()
+            return None, _err(401, "invalid_password", "비밀번호가 올바르지 않습니다.")
+    return row, None
+
+
+@app.get(P + "/shared/{token}")
+def read_shared(token: str, password: Optional[str] = Header(default=None, alias="X-Share-Password")):
+    conn = db.connect()
+    try:
+        share, err = _resolve_share(conn, token, password)
+        if err is not None:
+            return err
+        m = conn.execute("SELECT * FROM meetings WHERE id=? AND deleted_at IS NULL",
+                         (share["meeting_id"],)).fetchone()
+        if m is None:
+            return _err(404, "share_not_found", "링크가 없거나 만료되었습니다.")
+        conn.execute("UPDATE share_links SET access_count=access_count+1, last_accessed_at=?, "
+                     "failed_attempts=0 WHERE id=?", (db.now_iso(), share["id"]))
+        conn.commit()
+        out = {"title": m["title"], "recorded_at": m["recorded_at"],
+               "duration_ms": m["duration_ms"], "status": m["status"],
+               "expires_at": share["expires_at"]}
+        sv = db.latest_summary_version_row(conn, share["meeting_id"])
+        if sv is not None:
+            s = db.load_summary_version(conn, sv)
+            # 내부 식별자는 공유 응답에서 제거한다.
+            s.pop("summary_version_id", None)
+            out["summary"] = s
+        if bool(share["include_transcript"]):
+            segs = conn.execute(
+                "SELECT speaker_label, speaker_name, start_ms, end_ms, text, corrected_text "
+                "FROM transcript_segments WHERE meeting_id=? ORDER BY start_ms",
+                (share["meeting_id"],)).fetchall()
+            out["segments"] = [{
+                "speaker": r["speaker_name"] or r["speaker_label"],
+                "start_ms": r["start_ms"], "end_ms": r["end_ms"],
+                "text": r["corrected_text"] or r["text"],
+            } for r in segs]
+        return out
+    finally:
+        conn.close()
+
 @app.get(P + "/health")
 def health():
     from .providers import diarization
@@ -962,6 +1195,19 @@ def health():
             "db_backend": config.DB_BACKEND,  # sqlite(기본) | postgres(Supabase)
             "storage_provider": storage.name,  # local(기본) | supabase
             "auth_enabled": config.AUTH_ENABLED}
+
+
+@app.get("/s/{token}", include_in_schema=False)
+def share_page(token: str):
+    """공유 링크 페이지. 토큰 검증은 페이지가 아니라 /v1/shared/{token} 이 한다.
+
+    Vercel 은 vercel.json 의 라우트가 이 경로를 share.html 로 보내지만, 로컬
+    uvicorn 은 StaticFiles 뿐이라 같은 동작을 여기서 맞춰준다.
+    """
+    page = config.WEB_DIR / "share.html"
+    if not page.exists():
+        return _err(404, "not_found", "페이지를 찾을 수 없습니다.")
+    return FileResponse(str(page), media_type="text/html; charset=utf-8")
 
 
 config.WEB_DIR.mkdir(parents=True, exist_ok=True)

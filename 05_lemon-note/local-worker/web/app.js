@@ -403,6 +403,26 @@
         throw err;
       });
     },
+    getHighlights: function (id) {
+      return apiRequest('/meetings/' + encodeURIComponent(id) + '/highlights', { method: 'GET' })
+        .catch(function () { return { items: [] }; });
+    },
+    addHighlight: function (id, payload) {
+      return apiJson('/meetings/' + encodeURIComponent(id) + '/highlights', 'POST', payload);
+    },
+    deleteHighlight: function (id, hlId) {
+      return apiJson('/meetings/' + encodeURIComponent(id) + '/highlights/' + encodeURIComponent(hlId), 'DELETE');
+    },
+    createShareLink: function (id, payload) {
+      return apiJson('/meetings/' + encodeURIComponent(id) + '/share-links', 'POST', payload);
+    },
+    listShareLinks: function (id) {
+      return apiRequest('/meetings/' + encodeURIComponent(id) + '/share-links', { method: 'GET' })
+        .catch(function () { return { items: [] }; });
+    },
+    revokeShareLink: function (id, linkId) {
+      return apiJson('/meetings/' + encodeURIComponent(id) + '/share-links/' + encodeURIComponent(linkId), 'DELETE');
+    },
     getBookmarks: function (id) {
       return apiRequest('/meetings/' + encodeURIComponent(id) + '/bookmarks', { method: 'GET' })
         .catch(function () { return { items: [] }; });
@@ -725,6 +745,16 @@
               '<input type="text" id="nm-hotwords" class="input" placeholder="예: 회의녹음챗, 김민수, VibeVoice" />' +
             '</div>' +
             '<div class="field">' +
+              '<label class="field-label" for="nm-language">전사 언어</label>' +
+              '<select class="select" id="nm-language">' +
+                '<option value="ko" selected>한국어</option>' +
+                '<option value="en">English</option>' +
+                '<option value="ja">日本語</option>' +
+                '<option value="zh">中文</option>' +
+                '<option value="auto">자동 감지</option>' +
+              '</select>' +
+            '</div>' +
+            '<div class="field">' +
               '<label class="checkbox-row">' +
                 '<input type="checkbox" id="nm-consent" />' +
                 '<span class="checkbox-row-label"><strong>녹음 동의를 확인했습니다.</strong> 참석자에게 녹음 사실을 고지했으며, 업로드된 음성은 전사·요약 처리에 사용됩니다.</span>' +
@@ -768,6 +798,7 @@
     var stepperWrap = centerEl.querySelector('#nm-stepper-wrap');
     var titleInput = centerEl.querySelector('#nm-title');
     var hotwordsInput = centerEl.querySelector('#nm-hotwords');
+    var languageSelect = centerEl.querySelector('#nm-language');
     var consentInput = centerEl.querySelector('#nm-consent');
     var dialEl = centerEl.querySelector('#nm-dial');
     var dialTimeEl = centerEl.querySelector('#nm-timer');
@@ -1072,7 +1103,7 @@
       fd.append('recorded_at', recordedAt);
       fd.append('duration_ms', String(Math.round(previewInfo.durationMs || 0)));
       fd.append('source_device', resultSource === 'recording' ? 'web_recorder' : 'file_upload');
-      fd.append('language', 'ko');
+      fd.append('language', (languageSelect && languageSelect.value) || 'ko');
       var hotwordsRaw = hotwordsInput.value.trim();
       if (hotwordsRaw) {
         var list = hotwordsRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
@@ -1268,6 +1299,41 @@
     var segmentsState = [];
     var summaryState = null;
     var bookmarksState = [];
+    var highlightsState = [];
+
+    /* 세그먼트 본문 렌더 — 사용자 하이라이트를 먼저 입히고, 검색 강조는 그 위에 얹는다.
+       오프셋 기반이라 순서를 뒤집으면 <mark> 태그 길이 때문에 위치가 밀린다. */
+    function renderSegmentText(raw, q, segId) {
+      var hls = (highlightsState || []).filter(function (h) { return h.segment_id === segId; })
+        .slice().sort(function (a, b) { return a.start_offset - b.start_offset; });
+      if (!hls.length) return highlightMatch(raw, q);
+      var out = '', pos = 0;
+      hls.forEach(function (h) {
+        if (h.start_offset < pos) return;               // 겹치면 뒤엣것은 건너뛴다
+        out += highlightMatch(raw.slice(pos, h.start_offset), q);
+        out += '<mark class="user-hl" data-hl="' + esc(h.id) + '">'
+             + highlightMatch(raw.slice(h.start_offset, h.end_offset), q) + '</mark>';
+        pos = h.end_offset;
+      });
+      out += highlightMatch(raw.slice(pos), q);
+      return out;
+    }
+
+    /* 드래그로 고른 범위를 세그먼트 본문 기준 오프셋으로 바꾼다.
+       화면에는 <mark> 등이 섞여 있으므로 DOM 위치가 아니라 텍스트 길이로 센다. */
+    function selectionOffsets(textEl) {
+      var sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
+      var range = sel.getRangeAt(0);
+      if (!textEl.contains(range.commonAncestorContainer)) return null;
+      var pre = range.cloneRange();
+      pre.selectNodeContents(textEl);
+      pre.setEnd(range.startContainer, range.startOffset);
+      var start = pre.toString().length;
+      var end = start + range.toString().length;
+      return end > start ? { start: start, end: end } : null;
+    }
+
     var dirty = false;
     var lastHighlightedId = null;
     var transcriptQuery = '';
@@ -1279,12 +1345,14 @@
       API.getMeeting(meetingId),
       API.getSegments(meetingId),
       API.getSummary(meetingId),
-      API.getBookmarks(meetingId)
+      API.getBookmarks(meetingId),
+      API.getHighlights(meetingId)
     ]).then(function (results) {
       if (cancelled) return;
       meeting = results[0];
       segmentsState = (results[1] && results[1].items) || [];
       bookmarksState = (results[3] && results[3].items) || [];
+      highlightsState = (results[4] && results[4].items) || [];
       var summaryRes = results[2];
       summaryState = summaryRes ? Object.assign({}, summaryRes) : {
         summary_version_id: null, version: 0, source: null,
@@ -1410,6 +1478,19 @@
         '</div>' +
 
         '<div class="rtab-panel" data-rpanel="export">' +
+          '<div class="field">' +
+            '<label class="field-label">링크로 공유 <span class="field-hint">링크를 가진 사람만 읽기 전용으로 봅니다</span></label>' +
+            '<div class="field" style="margin-bottom:8px">' +
+              '<select class="select" id="md-share-ttl">' +
+                '<option value="7">7일</option><option value="30" selected>30일</option>' +
+                '<option value="90">90일</option><option value="180">180일</option><option value="365">1년</option>' +
+              '</select>' +
+            '</div>' +
+            '<input type="text" class="input" id="md-share-pw" placeholder="비밀번호 (선택)" autocomplete="new-password" />' +
+            '<label class="checkbox-row" style="margin-top:8px"><input type="checkbox" id="md-share-transcript" checked /><span>전체 전사 포함</span></label>' +
+            '<button type="button" class="btn btn-primary btn-sm" id="md-share-create" style="margin-top:8px">공유 링크 만들기</button>' +
+            '<div id="md-share-list"></div>' +
+          '</div>' +
           '<div class="export-grid">' +
             '<div class="export-option"><div class="export-option-title">' + ICONS.docEdit + '<span>Markdown 내보내기</span></div><p>요약, 결정사항, 할 일, 일정 후보, 전체 전사가 포함된 .md 파일을 생성합니다.</p><button type="button" class="btn btn-primary btn-sm" id="md-export-md">Markdown 내보내기</button></div>' +
             '<div class="export-option"><div class="export-option-title">' + ICONS.docText + '<span>TXT 내보내기</span></div><p>메신저나 이메일에 바로 붙여넣기 좋은 일반 텍스트 파일을 생성합니다.</p><button type="button" class="btn btn-primary btn-sm" id="md-export-txt">TXT 내보내기</button></div>' +
@@ -1639,9 +1720,114 @@
       audioEl.addEventListener('play', function () { updatePlayIcon(true); });
       audioEl.addEventListener('pause', function () { updatePlayIcon(false); });
       audioEl.addEventListener('ended', function () { updatePlayIcon(false); });
+      /* 전사에서 텍스트를 고르면 그 자리에서 하이라이트한다.
+         이미 하이라이트된 부분을 클릭하면 해제한다. */
+      centerEl.addEventListener('mouseup', function (e) {
+        var mark = e.target.closest && e.target.closest('mark.user-hl');
+        if (mark && (window.getSelection() || {}).isCollapsed !== false) {
+          var hlId = mark.dataset.hl;
+          API.deleteHighlight(meetingId, hlId).then(function () {
+            highlightsState = highlightsState.filter(function (h) { return h.id !== hlId; });
+            renderTranscriptTab();
+            renderWaveHighlights();
+          }).catch(function (err) { toast(err.message || '해제하지 못했습니다.', 'error'); });
+          return;
+        }
+        var textEl = e.target.closest && e.target.closest('.msg-text');
+        if (!textEl) return;
+        var off = selectionOffsets(textEl);
+        if (!off) return;
+        var segId = textEl.dataset.seg;
+        API.addHighlight(meetingId, {
+          segment_id: segId, start_offset: off.start, end_offset: off.end
+        }).then(function (hl) {
+          highlightsState.push(hl);
+          window.getSelection().removeAllRanges();
+          renderTranscriptTab();
+          renderWaveHighlights();
+          toast('하이라이트했습니다', 'success');
+        }).catch(function (err) { toast(err.message || '하이라이트하지 못했습니다.', 'error'); });
+      });
+
+      /* 하이라이트도 파형 마커로 보여준다(북마크와 색만 다르다). */
+      function renderWaveHighlights() {
+        if (!waveMarkers) return;
+        var dur = audioEl.duration || 0;
+        var segById = {};
+        (segmentsState || []).forEach(function (s) { segById[s.segment_id] = s; });
+        var hlMarks = (highlightsState || []).map(function (h) {
+          var s = segById[h.segment_id];
+          return s ? { at_ms: s.start_ms, kind: 'hl' } : null;
+        }).filter(Boolean);
+        var all = (bookmarksState || []).map(function (b) { return { at_ms: b.at_ms, kind: 'bm' }; })
+          .concat(hlMarks);
+        if (!dur || !all.length) { waveMarkers.innerHTML = ''; return; }
+        waveMarkers.innerHTML = all.map(function (m) {
+          var pct = Math.max(0, Math.min(100, (m.at_ms / 1000 / dur) * 100));
+          return '<button type="button" class="wave-marker wave-marker--' + m.kind + '"' +
+                 ' style="left:' + pct + '%" data-action="seek-bookmark" data-at="' + m.at_ms + '"' +
+                 ' title="' + esc(formatDuration(m.at_ms)) + (m.kind === 'hl' ? ' 하이라이트' : ' 북마크') + '"></button>';
+        }).join('');
+      }
+
+      /* ---- 공유 링크 ----
+         발급 응답의 평문 토큰은 서버가 저장하지 않는다(해시만 보관). 그래서 이
+         화면에서 한 번 보여주고, 목록에는 다시 나타나지 않는다. */
+      var shareTtl = centerEl.querySelector('#md-share-ttl');
+      var sharePw = centerEl.querySelector('#md-share-pw');
+      var shareTranscript = centerEl.querySelector('#md-share-transcript');
+      var shareCreate = centerEl.querySelector('#md-share-create');
+      var shareList = centerEl.querySelector('#md-share-list');
+
+      function renderShareList(items, freshUrl) {
+        if (!shareList) return;
+        var html = freshUrl
+          ? '<div class="share-link-row"><div class="share-link-meta">' +
+            '<div class="share-link-url">' + esc(freshUrl) + '</div>' +
+            '<div class="share-link-sub">이 주소는 지금만 보입니다 — 복사해 두세요</div></div>' +
+            '<button type="button" class="btn btn-subtle btn-sm" data-action="copy-share" data-url="' + esc(freshUrl) + '">복사</button></div>'
+          : '';
+        html += (items || []).map(function (s) {
+          var expired = new Date(s.expires_at) < new Date() || s.revoked_at;
+          return '<div class="share-link-row"><div class="share-link-meta">' +
+            '<div class="share-link-url">링크 ' + esc(String(s.id).slice(-6)) + (s.has_password ? ' · 비밀번호 있음' : '') + '</div>' +
+            '<div class="share-link-sub">만료 ' + esc(String(s.expires_at).slice(0, 10)) +
+            ' · 열람 ' + (s.access_count || 0) + '회</div></div>' +
+            '<span class="share-badge' + (expired ? ' share-badge--expired' : '') + '">' +
+              (s.revoked_at ? '폐기됨' : (expired ? '만료' : '유효')) + '</span>' +
+            (s.revoked_at ? '' : '<button type="button" class="btn btn-subtle btn-sm" data-action="revoke-share" data-id="' + esc(s.id) + '">폐기</button>') +
+            '</div>';
+        }).join('');
+        shareList.innerHTML = html;
+      }
+
+      function refreshShareList(freshUrl) {
+        API.listShareLinks(meetingId).then(function (res) {
+          renderShareList((res && res.items) || [], freshUrl);
+        });
+      }
+
+      if (shareCreate) {
+        shareCreate.addEventListener('click', function () {
+          shareCreate.disabled = true;
+          API.createShareLink(meetingId, {
+            expires_in_days: parseInt(shareTtl.value, 10),
+            password: sharePw.value.trim(),
+            include_transcript: !!shareTranscript.checked
+          }).then(function (link) {
+            sharePw.value = '';
+            refreshShareList(location.origin + link.path);
+            toast('공유 링크를 만들었습니다', 'success');
+          }).catch(function (err) {
+            toast(err.message || '링크를 만들지 못했습니다.', 'error');
+          }).then(function () { shareCreate.disabled = false; });
+        });
+      }
+      refreshShareList();
+
       audioEl.addEventListener('loadedmetadata', function () {
         updateSeekUI();
-        renderWaveMarkers(bookmarksState);
+        renderWaveHighlights();
       });
       if (meeting.audio && meeting.audio.stream_url) loadWaveform(meeting.audio.stream_url);
       window.addEventListener('resize', drawWave);
@@ -1699,7 +1885,7 @@
                 '<button type="button" class="msg-time mono" data-action="seek"><svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M5 1a4 4 0 100 8 4 4 0 000-8z" stroke="currentColor"/><path d="M5 2.6V5l1.6 1" stroke="currentColor" stroke-linecap="round"/></svg>' + formatDuration(seg.start_ms) + '</button>' +
               '</div>' +
               '<div class="msg-bubble ' + bubbleVariant + '">' +
-                '<span class="msg-text">' + highlightMatch(rawText, q) + '</span>' + (edited ? '<span class="msg-edited-tag">수정됨</span>' : '') +
+                '<span class="msg-text" data-seg="' + esc(seg.segment_id) + '">' + renderSegmentText(rawText, q, seg.segment_id) + '</span>' + (edited ? '<span class="msg-edited-tag">수정됨</span>' : '') +
                 '<div class="msg-edit-area" style="display:none">' +
                   '<textarea class="textarea">' + esc(rawText) + '</textarea>' +
                   '<div class="segment-edit-actions"><button type="button" class="btn btn-primary btn-sm" data-action="save-edit">저장</button><button type="button" class="btn btn-ghost btn-sm" data-action="cancel-edit">취소</button></div>' +
@@ -2004,6 +2190,17 @@
         var action = btn.dataset.action;
         var segRow, seg;
         switch (action) {
+          case 'copy-share':
+            navigator.clipboard.writeText(btn.dataset.url)
+              .then(function () { toast('링크를 복사했습니다', 'success'); })
+              .catch(function () { toast('복사하지 못했습니다.', 'error'); });
+            return;
+          case 'revoke-share':
+            API.revokeShareLink(meetingId, btn.dataset.id).then(function () {
+              refreshShareList();
+              toast('링크를 폐기했습니다', 'success');
+            }).catch(function (err) { toast(err.message || '폐기하지 못했습니다.', 'error'); });
+            return;
           case 'seek-bookmark':
             seekAndPlay(parseInt(btn.dataset.at, 10) || 0);
             return;

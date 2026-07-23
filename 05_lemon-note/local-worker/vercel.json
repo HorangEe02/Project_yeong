@@ -4,13 +4,31 @@
     {
       "src": "api/index.py",
       "use": "@vercel/python",
-      "config": { "includeFiles": "app/**" }
+      "config": {
+        "includeFiles": "app/**"
+      }
     },
-    { "src": "web/**", "use": "@vercel/static" }
+    {
+      "src": "web/**",
+      "use": "@vercel/static"
+    }
   ],
   "routes": [
-    { "src": "/v1/(.*)", "dest": "api/index.py" },
-    { "src": "/", "dest": "web/index.html" },
-    { "src": "/(.*)", "dest": "web/$1" }
+    {
+      "src": "/v1/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/s/(.*)",
+      "dest": "web/share.html"
+    },
+    {
+      "src": "/",
+      "dest": "web/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "web/$1"
+    }
   ]
 }

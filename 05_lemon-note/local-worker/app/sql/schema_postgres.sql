@@ -119,6 +119,34 @@ create table if not exists summary_versions (
   unique (meeting_id, version)
 );
 
+create table if not exists transcript_highlights (
+  id uuid primary key default gen_random_uuid(),
+  meeting_id uuid not null references meetings(id) on delete cascade,
+  segment_id uuid not null references transcript_segments(id) on delete cascade,
+  start_offset integer not null,
+  end_offset integer not null,
+  note text,
+  created_at timestamptz not null default now(),
+  constraint transcript_highlights_range_check check (end_offset > start_offset)
+);
+
+-- 공개 공유 링크. /v1(무인증 데모)과 분리된 독립 인가 경로의 근거가 되는 테이블.
+-- token 평문은 저장하지 않고(발급 시 1회만 노출) sha256 해시만 둔다.
+-- password 도 pbkdf2(솔트+반복)로 저장한다.
+create table if not exists share_links (
+  id uuid primary key default gen_random_uuid(),
+  meeting_id uuid not null references meetings(id) on delete cascade,
+  token_hash text not null unique,
+  password_hash text,
+  include_transcript boolean not null default true,
+  expires_at timestamptz not null,
+  revoked_at timestamptz,
+  access_count integer not null default 0,
+  failed_attempts integer not null default 0,
+  last_accessed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists meeting_bookmarks (
   id uuid primary key default gen_random_uuid(),
   meeting_id uuid not null references meetings(id) on delete cascade,
@@ -217,6 +245,8 @@ create table if not exists audit_logs (
 create index if not exists meetings_user_recorded_idx on meetings(user_id, recorded_at desc);
 create index if not exists jobs_meeting_idx on jobs(meeting_id);
 create index if not exists transcript_segments_meeting_time_idx on transcript_segments(meeting_id, start_ms);
+create index if not exists transcript_highlights_segment_idx on transcript_highlights(segment_id, start_offset);
+create index if not exists share_links_token_idx on share_links(token_hash);
 create index if not exists meeting_bookmarks_meeting_idx on meeting_bookmarks(meeting_id, at_ms);
 create index if not exists summary_sections_version_idx on summary_sections(summary_version_id, section_index);
 create index if not exists summary_versions_meeting_version_idx on summary_versions(meeting_id, version desc);
@@ -245,6 +275,8 @@ alter table speaker_aliases enable row level security;
 alter table summary_versions enable row level security;
 alter table summary_sections enable row level security;
 alter table meeting_bookmarks enable row level security;
+alter table transcript_highlights enable row level security;
+alter table share_links enable row level security;
 alter table summary_decisions enable row level security;
 alter table action_items enable row level security;
 alter table calendar_candidates enable row level security;
