@@ -6,7 +6,7 @@ docs/api-spec.md 계약을 따르며, 데모 편의를 위한 소수 추가 필�
 import json
 import os
 import urllib.parse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import (BackgroundTasks, Depends, FastAPI, File, Form, Header, HTTPException,
@@ -159,6 +159,19 @@ async def create_job(
 ):
     # 데모: 단일 로컬 사용자 (AUTH_ENABLED 시 별도 인증 레이어로 확장)
     user_id = config.DEFAULT_USER_ID
+
+    if config.MAX_JOBS_PER_HOUR > 0:
+        conn = db.connect()
+        try:
+            recent = conn.execute(
+                "SELECT COUNT(*) AS n FROM jobs WHERE created_at > ?",
+                (datetime.now(timezone.utc) - timedelta(hours=1),)).fetchone()
+            n = recent["n"] if recent is not None else 0
+        finally:
+            conn.close()
+        if n >= config.MAX_JOBS_PER_HOUR:
+            return _err(429, "rate_limited",
+                        "지금은 업로드가 몰려 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.")
 
     content = await audio_file.read()
     if len(content) > config.MAX_UPLOAD_BYTES:
