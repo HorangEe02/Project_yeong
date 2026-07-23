@@ -126,7 +126,7 @@ cp .env.example .env
 `.env` 열어서 값 채우기 (태동에게 받은 값):
 
 ```
-KAKAO_NATIVE_APP_KEY=e77b0826818850493f5ffeb1014a0833
+KAKAO_NATIVE_APP_KEY=<카카오 개발자 콘솔에서 발급 — 커밋 금지>
 GOOGLE_SERVER_CLIENT_ID=xxxxx.apps.googleusercontent.com
 API_BASE_URL=http://localhost:8000
 ```

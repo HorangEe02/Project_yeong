@@ -25,6 +25,21 @@ API_PREFIX = "/v1"
 LOCAL_API_TOKEN = os.getenv("LOCAL_API_TOKEN", "").strip()
 AUTH_ENABLED = bool(LOCAL_API_TOKEN)
 
+# 토큰이 없어도(공개 데모) 파괴적 작업만은 막는다.
+# 공개 배포에서 DELETE/PATCH 까지 열어두면 아무나 남의 회의록을 지우거나 고칠 수 있다.
+# 0 이면 읽기·업로드만 열리고 수정·삭제는 401 이 된다.
+WRITE_PROTECTED = os.getenv("WRITE_PROTECTED", "1") == "1"
+
+# 업로드 상한 — 무인증 공개 엔드포인트라 상한이 없으면 무료 티어를 태울 수 있다.
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(50 * 1024 * 1024)))
+
+# CORS 허용 오리진. 쉼표로 구분. "*" 를 쓰면 전체 허용(로컬 개발 기본값).
+_origins = os.getenv("ALLOWED_ORIGINS", "*").strip()
+ALLOWED_ORIGINS = ["*"] if _origins == "*" else [o.strip() for o in _origins.split(",") if o.strip()]
+
+# /v1/health 가 내부 구성(Supabase URL 등)을 밖으로 흘리지 않게 한다.
+HEALTH_DETAIL = os.getenv("HEALTH_DETAIL", "0") == "1"
+
 # DB 백엔드 선택: sqlite(기본, 검증됨) | postgres(Supabase, psycopg + native 타입)
 DB_BACKEND = os.getenv("DB_BACKEND", "sqlite").strip().lower()
 

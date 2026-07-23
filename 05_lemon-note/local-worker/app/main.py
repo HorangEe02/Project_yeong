@@ -9,7 +9,7 @@ import urllib.parse
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import (BackgroundTasks, FastAPI, File, Form, Header, HTTPException,
+from fastapi import (BackgroundTasks, Depends, FastAPI, File, Form, Header, HTTPException,
                      Request, UploadFile)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -24,9 +24,21 @@ from .providers.storage import storage
 app = FastAPI(title="Meeting Recorder — Local Demo Worker", version="0.1.0")
 
 app.add_middleware(
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware, allow_origins=config.ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
+
+
+@app.middleware("http")
+async def _security_headers(request: Request, call_next):
+    """기본 보안 헤더. 업로드된 파일을 브라우저가 HTML 로 해석하는 것을 막는 nosniff 가 핵심."""
+    resp = await call_next(request)
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("X-Frame-Options", "DENY")
+    resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    resp.headers.setdefault("Permissions-Policy", "geolocation=(), camera=(), microphone=(self)")
+    return resp
 
 P = config.API_PREFIX  # "/v1"
 
@@ -37,6 +49,22 @@ def _startup():
 
 
 # --- 인증 (데모: 토큰 미설정 시 통과) ---
+def require_write(authorization: Optional[str] = Header(default=None)) -> str:
+    """수정·삭제 라우트 게이트.
+
+    이 앱은 공개 데모라 읽기와 업로드는 열어 두지만, 파괴적 작업까지 열면
+    인터넷의 누구나 남의 회의록을 지우거나 고칠 수 있다.
+    토큰이 설정돼 있으면 그 토큰을, 없고 WRITE_PROTECTED 면 차단한다.
+    """
+    if config.AUTH_ENABLED:
+        return require_user(authorization)
+    if config.WRITE_PROTECTED:
+        raise HTTPException(status_code=401, detail={"error": {
+            "code": "write_disabled",
+            "message": "공개 데모에서는 수정·삭제가 비활성화돼 있습니다."}})
+    return config.DEFAULT_USER_ID
+
+
 def require_user(authorization: Optional[str] = Header(default=None)) -> str:
     if not config.AUTH_ENABLED:
         return config.DEFAULT_USER_ID
@@ -105,6 +133,17 @@ def _get_meeting(conn, meeting_id, user_id):
 # ============================ Jobs ============================
 _ALLOWED_EXT = {"m4a", "aac", "webm", "wav", "mp3", "ogg", "mp4"}
 
+# 클라이언트가 보낸 Content-Type 을 그대로 저장하면 text/html 로 올려서
+# 다운로드 라우트가 그대로 되돌려줄 때 앱 오리진에서 스크립트가 실행된다(저장형 XSS).
+# 확장자에서 서버가 직접 정한다.
+_EXT_MIME = {"m4a": "audio/mp4", "mp4": "audio/mp4", "aac": "audio/aac",
+             "webm": "audio/webm", "wav": "audio/wav", "mp3": "audio/mpeg",
+             "ogg": "audio/ogg"}
+
+
+def _safe_mime(ext: str) -> str:
+    return _EXT_MIME.get((ext or "").lower(), "application/octet-stream")
+
 
 @app.post(P + "/jobs", status_code=201)
 async def create_job(
@@ -122,8 +161,12 @@ async def create_job(
     user_id = config.DEFAULT_USER_ID
 
     content = await audio_file.read()
+    if len(content) > config.MAX_UPLOAD_BYTES:
+        return _err(413, "audio_too_large",
+                    f"녹음 파일이 너무 큽니다. {config.MAX_UPLOAD_BYTES // (1024 * 1024)}MB 이하로 업로드하세요.")
     ext = (os.path.splitext(audio_file.filename or "")[1] or "").lstrip(".").lower()
-    if ext and ext not in _ALLOWED_EXT:
+    # 확장자가 비면 통과시키던 구멍 — 이제 확장자를 반드시 요구한다.
+    if ext not in _ALLOWED_EXT:
         return _err(415, "unsupported_media_type",
                     "지원하지 않는 녹음 파일입니다. m4a, aac, webm, wav 파일을 사용하세요.")
     if len(content) < 256:
@@ -166,7 +209,7 @@ async def create_job(
                (id,meeting_id,user_id,kind,storage_path,mime_type,size_bytes,duration_ms,checksum_sha256,created_at)
                VALUES (?,?,?,?,?,?,?,?,?,?)""",
             (rec_id, meeting_id, user_id, "original", saved["path"],
-             audio_file.content_type, saved["size"], duration_ms, saved["checksum"], now),
+             _safe_mime(ext), saved["size"], duration_ms, saved["checksum"], now),
         )
         conn.execute(
             """INSERT INTO jobs (id,meeting_id,status,progress,created_at,updated_at)
@@ -373,7 +416,8 @@ def get_meeting(meeting_id: str):
 
 
 @app.patch(P + "/meetings/{meeting_id}")
-def patch_meeting(meeting_id: str, body: MeetingPatch):
+def patch_meeting(meeting_id: str, body: MeetingPatch,
+                  _: str = Depends(require_write)):
     user_id = config.DEFAULT_USER_ID
     conn = db.connect()
     try:
@@ -387,7 +431,7 @@ def patch_meeting(meeting_id: str, body: MeetingPatch):
 
 
 @app.delete(P + "/meetings/{meeting_id}")
-def delete_meeting(meeting_id: str):
+def delete_meeting(meeting_id: str, _: str = Depends(require_write)):
     user_id = config.DEFAULT_USER_ID
     conn = db.connect()
     try:
@@ -425,7 +469,8 @@ def get_segments(meeting_id: str):
 
 
 @app.patch(P + "/meetings/{meeting_id}/segments/{segment_id}")
-def patch_segment(meeting_id: str, segment_id: str, body: SegmentPatch):
+def patch_segment(meeting_id: str, segment_id: str, body: SegmentPatch,
+                  _: str = Depends(require_write)):
     user_id = config.DEFAULT_USER_ID
     conn = db.connect()
     try:
@@ -464,7 +509,8 @@ def patch_segment(meeting_id: str, segment_id: str, body: SegmentPatch):
 
 
 @app.patch(P + "/meetings/{meeting_id}/speakers/{speaker_label}")
-def patch_speaker(meeting_id: str, speaker_label: str, body: SpeakerPatch):
+def patch_speaker(meeting_id: str, speaker_label: str, body: SpeakerPatch,
+                  _: str = Depends(require_write)):
     user_id = config.DEFAULT_USER_ID
     conn = db.connect()
     try:
@@ -505,7 +551,8 @@ def get_summary(meeting_id: str):
 
 
 @app.patch(P + "/meetings/{meeting_id}/summary")
-def patch_summary(meeting_id: str, body: SummaryPatch):
+def patch_summary(meeting_id: str, body: SummaryPatch,
+                  _: str = Depends(require_write)):
     user_id = config.DEFAULT_USER_ID
     conn = db.connect()
     try:
@@ -601,7 +648,8 @@ def download_export(export_id: str):
 
 # ============================ Slack Share ============================
 @app.post(P + "/meetings/{meeting_id}/share/slack")
-def share_slack(meeting_id: str, body: SlackShareIn):
+def share_slack(meeting_id: str, body: SlackShareIn,
+               _: str = Depends(require_write)):
     user_id = config.DEFAULT_USER_ID
     conn = db.connect()
     try:
@@ -644,8 +692,10 @@ def stream_file(recording_file_id: str, request: Request):
     user_id = config.DEFAULT_USER_ID
     conn = db.connect()
     try:
+        # 회의를 지워도 파일 접근이 살아 있으면 삭제가 접근 회수로 이어지지 않는다.
         row = conn.execute("SELECT r.*, m.user_id AS owner FROM recording_files r "
-                           "JOIN meetings m ON m.id=r.meeting_id WHERE r.id=?",
+                           "JOIN meetings m ON m.id=r.meeting_id "
+                           "WHERE r.id=? AND m.deleted_at IS NULL",
                            (recording_file_id,)).fetchone()
         if not row or not _same_id(row["owner"], user_id):
             return _err(404, "file_not_found", "음성 파일을 찾을 수 없습니다.")
@@ -694,6 +744,9 @@ def stream_file(recording_file_id: str, request: Request):
 @app.get(P + "/health")
 def health():
     from .providers import diarization
+    if not config.HEALTH_DETAIL:
+        # 구성 정보는 운영자만 볼 수 있게 한다(HEALTH_DETAIL=1). 기본은 생존 여부만.
+        return {"ok": True}
     return {"ok": True, "asr_provider": config.ASR_PROVIDER,
             "whisper_model": config.WHISPER_MODEL,
             "summary_provider": config.SUMMARY_PROVIDER,
