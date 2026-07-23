@@ -976,3 +976,31 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   background: var(--brand-100); color: var(--brand-900);
   font-weight: 700; padding: 0 1px; border-radius: 3px;
 }
+
+/* ----------------------------------------------------------------------
+   16. 파형 스크러버 + 북마크 마커
+   ------------------------------------------------------------------- */
+/* flex:1 만으로는 자식이 전부 absolute 라 폭이 0 이 된다 — width:100% 로 명시한다. */
+.wave-wrap { position: relative; flex: 1 1 auto; width: 100%; min-width: 0; height: 34px; }
+.wave-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.wave-markers { position: absolute; inset: 0; pointer-events: none; }
+.wave-marker {
+  position: absolute; top: -3px; width: 12px; height: 12px; margin-left: -6px;
+  padding: 0; border: none; background: none; cursor: pointer; pointer-events: auto;
+}
+.wave-marker::before {
+  content: ""; position: absolute; left: 5px; top: 4px;
+  width: 2px; height: 30px; background: var(--brand-600); border-radius: 1px;
+}
+.wave-marker::after {
+  content: ""; position: absolute; left: 2px; top: 0;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--brand-600); box-shadow: 0 0 0 2px rgba(15, 18, 34, .85);
+}
+.wave-marker:hover::after { background: #fff; }
+.wave-marker:focus-visible { outline: 2px solid var(--brand-600); outline-offset: 2px; }
+/* 파형 위에 겹치는 seek 은 보이지 않게 두고 조작만 받는다 */
+.wave-wrap .audio-seek {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  margin: 0; background: none; opacity: 0; cursor: pointer;
+}

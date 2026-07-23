@@ -403,6 +403,10 @@
         throw err;
       });
     },
+    getBookmarks: function (id) {
+      return apiRequest('/meetings/' + encodeURIComponent(id) + '/bookmarks', { method: 'GET' })
+        .catch(function () { return { items: [] }; });
+    },
     updateSummary: function (id, body) {
       return apiJson('/meetings/' + encodeURIComponent(id) + '/summary', 'PATCH', body);
     },
@@ -694,6 +698,7 @@
           '<button type="button" class="btn btn-primary" id="nm-btn-start">' + ICONS.record + '<span>녹음 시작</span></button>' +
           '<button type="button" class="btn btn-ghost" id="nm-btn-pause" style="display:none">일시정지</button>' +
           '<button type="button" class="btn btn-primary" id="nm-btn-resume" style="display:none">재개</button>' +
+          '<button type="button" class="btn btn-ghost" id="nm-btn-bookmark" style="display:none">' + ICONS.star + '<span>북마크</span></button>' +
           '<button type="button" class="btn btn-danger" id="nm-btn-stop" style="display:none">정지</button>' +
         '</div>' +
       '</div>'
@@ -772,6 +777,7 @@
     var pauseBtn = centerEl.querySelector('#nm-btn-pause');
     var resumeBtn = centerEl.querySelector('#nm-btn-resume');
     var stopBtn = centerEl.querySelector('#nm-btn-stop');
+    var bookmarkBtn = centerEl.querySelector('#nm-btn-bookmark');
     var dropzone = centerEl.querySelector('#nm-dropzone');
     var fileInput = centerEl.querySelector('#nm-file-input');
     var previewCard = centerEl.querySelector('#nm-preview');
@@ -788,6 +794,7 @@
     var audioCtx = null, analyser = null;
     var chunks = [];
     var startedAt = null;
+    var liveBookmarks = [];   // 녹음 중 찍은 북마크(ms)
     var elapsedMs = 0;
     var segmentStartTs = 0;
     var timerRaf = null;
@@ -822,6 +829,26 @@
       if (pauseBtn) pauseBtn.style.display = s === 'recording' ? '' : 'none';
       if (resumeBtn) resumeBtn.style.display = s === 'paused' ? '' : 'none';
       if (stopBtn) stopBtn.style.display = (s === 'recording' || s === 'paused') ? '' : 'none';
+      if (bookmarkBtn) bookmarkBtn.style.display = (s === 'recording' || s === 'paused') ? '' : 'none';
+    }
+
+    /* 녹음 중 북마크 — 중요한 순간을 그 자리에서 표시한다.
+       전사가 끝나면 서버가 이 시각을 포함하는 세그먼트로 표시를 옮기고,
+       재생 화면의 파형에도 마커로 찍힌다. */
+    function currentRecordMs() {
+      return recState === 'recording'
+        ? elapsedMs + (performance.now() - segmentStartTs)
+        : elapsedMs;
+    }
+
+    function addLiveBookmark() {
+      var at = Math.round(currentRecordMs());
+      // 연타로 같은 지점이 중복 기록되는 것을 막는다
+      if (liveBookmarks.length && Math.abs(liveBookmarks[liveBookmarks.length - 1] - at) < 800) return;
+      liveBookmarks.push(at);
+      toast(formatDuration(at) + ' 북마크됨', 'success');
+      var label = bookmarkBtn && bookmarkBtn.querySelector('span');
+      if (label) label.textContent = '북마크 ' + liveBookmarks.length;
     }
 
     function tickTimer() {
@@ -886,6 +913,7 @@
         mediaRecorder.onstop = onRecorderStop;
         mediaRecorder.start(250);
         startedAt = new Date();
+        liveBookmarks = [];
         elapsedMs = 0;
         segmentStartTs = performance.now();
         setState('recording');
@@ -1051,6 +1079,7 @@
         if (list.length) fd.append('hotwords', JSON.stringify(list));
       }
       fd.append('recording_consent_confirmed', consentInput.checked ? 'true' : 'false');
+      if (liveBookmarks.length) fd.append('bookmarks', JSON.stringify(liveBookmarks));
 
       // 파일이 API 를 통과하면 Vercel 서버리스의 요청 본문 제한(4.5MB)에 걸려
       // 2분 남짓 녹음도 못 올린다. Storage 직접 업로드가 가능하면 그쪽을 쓰고,
@@ -1161,6 +1190,7 @@
     if (startBtn) startBtn.addEventListener('click', startRecording);
     if (pauseBtn) pauseBtn.addEventListener('click', pauseRecording);
     if (resumeBtn) resumeBtn.addEventListener('click', resumeRecording);
+    if (bookmarkBtn) bookmarkBtn.addEventListener('click', addLiveBookmark);
     if (stopBtn) stopBtn.addEventListener('click', stopRecording);
     uploadBtn.addEventListener('click', uploadNow);
     resetBtn.addEventListener('click', resetAll);
@@ -1237,6 +1267,7 @@
     var meeting = null;
     var segmentsState = [];
     var summaryState = null;
+    var bookmarksState = [];
     var dirty = false;
     var lastHighlightedId = null;
     var transcriptQuery = '';
@@ -1247,11 +1278,13 @@
     Promise.all([
       API.getMeeting(meetingId),
       API.getSegments(meetingId),
-      API.getSummary(meetingId)
+      API.getSummary(meetingId),
+      API.getBookmarks(meetingId)
     ]).then(function (results) {
       if (cancelled) return;
       meeting = results[0];
       segmentsState = (results[1] && results[1].items) || [];
+      bookmarksState = (results[3] && results[3].items) || [];
       var summaryRes = results[2];
       summaryState = summaryRes ? Object.assign({}, summaryRes) : {
         summary_version_id: null, version: 0, source: null,
@@ -1308,7 +1341,11 @@
             '<button type="button" class="playback-btn" id="md-skip-fwd" title="10초 앞으로">' + ICONS.skipFwd + '</button>' +
             '<div class="playback-seek-wrap">' +
               '<span class="playback-time mono" id="md-cur-time">00:00</span>' +
-              '<input type="range" class="audio-seek" id="md-seek" min="0" max="100" value="0" step="0.1" />' +
+              '<div class="wave-wrap" id="md-wave-wrap">' +
+                '<canvas class="wave-canvas" id="md-wave"></canvas>' +
+                '<div class="wave-markers" id="md-wave-markers"></div>' +
+                '<input type="range" class="audio-seek" id="md-seek" min="0" max="100" value="0" step="0.1" />' +
+              '</div>' +
               '<span class="playback-time mono" id="md-dur-time">00:00</span>' +
             '</div>' +
             '<select class="audio-rate-select" id="md-rate-select" title="재생 속도">' +
@@ -1397,6 +1434,76 @@
       var skipBackBtn = centerEl.querySelector('#md-skip-back');
       var skipFwdBtn = centerEl.querySelector('#md-skip-fwd');
       var seekRange = centerEl.querySelector('#md-seek');
+      var waveCanvas = centerEl.querySelector('#md-wave');
+      var waveMarkers = centerEl.querySelector('#md-wave-markers');
+
+      /* ---- 파형 스크러버 ----
+         브라우저가 오디오를 디코딩해 피크를 뽑는다. 서버(Vercel 서버리스)에서
+         돌리면 대용량 파일마다 함수 실행 시간을 태우므로 클라이언트에서 한다.
+         디코딩은 파일 전체를 메모리에 올리므로 큰 파일은 건너뛰고 기존 막대만 쓴다. */
+      var WAVE_MAX_BYTES = 30 * 1024 * 1024;
+      var wavePeaks = null;
+
+      function drawWave() {
+        if (!waveCanvas) return;
+        var w = waveCanvas.clientWidth, h = waveCanvas.clientHeight;
+        if (!w || !h) return;
+        var dpr = window.devicePixelRatio || 1;
+        waveCanvas.width = Math.round(w * dpr);
+        waveCanvas.height = Math.round(h * dpr);
+        var ctx = waveCanvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, w, h);
+        if (!wavePeaks || !wavePeaks.length) return;
+        var played = (audioEl.duration ? audioEl.currentTime / audioEl.duration : 0);
+        var mid = h / 2, bw = w / wavePeaks.length;
+        for (var i = 0; i < wavePeaks.length; i++) {
+          var amp = Math.max(1, wavePeaks[i] * (h * 0.46));
+          ctx.fillStyle = (i / wavePeaks.length) <= played
+            ? 'rgba(255,199,0,0.95)' : 'rgba(255,255,255,0.28)';
+          ctx.fillRect(i * bw, mid - amp, Math.max(1, bw - 0.6), amp * 2);
+        }
+      }
+
+      function renderWaveMarkers(bookmarks) {
+        if (!waveMarkers) return;
+        var dur = audioEl.duration || 0;
+        if (!dur || !bookmarks || !bookmarks.length) { waveMarkers.innerHTML = ''; return; }
+        waveMarkers.innerHTML = bookmarks.map(function (b) {
+          var pct = Math.max(0, Math.min(100, (b.at_ms / 1000 / dur) * 100));
+          return '<button type="button" class="wave-marker" style="left:' + pct + '%"' +
+                 ' data-action="seek-bookmark" data-at="' + b.at_ms + '"' +
+                 ' title="' + esc(formatDuration(b.at_ms)) + ' 북마크"></button>';
+        }).join('');
+      }
+
+      function loadWaveform(url) {
+        if (!waveCanvas || !url || !window.AudioContext) return;
+        fetch(url).then(function (r) {
+          var len = parseInt(r.headers.get('Content-Length') || '0', 10);
+          if (len && len > WAVE_MAX_BYTES) throw new Error('too-large');
+          return r.arrayBuffer();
+        }).then(function (buf) {
+          var ac = new AudioContext();
+          return ac.decodeAudioData(buf).then(function (audio) {
+            var ch = audio.getChannelData(0);
+            var N = 420, block = Math.floor(ch.length / N) || 1, peaks = [];
+            for (var i = 0; i < N; i++) {
+              var mx = 0, s = i * block, e = Math.min(ch.length, s + block);
+              for (var j = s; j < e; j++) { var v = ch[j] < 0 ? -ch[j] : ch[j]; if (v > mx) mx = v; }
+              peaks.push(mx);
+            }
+            var top = Math.max.apply(null, peaks) || 1;
+            wavePeaks = peaks.map(function (v) { return v / top; });
+            ac.close();
+            drawWave();
+          });
+        }).catch(function () {
+          // 디코딩 실패·대용량이면 파형 없이 기존 막대만 쓴다. 재생을 막지 않는다.
+          wavePeaks = null;
+        });
+      }
+
       var curTimeEl = centerEl.querySelector('#md-cur-time');
       var durTimeEl = centerEl.querySelector('#md-dur-time');
       var rateSelect = centerEl.querySelector('#md-rate-select');
@@ -1510,6 +1617,7 @@
         var pct = dur > 0 ? (cur / dur * 100) : 0;
         if (!fromUserSeek) seekRange.value = String(pct);
         seekRange.style.setProperty('--seek-pct', pct + '%');
+        drawWave();
         curTimeEl.textContent = formatDuration(cur * 1000);
         durTimeEl.textContent = formatDuration(dur * 1000);
       }
@@ -1531,7 +1639,12 @@
       audioEl.addEventListener('play', function () { updatePlayIcon(true); });
       audioEl.addEventListener('pause', function () { updatePlayIcon(false); });
       audioEl.addEventListener('ended', function () { updatePlayIcon(false); });
-      audioEl.addEventListener('loadedmetadata', function () { updateSeekUI(); });
+      audioEl.addEventListener('loadedmetadata', function () {
+        updateSeekUI();
+        renderWaveMarkers(bookmarksState);
+      });
+      if (meeting.audio && meeting.audio.stream_url) loadWaveform(meeting.audio.stream_url);
+      window.addEventListener('resize', drawWave);
       audioEl.addEventListener('error', function () {
         nowPlayingEl.textContent = '오디오를 불러올 수 없습니다.';
       });
@@ -1891,6 +2004,9 @@
         var action = btn.dataset.action;
         var segRow, seg;
         switch (action) {
+          case 'seek-bookmark':
+            seekAndPlay(parseInt(btn.dataset.at, 10) || 0);
+            return;
           case 'seek-section':
             // 구간 요약의 시각 → 해당 지점부터 재생. 전사 말풍선의 seek 과 같은 경로를 쓴다.
             seekAndPlay(parseInt(btn.dataset.start, 10) || 0);
