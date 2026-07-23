@@ -361,6 +361,12 @@
   }
 
   var API = {
+    presignUpload: function (filename) {
+      return fetch(API_BASE + '/uploads/presign', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: filename })
+      }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    },
     createJob: function (formData) {
       return apiRequest('/jobs', { method: 'POST', body: formData });
     },
@@ -985,6 +991,43 @@
         consentInput.focus();
         return;
       }
+    /* 브라우저 → Supabase Storage 직접 업로드.
+       서버는 경로만 받으므로 Vercel 의 4.5MB 요청 본문 제한을 받지 않는다.
+       presign 이 supported:false 를 주면(로컬 저장소) null 을 돌려 호출측이
+       기존 multipart 로 되돌아간다. 실패해도 마찬가지 — 업로드 자체를 막지 않는다. */
+    function tryDirectUpload(filePart, fileName) {
+      return API.presignUpload(fileName).then(function (pre) {
+        if (!pre || !pre.supported) return null;
+        if (filePart.size > (pre.max_bytes || Infinity)) {
+          throw new Error('녹음 파일이 너무 큽니다 (' +
+            Math.round((pre.max_bytes || 0) / 1024 / 1024) + 'MB 이하).');
+        }
+        return new Promise(function (resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('PUT', pre.upload_url, true);
+          xhr.setRequestHeader('Content-Type', filePart.type || 'application/octet-stream');
+          xhr.upload.onprogress = function (e) {
+            if (!e.lengthComputable) return;
+            uploadBtn.textContent = '업로드 중… ' + Math.round((e.loaded / e.total) * 100) + '%';
+          };
+          xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              uploadBtn.textContent = '처리 준비 중…';
+              resolve({ storage_path: pre.storage_path, meeting_id: pre.meeting_id });
+            } else {
+              reject(new Error('업로드에 실패했습니다 (' + xhr.status + ').'));
+            }
+          };
+          xhr.onerror = function () { reject(new Error('업로드 중 네트워크 오류가 발생했습니다.')); };
+          xhr.send(filePart);
+        });
+      }).catch(function (err) {
+        // presign 단계 실패는 치명적이지 않다 — 기존 경로로 넘긴다.
+        if (err && /너무 큽니다/.test(err.message)) throw err;
+        return null;
+      });
+    }
+
       if (!previewInfo) { toast('업로드할 녹음 또는 파일이 없습니다.', 'error'); return; }
       uploadBtn.disabled = true;
       resetBtn.disabled = true;
@@ -993,7 +1036,6 @@
       var fd = new FormData();
       var filePart = resultSource === 'recording' ? previewInfo.blob : resultFile;
       var fileName = resultSource === 'recording' ? previewInfo.name : resultFile.name;
-      fd.append('audio_file', filePart, fileName);
       var title = titleInput.value.trim();
       if (title) fd.append('title', title);
       var recordedAt = resultSource === 'recording'
@@ -1010,7 +1052,18 @@
       }
       fd.append('recording_consent_confirmed', consentInput.checked ? 'true' : 'false');
 
-      API.createJob(fd).then(function (res) {
+      // 파일이 API 를 통과하면 Vercel 서버리스의 요청 본문 제한(4.5MB)에 걸려
+      // 2분 남짓 녹음도 못 올린다. Storage 직접 업로드가 가능하면 그쪽을 쓰고,
+      // 안 되면(로컬 저장소 등) 기존 multipart 로 그대로 돌아간다.
+      tryDirectUpload(filePart, fileName).then(function (direct) {
+        if (direct) {
+          fd.append('storage_path', direct.storage_path);
+          fd.append('meeting_id', direct.meeting_id);
+        } else {
+          fd.append('audio_file', filePart, fileName);
+        }
+        return API.createJob(fd);
+      }).then(function (res) {
         ListColumn.refresh(true);
         startPolling(res.job_id, res.meeting_id);
       }).catch(function (err) {

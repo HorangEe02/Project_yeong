@@ -148,7 +148,10 @@ def _safe_mime(ext: str) -> str:
 @app.post(P + "/jobs", status_code=201)
 async def create_job(
     background: BackgroundTasks,
-    audio_file: UploadFile = File(...),
+    audio_file: Optional[UploadFile] = File(None),
+    # 브라우저가 Supabase Storage 로 직접 올린 뒤 경로만 넘기는 경로(대용량용).
+    storage_path: Optional[str] = Form(None),
+    meeting_id_in: Optional[str] = Form(None, alias="meeting_id"),
     title: Optional[str] = Form(None),
     recorded_at: Optional[str] = Form(None),
     duration_ms: Optional[int] = Form(None),
@@ -160,29 +163,39 @@ async def create_job(
     # 데모: 단일 로컬 사용자 (AUTH_ENABLED 시 별도 인증 레이어로 확장)
     user_id = config.DEFAULT_USER_ID
 
-    if config.MAX_JOBS_PER_HOUR > 0:
-        conn = db.connect()
-        try:
-            recent = conn.execute(
-                "SELECT COUNT(*) AS n FROM jobs WHERE created_at > ?",
-                (datetime.now(timezone.utc) - timedelta(hours=1),)).fetchone()
-            n = recent["n"] if recent is not None else 0
-        finally:
-            conn.close()
-        if n >= config.MAX_JOBS_PER_HOUR:
-            return _err(429, "rate_limited",
-                        "지금은 업로드가 몰려 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.")
+    limited = _rate_limited()
+    if limited:
+        return limited
 
-    content = await audio_file.read()
-    if len(content) > config.MAX_UPLOAD_BYTES:
+    direct = bool(storage_path and meeting_id_in)
+    if direct:
+        # 클라이언트가 보고한 크기·체크섬을 믿지 않고 서버가 객체를 확인한다.
+        meta = storage.stat_uploaded(storage_path)
+        if not meta:
+            return _err(404, "upload_not_found",
+                        "업로드된 파일을 찾을 수 없습니다. 다시 시도해 주세요.")
+        ext = (os.path.splitext(storage_path)[1] or "").lstrip(".").lower()
+        if ext not in _ALLOWED_EXT:
+            return _err(415, "unsupported_media_type",
+                        "지원하지 않는 녹음 파일입니다. m4a, aac, webm, wav 파일을 사용하세요.")
+        if meta["size"] < 256:
+            return _err(422, "audio_too_short",
+                        "녹음 길이가 너무 짧아 회의록을 만들 수 없습니다.")
+        content = None
+    else:
+        if audio_file is None:
+            return _err(422, "audio_required", "녹음 파일이 필요합니다.")
+        content = await audio_file.read()
+    if content is not None and len(content) > config.MAX_UPLOAD_BYTES:
         return _err(413, "audio_too_large",
                     f"녹음 파일이 너무 큽니다. {config.MAX_UPLOAD_BYTES // (1024 * 1024)}MB 이하로 업로드하세요.")
-    ext = (os.path.splitext(audio_file.filename or "")[1] or "").lstrip(".").lower()
+    if not direct:
+        ext = (os.path.splitext(audio_file.filename or "")[1] or "").lstrip(".").lower()
     # 확장자가 비면 통과시키던 구멍 — 이제 확장자를 반드시 요구한다.
     if ext not in _ALLOWED_EXT:
         return _err(415, "unsupported_media_type",
                     "지원하지 않는 녹음 파일입니다. m4a, aac, webm, wav 파일을 사용하세요.")
-    if len(content) < 256:
+    if content is not None and len(content) < 256:
         return _err(422, "audio_too_short",
                     "녹음 길이가 너무 짧아 회의록을 만들 수 없습니다.")
 
@@ -199,12 +212,14 @@ async def create_job(
     conn = db.connect()
     try:
         now = db.now_iso()
-        meeting_id = db.new_id("meeting_")
+        meeting_id = meeting_id_in if direct else db.new_id("meeting_")
         job_id = db.new_id("job_")
         rec_id = db.new_id("file_")
         title_final = (title or "").strip() or f"회의 {now[:10]}"
 
-        saved = storage.save_original(user_id, meeting_id, audio_file.filename or "audio.webm", content)
+        saved = (meta if direct
+                 else storage.save_original(user_id, meeting_id,
+                                            audio_file.filename or "audio.webm", content))
 
         conn.execute(
             """INSERT INTO meetings
@@ -239,6 +254,48 @@ async def create_job(
     return {"job_id": job_id, "meeting_id": meeting_id, "status": "uploaded",
             "created_at": now}
 
+
+
+def _rate_limited():
+    """시간당 업로드 상한. 직접 업로드 경로(presign)와 기존 multipart 가 함께 쓴다."""
+    if config.MAX_JOBS_PER_HOUR <= 0:
+        return None
+    conn = db.connect()
+    try:
+        row = conn.execute("SELECT COUNT(*) AS n FROM jobs WHERE created_at > ?",
+                           (datetime.now(timezone.utc) - timedelta(hours=1),)).fetchone()
+        n = row["n"] if row is not None else 0
+    finally:
+        conn.close()
+    if n >= config.MAX_JOBS_PER_HOUR:
+        return _err(429, "rate_limited",
+                    "지금은 업로드가 몰려 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.")
+    return None
+
+
+@app.post(P + "/uploads/presign", status_code=201)
+def presign_upload(body: dict):
+    """브라우저가 Storage 로 직접 올릴 1회용 URL 을 발급한다.
+
+    Vercel 서버리스는 요청 본문이 4.5MB 로 제한돼, 파일이 API 를 통과하는 구조로는
+    2분 남짓 녹음도 못 올린다. 파일은 브라우저 → Storage 로 직행하고 서버는
+    경로만 받는다. 로컬 저장소에서는 빈 응답을 주어 호출측이 기존 multipart 로 돌아간다.
+    """
+    limited = _rate_limited()
+    if limited:
+        return limited
+    filename = str((body or {}).get("filename") or "")
+    ext = (os.path.splitext(filename)[1] or "").lstrip(".").lower()
+    if ext not in _ALLOWED_EXT:
+        return _err(415, "unsupported_media_type",
+                    "지원하지 않는 녹음 파일입니다. m4a, aac, webm, wav 파일을 사용하세요.")
+    meeting_id = db.new_id("meeting_")
+    signed = storage.create_signed_upload(config.DEFAULT_USER_ID, meeting_id, ext)
+    if not signed:
+        return {"supported": False}
+    return {"supported": True, "meeting_id": meeting_id,
+            "upload_url": signed["upload_url"], "storage_path": signed["path"],
+            "max_bytes": config.MAX_UPLOAD_BYTES}
 
 @app.get(P + "/jobs/{job_id}")
 def get_job(job_id: str, user_id: str = None):
