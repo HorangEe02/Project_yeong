@@ -167,8 +167,17 @@ body {
 .rail-btn:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
 
 .rail-spacer { flex: 1; }
-.rail-settings { color: var(--ink-300); }
-.rail-settings:hover { background: var(--surface-sunken); color: var(--ink-600); }
+/* 새 회의 컴포즈 — 레일 상단의 주요 액션(모바일 FAB 의 데스크톱 대응) */
+.rail-compose {
+  width: 42px; height: 42px; border-radius: var(--radius-md);
+  background: var(--brand-600); color: var(--on-brand);
+  display: flex; align-items: center; justify-content: center; flex: none;
+  box-shadow: 0 3px 10px rgba(201, 145, 0, 0.35); text-decoration: none;
+  transition: background-color .15s var(--ease), transform .1s var(--ease);
+}
+.rail-compose:hover { background: var(--brand-500); }
+.rail-compose:active { transform: scale(0.94); }
+.rail-compose:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
 
 /* ----------------------------------------------------------------------
    3. 목록 컬럼 — 회의 목록
@@ -896,16 +905,17 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
 }
 
 @media (max-width: 760px) {
-  :root { --rail-w: 58px; --list-w: 100%; }
-  .app-shell { grid-template-columns: var(--rail-w) 1fr; }
-  .icon-rail { padding: 12px 0 10px; gap: 16px; }
-  .rail-logo { width: 34px; height: 34px; }
-  .rail-btn { width: 38px; height: 38px; }
-  .col-list { grid-column: 2; }
-  .col-center { grid-column: 2; }
+  :root { --list-w: 100%; }
+  /* 모바일: 레일 숨기고 하단 탭바로 대체, 단일 페인 그리드 */
+  .icon-rail { display: none; }
+  .app-shell { grid-template-columns: 1fr; }
+  .col-list { grid-column: 1; }
+  .col-center { grid-column: 1; }
   .app-shell[data-route="new"] .col-list,
   .app-shell[data-route="detail"] .col-list,
-  .app-shell[data-route="calendar"] .col-list { display: none; }
+  .app-shell[data-route="calendar"] .col-list,
+  .app-shell[data-route="folders"] .col-list,
+  .app-shell[data-route="me"] .col-list { display: none; }
   .app-shell[data-route="list"] .col-center { display: none; }
   .detail-back-btn { display: flex; }
   .msg-col { max-width: 84%; }
@@ -1089,4 +1099,69 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
   .wave-marker { width: 22px; margin-left: -11px; }
   .wave-marker::before { left: 10px; }
   .wave-marker::after { left: 7px; }
+}
+
+/* ----------------------------------------------------------------------
+   20. 하단 탭바 · FAB · 플레이스홀더 (서브프로젝트 A)
+   ------------------------------------------------------------------- */
+.tab-bar { display: none; }
+.tab-fab { display: none; }
+
+/* 플레이스홀더 페이지(폴더·마이) — C·E 구현 전 셸 */
+.placeholder-page {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 12px; padding: 64px 24px; color: var(--ink-500);
+}
+.placeholder-icon { color: var(--ink-300); }
+.placeholder-title { font-size: 18px; font-weight: 800; color: var(--ink-900); }
+.placeholder-desc { font-size: 13px; max-width: 340px; line-height: 1.6; }
+.mypage-profile { display: flex; align-items: center; gap: 14px; }
+.mypage-avatar {
+  width: 52px; height: 52px; border-radius: 50%; flex: none;
+  background: var(--brand-100); color: var(--brand-700);
+  display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px;
+}
+.mypage-id { text-align: left; }
+.mypage-name { font-weight: 800; font-size: 15px; color: var(--ink-900); }
+.mypage-mail { font-size: 12px; color: var(--ink-500); margin-top: 2px; }
+
+/* 이 @media 는 파일 맨 끝 — clearance 규칙이 기존 .cal-page/.compose-scroll(위쪽)보다 뒤라 cascade 에서 이긴다 */
+@media (max-width: 760px) {
+  .tab-bar {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    height: calc(56px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--surface); border-top: 1px solid var(--border);
+  }
+  .tab-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    color: var(--ink-400); text-decoration: none; font-size: 10.5px; font-weight: 700;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab-btn svg { width: 22px; height: 22px; }
+  .tab-btn.is-active { color: var(--brand-700); }
+
+  .tab-fab {
+    display: flex; position: fixed; right: 16px; z-index: 51;
+    bottom: calc(56px + 16px + env(safe-area-inset-bottom));
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--brand-600); color: var(--on-brand);
+    align-items: center; justify-content: center; text-decoration: none;
+    box-shadow: var(--shadow-md);
+    transition: transform .1s var(--ease), background-color .15s var(--ease);
+  }
+  .tab-fab:hover { background: var(--brand-500); }
+  .tab-fab:active { transform: scale(0.94); }
+
+  /* detail = 풀스크린: 탭바 숨김(상단 .detail-back-btn 로 이탈).
+     new 는 기본 랜딩이라 탭바를 남겨 내비 크롬 유지(스트랜딩 방지) — 현재 화면이 새 회의라 FAB 만 숨긴다. */
+  .app-shell[data-route="detail"] .tab-bar { display: none; }
+  .app-shell[data-route="new"] .tab-fab,
+  .app-shell[data-route="detail"] .tab-fab { display: none; }
+
+  /* 콘텐츠가 탭바 뒤로 가리지 않게 하단 여백 확보(탭바 표시 라우트: list·folders·me·calendar·new) */
+  .list-scroll { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .cal-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .compose-scroll { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .placeholder-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
