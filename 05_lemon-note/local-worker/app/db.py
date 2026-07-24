@@ -16,6 +16,15 @@ CREATE TABLE IF NOT EXISTS profiles (
   created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS folders (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  parent_id TEXT,                                  -- 중첩(self-FK). 삭제 시 앱이 자식 승격
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS meetings (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
@@ -29,6 +38,7 @@ CREATE TABLE IF NOT EXISTS meetings (
   recording_consent_confirmed INTEGER NOT NULL DEFAULT 0,
   recording_consent_confirmed_at TEXT,
   deleted_at TEXT,
+  folder_id TEXT,                                  -- NULL = 기본폴더(미분류). 단일 소속
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );

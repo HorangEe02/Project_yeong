@@ -71,6 +71,14 @@ class LocalFileStorage:
             f.seek(start)
             return f.read(end - start + 1)
 
+    def delete(self, path) -> None:
+        """저장 파일 1개 삭제(영구삭제용). 없으면 조용히 통과."""
+        try:
+            if path and os.path.exists(path):
+                os.remove(path)
+        except OSError:
+            pass
+
 
 # ------------------------------------------------------------- supabase
 class SupabaseStorage:
@@ -126,6 +134,19 @@ class SupabaseStorage:
     @staticmethod
     def _key(user_id, meeting_id, *parts) -> str:
         return "/".join(["users", str(user_id), "meetings", str(meeting_id), *parts])
+
+    def delete(self, path) -> None:
+        """Storage 객체 1개 삭제(service_role, 영구삭제용). 404/400 은 무시."""
+        if not path:
+            return
+        req = urllib.request.Request(self._url(path), method="DELETE",
+                                     headers=self._headers())
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                resp.read()
+        except urllib.error.HTTPError as e:
+            if e.code not in (404, 400):
+                raise
 
     def save_original(self, user_id, meeting_id, filename, content: bytes) -> dict:
         ext = (os.path.splitext(filename or "")[1] or ".bin").lstrip(".").lower()

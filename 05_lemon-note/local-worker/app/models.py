@@ -8,6 +8,20 @@ class MeetingPatch(BaseModel):
     title: str
 
 
+class FolderCreate(BaseModel):
+    name: str
+    parent_id: Optional[str] = None
+
+
+class FolderPatch(BaseModel):
+    name: Optional[str] = None
+    parent_id: Optional[str] = None
+
+
+class FolderMoveIn(BaseModel):
+    folder_id: Optional[str] = None
+
+
 class SegmentPatch(BaseModel):
     corrected_text: Optional[str] = None
     bookmarked: Optional[bool] = None

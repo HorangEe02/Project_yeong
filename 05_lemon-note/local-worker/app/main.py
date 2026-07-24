@@ -19,7 +19,8 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from . import config, database, db, pipeline, textbuild
-from .models import (ExportIn, MeetingPatch, SegmentPatch, SlackShareIn,
+from .models import (ExportIn, FolderCreate, FolderMoveIn, FolderPatch,
+                     MeetingPatch, SegmentPatch, SlackShareIn,
                      SpeakerPatch, SummaryPatch)
 from .providers import slack
 from .providers.storage import storage
@@ -408,11 +409,23 @@ def _search_matches(conn, meeting_id: str, q: str, title: str, limit: int = 3) -
                         "text": _snippet(body, q), "start_ms": r["start_ms"]})
     return out[:5]
 
+_SORT_COLUMNS = {"recorded_at": "m.recorded_at", "title": "m.title", "duration": "m.duration_ms"}
+
+
+def _sort_clause(sort: Optional[str]) -> str:
+    """`<col>` 또는 `<col>:asc|desc` → 안전한 ORDER BY 절. 화이트리스트만 허용."""
+    col, _, direction = (sort or "").partition(":")
+    column = _SORT_COLUMNS.get(col, "m.recorded_at")
+    order = "ASC" if direction.lower() == "asc" else "DESC"
+    return f"{column} {order}"
+
+
 @app.get(P + "/meetings")
 def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
-                  date: Optional[str] = None,
+                  date: Optional[str] = None, folder: Optional[str] = None,
+                  sort: Optional[str] = None,
                   limit: int = 20, cursor: Optional[str] = None):
-    """회의 목록. `date=YYYY-MM-DD` 를 주면 그 날짜에 녹음한 회의만 반환한다."""
+    """회의 목록. `date=YYYY-MM-DD`·`folder`(<id>|null|shared|trash)·`sort` 지원."""
     user_id = config.DEFAULT_USER_ID
     limit = max(1, min(100, limit))
     offset = 0
@@ -423,8 +436,18 @@ def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
             offset = 0
     conn = db.connect()
     try:
-        where = ["m.user_id=?", "m.deleted_at IS NULL"]
+        # folder=trash 면 삭제된 것만, 그 외엔 삭제 안 된 것만.
+        if folder == "trash":
+            where = ["m.user_id=?", "m.deleted_at IS NOT NULL"]
+        else:
+            where = ["m.user_id=?", "m.deleted_at IS NULL"]
         params = [user_id]
+        if folder == "null":
+            where.append("m.folder_id IS NULL")
+        elif folder == "shared":
+            where.append("m.id IN (SELECT meeting_id FROM share_links WHERE revoked_at IS NULL)")
+        elif folder and folder != "trash":
+            where.append("m.folder_id=?"); params.append(folder)
         if date:
             try:
                 d_start, d_end = _day_bounds(date)
@@ -455,7 +478,7 @@ def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
             "EXISTS(SELECT 1 FROM summary_versions sv WHERE sv.meeting_id=m.id) AS has_summary, "
             "(SELECT COUNT(*) FROM share_logs s WHERE s.meeting_id=m.id AND s.status='sent') AS shared_count "
             "FROM meetings m WHERE " + " AND ".join(where) +
-            " ORDER BY m.recorded_at DESC LIMIT ? OFFSET ?")
+            " ORDER BY " + _sort_clause(sort) + " LIMIT ? OFFSET ?")
         rows = conn.execute(sql, params + [limit + 1, offset]).fetchall()
         has_more = len(rows) > limit
         rows = rows[:limit]
@@ -571,6 +594,23 @@ def patch_meeting(meeting_id: str, body: MeetingPatch,
         conn.close()
 
 
+@app.post(P + "/meetings/{meeting_id}/move")
+def move_meeting(meeting_id: str, body: FolderMoveIn, _: str = Depends(require_write)):
+    """노트를 폴더로 이동. folder_id=null 이면 기본폴더(미분류)."""
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        _get_meeting(conn, meeting_id, user_id)
+        if body.folder_id:
+            _get_folder(conn, body.folder_id, user_id)  # 대상 폴더 존재·소유 검증
+        conn.execute("UPDATE meetings SET folder_id=?, updated_at=? WHERE id=?",
+                     (body.folder_id, db.now_iso(), meeting_id))
+        conn.commit()
+        return {"ok": True}
+    finally:
+        conn.close()
+
+
 @app.delete(P + "/meetings/{meeting_id}")
 def delete_meeting(meeting_id: str, _: str = Depends(require_write)):
     user_id = config.DEFAULT_USER_ID
@@ -581,6 +621,212 @@ def delete_meeting(meeting_id: str, _: str = Depends(require_write)):
                      (db.now_iso(), db.now_iso(), meeting_id))
         conn.commit()
         db.audit(conn, user_id, meeting_id, "meeting_deleted", {})
+        return {"ok": True}
+    finally:
+        conn.close()
+
+
+def _get_deleted_meeting(conn, meeting_id, user_id):
+    """휴지통 대상(soft-delete + 본인)만 반환. 아니면 404. purge 안전 2중 확인."""
+    row = conn.execute(
+        "SELECT * FROM meetings WHERE id=? AND deleted_at IS NOT NULL", (meeting_id,)
+    ).fetchone()
+    if not row or not _same_id(row["user_id"], user_id):
+        raise HTTPException(status_code=404, detail={"error": {
+            "code": "meeting_not_found", "message": "휴지통에서 회의를 찾을 수 없습니다."}})
+    return row
+
+
+def _purge_meeting(conn, meeting_id):
+    """스토리지 파일 + 회의/자식 전부 하드삭제. 호출측이 soft-delete+본인 검증을 마친 상태여야.
+
+    ON DELETE CASCADE 에 의존하지 않고 자식을 명시 삭제한다:
+    (a) SQLite 는 FK/CASCADE 가 아예 없어 DELETE FROM meetings 가 자식을 고아로 남기고,
+    (b) Postgres 도 audit_logs.meeting_id 는 cascade 가 없어 FK 위반으로 500 이 난다.
+    retry_job(main.py)의 수동 삭제 패턴과 동일한 접근. 테이블명은 상수라 인젝션 없음."""
+    # 스토리지: 녹음 원본 + 내보내기 파일 (경로가 없으면 storage.delete 가 무시)
+    for tbl in ("recording_files", "exports"):
+        for r in conn.execute(f"SELECT storage_path FROM {tbl} WHERE meeting_id=?", (meeting_id,)).fetchall():
+            storage.delete(r["storage_path"])
+    # 요약 버전의 자식들(summary_version_id 로 연결)
+    svs = conn.execute("SELECT id FROM summary_versions WHERE meeting_id=?", (meeting_id,)).fetchall()
+    for sv in svs:
+        for tbl in ("summary_sections", "summary_decisions", "action_items", "calendar_candidates"):
+            conn.execute(f"DELETE FROM {tbl} WHERE summary_version_id=?", (sv["id"],))
+    # meetings 의 직속 자식 전부
+    # summary_versions 는 exports·share_logs 가 summary_version_id 로 참조하고(둘 다 no-cascade)
+    # Postgres 는 즉시 FK 검사를 하므로 그 둘보다 뒤에 지운다(순서 어기면 프로덕션 500).
+    for tbl in ("jobs", "recording_files", "transcript_segments", "speaker_aliases",
+                "transcript_highlights", "share_links", "meeting_bookmarks",
+                "exports", "share_logs", "audit_logs", "summary_versions"):
+        conn.execute(f"DELETE FROM {tbl} WHERE meeting_id=?", (meeting_id,))
+    conn.execute("DELETE FROM meetings WHERE id=?", (meeting_id,))
+
+
+@app.post(P + "/meetings/{meeting_id}/restore")
+def restore_meeting(meeting_id: str, _: str = Depends(require_write)):
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        _get_deleted_meeting(conn, meeting_id, user_id)
+        conn.execute("UPDATE meetings SET deleted_at=NULL, updated_at=? WHERE id=?",
+                     (db.now_iso(), meeting_id))
+        conn.commit()
+        return {"ok": True}
+    finally:
+        conn.close()
+
+
+@app.delete(P + "/meetings/{meeting_id}/purge")
+def purge_meeting(meeting_id: str, _: str = Depends(require_write)):
+    """영구삭제. soft-delete 된 본인 회의만(2중 확인). 스토리지+DB 하드삭제."""
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        _get_deleted_meeting(conn, meeting_id, user_id)
+        _purge_meeting(conn, meeting_id)
+        conn.commit()
+        return {"ok": True}
+    finally:
+        conn.close()
+
+
+@app.post(P + "/trash/empty")
+def empty_trash(_: str = Depends(require_write)):
+    """휴지통 비우기. 무조건부 대량 DELETE 아니라 대상 목록을 뽑아 건별 purge."""
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        rows = conn.execute(
+            "SELECT id FROM meetings WHERE user_id=? AND deleted_at IS NOT NULL",
+            (user_id,)).fetchall()
+        for r in rows:
+            _purge_meeting(conn, r["id"])
+        conn.commit()
+        return {"ok": True, "purged": len(rows)}
+    finally:
+        conn.close()
+
+
+# ============================ Folders ============================
+
+def _get_folder(conn, folder_id, user_id):
+    row = conn.execute("SELECT * FROM folders WHERE id=?", (folder_id,)).fetchone()
+    if not row or not _same_id(row["user_id"], user_id):
+        raise HTTPException(status_code=404, detail={"error": {
+            "code": "folder_not_found", "message": "폴더를 찾을 수 없습니다."}})
+    return row
+
+
+def _folder_descendant_ids(conn, folder_id, user_id):
+    """folder_id 와 그 모든 자손 id 집합. postgres 는 uuid 컬럼을 UUID 객체로 돌려주므로
+    문자열로 정규화한다(안 하면 str==UUID 가 항상 거짓이라 사이클 검사가 프로덕션에서 무력화)."""
+    root = str(folder_id)
+    ids, frontier = {root}, [root]
+    while frontier:
+        cur = frontier.pop()
+        kids = conn.execute(
+            "SELECT id FROM folders WHERE user_id=? AND parent_id=?", (user_id, cur)
+        ).fetchall()
+        for k in kids:
+            kid = str(k["id"])
+            if kid not in ids:
+                ids.add(kid); frontier.append(kid)
+    return ids
+
+
+@app.get(P + "/folders")
+def list_folders():
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        rows = conn.execute(
+            "SELECT f.id, f.name, f.parent_id, "
+            "(SELECT COUNT(*) FROM meetings m WHERE m.folder_id=f.id AND m.deleted_at IS NULL) AS note_count "
+            "FROM folders f WHERE f.user_id=? ORDER BY f.name", (user_id,)).fetchall()
+        folders = [{"id": r["id"], "name": r["name"],
+                    "parent_id": r["parent_id"], "note_count": r["note_count"]} for r in rows]
+
+        def _c(extra):
+            return conn.execute(
+                "SELECT COUNT(*) AS n FROM meetings m WHERE m.user_id=? " + extra,
+                (user_id,)).fetchone()["n"]
+        counts = {
+            "all": _c("AND m.deleted_at IS NULL"),
+            "unfiled": _c("AND m.deleted_at IS NULL AND m.folder_id IS NULL"),
+            "trash": _c("AND m.deleted_at IS NOT NULL"),
+            "shared": conn.execute(
+                "SELECT COUNT(DISTINCT m.id) AS n FROM meetings m "
+                "JOIN share_links sl ON sl.meeting_id=m.id "
+                "WHERE m.user_id=? AND m.deleted_at IS NULL AND sl.revoked_at IS NULL",
+                (user_id,)).fetchone()["n"],
+        }
+        return {"folders": folders, "counts": counts}
+    finally:
+        conn.close()
+
+
+@app.post(P + "/folders")
+def create_folder(body: FolderCreate, _: str = Depends(require_write)):
+    user_id = config.DEFAULT_USER_ID
+    name = (body.name or "").strip()
+    if not name:
+        return _err(422, "invalid_name", "폴더 이름이 필요합니다.")
+    conn = db.connect()
+    try:
+        if body.parent_id:
+            _get_folder(conn, body.parent_id, user_id)  # 부모 존재·소유 검증
+        fid = db.new_id("folder_")
+        now = db.now_iso()
+        conn.execute(
+            "INSERT INTO folders (id,user_id,name,parent_id,created_at,updated_at) "
+            "VALUES (?,?,?,?,?,?)", (fid, user_id, name, body.parent_id, now, now))
+        conn.commit()
+        return {"id": fid, "name": name, "parent_id": body.parent_id, "note_count": 0}
+    finally:
+        conn.close()
+
+
+@app.patch(P + "/folders/{folder_id}")
+def patch_folder(folder_id: str, body: FolderPatch, _: str = Depends(require_write)):
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        _get_folder(conn, folder_id, user_id)
+        if body.parent_id is not None:
+            # 사이클 금지: 새 부모가 자기 자신 또는 자손이면 거부
+            if body.parent_id:
+                _get_folder(conn, body.parent_id, user_id)
+                if body.parent_id in _folder_descendant_ids(conn, folder_id, user_id):
+                    return _err(409, "folder_cycle", "폴더를 자기 자신 또는 하위로 이동할 수 없습니다.")
+            conn.execute("UPDATE folders SET parent_id=?, updated_at=? WHERE id=?",
+                         (body.parent_id, db.now_iso(), folder_id))
+        if body.name is not None:
+            nm = body.name.strip()
+            if not nm:
+                return _err(422, "invalid_name", "폴더 이름이 필요합니다.")
+            conn.execute("UPDATE folders SET name=?, updated_at=? WHERE id=?",
+                         (nm, db.now_iso(), folder_id))
+        conn.commit()
+        return {"ok": True}
+    finally:
+        conn.close()
+
+
+@app.delete(P + "/folders/{folder_id}")
+def delete_folder(folder_id: str, _: str = Depends(require_write)):
+    """자식 승격(비파괴): 직속 노트→기본폴더(NULL), 직속 하위폴더→이 폴더의 부모."""
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        row = _get_folder(conn, folder_id, user_id)
+        parent = row["parent_id"]
+        conn.execute("UPDATE meetings SET folder_id=NULL, updated_at=? WHERE folder_id=? AND user_id=?",
+                     (db.now_iso(), folder_id, user_id))
+        conn.execute("UPDATE folders SET parent_id=?, updated_at=? WHERE parent_id=? AND user_id=?",
+                     (parent, db.now_iso(), folder_id, user_id))
+        conn.execute("DELETE FROM folders WHERE id=?", (folder_id,))
+        conn.commit()
         return {"ok": True}
     finally:
         conn.close()
