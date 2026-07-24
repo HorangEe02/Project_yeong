@@ -1165,3 +1165,39 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
   .compose-scroll { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
   .placeholder-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
+
+/* ----------------------------------------------------------------------
+   21. 폴더 (서브프로젝트 C2)
+   ------------------------------------------------------------------- */
+.folder-page { padding: 20px 18px; overflow-y: auto; height: 100%; }
+.folder-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.folder-title { font-size: 18px; font-weight: 800; color: var(--ink-950); }
+.folder-list { display: flex; flex-direction: column; gap: 2px; }
+.folder-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--radius-md); text-decoration: none; color: var(--ink-800); }
+.folder-row:hover { background: var(--surface-alt); }
+.folder-row-link { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; text-decoration: none; color: inherit; }
+.folder-icon { color: var(--ink-400); display: flex; }
+.folder-name { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.folder-count { flex: none; font-size: 12px; color: var(--ink-500); }
+.folder-fixed .folder-name { font-weight: 700; }
+.folder-act { flex: none; width: 28px; height: 28px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--ink-400); cursor: pointer; opacity: 0; display: flex; align-items: center; justify-content: center; }
+.folder-row:hover .folder-act { opacity: 1; }
+.folder-act:hover { background: var(--surface-sunken); color: var(--ink-700); }
+.folder-divider { height: 1px; background: var(--border); margin: 8px 4px; }
+.folder-empty, .folder-loading { padding: 32px 14px; text-align: center; color: var(--ink-500); font-size: 13px; }
+
+.fd-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.fd-head .folder-title { flex: 1; }
+.fd-head .detail-back-btn { display: flex; }  /* 폴더 상세는 데스크톱에서도 뒤로가기 노출(상시 트리 없음) */
+.fd-controls { display: flex; gap: 8px; }
+.fd-controls .select { height: 32px; }
+.fd-page .list-scroll { padding: 0; }
+.card-actions { display: flex; flex-direction: column; gap: 4px; flex: none; }
+
+.folder-picker-list { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; margin: 10px 0; }
+.folder-picker-row { text-align: left; padding: 10px 12px; border: none; background: transparent; border-radius: var(--radius-sm); cursor: pointer; color: var(--ink-800); font-weight: 600; }
+.folder-picker-row:hover { background: var(--surface-alt); }
+
+@media (max-width: 760px) {
+  .folder-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+}
