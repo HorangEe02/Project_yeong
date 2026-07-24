@@ -462,6 +462,10 @@
         month: (isFinite(m) && m >= 1 && m <= 12) ? m : null
       };
     }
+    // 홈 탭은 회의 목록을 재사용한다(모바일에서 목록 페인, 데스크톱에서 상시 목록 + 빈 본문).
+    if (parts[0] === 'home') return { name: 'list' };
+    if (parts[0] === 'folders') return { name: 'folders' };
+    if (parts[0] === 'me') return { name: 'me' };
     return { name: 'new' };
   }
 
@@ -473,11 +477,14 @@
     }
   }
 
-  function updateRailActive(route) {
-    document.querySelectorAll('.rail-btn[data-nav]').forEach(function (a) { a.classList.remove('is-active'); });
-    var key = route.name === 'new' ? 'new' : (route.name === 'calendar' ? 'calendar' : 'meetings');
-    var el = document.querySelector('.rail-btn[data-nav="' + key + '"]');
-    if (el) el.classList.add('is-active');
+  function updateNavActive(route) {
+    // 레일(데스크톱)·탭바(모바일) 공용: [data-nav] 전체를 대상으로 한다.
+    document.querySelectorAll('[data-nav]').forEach(function (a) { a.classList.remove('is-active'); });
+    // 라우트 → 내비 키. detail 은 홈(목록)에서 진입하므로 홈을 강조. new(FAB)는 지속 탭이 없어 강조 없음.
+    var map = { list: 'home', detail: 'home', calendar: 'calendar', folders: 'folders', me: 'me' };
+    var key = map[route.name];
+    if (!key) return;
+    document.querySelectorAll('[data-nav="' + key + '"]').forEach(function (el) { el.classList.add('is-active'); });
   }
 
   function closeOpenDialogs() {
@@ -504,7 +511,7 @@
     closeDrawer();
     var route = parseHash();
     if (shellEl) shellEl.dataset.route = route.name;
-    updateRailActive(route);
+    updateNavActive(route);
     ListColumn.setActive(route.name === 'detail' ? route.meetingId : null);
     colCenterEl.innerHTML = '';
     colRightContentEl.innerHTML = '';
@@ -512,8 +519,16 @@
       document.title = '새 회의 — 회의녹음챗';
       currentCleanup = renderNewMeetingView(colCenterEl, colRightContentEl);
     } else if (route.name === 'list') {
-      document.title = '회의 목록 — 회의녹음챗';
+      document.title = '홈 — 회의녹음챗';
       renderCenterEmpty(colCenterEl);
+      renderRightTips(colRightContentEl, 'list');
+    } else if (route.name === 'folders') {
+      document.title = '폴더 — 회의녹음챗';
+      renderFolderPlaceholder(colCenterEl);
+      renderRightTips(colRightContentEl, 'list');
+    } else if (route.name === 'me') {
+      document.title = '마이 — 회의녹음챗';
+      renderMyPagePlaceholder(colCenterEl);
       renderRightTips(colRightContentEl, 'list');
     } else if (route.name === 'calendar') {
       document.title = '녹음 달력 — 회의녹음챗';
@@ -1285,6 +1300,29 @@
   /* ==========================================================================
      8. 가운데 + 오른쪽 컬럼: 회의 상세
      ======================================================================= */
+
+  /* 폴더·마이 플레이스홀더 — 서브프로젝트 C·E 에서 실제 기능으로 교체된다. */
+  function renderFolderPlaceholder(centerEl) {
+    centerEl.innerHTML =
+      '<div class="placeholder-page">' +
+        '<div class="placeholder-icon"><svg width="34" height="34" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2.5 6A1.5 1.5 0 014 4.5h3l1.6 2h5.9A1.5 1.5 0 0116 8v6.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 014 14.5V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>' +
+        '<h2 class="placeholder-title">폴더</h2>' +
+        '<p class="placeholder-desc">전체 노트 · 기본 폴더 · 공유받은/공유한 노트 · 휴지통을 여기서 관리할 수 있게 준비하고 있어요.</p>' +
+        '<span class="chip chip-gray">곧 제공</span>' +
+      '</div>';
+  }
+
+  function renderMyPagePlaceholder(centerEl) {
+    centerEl.innerHTML =
+      '<div class="placeholder-page">' +
+        '<div class="mypage-profile">' +
+          '<div class="mypage-avatar">회</div>' +
+          '<div class="mypage-id"><div class="mypage-name">회의녹음챗</div><div class="mypage-mail mono">demo@local</div></div>' +
+        '</div>' +
+        '<p class="placeholder-desc">프로필 · 사용량 · 인식 언어 · 자주 쓰는 단어 · 관심 분야 등 설정을 여기서 제공할 예정이에요.</p>' +
+        '<span class="chip chip-gray">곧 제공</span>' +
+      '</div>';
+  }
 
   function renderMeetingDetailView(centerEl, rightEl, meetingId, initialTab) {
     centerEl.innerHTML =
@@ -2686,12 +2724,10 @@
     colRightContentEl = document.getElementById('col-right-content');
     drawerBackdropEl = document.getElementById('drawer-backdrop');
     var drawerCloseBtn = document.getElementById('drawer-close-btn');
-    var railSettingsBtn = document.getElementById('rail-settings-btn');
 
     drawerBackdropEl.addEventListener('click', closeDrawer);
     drawerCloseBtn.addEventListener('click', closeDrawer);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
-    if (railSettingsBtn) railSettingsBtn.addEventListener('click', function () { toast('설정은 준비 중입니다.', 'info'); });
 
     ListColumn.init(document.getElementById('col-list'));
     renderRoute();

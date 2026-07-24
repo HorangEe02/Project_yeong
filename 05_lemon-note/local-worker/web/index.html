@@ -12,7 +12,7 @@
 <div class="app-shell" id="app-shell" data-route="new">
 
   <nav class="icon-rail" aria-label="주요 메뉴">
-    <a href="#/meetings" class="rail-logo" aria-label="회의녹음챗 홈">
+    <a href="#/home" class="rail-logo" aria-label="회의녹음챗 홈">
       <svg width="18" height="18" viewBox="0 0 22 22" fill="none" aria-hidden="true">
         <rect class="rail-logo-bar" x="2" y="8" width="3.2" height="10" rx="1.4" fill="#191f28"/>
         <rect class="rail-logo-bar" x="7.4" y="4" width="3.2" height="14" rx="1.4" fill="#191f28"/>
@@ -20,21 +20,24 @@
         <rect class="rail-logo-bar" x="18.2" y="6" width="3.2" height="12" rx="1.4" fill="#191f28"/>
       </svg>
     </a>
+    <a href="#/new" class="rail-compose" title="새 회의" aria-label="새 회의 녹음 또는 업로드">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </a>
     <div class="rail-nav" id="rail-nav">
-      <a href="#/new" class="rail-btn" data-nav="new" title="새 회의" aria-label="새 회의 녹음 또는 업로드">
-        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" aria-hidden="true"><rect x="7" y="2.5" width="5" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M4.2 9a5.3 5.3 0 0010.6 0M9.5 15.8v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <a href="#/home" class="rail-btn" data-nav="home" title="홈" aria-label="홈">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 9.5L10 3l7 6.5M5 8.5V16a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V8.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </a>
-      <a href="#/meetings" class="rail-btn" data-nav="meetings" title="회의 목록" aria-label="회의 목록">
-        <svg width="19" height="19" viewBox="0 0 19 19" fill="none" aria-hidden="true"><circle cx="3.4" cy="5" r="1.3" fill="currentColor"/><circle cx="3.4" cy="9.5" r="1.3" fill="currentColor"/><circle cx="3.4" cy="14" r="1.3" fill="currentColor"/><path d="M7.5 5h8M7.5 9.5h8M7.5 14h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <a href="#/folders" class="rail-btn" data-nav="folders" title="폴더" aria-label="폴더">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2.5 6A1.5 1.5 0 014 4.5h3l1.6 2h5.9A1.5 1.5 0 0116 8v6.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 014 14.5V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
       </a>
-      <a href="#/calendar" class="rail-btn" data-nav="calendar" title="녹음 달력" aria-label="녹음 달력">
+      <a href="#/calendar" class="rail-btn" data-nav="calendar" title="달력" aria-label="녹음 달력">
         <svg width="19" height="19" viewBox="0 0 19 19" fill="none" aria-hidden="true"><rect x="2.5" y="4" width="14" height="12.5" rx="2.3" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.8h14" stroke="currentColor" stroke-width="1.5"/><path d="M6.3 2.2v3M12.7 2.2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="5.6" y="10.1" width="2.7" height="2.7" rx="0.6" fill="currentColor"/></svg>
+      </a>
+      <a href="#/me" class="rail-btn" data-nav="me" title="마이" aria-label="마이 페이지">
+        <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="6.4" r="3.1" stroke="currentColor" stroke-width="1.5"/><path d="M4 16.5c0-3.1 2.7-5 6-5s6 1.9 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
       </a>
     </div>
     <div class="rail-spacer"></div>
-    <button type="button" class="rail-btn rail-settings" id="rail-settings-btn" title="설정" aria-label="설정 (준비 중)">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="2.6" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.8v2M9 14.2v2M16.2 9h-2M3.8 9h-2M14.1 3.9l-1.4 1.4M5.3 12.7l-1.4 1.4M14.1 14.1l-1.4-1.4M5.3 5.3L3.9 3.9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-    </button>
   </nav>
 
   <aside class="col-list" id="col-list" aria-label="회의 목록"></aside>
@@ -46,6 +49,28 @@
     <button type="button" class="drawer-close-btn" id="drawer-close-btn" aria-label="패널 닫기"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
     <div class="col-right-content" id="col-right-content"></div>
   </aside>
+
+  <nav class="tab-bar" aria-label="주요 메뉴">
+    <a href="#/home" class="tab-btn" data-nav="home">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 9.5L10 3l7 6.5M5 8.5V16a1 1 0 001 1h3v-4h2v4h3a1 1 0 001-1V8.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <span>홈</span>
+    </a>
+    <a href="#/folders" class="tab-btn" data-nav="folders">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2.5 6A1.5 1.5 0 014 4.5h3l1.6 2h5.9A1.5 1.5 0 0116 8v6.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 014 14.5V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span>폴더</span>
+    </a>
+    <a href="#/calendar" class="tab-btn" data-nav="calendar">
+      <svg width="22" height="22" viewBox="0 0 19 19" fill="none" aria-hidden="true"><rect x="2.5" y="4" width="14" height="12.5" rx="2.3" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.8h14" stroke="currentColor" stroke-width="1.5"/><path d="M6.3 2.2v3M12.7 2.2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="5.6" y="10.1" width="2.7" height="2.7" rx="0.6" fill="currentColor"/></svg>
+      <span>달력</span>
+    </a>
+    <a href="#/me" class="tab-btn" data-nav="me">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="6.4" r="3.1" stroke="currentColor" stroke-width="1.5"/><path d="M4 16.5c0-3.1 2.7-5 6-5s6 1.9 6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span>마이</span>
+    </a>
+  </nav>
+  <a href="#/new" class="tab-fab" aria-label="새 회의 녹음 또는 업로드">
+    <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </a>
 
 </div>
 
