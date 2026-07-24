@@ -55,6 +55,8 @@
 
   var ICONS = {
     search: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+    folderMove: '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M2.5 6A1.5 1.5 0 014 4.5h3l1.6 2h5.9A1.5 1.5 0 0116 8v6.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 014 14.5V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
+    share: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="4" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.7 7L10.3 5M5.7 9l4.6 2" stroke="currentColor" stroke-width="1.5"/></svg>',
     check: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7.2l3 3 6-6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     star: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.3l1.9 4.2 4.6.5-3.4 3.2.9 4.6L8 11.6l-4 2.2.9-4.6-3.4-3.2 4.6-.5L8 1.3z"/></svg>',
     edit: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M9.8 2.3l2.9 2.9-7.3 7.3-3.3.4.4-3.3 7.3-7.3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
@@ -388,6 +390,30 @@
     deleteMeeting: function (id) {
       return apiRequest('/meetings/' + encodeURIComponent(id), { method: 'DELETE' });
     },
+    listFolders: function () {
+      return apiRequest('/folders', { method: 'GET' });
+    },
+    createFolder: function (body) {
+      return apiJson('/folders', 'POST', body);
+    },
+    patchFolder: function (id, body) {
+      return apiJson('/folders/' + encodeURIComponent(id), 'PATCH', body);
+    },
+    deleteFolder: function (id) {
+      return apiRequest('/folders/' + encodeURIComponent(id), { method: 'DELETE' });
+    },
+    moveMeeting: function (id, body) {
+      return apiJson('/meetings/' + encodeURIComponent(id) + '/move', 'POST', body);
+    },
+    restoreMeeting: function (id) {
+      return apiJson('/meetings/' + encodeURIComponent(id) + '/restore', 'POST', {});
+    },
+    purgeMeeting: function (id) {
+      return apiRequest('/meetings/' + encodeURIComponent(id) + '/purge', { method: 'DELETE' });
+    },
+    emptyTrash: function () {
+      return apiJson('/trash/empty', 'POST', {});
+    },
     getSegments: function (id) {
       return apiRequest('/meetings/' + encodeURIComponent(id) + '/segments', { method: 'GET' });
     },
@@ -464,7 +490,7 @@
     }
     // 홈 탭은 회의 목록을 재사용한다(모바일에서 목록 페인, 데스크톱에서 상시 목록 + 빈 본문).
     if (parts[0] === 'home') return { name: 'list' };
-    if (parts[0] === 'folders') return { name: 'folders' };
+    if (parts[0] === 'folders') return { name: 'folders', key: parts[1] ? decodeURIComponent(parts[1]) : null };
     if (parts[0] === 'me') return { name: 'me' };
     return { name: 'new' };
   }
@@ -524,7 +550,9 @@
       renderRightTips(colRightContentEl, 'list');
     } else if (route.name === 'folders') {
       document.title = '폴더 — 회의녹음챗';
-      renderFolderPlaceholder(colCenterEl);
+      currentCleanup = route.key
+        ? renderFolderDetail(colCenterEl, route.key)
+        : renderFolderTree(colCenterEl);
       renderRightTips(colRightContentEl, 'list');
     } else if (route.name === 'me') {
       document.title = '마이 — 회의녹음챗';
@@ -544,6 +572,54 @@
      5. 회의 목록 컬럼 (상시 마운트 — 채팅 앱의 대화 목록처럼 항상 노출)
      ======================================================================= */
 
+  /* 노트 카드 — 상시 목록(ListColumn)과 폴더 상세가 공유. mode 로 우측 액션이 달라진다. */
+  function itemChipsHtml(m) {
+    var html = statusChipHtml(m.status);
+    if (m.has_summary) html += '<span class="chip chip-brand">요약</span>';
+    if (m.shared_count > 0) html += '<span class="chip chip-gray">공유 ' + m.shared_count + '</span>';
+    return html;
+  }
+
+  function renderNoteCard(m, opts) {
+    opts = opts || {};
+    var title = m.title || '(제목 없음)';
+    var col = colorFromString(m.meeting_id);
+    var actions;
+    if (opts.mode === 'trash') {
+      actions =
+        '<div class="card-actions">' +
+          '<button type="button" class="btn btn-subtle btn-sm" data-action="restore" title="복원">복원</button>' +
+          '<button type="button" class="btn btn-danger btn-sm" data-action="purge" title="영구삭제">영구삭제</button>' +
+        '</div>';
+    } else if (opts.mode === 'folder') {
+      actions =
+        '<button type="button" class="list-item-delete" data-action="move" title="폴더 이동" aria-label="폴더 이동">' + ICONS.folderMove + '</button>';
+    } else {
+      actions =
+        '<button type="button" class="list-item-delete" data-action="delete" title="삭제" aria-label="회의 삭제">' + ICONS.trash + '</button>';
+    }
+    return (
+      '<div class="list-item' + (m.meeting_id === opts.activeId ? ' is-active' : '') + '" data-id="' + esc(m.meeting_id) + '" tabindex="0">' +
+        '<div class="list-item-avatar" style="background:' + col.bg + ';color:' + col.fg + '">' + esc(title.charAt(0) || '회') + '</div>' +
+        '<div class="list-item-main">' +
+          '<div class="list-item-top"><span class="list-item-title">' + esc(title) + '</span><span class="list-item-time mono">' + esc(shortDate(m.recorded_at)) + '</span></div>' +
+          '<div class="list-item-sub mono">' + esc(formatDateTime(m.recorded_at, { dateOnly: true })) + ' · ' + esc(formatDuration(m.duration_ms)) + '</div>' +
+          '<div class="list-item-chips">' + itemChipsHtml(m) + '</div>' +
+          ((m.matches && m.matches.length)
+            ? '<div class="match-list">' + m.matches.map(function (mt) {
+                return '<div class="match-row">' +
+                  '<span class="match-src match-src--' + esc(mt.source) + '">' + esc(mt.label) + '</span>' +
+                  (mt.start_ms != null ? '<span class="match-time mono">' + esc(formatDuration(mt.start_ms)) + '</span>' : '') +
+                  '<span class="match-text">' + highlightMatch(mt.text, opts.query || '') + '</span>' +
+                '</div>';
+              }).join('') + '</div>'
+            : '') +
+        '</div>' +
+        actions +
+      '</div>'
+    );
+  }
+
   var ListColumn = (function () {
     var scrollEl, searchInput, filterSelect, loadMoreWrap, loadMoreBtn, countEl;
     var items = [];
@@ -561,38 +637,8 @@
       ['failed', '실패']
     ];
 
-    function itemChipsHtml(m) {
-      var html = statusChipHtml(m.status);
-      if (m.has_summary) html += '<span class="chip chip-brand">요약</span>';
-      if (m.shared_count > 0) html += '<span class="chip chip-gray">공유 ' + m.shared_count + '</span>';
-      return html;
-    }
-
     function itemHtml(m) {
-      var title = m.title || '(제목 없음)';
-      var col = colorFromString(m.meeting_id);
-      return (
-        '<div class="list-item' + (m.meeting_id === activeId ? ' is-active' : '') + '" data-id="' + esc(m.meeting_id) + '" tabindex="0">' +
-          '<div class="list-item-avatar" style="background:' + col.bg + ';color:' + col.fg + '">' + esc(title.charAt(0) || '회') + '</div>' +
-          '<div class="list-item-main">' +
-            '<div class="list-item-top"><span class="list-item-title">' + esc(title) + '</span><span class="list-item-time mono">' + esc(shortDate(m.recorded_at)) + '</span></div>' +
-            '<div class="list-item-sub mono">' + esc(formatDateTime(m.recorded_at, { dateOnly: true })) + ' · ' + esc(formatDuration(m.duration_ms)) + '</div>' +
-            '<div class="list-item-chips">' + itemChipsHtml(m) + '</div>' +
-            // 검색 중일 때만: 왜 이 회의가 결과에 떴는지 스니펫과 출처로 보여준다.
-            ((m.matches && m.matches.length)
-              ? '<div class="match-list">' + m.matches.map(function (mt) {
-                  return '<div class="match-row">' +
-                    '<span class="match-src match-src--' + esc(mt.source) + '">' + esc(mt.label) + '</span>' +
-                    (mt.start_ms != null
-                      ? '<span class="match-time mono">' + esc(formatDuration(mt.start_ms)) + '</span>' : '') +
-                    '<span class="match-text">' + highlightMatch(mt.text, lastQuery) + '</span>' +
-                  '</div>';
-                }).join('') + '</div>'
-              : '') +
-          '</div>' +
-          '<button type="button" class="list-item-delete" data-action="delete" title="삭제" aria-label="회의 삭제">' + ICONS.trash + '</button>' +
-        '</div>'
-      );
+      return renderNoteCard(m, { activeId: activeId, query: lastQuery, mode: 'list' });
     }
 
     function renderItems(loading) {
@@ -1301,16 +1347,7 @@
      8. 가운데 + 오른쪽 컬럼: 회의 상세
      ======================================================================= */
 
-  /* 폴더·마이 플레이스홀더 — 서브프로젝트 C·E 에서 실제 기능으로 교체된다. */
-  function renderFolderPlaceholder(centerEl) {
-    centerEl.innerHTML =
-      '<div class="placeholder-page">' +
-        '<div class="placeholder-icon"><svg width="34" height="34" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2.5 6A1.5 1.5 0 014 4.5h3l1.6 2h5.9A1.5 1.5 0 0116 8v6.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 014 14.5V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>' +
-        '<h2 class="placeholder-title">폴더</h2>' +
-        '<p class="placeholder-desc">전체 노트 · 기본 폴더 · 공유받은/공유한 노트 · 휴지통을 여기서 관리할 수 있게 준비하고 있어요.</p>' +
-        '<span class="chip chip-gray">곧 제공</span>' +
-      '</div>';
-  }
+  /* 마이 플레이스홀더 — 서브프로젝트 E 에서 실제 기능으로 교체된다. */
 
   function renderMyPagePlaceholder(centerEl) {
     centerEl.innerHTML =
@@ -1322,6 +1359,211 @@
         '<p class="placeholder-desc">프로필 · 사용량 · 인식 언어 · 자주 쓰는 단어 · 관심 분야 등 설정을 여기서 제공할 예정이에요.</p>' +
         '<span class="chip chip-gray">곧 제공</span>' +
       '</div>';
+  }
+
+  /* 폴더 트리 화면 — 고정 항목(전체/기본/공유한/휴지통) + 중첩 사용자 폴더 */
+  function renderFolderTree(centerEl) {
+    var cancelled = false;
+    function fixedRow(key, label, count, icon) {
+      return '<a class="folder-row folder-fixed" href="#/folders/' + key + '">' +
+        '<span class="folder-icon">' + icon + '</span>' +
+        '<span class="folder-name">' + esc(label) + '</span>' +
+        '<span class="folder-count mono">' + count + '</span></a>';
+    }
+    function userRow(f, depth) {
+      return '<div class="folder-row" data-fid="' + esc(f.id) + '" style="padding-left:' + (14 + depth * 16) + 'px">' +
+        '<a class="folder-row-link" href="#/folders/' + esc(f.id) + '">' +
+          '<span class="folder-icon">' + ICONS.folderMove + '</span>' +
+          '<span class="folder-name">' + esc(f.name) + '</span>' +
+          '<span class="folder-count mono">' + f.note_count + '</span>' +
+        '</a>' +
+        '<button type="button" class="folder-act" data-action="rename" title="이름 변경" aria-label="이름 변경">' + ICONS.edit + '</button>' +
+        '<button type="button" class="folder-act" data-action="delete-folder" title="폴더 삭제" aria-label="폴더 삭제">' + ICONS.trash + '</button>' +
+      '</div>';
+    }
+    function treeHtml(folders, parentId, depth) {
+      return folders.filter(function (f) { return (f.parent_id || null) === parentId; })
+        .map(function (f) { return userRow(f, depth) + treeHtml(folders, f.id, depth + 1); }).join('');
+    }
+    function load() {
+      centerEl.innerHTML = '<div class="folder-page"><div class="folder-loading">불러오는 중…</div></div>';
+      API.listFolders().then(function (res) {
+        if (cancelled) return;
+        var c = res.counts || {};
+        centerEl.innerHTML =
+          '<div class="folder-page">' +
+            '<div class="folder-head"><h2 class="folder-title">폴더</h2>' +
+              '<button type="button" class="btn btn-primary btn-sm" data-action="add-folder">' + ICONS.plus + ' 폴더 추가</button></div>' +
+            '<div class="folder-list">' +
+              fixedRow('all', '전체 노트', c.all || 0, ICONS.folderMove) +
+              fixedRow('unfiled', '기본폴더', c.unfiled || 0, ICONS.folderMove) +
+              fixedRow('shared', '공유한 노트', c.shared || 0, ICONS.share) +
+              fixedRow('trash', '휴지통', c.trash || 0, ICONS.trash) +
+              '<div class="folder-divider"></div>' +
+              (res.folders.length ? treeHtml(res.folders, null, 0)
+                : '<div class="folder-empty">아직 폴더가 없어요. "폴더 추가"로 만들어보세요.</div>') +
+            '</div>' +
+          '</div>';
+      }).catch(function (err) {
+        if (cancelled) return;
+        centerEl.innerHTML = '<div class="folder-page"><div class="folder-empty">폴더를 불러오지 못했습니다.</div></div>';
+        toast(err.message || '폴더를 불러오지 못했습니다.', 'error');
+      });
+    }
+    function onClick(e) {
+      var addBtn = e.target.closest('[data-action="add-folder"]');
+      if (addBtn) {
+        var name = window.prompt('새 폴더 이름');
+        if (name && name.trim()) {
+          API.createFolder({ name: name.trim() }).then(function () { toast('폴더를 만들었습니다.', 'success'); load(); })
+            .catch(function (err) { toast(err.message || '폴더 생성 실패', 'error'); });
+        }
+        return;
+      }
+      var row = e.target.closest('[data-fid]');
+      if (!row) return;
+      var fid = row.dataset.fid;
+      if (e.target.closest('[data-action="rename"]')) {
+        var nm = window.prompt('폴더 이름 변경');
+        if (nm && nm.trim()) {
+          API.patchFolder(fid, { name: nm.trim() }).then(function () { toast('이름을 변경했습니다.', 'success'); load(); })
+            .catch(function (err) { toast(err.message || '변경 실패', 'error'); });
+        }
+        return;
+      }
+      if (e.target.closest('[data-action="delete-folder"]')) {
+        confirmDialog('이 폴더를 삭제할까요? 폴더 안 노트는 기본폴더로, 하위 폴더는 상위로 이동합니다.', { title: '폴더 삭제', confirmLabel: '삭제', danger: true }).then(function (ok) {
+          if (!ok) return;
+          API.deleteFolder(fid).then(function () { toast('폴더를 삭제했습니다.', 'success'); load(); })
+            .catch(function (err) { toast(err.message || '삭제 실패', 'error'); });
+        });
+      }
+    }
+    centerEl.addEventListener('click', onClick);
+    load();
+    return function cleanup() { cancelled = true; centerEl.removeEventListener('click', onClick); };
+  }
+
+  /* 폴더 선택 모달 — 노트 이동. onDone 은 성공 시 호출(현재 뷰 새로고침). */
+  function openFolderPicker(meetingId, onDone) {
+    var dlg = document.getElementById('folder-picker');
+    var listEl = document.getElementById('folder-picker-list');
+    var cancelBtn = document.getElementById('folder-picker-cancel');
+    function rowHtml(id, name, depth) {
+      return '<button type="button" class="folder-picker-row" data-folder="' + esc(id) + '" style="padding-left:' + (12 + depth * 16) + 'px">' + esc(name) + '</button>';
+    }
+    function treeHtml(folders, parentId, depth) {
+      return folders.filter(function (f) { return (f.parent_id || null) === parentId; })
+        .map(function (f) { return rowHtml(f.id, f.name, depth) + treeHtml(folders, f.id, depth + 1); }).join('');
+    }
+    listEl.innerHTML = '<div class="folder-loading">불러오는 중…</div>';
+    API.listFolders().then(function (res) {
+      listEl.innerHTML = rowHtml('__none__', '기본폴더 (미분류)', 0) + treeHtml(res.folders, null, 0);
+    }).catch(function () {
+      listEl.innerHTML = '<div class="folder-empty">폴더를 불러오지 못했습니다.</div>';
+    });
+    // confirmDialog 패턴: 리스너 정리는 dialog 'close' 이벤트에서. ESC·closeOpenDialogs 의
+    // 직접 dlg.close() 도 'close' 를 발생시키므로 리스너 누적/오노트 이동을 막는다.
+    var moved = false;
+    function onPick(e) {
+      var btn = e.target.closest('[data-folder]');
+      if (!btn) return;
+      var fid = btn.dataset.folder === '__none__' ? null : btn.dataset.folder;
+      API.moveMeeting(meetingId, { folder_id: fid }).then(function () {
+        moved = true; toast('폴더로 이동했습니다.', 'success'); dlg.close();
+      }).catch(function (err) { toast(err.message || '이동 실패', 'error'); });
+    }
+    function onCancel() { dlg.close(); }
+    function onClose() {
+      listEl.removeEventListener('click', onPick);
+      cancelBtn.removeEventListener('click', onCancel);
+      dlg.removeEventListener('close', onClose);
+      if (moved && onDone) onDone();
+    }
+    listEl.addEventListener('click', onPick);
+    cancelBtn.addEventListener('click', onCancel);
+    dlg.addEventListener('close', onClose);
+    dlg.showModal();
+  }
+
+  /* 폴더 상세 — 선택 폴더/뷰의 노트 목록(정렬·필터). key=trash 는 복원/영구삭제 모드. */
+  var FOLDER_TITLES = { all: '전체 노트', unfiled: '기본폴더', shared: '공유한 노트', trash: '휴지통' };
+  function renderFolderDetail(centerEl, key) {
+    var cancelled = false;   // 라우트 이탈 시 in-flight 응답/토스트 억제(파일 관례)
+    var isTrash = key === 'trash';
+    var sort = 'recorded_at', status = '', title = FOLDER_TITLES[key] || '폴더';
+    function folderParam() {
+      if (key === 'all') return undefined;      // 전체(폴더 파라미터 없음)
+      if (key === 'unfiled') return 'null';
+      if (key === 'shared') return 'shared';
+      if (key === 'trash') return 'trash';
+      return key;                               // 사용자 folder_id
+    }
+    function load() {
+      var scroll = centerEl.querySelector('#fd-scroll');
+      if (scroll) scroll.innerHTML = '<div class="folder-loading">불러오는 중…</div>';
+      API.listMeetings({ folder: folderParam(), sort: sort, status: status, limit: 50 }).then(function (res) {
+        if (cancelled) return;
+        var s = centerEl.querySelector('#fd-scroll');
+        if (!s) return;
+        if (!res.items.length) { s.innerHTML = '<div class="folder-empty">' + (isTrash ? '휴지통이 비어 있어요.' : '노트가 없어요.') + '</div>'; return; }
+        s.innerHTML = res.items.map(function (m) { return renderNoteCard(m, { mode: isTrash ? 'trash' : 'folder' }); }).join('');
+      }).catch(function (err) {
+        if (cancelled) return;
+        var s = centerEl.querySelector('#fd-scroll'); if (s) s.innerHTML = '<div class="folder-empty">불러오지 못했습니다.</div>';
+        toast(err.message || '불러오지 못했습니다.', 'error');
+      });
+    }
+    centerEl.innerHTML =
+      '<div class="folder-page fd-page">' +
+        '<div class="fd-head">' +
+          '<button type="button" class="detail-back-btn" data-action="back" aria-label="폴더로">' + ICONS.back + '</button>' +
+          '<h2 class="folder-title">' + esc(title) + '</h2>' +
+          (isTrash ? '<button type="button" class="btn btn-danger btn-sm" data-action="empty">휴지통 비우기</button>'
+            : '<div class="fd-controls">' +
+                '<select class="select" id="fd-sort">' +
+                  '<option value="recorded_at">최근순</option><option value="title">제목순</option><option value="duration">길이순</option>' +
+                '</select>' +
+                '<select class="select" id="fd-status"><option value="">전체 상태</option>' +
+                  '<option value="ready_for_review">검토 대기</option><option value="failed">실패</option></select>' +
+              '</div>') +
+        '</div>' +
+        '<div class="list-scroll" id="fd-scroll"></div>' +
+      '</div>';
+    var sortSel = centerEl.querySelector('#fd-sort'), statusSel = centerEl.querySelector('#fd-status');
+    if (sortSel) sortSel.addEventListener('change', function () { sort = sortSel.value; load(); });
+    if (statusSel) statusSel.addEventListener('change', function () { status = statusSel.value; load(); });
+    function onClick(e) {
+      if (e.target.closest('[data-action="back"]')) { navigate('#/folders'); return; }
+      if (e.target.closest('[data-action="empty"]')) {
+        confirmDialog('휴지통을 비울까요? 모든 노트가 영구 삭제되며 되돌릴 수 없습니다.', { title: '휴지통 비우기', confirmLabel: '비우기', danger: true }).then(function (ok) {
+          if (!ok) return;
+          API.emptyTrash().then(function (r) { toast((r.purged || 0) + '건 영구 삭제했습니다.', 'success'); load(); })
+            .catch(function (err) { toast(err.message || '실패', 'error'); });
+        });
+        return;
+      }
+      var row = e.target.closest('[data-id]');
+      if (!row) return;
+      var id = row.dataset.id;
+      if (e.target.closest('[data-action="restore"]')) {
+        API.restoreMeeting(id).then(function () { toast('복원했습니다.', 'success'); load(); ListColumn.refresh(true); }).catch(function (err) { toast(err.message || '복원 실패', 'error'); });
+        return;
+      }
+      if (e.target.closest('[data-action="purge"]')) {
+        confirmDialog('이 노트를 영구 삭제할까요? 되돌릴 수 없습니다.', { title: '영구 삭제', confirmLabel: '영구삭제', danger: true }).then(function (ok) {
+          if (!ok) return;
+          API.purgeMeeting(id).then(function () { toast('영구 삭제했습니다.', 'success'); load(); }).catch(function (err) { toast(err.message || '실패', 'error'); });
+        });
+        return;
+      }
+      if (e.target.closest('[data-action="move"]')) { openFolderPicker(id, load); return; }
+      if (isTrash) return;   // 휴지통 카드 본문 클릭은 무동작(삭제된 회의는 상세 404)
+      navigate('#/meetings/' + encodeURIComponent(id));   // 카드 본문 클릭 = 열기
+    }
+    centerEl.addEventListener('click', onClick);
+    load();
+    return function cleanup() { cancelled = true; centerEl.removeEventListener('click', onClick); };
   }
 
   function renderMeetingDetailView(centerEl, rightEl, meetingId, initialTab) {
@@ -1427,6 +1669,7 @@
           '</div>' +
           '<div class="detail-topbar-actions">' +
             '<button type="button" class="btn btn-ghost btn-icon info-toggle-btn" id="md-info-toggle" title="참석자·요약 보기" aria-label="참석자·요약 보기">' + ICONS.users + '</button>' +
+            '<button type="button" class="btn btn-ghost btn-icon" id="md-move-btn" title="폴더 이동" aria-label="폴더 이동">' + ICONS.folderMove + '</button>' +
             '<button type="button" class="btn btn-ghost btn-icon" id="md-delete-btn" title="삭제" aria-label="회의 삭제">' + ICONS.trash + '</button>' +
           '</div>' +
         '</div>' +
@@ -1545,6 +1788,8 @@
     function wireDetailUI() {
       /* ---- 공통 엘리먼트 (가운데) ---- */
       var titleInput = centerEl.querySelector('#md-title-input');
+      var moveBtn = centerEl.querySelector('#md-move-btn');
+      if (moveBtn) moveBtn.addEventListener('click', function () { openFolderPicker(meetingId, null); });
       var backBtn = centerEl.querySelector('#md-back-btn');
       var deleteBtn = centerEl.querySelector('#md-delete-btn');
       var infoToggleBtn = centerEl.querySelector('#md-info-toggle');
