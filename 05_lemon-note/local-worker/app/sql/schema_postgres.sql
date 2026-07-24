@@ -20,6 +20,15 @@ create table if not exists profiles (
   created_at timestamptz not null default now()
 );
 
+create table if not exists folders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references profiles(id),
+  name text not null,
+  parent_id uuid references folders(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists meetings (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references profiles(id),
@@ -33,6 +42,7 @@ create table if not exists meetings (
   recording_consent_confirmed boolean not null default false,
   recording_consent_confirmed_at timestamptz,
   deleted_at timestamptz,
+  folder_id uuid references folders(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint meetings_status_check check (
@@ -243,6 +253,8 @@ create table if not exists audit_logs (
 
 -- Indexes
 create index if not exists meetings_user_recorded_idx on meetings(user_id, recorded_at desc);
+create index if not exists folders_user_parent_idx on folders(user_id, parent_id);
+create index if not exists meetings_folder_idx on meetings(folder_id) where deleted_at is null;
 create index if not exists jobs_meeting_idx on jobs(meeting_id);
 create index if not exists transcript_segments_meeting_time_idx on transcript_segments(meeting_id, start_ms);
 create index if not exists transcript_highlights_segment_idx on transcript_highlights(segment_id, start_offset);
@@ -268,6 +280,7 @@ create index if not exists audit_logs_meeting_idx on audit_logs(meeting_id, crea
 -- ---------------------------------------------------------------------------
 alter table profiles enable row level security;
 alter table meetings enable row level security;
+alter table folders enable row level security;
 alter table jobs enable row level security;
 alter table recording_files enable row level security;
 alter table transcript_segments enable row level security;
