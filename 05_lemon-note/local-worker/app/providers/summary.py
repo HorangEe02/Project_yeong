@@ -133,9 +133,19 @@ class OllamaSummaryProvider:
             '"calendar_candidates": [{"title": str, "start_at": ISO8601|null, '
             '"end_at": ISO8601|null, "attendees": [str], "source_indices": [int], "confidence": float}]}'
         )
+        # 마이페이지의 관심 분야 — 사용자 입력이므로 지시문이 아니라 '인용된 데이터'로만 넣는다
+        # (저장 시 개행·중괄호는 이미 제거되고, 여기서 따옴표로 감싸 한 줄로 고정한다).
+        interests = [str(t).replace('"', "'").strip()
+                     for t in (context.get("interests") or []) if str(t).strip()]
+        interest_line = ""
+        if interests:
+            quoted = ", ".join('"' + t + '"' for t in interests[:12])
+            interest_line = f"참고 — 사용자가 등록한 관심 분야: {quoted}\n"
+
         prompt = (
             "너는 한국어 회의록 요약 도우미다. 아래 전사를 읽고 회의 요약을 만든다.\n"
             f"오늘 날짜는 {today} 이다. 상대적 날짜(다음 주 수요일 등)는 이 기준으로 절대 날짜로 변환한다.\n"
+            + interest_line +
             "각 항목의 근거가 된 발화는 전사 앞의 [번호]를 source_indices 배열(정수)로 표기한다.\n"
             "keywords: 회의를 대표하는 핵심어 5~8개. 명사구로 짧게. 일반어(회의, 논의)는 제외한다.\n"
             "sections: 회의를 흐름에 따라 3~6개 구간으로 나누고 각 구간을 한두 문장으로 요약한다.\n"

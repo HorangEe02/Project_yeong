@@ -11,6 +11,24 @@ from . import config, database, db
 from .providers import get_summary_provider, get_transcription_provider
 
 
+def _user_interests(conn, user_id) -> list:
+    """마이페이지에 저장한 관심 분야를 요약 힌트로 넘기기 위해 읽는다.
+
+    설정을 못 읽어도 요약은 계속돼야 하므로(노트 하나가 실패하면 안 된다) 모든 실패를
+    빈 목록으로 흘린다. profiles.settings 컬럼이 없는 DB 도 여기에 해당한다.
+    """
+    try:
+        row = conn.execute("SELECT * FROM profiles WHERE id=?", (user_id,)).fetchone()
+        if row is None or "settings" not in row.keys():
+            return []
+        raw = database.dec_json(row["settings"]) or {}
+        if not isinstance(raw, dict):
+            return []
+        return [t for t in (raw.get("interests") or []) if isinstance(t, str) and t.strip()]
+    except Exception:  # noqa: BLE001 - 설정 조회 실패가 요약을 막지 않는다
+        return []
+
+
 def _set_status(conn, job_id, meeting_id, status, progress, stage,
                 error_code=None, error_message=None):
     now = db.now_iso()
@@ -101,7 +119,8 @@ def run_pipeline(job_id: str, meeting_id: str) -> None:
         sp = get_summary_provider()
         result = sp.summarize(
             seg_rows, language=meeting["language"],
-            context={"recorded_at": meeting["recorded_at"], "title": meeting["title"]},
+            context={"recorded_at": meeting["recorded_at"], "title": meeting["title"],
+                     "interests": _user_interests(conn, meeting["user_id"])},
         )
         db.store_summary_version(conn, meeting_id, result, source="ai",
                                  created_by=meeting["user_id"])
