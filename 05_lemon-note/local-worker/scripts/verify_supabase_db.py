@@ -51,6 +51,18 @@ try:
                 if t in tables:
                     cur.execute(f"select count(*) from {t}")
                     print(f"   - {t}: {cur.fetchone()[0]} rows")
+            # E1: profiles.settings 컬럼 단언 — 테이블 존재만 보면 컬럼 누락을 못 잡는다.
+            # sys.exit 를 쓰는 이유: raise 는 아래 except Exception 에 걸려 '연결 실패'로 오진된다.
+            cur.execute("select data_type from information_schema.columns "
+                        "where table_schema='public' and table_name='profiles' "
+                        "and column_name='settings'")
+            row = cur.fetchone()
+            if not row:
+                sys.exit("❌ profiles.settings 컬럼 없음 — "
+                         "alter table profiles add column if not exists settings jsonb; 를 먼저 적용하세요.")
+            print(f"   - profiles.settings: {row[0]}")
+            if row[0] != "jsonb":
+                sys.exit(f"❌ profiles.settings 타입이 {row[0]} — jsonb 여야 합니다.")
     print("연결 검증 완료. (worker DB 백엔드를 Postgres 로 전환하는 것은 별도 구현 단계)")
 except Exception as e:  # noqa: BLE001
     sys.exit(f"❌ 연결 실패: {e}\n"

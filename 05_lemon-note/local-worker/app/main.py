@@ -12,7 +12,7 @@ import urllib.parse
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from fastapi import (BackgroundTasks, Depends, FastAPI, File, Form, Header, HTTPException,
+from fastapi import (BackgroundTasks, Body, Depends, FastAPI, File, Form, Header, HTTPException,
                      Request, UploadFile)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -1487,6 +1487,188 @@ def list_keywords():
                 counts[w] = counts.get(w, 0) + 1
         top = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:8]
         return {"keywords": [{"text": t, "count": c} for t, c in top]}
+    finally:
+        conn.close()
+
+
+# --- 마이페이지: 프로필 · 사용자 설정 (서브프로젝트 E1) ---
+
+_SETTINGS_LANGS = {"ko", "en", "ja", "zh", "auto"}   # web/app.js 의 전사 언어 셀렉트와 동일
+_MAX_HOTWORDS = 10          # 새 회의 폼이 콤마 구분 한 줄이라 이 정도가 실용 상한
+_MAX_INTERESTS = 12
+_MAX_TERM = 24
+_MAX_SETTINGS_BYTES = 2048
+
+
+def _read_profile(conn, user_id: str):
+    """프로필 행과 설정을 함께 읽는다.
+
+    settings 컬럼이 아직 없는 DB(마이그레이션 미적용)에서도 500 이 아니라 빈 설정으로
+    내려가야 한다. 컬럼을 나열해 SELECT 하면 쿼리 자체가 실패해 가드가 돌 기회조차
+    없으므로 반드시 SELECT * 로 읽는다.
+    """
+    row = conn.execute("SELECT * FROM profiles WHERE id=?", (user_id,)).fetchone()
+    if row is None:
+        return None, {}
+    if "settings" not in row.keys():
+        return row, {}
+    return row, (database.dec_json(row["settings"]) or {})
+
+
+def _clean_terms(raw, field: str, max_items: int, allow_comma: bool = True) -> list:
+    if not isinstance(raw, list):
+        raise HTTPException(status_code=422, detail={"error": {
+            "code": "invalid_settings", "message": f"{field} 는 문자열 배열이어야 합니다."}})
+    out = []
+    for item in raw:
+        if not isinstance(item, str):
+            raise HTTPException(status_code=422, detail={"error": {
+                "code": "invalid_settings", "message": f"{field} 항목은 문자열이어야 합니다."}})
+        # 개행·중괄호는 요약 프롬프트에 실릴 때를 대비해 저장 시점에 털어낸다.
+        term = item.replace("\n", " ").replace("\r", " ").replace("{", "").replace("}", "").strip()
+        if not term:
+            continue
+        if not allow_comma and "," in term:
+            raise HTTPException(status_code=422, detail={"error": {
+                "code": "invalid_settings",
+                "message": "자주 쓰는 단어에는 쉼표를 넣을 수 없습니다."}})
+        if len(term) > _MAX_TERM:
+            raise HTTPException(status_code=422, detail={"error": {
+                "code": "invalid_settings",
+                "message": f"{field} 항목은 {_MAX_TERM}자 이하여야 합니다."}})
+        if term not in out:
+            out.append(term)
+    if len(out) > max_items:
+        raise HTTPException(status_code=422, detail={"error": {
+            "code": "invalid_settings", "message": f"{field} 는 최대 {max_items}개까지입니다."}})
+    return out
+
+
+def _validate_settings(patch: dict) -> dict:
+    """요청에 들어온 키만 검증한다. 저장된 blob 은 재검증하지 않는다 —
+    F(알림)가 나중에 넣을 키를 E 시절 코드가 지우면 안 된다.
+    """
+    out = {}
+    for key, value in patch.items():
+        if key == "language":
+            if value not in _SETTINGS_LANGS:
+                raise HTTPException(status_code=422, detail={"error": {
+                    "code": "invalid_settings", "message": "지원하지 않는 언어입니다."}})
+            out["language"] = value
+        elif key == "hotwords":
+            out["hotwords"] = _clean_terms(value, "자주 쓰는 단어", _MAX_HOTWORDS, allow_comma=False)
+        elif key == "interests":
+            out["interests"] = _clean_terms(value, "관심 분야", _MAX_INTERESTS)
+        else:
+            # 무음 드롭 대신 명시적으로 거부한다(오타를 조용히 삼키지 않게).
+            raise HTTPException(status_code=422, detail={"error": {
+                "code": "unknown_setting", "message": f"알 수 없는 설정 항목입니다: {key}"}})
+    return out
+
+
+@app.get(P + "/me")
+def get_me():
+    """마이페이지용 프로필 + 설정. 인증 없는 공개 데모라 email·id 는 내리지 않는다.
+
+    write_protected 는 HEALTH_DETAIL(운영자 전용) 규칙의 의도적 예외 —
+    '읽기 전용 데모' 안내에 필요하고 401 한 번이면 알 수 있는 정보다.
+    여기에 다른 구성 값을 추가하지 않는다.
+    """
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        row, settings = _read_profile(conn, user_id)
+        return {
+            "display_name": (row["display_name"] if row else None) or config.DEFAULT_USER_NAME,
+            "created_at": row["created_at"] if row else None,
+            "settings": settings,
+            "write_protected": bool(config.WRITE_PROTECTED),
+        }
+    finally:
+        conn.close()
+
+
+@app.patch(P + "/me/settings")
+def patch_me_settings(body: dict = Body(...), user_id: str = Depends(require_user)):
+    """본인 설정 저장. 회의를 바꾸는 게 아니라 본인 취향값이라 require_user 로 건다
+    (require_write 는 공개 데모에서 401 이라 설정 자체를 못 쓴다).
+    """
+    if not isinstance(body, dict):
+        return _err(422, "invalid_body", "설정 본문이 올바르지 않습니다.")
+    validated = _validate_settings(body)
+    conn = db.connect()
+    try:
+        _row, stored = _read_profile(conn, user_id)
+        merged = dict(stored)
+        merged.update(validated)
+        blob = json.dumps(merged, ensure_ascii=False)
+        if len(blob.encode("utf-8")) > _MAX_SETTINGS_BYTES:
+            return _err(422, "settings_too_large", "설정이 너무 큽니다.")
+        try:
+            # 프로필 행이 없을 수도 있어(프로덕션 시드는 best-effort) UPSERT 로 넣는다.
+            # 단순 UPDATE 면 0 행 갱신인데 200 을 돌려줘 '저장됐다'고 거짓말하게 된다.
+            conn.execute(
+                "INSERT INTO profiles (id,email,display_name,created_at,settings) VALUES (?,?,?,?,?) "
+                "ON CONFLICT (id) DO UPDATE SET settings = excluded.settings",
+                (user_id, config.DEFAULT_USER_EMAIL, config.DEFAULT_USER_NAME,
+                 db.now_iso(), database.enc_json(merged)),
+            )
+            conn.commit()
+        except Exception as exc:  # noqa: BLE001
+            if "settings" in str(exc):
+                # 컬럼이 아직 없는 상태 — 읽기는 degrade 하지만 쓰기는 구분 가능한 코드로 알린다.
+                return _err(503, "settings_unavailable", "설정 저장소가 아직 준비되지 않았습니다.")
+            raise
+        return {"settings": merged}
+    finally:
+        conn.close()
+
+
+@app.get(P + "/usage")
+def get_usage():
+    """마이페이지 사용량 — 실제 수치만 돌려준다(쿼터 개념은 앱에 없으므로 만들지 않는다).
+
+    빈 DB 에서 SUM 은 NULL 이라 COALESCE 로 0 을 보장한다(프로덕션이 지금 그 상태).
+    노트 카운트 규칙은 list_folders 와 동일하게 맞춘다.
+    """
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        def _c(extra):
+            return conn.execute(
+                "SELECT COUNT(*) AS n FROM meetings m WHERE m.user_id=? " + extra,
+                (user_id,)).fetchone()["n"]
+
+        notes = {
+            "all": _c("AND m.deleted_at IS NULL"),
+            "unfiled": _c("AND m.deleted_at IS NULL AND m.folder_id IS NULL"),
+            "trash": _c("AND m.deleted_at IS NOT NULL"),
+            "shared": conn.execute(
+                "SELECT COUNT(DISTINCT m.id) AS n FROM meetings m "
+                "JOIN share_links sl ON sl.meeting_id=m.id "
+                "WHERE m.user_id=? AND m.deleted_at IS NULL AND sl.revoked_at IS NULL",
+                (user_id,)).fetchone()["n"],
+        }
+        total_ms = conn.execute(
+            "SELECT COALESCE(SUM(duration_ms),0) AS s FROM meetings "
+            "WHERE user_id=? AND deleted_at IS NULL", (user_id,)).fetchone()["s"]
+        storage = conn.execute(
+            "SELECT COUNT(*) AS n, COALESCE(SUM(size_bytes),0) AS s "
+            "FROM recording_files WHERE user_id=?", (user_id,)).fetchone()
+
+        # 이번 달: recorded_at 문자열 앞 7자리(YYYY-MM) 비교 — 양 백엔드 공통으로 안전하다.
+        month = db.now_iso()[:7]
+        this_month = conn.execute(
+            "SELECT COUNT(*) AS n, COALESCE(SUM(duration_ms),0) AS s FROM meetings "
+            "WHERE user_id=? AND deleted_at IS NULL AND CAST(recorded_at AS TEXT) LIKE ?",
+            (user_id, month + "%")).fetchone()
+
+        return {
+            "notes": notes,
+            "total_duration_ms": total_ms,
+            "storage": {"files": storage["n"], "bytes": storage["s"]},
+            "this_month": {"count": this_month["n"], "duration_ms": this_month["s"]},
+        }
     finally:
         conn.close()
 

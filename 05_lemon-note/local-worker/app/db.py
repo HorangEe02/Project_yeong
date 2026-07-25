@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   id TEXT PRIMARY KEY,
   email TEXT,
   display_name TEXT,
-  created_at TEXT NOT NULL
+  created_at TEXT NOT NULL,
+  settings TEXT              -- 사용자 설정 JSON(언어·자주 쓰는 단어·관심 분야). NULL 이면 dec_json 이 {} 로 준다.
 );
 
 CREATE TABLE IF NOT EXISTS folders (
@@ -243,6 +244,22 @@ def connect():
     return database.connect()
 
 
+# CREATE TABLE IF NOT EXISTS 는 '기존' 테이블에 컬럼을 붙이지 않는다.
+# 이미 만들어진 로컬 app.db 를 최신 스키마로 맞추는 최소 마이그레이션(sqlite 전용).
+_ADDED_COLUMNS = (("profiles", "settings", "TEXT"),)
+
+
+def _ensure_columns(conn) -> None:
+    """누락된 컬럼만 골라 ALTER 한다(멱등). PRAGMA 는 ? 바인딩이 안 돼 f-string 이지만
+    _ADDED_COLUMNS 는 하드코딩 리터럴이라 주입면이 없다.
+    conn 은 database.connect() 가 준 것이라 row_factory=sqlite3.Row 가 이미 설정돼 있다.
+    """
+    for table, column, ddl in _ADDED_COLUMNS:
+        cols = {r["name"] for r in conn.execute(f"PRAGMA table_info({table})").fetchall()}
+        if cols and column not in cols:  # cols 가 비면 테이블 자체가 없음 → SCHEMA 가 만든다
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}")
+
+
 def init_db() -> None:
     if database.BACKEND == "postgres":
         # postgres 스키마는 Supabase 에 이미 적용됨 → DDL 실행하지 않는다.
@@ -266,6 +283,7 @@ def init_db() -> None:
     conn = connect()
     try:
         conn.executescript(SCHEMA)
+        _ensure_columns(conn)   # 기존 DB 에 새 컬럼 반영(sqlite 분기에서만 — postgres 는 위에서 return)
         # 단일 로컬 사용자 시드
         exists = conn.execute(
             "SELECT 1 FROM profiles WHERE id=?", (config.DEFAULT_USER_ID,)
