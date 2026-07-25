@@ -391,6 +391,15 @@
     getKeywords: function () {
       return apiRequest('/keywords', { method: 'GET' });
     },
+    getMe: function () {
+      return apiRequest('/me', { method: 'GET' });
+    },
+    getUsage: function () {
+      return apiRequest('/usage', { method: 'GET' });
+    },
+    patchSettings: function (body) {
+      return apiJson('/me/settings', 'PATCH', body);
+    },
     getCalendar: function (params) {
       return apiRequest('/meetings/calendar' + buildQuery(params), { method: 'GET' });
     },
@@ -483,6 +492,10 @@
 
   var shellEl, colCenterEl, colRightEl, colRightContentEl, drawerBackdropEl;
   var currentCleanup = null;
+  /* 사용자 설정 캐시 + 부팅 로드 promise. 새 회의 폼 프리필이 첫 렌더(동기) 이후에도
+     한 번 더 적용될 수 있게 promise 를 들고 있는다. */
+  var userSettings = {};
+  var settingsReady = null;
 
   function parseHash() {
     var h = (location.hash || '#/new').replace(/^#/, '');
@@ -569,7 +582,7 @@
       renderRightTips(colRightContentEl, 'list');
     } else if (route.name === 'me') {
       document.title = '마이 — 회의녹음챗';
-      renderMyPagePlaceholder(colCenterEl);
+      currentCleanup = renderMyPageView(colCenterEl);
       renderRightTips(colRightContentEl, 'list');
     } else if (route.name === 'calendar') {
       document.title = '녹음 달력 — 회의녹음챗';
@@ -1003,6 +1016,21 @@
     var hotwordsInput = centerEl.querySelector('#nm-hotwords');
     var languageSelect = centerEl.querySelector('#nm-language');
     var consentInput = centerEl.querySelector('#nm-consent');
+
+    /* 마이페이지에 저장한 설정으로 힌트 단어·언어를 채운다.
+       빈 필드/기본값일 때만 건드려 사용자가 입력 중인 값을 덮지 않는다.
+       키가 아예 없는 설정({"language":"ko"} 처럼)도 있으므로 반드시 값 존재를 먼저 본다 —
+       무가드로 .join() 하면 이 화면(기본 라우트)의 이벤트 바인딩 전체가 죽는다. */
+    var prefillCancelled = false;
+    function applySettingsPrefill() {
+      if (prefillCancelled) return;
+      var hw = userSettings && userSettings.hotwords;
+      if (hw && hw.length && !hotwordsInput.value) hotwordsInput.value = hw.join(', ');
+      var lang = userSettings && userSettings.language;
+      if (lang && languageSelect && languageSelect.value === 'ko') languageSelect.value = lang;
+    }
+    applySettingsPrefill();
+    if (settingsReady) settingsReady.then(applySettingsPrefill);
     var dialEl = centerEl.querySelector('#nm-dial');
     var dialTimeEl = centerEl.querySelector('#nm-timer');
     var dialStatusEl = centerEl.querySelector('#nm-dial-status');
@@ -1445,6 +1473,7 @@
     setState('idle');
 
     return function cleanup() {
+      prefillCancelled = true;   // 늦게 도착한 설정이 사라진 폼에 쓰지 않게
       if (pollTimer) clearTimeout(pollTimer);
       if (timerRaf) cancelAnimationFrame(timerRaf);
       teardownLevelMeter();
@@ -1489,18 +1518,278 @@
      8. 가운데 + 오른쪽 컬럼: 회의 상세
      ======================================================================= */
 
-  /* 마이 플레이스홀더 — 서브프로젝트 E 에서 실제 기능으로 교체된다. */
+  /* 마이페이지 — 프로필·사용량·설정(인식 언어·자주 쓰는 단어·관심 분야)·계정.
+     설정 저장은 PATCH /v1/me/settings 이고 변경된 키만 보낸다(공용 계정에서 남의 저장을 덮지 않게). */
 
-  function renderMyPagePlaceholder(centerEl) {
-    centerEl.innerHTML =
-      '<div class="placeholder-page">' +
-        '<div class="mypage-profile">' +
-          '<div class="mypage-avatar">회</div>' +
-          '<div class="mypage-id"><div class="mypage-name">회의녹음챗</div><div class="mypage-mail mono">demo@local</div></div>' +
+  var MP_LANGS = [['ko', '한국어'], ['en', 'English'], ['ja', '日本語'], ['zh', '中文'], ['auto', '자동 감지']];
+  var MP_MAX_HOTWORDS = 10;
+  var MP_MAX_INTERESTS = 12;
+
+  function mpChipHtml(text, kind) {
+    return '<li class="mypage-chip" data-mp-chip="' + kind + '" data-term="' + esc(text) + '">' +
+      '<span>' + esc(text) + '</span>' +
+      '<button type="button" class="mypage-chip-x" data-action="mp-del" data-kind="' + kind + '" ' +
+        'data-term="' + esc(text) + '" aria-label="' + esc(text) + ' 삭제">' + ICONS.close + '</button>' +
+    '</li>';
+  }
+
+  function mpStatHtml(key, label, raw, shown) {
+    return '<div class="mypage-stat" data-usage="' + key + '" data-raw="' + esc(String(raw)) + '">' +
+      '<div class="mypage-stat-label">' + esc(label) + '</div>' +
+      '<div class="mypage-stat-value mono">' + esc(shown) + '</div>' +
+    '</div>';
+  }
+
+  function renderMyPageView(centerEl) {
+    var cancelled = false;
+    var loaded = {};      // 렌더 시점 서버 설정 스냅샷 — 저장 시 변경된 키만 골라내는 기준
+    var hotwords = [];
+    var interests = [];
+    var suggests = [];
+    var saving = false;
+
+    centerEl.innerHTML = '<div class="col-center-scroll"><div class="mypage-page view-fade">' +
+      '<div class="list-empty"><p>불러오는 중…</p></div></div></div>';
+
+    /* getKeywords 는 개별 catch — 이게 없으면 추천 행 하나 때문에 Promise.all 이 전체를 실패시킨다. */
+    Promise.all([
+      API.getMe(),
+      API.getUsage(),
+      API.getKeywords().catch(function () { return null; })
+    ]).then(function (res) {
+      if (cancelled) return;
+      var me = res[0] || {};
+      var usage = res[1] || {};
+      loaded = me.settings || {};
+      hotwords = (loaded.hotwords || []).slice();
+      interests = (loaded.interests || []).slice();
+      suggests = ((res[2] && res[2].keywords) || []).map(function (k) { return k.text; }).filter(Boolean);
+      paint(me, usage);
+    }).catch(function (err) {
+      if (cancelled) return;
+      centerEl.innerHTML = '<div class="col-center-scroll"><div class="mypage-page view-fade">' +
+        emptyStateHtml('마이페이지를 불러오지 못했습니다', err.message || '') + '</div></div>';
+    });
+
+    function paint(me, usage) {
+      var notes = usage.notes || {};
+      var storage = usage.storage || {};
+      var month = usage.this_month || {};
+      var lang = loaded.language || 'ko';
+      var avatar = (me.display_name || '회').charAt(0);
+
+      centerEl.innerHTML = '<div class="col-center-scroll"><div class="mypage-page view-fade">' +
+        /* 1. 프로필 — 값은 전부 서버에서 온다(이메일은 API 가 내리지 않으므로 표시하지 않는다). */
+        '<section class="mypage-section" role="group" aria-labelledby="mp-h-profile">' +
+          '<h2 class="mypage-h" id="mp-h-profile">프로필</h2>' +
+          '<div class="mypage-profile">' +
+            '<div class="mypage-avatar">' + esc(avatar) + '</div>' +
+            '<div class="mypage-id">' +
+              '<div class="mypage-name">' + esc(me.display_name || '-') + '</div>' +
+              '<div class="mypage-mail mono">' + esc(formatDateTime(me.created_at, { dateOnly: true })) + ' 가입</div>' +
+            '</div>' +
+          '</div>' +
+        '</section>' +
+
+        /* 2. 사용량 — 실제 수치만. 쿼터 개념이 앱에 없어 게이지를 만들지 않는다. */
+        '<section class="mypage-section" role="group" aria-labelledby="mp-h-usage">' +
+          '<h2 class="mypage-h" id="mp-h-usage">사용량</h2>' +
+          '<div class="mypage-stats">' +
+            mpStatHtml('notes_all', '노트', notes.all || 0, String(notes.all || 0) + '개') +
+            mpStatHtml('duration', '총 녹음', usage.total_duration_ms || 0, formatDuration(usage.total_duration_ms || 0)) +
+            mpStatHtml('bytes', '저장 용량', storage.bytes || 0, formatFileSize(storage.bytes || 0)) +
+            mpStatHtml('month', '이번 달', month.count || 0, String(month.count || 0) + '개') +
+          '</div>' +
+        '</section>' +
+
+        /* 3. 인식 언어 — 선택지는 새 회의 폼과 동일해야 한다(서버 화이트리스트도 같다). */
+        '<section class="mypage-section" role="group" aria-labelledby="mp-h-lang">' +
+          '<h2 class="mypage-h" id="mp-h-lang">인식 언어</h2>' +
+          '<label class="field-label" for="mp-language">새 회의의 기본 전사 언어</label>' +
+          '<select class="select" id="mp-language">' +
+            MP_LANGS.map(function (o) {
+              return '<option value="' + o[0] + '"' + (o[0] === lang ? ' selected' : '') + '>' + esc(o[1]) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</section>' +
+
+        /* 4. 자주 쓰는 단어 — 새 회의 힌트 단어로 자동 채워진다. */
+        '<section class="mypage-section" role="group" aria-labelledby="mp-h-hot">' +
+          '<h2 class="mypage-h" id="mp-h-hot">자주 쓰는 단어</h2>' +
+          '<p class="mypage-hint" id="mp-hot-hint">새 회의의 힌트 단어로 자동 입력됩니다. 최대 ' + MP_MAX_HOTWORDS + '개 · 쉼표는 넣을 수 없어요.</p>' +
+          '<ul class="mypage-chips" role="list" id="mp-hot-chips">' +
+            hotwords.map(function (t) { return mpChipHtml(t, 'hotword'); }).join('') +
+          '</ul>' +
+          '<div class="mypage-add">' +
+            '<input type="text" class="input" id="mp-hotword-input" placeholder="예: 회의녹음챗" aria-describedby="mp-hot-hint"' +
+              (hotwords.length >= MP_MAX_HOTWORDS ? ' disabled' : '') + ' />' +
+            '<button type="button" class="btn btn-ghost btn-sm" data-action="mp-add-hotword"' +
+              (hotwords.length >= MP_MAX_HOTWORDS ? ' disabled aria-describedby="mp-hot-hint"' : '') + '>추가</button>' +
+          '</div>' +
+        '</section>' +
+
+        /* 5. 관심 분야 — 요약 생성 시 힌트로 전달된다. */
+        '<section class="mypage-section" role="group" aria-labelledby="mp-h-int">' +
+          '<h2 class="mypage-h" id="mp-h-int">관심 분야</h2>' +
+          '<p class="mypage-hint" id="mp-int-hint">요약을 만들 때 힌트로 전달됩니다. 최대 ' + MP_MAX_INTERESTS + '개.</p>' +
+          '<ul class="mypage-chips" role="list" id="mp-int-chips">' +
+            interests.map(function (t) { return mpChipHtml(t, 'interest'); }).join('') +
+          '</ul>' +
+          '<div class="mypage-add">' +
+            '<input type="text" class="input" id="mp-interest-input" placeholder="예: 제품 기획" aria-describedby="mp-int-hint"' +
+              (interests.length >= MP_MAX_INTERESTS ? ' disabled' : '') + ' />' +
+            '<button type="button" class="btn btn-ghost btn-sm" data-action="mp-add-interest"' +
+              (interests.length >= MP_MAX_INTERESTS ? ' disabled' : '') + '>추가</button>' +
+          '</div>' +
+          /* 추천은 있을 때만 보여준다. 프로덕션 요약은 스텁이라 비어 있는 게 정상이고,
+             '내 노트에서 뽑은 키워드'라고 말하지 않는다. */
+          (suggests.length
+            ? '<div class="mypage-suggest"><span class="mypage-suggest-label">추천</span>' +
+                suggests.map(function (t) {
+                  return '<button type="button" class="search-chip search-chip--suggest" data-action="mp-suggest" data-term="' + esc(t) + '">' + esc(t) + '</button>';
+                }).join('') +
+              '</div>'
+            : '') +
+        '</section>' +
+
+        /* 6. 계정 · 앱 정보 */
+        '<section class="mypage-section" role="group" aria-labelledby="mp-h-acc">' +
+          '<h2 class="mypage-h" id="mp-h-acc">계정</h2>' +
+          '<p class="mypage-hint">이 데모는 단일 공용 계정이라 저장한 설정이 모든 방문자에게 적용됩니다.</p>' +
+          (me.write_protected
+            ? '<p class="mypage-hint">읽기 전용 데모예요 — 회의 수정·삭제는 막혀 있지만 이 설정은 저장됩니다.</p>'
+            : '') +
+        '</section>' +
+
+        '<div class="mypage-actions">' +
+          '<button type="button" class="btn btn-primary" data-action="mp-save">설정 저장</button>' +
         '</div>' +
-        '<p class="placeholder-desc">프로필 · 사용량 · 인식 언어 · 자주 쓰는 단어 · 관심 분야 등 설정을 여기서 제공할 예정이에요.</p>' +
-        '<span class="chip chip-gray">곧 제공</span>' +
-      '</div>';
+      '</div></div>';
+
+      lastMe = me;
+      lastUsage = usage;
+    }
+
+    var lastMe = {};
+    var lastUsage = {};
+
+    /* 칩 행만 부분 갱신한다 — #col-center 가 aria-live 라서 전체 재렌더는 6섹션을 다시 낭독한다. */
+    function repaintChips(kind) {
+      var list = kind === 'hotword' ? hotwords : interests;
+      var max = kind === 'hotword' ? MP_MAX_HOTWORDS : MP_MAX_INTERESTS;
+      var ul = centerEl.querySelector(kind === 'hotword' ? '#mp-hot-chips' : '#mp-int-chips');
+      if (!ul) return;
+      ul.innerHTML = list.map(function (t) { return mpChipHtml(t, kind); }).join('');
+      var input = centerEl.querySelector(kind === 'hotword' ? '#mp-hotword-input' : '#mp-interest-input');
+      var addBtn = centerEl.querySelector('[data-action="mp-add-' + (kind === 'hotword' ? 'hotword' : 'interest') + '"]');
+      if (input) input.disabled = list.length >= max;
+      if (addBtn) addBtn.disabled = list.length >= max;
+    }
+
+    function addTerm(kind) {
+      var input = centerEl.querySelector(kind === 'hotword' ? '#mp-hotword-input' : '#mp-interest-input');
+      if (!input) return;
+      var term = (input.value || '').trim();
+      if (!term) return;
+      if (kind === 'hotword' && term.indexOf(',') !== -1) {
+        toast('자주 쓰는 단어에는 쉼표를 넣을 수 없습니다.', 'error');
+        return;
+      }
+      var list = kind === 'hotword' ? hotwords : interests;
+      var max = kind === 'hotword' ? MP_MAX_HOTWORDS : MP_MAX_INTERESTS;
+      if (list.length >= max) { toast('최대 ' + max + '개까지 추가할 수 있습니다.', 'error'); return; }
+      if (list.indexOf(term) !== -1) { input.value = ''; return; }
+      list.push(term);
+      input.value = '';
+      repaintChips(kind);
+      input.focus();
+    }
+
+    function delTerm(kind, term) {
+      var list = kind === 'hotword' ? hotwords : interests;
+      var idx = list.indexOf(term);
+      if (idx === -1) return;
+      list.splice(idx, 1);
+      repaintChips(kind);
+      /* 지운 자리의 칩으로 포커스를 옮긴다(안 하면 매 삭제마다 포커스가 body 로 떨어진다). */
+      var ul = centerEl.querySelector(kind === 'hotword' ? '#mp-hot-chips' : '#mp-int-chips');
+      var next = ul && (ul.children[idx] || ul.children[idx - 1]);
+      var btn = next && next.querySelector('.mypage-chip-x');
+      if (btn) { btn.focus(); return; }
+      var input = centerEl.querySelector(kind === 'hotword' ? '#mp-hotword-input' : '#mp-interest-input');
+      if (input && !input.disabled) input.focus();
+    }
+
+    function save() {
+      if (saving) return;
+      var sel = centerEl.querySelector('#mp-language');
+      var body = {};
+      /* 비교용 구분자 — 단어에 들어갈 수 없는 문자여야 한다.
+         공백을 쓰면 ['a b'] 와 ['a','b'] 가 같다고 판정돼 변경을 놓친다. */
+      var sep = '\u0000';
+      if (sel && sel.value !== (loaded.language || 'ko')) body.language = sel.value;
+      if (hotwords.join(sep) !== (loaded.hotwords || []).join(sep)) body.hotwords = hotwords;
+      if (interests.join(sep) !== (loaded.interests || []).join(sep)) body.interests = interests;
+      if (!Object.keys(body).length) { toast('변경된 설정이 없습니다.'); return; }
+
+      var btn = centerEl.querySelector('[data-action="mp-save"]');
+      saving = true;
+      if (btn) { btn.disabled = true; btn.setAttribute('aria-busy', 'true'); }
+      API.patchSettings(body).then(function (res) {
+        if (cancelled) return;
+        loaded = (res && res.settings) || {};
+        hotwords = (loaded.hotwords || []).slice();
+        interests = (loaded.interests || []).slice();
+        userSettings = loaded;          // 새 회의 폼 프리필이 즉시 최신 값을 쓰게 한다
+        repaintChips('hotword');
+        repaintChips('interest');
+        if (sel) sel.value = loaded.language || 'ko';
+        toast('설정을 저장했습니다.', 'success');
+      }).catch(function (err) {
+        if (cancelled) return;
+        if (err.code === 'write_disabled') toast('읽기 전용 데모라 저장할 수 없습니다.', 'error');
+        else if (err.code === 'settings_unavailable') toast('설정 저장소가 아직 준비되지 않았습니다.', 'error');
+        else toast(err.message || '저장에 실패했습니다.', 'error');
+      }).then(function () {
+        saving = false;
+        var b = centerEl.querySelector('[data-action="mp-save"]');
+        if (b) { b.disabled = false; b.removeAttribute('aria-busy'); }
+      });
+    }
+
+    function onMyPageClick(e) {
+      var el = e.target.closest('[data-action]');
+      if (!el || !centerEl.contains(el)) return;
+      var action = el.dataset.action;
+      if (action === 'mp-save') save();
+      else if (action === 'mp-add-hotword') addTerm('hotword');
+      else if (action === 'mp-add-interest') addTerm('interest');
+      else if (action === 'mp-del') delTerm(el.dataset.kind, el.dataset.term);
+      else if (action === 'mp-suggest') {
+        var t = el.dataset.term;
+        if (interests.indexOf(t) === -1 && interests.length < MP_MAX_INTERESTS) {
+          interests.push(t);
+          repaintChips('interest');
+        }
+      }
+    }
+
+    /* 한글 조합 확정 Enter 는 무시한다(안 그러면 조합 중 문자가 칩으로 들어간다). */
+    function onMyPageKeydown(e) {
+      if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+      var id = e.target && e.target.id;
+      if (id === 'mp-hotword-input') { e.preventDefault(); addTerm('hotword'); }
+      else if (id === 'mp-interest-input') { e.preventDefault(); addTerm('interest'); }
+    }
+
+    centerEl.addEventListener('click', onMyPageClick);
+    centerEl.addEventListener('keydown', onMyPageKeydown);
+
+    return function cleanup() {
+      cancelled = true;
+      centerEl.removeEventListener('click', onMyPageClick);
+      centerEl.removeEventListener('keydown', onMyPageKeydown);
+    };
   }
 
   /* 폴더 트리 화면 — 고정 항목(전체/기본/공유한/휴지통) + 중첩 사용자 폴더 */
@@ -3180,6 +3469,16 @@
     drawerBackdropEl.addEventListener('click', closeDrawer);
     drawerCloseBtn.addEventListener('click', closeDrawer);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+
+    /* 사용자 설정을 부팅 시 1회 받아 새 회의 폼 프리필에 쓴다.
+       await 하지 않는다 — /v1/me 가 느리거나 실패하면 앱 부팅 전체가 멈춘다.
+       renderRoute() 는 동기라 첫 렌더 때는 아직 비어 있고, 그래서 promise 를 보관해
+       각 뷰가 응답 후 한 번 더 프리필을 적용한다. */
+    settingsReady = API.getMe().then(function (me) {
+      userSettings = (me && me.settings) || {};
+    }).catch(function () {
+      userSettings = {};
+    });
 
     ListColumn.init(document.getElementById('col-list'));
     renderRoute();

@@ -1126,14 +1126,8 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 .tab-bar { display: none; }
 .tab-fab { display: none; }
 
-/* 플레이스홀더 페이지(폴더·마이) — C·E 구현 전 셸 */
-.placeholder-page {
-  display: flex; flex-direction: column; align-items: center; text-align: center;
-  gap: 12px; padding: 64px 24px; color: var(--ink-500);
-}
-.placeholder-icon { color: var(--ink-300); }
-.placeholder-title { font-size: 18px; font-weight: 800; color: var(--ink-900); }
-.placeholder-desc { font-size: 13px; max-width: 340px; line-height: 1.6; }
+/* 프로필 헤더(마이페이지) — A 에서 심고 E2 가 실제 값으로 쓴다.
+   .placeholder-* 규칙은 E2 에서 마이 플레이스홀더가 사라지며 함께 제거됐다. */
 .mypage-profile { display: flex; align-items: center; gap: 14px; }
 .mypage-avatar {
   width: 52px; height: 52px; border-radius: 50%; flex: none;
@@ -1182,7 +1176,6 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
   .list-scroll { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
   .cal-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
   .compose-scroll { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
-  .placeholder-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
 
 /* ----------------------------------------------------------------------
@@ -1272,3 +1265,51 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 }
 .home-feature-icon { color: var(--brand-700); }
 .home-feature-label { font-size: 11.5px; font-weight: 700; color: var(--ink-700); line-height: 1.35; }
+
+/* ----------------------------------------------------------------------
+   24. 마이페이지 (서브프로젝트 E2)
+   ------------------------------------------------------------------- */
+/* .col-center-scroll 이 스크롤을 맡으므로 이 컨테이너는 스크롤을 만들지 않는다(이중 스크롤 금지). */
+.mypage-page { padding: 26px 28px 40px; max-width: 640px; margin: 0 auto; width: 100%; }
+.mypage-section { padding: 18px 0; border-bottom: 1px solid var(--border); }
+.mypage-section:last-of-type { border-bottom: 0; }
+.mypage-h { font-size: 13px; font-weight: 800; color: var(--ink-900); margin-bottom: 10px; }
+.mypage-hint { font-size: 12px; color: var(--ink-500); line-height: 1.6; margin-bottom: 8px; }
+
+.mypage-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.mypage-stat { padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); }
+.mypage-stat-label { font-size: 11.5px; font-weight: 700; color: var(--ink-500); }
+.mypage-stat-value { font-size: 17px; font-weight: 800; color: var(--ink-900); margin-top: 3px; }
+
+.mypage-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; }
+.mypage-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 6px 4px 11px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 12px; font-weight: 600; color: var(--ink-700);
+}
+/* 칩 자체는 비인터랙티브 — 안에 실제 버튼 하나만 둔다(중첩 인터랙티브 회피). */
+.mypage-chip-x {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; padding: 0; border: 0; border-radius: 50%;
+  background: none; color: var(--ink-600); cursor: pointer;
+}
+.mypage-chip-x:hover { background: var(--surface-alt); color: var(--ink-900); }
+.mypage-chip-x svg { width: 12px; height: 12px; }
+
+.mypage-add { display: flex; gap: 6px; }
+.mypage-add .input { flex: 1; min-width: 0; }
+.mypage-suggest { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+.mypage-suggest-label { font-size: 11px; font-weight: 700; color: var(--ink-500); }
+.mypage-actions { padding: 20px 0 8px; }
+.mypage-actions .btn { width: 100%; }
+
+.mypage-chip-x:focus-visible,
+.mypage-actions .btn:focus-visible,
+.mypage-suggest .search-chip:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  /* 단축 속성과 longhand 를 같은 블록에 둬서 뒤 블록이 padding-bottom 을 덮는 사고를 막는다. */
+  .mypage-page { padding: 18px 16px 32px; padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .mypage-stats { grid-template-columns: 1fr; }
+}
