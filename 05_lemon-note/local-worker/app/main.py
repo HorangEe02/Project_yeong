@@ -376,19 +376,32 @@ def _snippet(text: str, q: str, width: int = 46) -> str:
     return ("…" if start > 0 else "") + out + ("…" if end < len(text) else "")
 
 
+# SQLite 에는 ILIKE 가 없다(문법 오류). postgres 는 ILIKE 도 pg_trgm GIN 인덱스를 탄다.
+# 이 상수 하나로 검색 LIKE 11곳(list_meetings 7 + _search_matches 4)이 같은 연산자를 쓴다.
+_LIKE_OP = "ILIKE" if database.BACKEND == "postgres" else "LIKE"
+
+
+def _like_pattern(q: str) -> str:
+    """검색어를 LIKE 패턴으로 감싼다. `%`·`_` 는 와일드카드라 escape 하지 않으면
+    '100%' 검색이 전체 노트를, 'a_b' 가 'axb' 를 잘못 잡는다. SQL 쪽에 ESCAPE '\\' 를 붙여 쓴다.
+    """
+    esc = q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{esc}%"
+
+
 def _search_matches(conn, meeting_id: str, q: str, title: str, limit: int = 3) -> list:
     """검색어가 어디에 걸렸는지(제목/전사/요약/구간) 스니펫과 함께 돌려준다.
 
     클로바 노트가 '음성기록 결과 / 메모 결과' 라벨을 보여주는 것과 같은 목적 —
     왜 이 회의가 결과에 떴는지 사용자가 바로 알 수 있어야 한다.
     """
-    like = f"%{q}%"
+    like = _like_pattern(q)
     out = []
     if title and q.lower() in title.lower():
         out.append({"source": "title", "label": "제목", "text": _snippet(title, q), "start_ms": None})
     for r in conn.execute(
             "SELECT start_ms, text, corrected_text FROM transcript_segments "
-            "WHERE meeting_id=? AND (text LIKE ? OR corrected_text LIKE ?) "
+            f"WHERE meeting_id=? AND (text {_LIKE_OP} ? ESCAPE '\\' OR corrected_text {_LIKE_OP} ? ESCAPE '\\') "
             "ORDER BY start_ms LIMIT ?", (meeting_id, like, like, limit)).fetchall():
         body = r["corrected_text"] or r["text"] or ""
         out.append({"source": "transcript", "label": "전사",
@@ -402,7 +415,7 @@ def _search_matches(conn, meeting_id: str, q: str, title: str, limit: int = 3) -
                         "text": _snippet(sv["summary"], q), "start_ms": None})
         for r in conn.execute(
                 "SELECT start_ms, heading, text FROM summary_sections "
-                "WHERE summary_version_id=? AND (text LIKE ? OR heading LIKE ?) "
+                f"WHERE summary_version_id=? AND (text {_LIKE_OP} ? ESCAPE '\\' OR heading {_LIKE_OP} ? ESCAPE '\\') "
                 "ORDER BY section_index LIMIT ?", (sv["id"], like, like, limit)).fetchall():
             body = r["text"] or r["heading"] or ""
             out.append({"source": "section", "label": "구간 요약",
@@ -461,17 +474,17 @@ def list_meetings(status: Optional[str] = None, q: Optional[str] = None,
         if q:
             # 제목 · 전사 · 요약 본문 · 구간 요약을 모두 훑는다.
             # 한국어는 교착어라 형태소 분석 없이는 부분 일치가 사실상 유일한 선택이고,
-            # postgres 에는 pg_trgm GIN 인덱스가 있어 이 LIKE 가 인덱스를 탄다.
+            # postgres 에는 pg_trgm GIN 인덱스가 있어 이 ILIKE 가 인덱스를 탄다(gin_trgm_ops).
             where.append(
-                "(m.title LIKE ?"
+                f"(m.title {_LIKE_OP} ? ESCAPE '\\'"
                 " OR m.id IN (SELECT meeting_id FROM transcript_segments"
-                "             WHERE text LIKE ? OR corrected_text LIKE ?)"
+                f"             WHERE text {_LIKE_OP} ? ESCAPE '\\' OR corrected_text {_LIKE_OP} ? ESCAPE '\\')"
                 " OR m.id IN (SELECT meeting_id FROM summary_versions"
-                "             WHERE title LIKE ? OR summary LIKE ?)"
+                f"             WHERE title {_LIKE_OP} ? ESCAPE '\\' OR summary {_LIKE_OP} ? ESCAPE '\\')"
                 " OR m.id IN (SELECT sv.meeting_id FROM summary_sections ss"
                 "             JOIN summary_versions sv ON sv.id = ss.summary_version_id"
-                "             WHERE ss.text LIKE ? OR ss.heading LIKE ?))")
-            like = f"%{q}%"
+                f"             WHERE ss.text {_LIKE_OP} ? ESCAPE '\\' OR ss.heading {_LIKE_OP} ? ESCAPE '\\'))")
+            like = _like_pattern(q)
             params += [like] * 7
         sql = (
             "SELECT m.*, "
@@ -1432,6 +1445,51 @@ def read_shared(token: str, password: Optional[str] = Header(default=None, alias
         return out
     finally:
         conn.close()
+
+@app.get(P + "/keywords")
+def list_keywords():
+    """검색 칩에 쓸 추천 키워드 — 노트 요약(raw_json.keywords)을 빈도순으로 집계한다.
+
+    읽기 전용이라 WRITE_PROTECTED 게이트를 붙이지 않는다.
+    한계: 사용자가 요약을 편집하면 그 버전 raw_json 에는 keywords 가 없다(patch_summary
+    가 키워드를 싣지 않음). 그래서 최신 버전만 보지 않고, 노트별로 version 내림차순으로
+    훑어 keywords 가 있는 첫 버전을 채택한다.
+    """
+    user_id = config.DEFAULT_USER_ID
+    conn = db.connect()
+    try:
+        # raw_json 은 요약 전문이라 행마다 크다. 최근 노트로 상한을 두어
+        # 노트가 쌓여도 칩 8개 뽑자고 전체 이력을 읽지 않게 한다.
+        rows = conn.execute(
+            "SELECT sv.meeting_id, sv.raw_json FROM summary_versions sv "
+            "WHERE sv.meeting_id IN (SELECT id FROM meetings WHERE user_id=? "
+            "                        AND deleted_at IS NULL AND status <> 'failed' "
+            "                        ORDER BY recorded_at DESC LIMIT 200) "
+            "ORDER BY sv.meeting_id, sv.version DESC", (user_id,)).fetchall()
+        counts = {}
+        seen = set()  # 노트당 keywords 를 가진 첫(=최신) 버전만 센다
+        for r in rows:
+            mid = r["meeting_id"]
+            if mid in seen:
+                continue
+            try:
+                raw = database.dec_json(r["raw_json"]) or {}
+            except (ValueError, TypeError):
+                continue  # 손상된 행 하나 때문에 추천 칩 전체가 죽지 않게 한다
+            if not isinstance(raw, dict):
+                continue  # postgres jsonb 가 배열이거나 값이 깨진 행은 건너뛴다
+            words = [k.strip() for k in (raw.get("keywords") or [])
+                     if isinstance(k, str) and k.strip()]
+            if not words:
+                continue
+            seen.add(mid)
+            for w in words:
+                counts[w] = counts.get(w, 0) + 1
+        top = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:8]
+        return {"keywords": [{"text": t, "count": c} for t, c in top]}
+    finally:
+        conn.close()
+
 
 @app.get(P + "/health")
 def health():
