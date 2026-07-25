@@ -1201,3 +1201,30 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 @media (max-width: 760px) {
   .folder-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
+
+/* ----------------------------------------------------------------------
+   22. 홈 배너 (서브프로젝트 B)
+   ------------------------------------------------------------------- */
+.home-banner { margin: 4px 8px 12px; }
+/* 홈(`list`) 라우트에서만 표시. 다른 라우트에선 상시 목록(데스크톱)에 노드가 남아도 숨긴다
+   — home→상세/달력/폴더/마이 이탈 시 배너 잔존 blocker의 실제 수정(적대적 리뷰 반영). */
+.app-shell:not([data-route="list"]) .home-banner { display: none; }
+.home-banner-hero {
+  background: var(--brand-600); color: var(--on-brand);
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  box-shadow: 0 4px 14px rgba(201, 145, 0, 0.28);
+}
+.home-banner-title { font-size: 15px; font-weight: 800; letter-spacing: -0.01em; }
+.home-banner-sub { font-size: 12px; margin-top: 5px; opacity: 0.85; line-height: 1.5; }
+.home-features {
+  display: flex; gap: 8px; margin-top: 10px; padding-bottom: 4px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.home-features::-webkit-scrollbar { display: none; }
+.home-feature {
+  flex: none; width: 92px; display: flex; flex-direction: column; gap: 6px;
+  padding: 12px 10px; border-radius: var(--radius-md);
+  background: var(--surface); border: 1px solid var(--border);
+}
+.home-feature-icon { color: var(--brand-700); }
+.home-feature-label { font-size: 11.5px; font-weight: 700; color: var(--ink-700); line-height: 1.35; }

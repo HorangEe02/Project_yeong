@@ -620,6 +620,30 @@
     );
   }
 
+  /* 홈 온보딩 배너 + 기능 카드 (정적). ListColumn.renderItems 가 홈 라우트에서 노트 앞에 prepend. */
+  function renderHomeBanner() {
+    var features = [
+      ['다양한 녹음 언어', '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 10h15M10 2.5c2.5 2 2.5 13 0 15M10 2.5c-2.5 2-2.5 13 0 15" stroke="currentColor" stroke-width="1.5"/></svg>'],
+      ['중요한 순간 북마크', '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M5 3.5h10v13l-5-3.5-5 3.5v-13z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>'],
+      ['강조 하이라이트', '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M3 15l2-6 8-8 3 3-8 8-5 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>'],
+      ['녹음 중 실시간 메모', '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><path d="M4 3.5h9l3 3v10H4v-13z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 8.5h7M6.5 11.5h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'],
+      ['이메일로 공유', '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false"><rect x="2.5" y="4.5" width="15" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 5.5l7 5 7-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>']
+    ];
+    return (
+      '<div class="home-banner">' +
+        '<div class="home-banner-hero">' +
+          '<div class="home-banner-title">회의녹음챗, 이렇게 써보세요!</div>' +
+          '<div class="home-banner-sub">녹음하거나 파일을 올리면 전사·요약을 자동으로. 북마크·하이라이트·공유까지 한 곳에서.</div>' +
+        '</div>' +
+        '<div class="home-features">' +
+          features.map(function (f) {
+            return '<div class="home-feature"><span class="home-feature-icon">' + f[1] + '</span><span class="home-feature-label">' + esc(f[0]) + '</span></div>';
+          }).join('') +
+        '</div>' +
+      '</div>'
+    );
+  }
+
   var ListColumn = (function () {
     var scrollEl, searchInput, filterSelect, loadMoreWrap, loadMoreBtn, countEl;
     var items = [];
@@ -641,6 +665,14 @@
       return renderNoteCard(m, { activeId: activeId, query: lastQuery, mode: 'list' });
     }
 
+    /* 검색/필터가 없을 때 배너를 노트 앞에 prepend(함께 스크롤). 홈 라우트에서만 보이게 하는 것은
+       CSS(.app-shell:not([data-route="list"]) .home-banner{display:none})가 판정한다 — 라우트 이탈 시
+       상시 목록(데스크톱)에 배너가 잔존하는 문제를 JS rerender 없이 확실히 막는다(적대적 리뷰 반영). */
+    function homeBannerHtml() {
+      var isFiltered = !!(searchInput.value.trim() || filterSelect.value);
+      return isFiltered ? '' : renderHomeBanner();
+    }
+
     function renderItems(loading) {
       if (countEl) countEl.textContent = items.length;
       if (loading && items.length === 0) {
@@ -651,10 +683,10 @@
         var isFiltered = !!(searchInput.value.trim() || filterSelect.value);
         scrollEl.innerHTML = isFiltered
           ? emptyStateHtml('검색 결과가 없습니다', '다른 검색어나 상태 필터를 시도해보세요.')
-          : emptyStateHtml('아직 등록된 회의가 없습니다', '첫 회의를 녹음하거나 파일을 업로드해보세요.', '<a href="#/new" class="btn btn-primary btn-sm">새 회의 시작하기</a>');
+          : homeBannerHtml() + emptyStateHtml('아직 등록된 회의가 없습니다', '첫 회의를 녹음하거나 파일을 업로드해보세요.', '<a href="#/new" class="btn btn-primary btn-sm">새 회의 시작하기</a>');
         return;
       }
-      scrollEl.innerHTML = items.map(itemHtml).join('');
+      scrollEl.innerHTML = homeBannerHtml() + items.map(itemHtml).join('');
     }
 
     function fetchList(reset) {
