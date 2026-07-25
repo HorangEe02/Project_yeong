@@ -46,6 +46,10 @@ def _set_status(conn, job_id, meeting_id, status, progress, stage,
 
 def run_pipeline(job_id: str, meeting_id: str) -> None:
     conn = db.connect()
+    # except 절에서 참조하므로 try 밖에서 초기화한다. 아래 SELECT 전에 실패하면
+    # unbound 라 except 안에서 UnboundLocalError 가 나고, 그게 자기 except 에 삼켜져
+    # 실패 알림이 조용히 사라진다(실패가 실패를 숨기는 형태).
+    meeting = None
     try:
         conn.execute(
             "UPDATE jobs SET attempts=attempts+1, updated_at=? WHERE id=?",
@@ -135,6 +139,13 @@ def run_pipeline(job_id: str, meeting_id: str) -> None:
             _set_status(conn, job_id, meeting_id, "failed", 0.0, None,
                         error_code="pipeline_error", error_message=str(e)[:500])
         except Exception:  # noqa: BLE001
+            pass
+        try:
+            # 알림용 이벤트. user_id 를 NULL 로 두면 인박스가 user_id 로 걸러서
+            # 영원히 안 보이므로 기본 사용자로 폴백한다. 오류 원문은 넣지 않는다.
+            db.audit(conn, meeting["user_id"] if meeting else config.DEFAULT_USER_ID,
+                     meeting_id, "pipeline_failed", {"stage": "pipeline"})
+        except Exception:  # noqa: BLE001 - 알림 기록 실패가 파이프라인 정리를 막지 않는다
             pass
     finally:
         conn.close()

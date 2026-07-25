@@ -255,6 +255,16 @@ create table if not exists audit_logs (
   created_at timestamptz not null default now()
 );
 
+-- 알림(서브프로젝트 F): 인박스 본문은 audit_logs 파생, 여기엔 항목별 상태만.
+-- audit_id 에는 FK 를 걸지 않는다(purge 삭제 순서 제약 회피 — C1 교훈). user_id 는 FK 무해.
+create table if not exists notification_states (
+  user_id uuid not null references profiles(id),
+  audit_id uuid not null,
+  read_at timestamptz,
+  dismissed_at timestamptz,
+  primary key (user_id, audit_id)
+);
+
 -- Indexes
 create index if not exists meetings_user_recorded_idx on meetings(user_id, recorded_at desc);
 create index if not exists folders_user_parent_idx on folders(user_id, parent_id);
@@ -269,6 +279,8 @@ create index if not exists summary_versions_meeting_version_idx on summary_versi
 create index if not exists exports_meeting_idx on exports(meeting_id, created_at desc);
 create index if not exists share_logs_meeting_idx on share_logs(meeting_id, created_at desc);
 create index if not exists audit_logs_meeting_idx on audit_logs(meeting_id, created_at desc);
+create index if not exists audit_logs_user_idx on audit_logs(user_id, created_at desc);
+create index if not exists notif_states_user_idx on notification_states(user_id, read_at);
 
 
 -- ---------------------------------------------------------------------------
@@ -300,6 +312,7 @@ alter table calendar_candidates enable row level security;
 alter table exports enable row level security;
 alter table share_logs enable row level security;
 alter table audit_logs enable row level security;
+alter table notification_states enable row level security;
 
 -- ---------------------------------------------------------------------------
 -- 전역 검색 인덱스 (pg_trgm)

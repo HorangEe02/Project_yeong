@@ -63,6 +63,24 @@ try:
             print(f"   - profiles.settings: {row[0]}")
             if row[0] != "jsonb":
                 sys.exit(f"❌ profiles.settings 타입이 {row[0]} — jsonb 여야 합니다.")
+            # F1: 알림 상태 테이블 + 인덱스 단언.
+            cur.execute("select column_name from information_schema.columns "
+                        "where table_schema='public' and table_name='notification_states'")
+            cols = {r[0] for r in cur.fetchall()}
+            if not cols:
+                sys.exit("❌ notification_states 테이블 없음 — F1 마이그레이션"
+                         "(create table + index 2개 + enable RLS)을 먼저 적용하세요.")
+            missing = {"user_id", "audit_id", "read_at", "dismissed_at"} - cols
+            if missing:
+                sys.exit(f"❌ notification_states 컬럼 누락: {sorted(missing)}")
+            print(f"   - notification_states: {len(cols)} columns")
+            want = {"audit_logs_user_idx", "notif_states_user_idx"}
+            cur.execute("select indexname from pg_indexes where schemaname='public' "
+                        "and indexname = any(%s)", (list(want),))
+            idx = {r[0] for r in cur.fetchall()}
+            if idx != want:
+                sys.exit(f"❌ 인덱스 누락: {sorted(want - idx)}")
+            print(f"   - indexes: {', '.join(sorted(idx))}")
     print("연결 검증 완료. (worker DB 백엔드를 Postgres 로 전환하는 것은 별도 구현 단계)")
 except Exception as e:  # noqa: BLE001
     sys.exit(f"❌ 연결 실패: {e}\n"
