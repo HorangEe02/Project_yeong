@@ -563,6 +563,11 @@ dialog.modal::backdrop { background: rgba(15, 18, 34, 0.5); backdrop-filter: blu
 .transcript-search-row .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ink-400); pointer-events: none; }
 .transcript-search-row .search-wrap .input { padding-left: 34px; }
 .transcript-count { font-size: 12px; color: var(--ink-500); flex: none; }
+/* 검색 매치 이동(1/131) — 화살표 2개와 카운터가 한 덩어리로 묶여 같이 줄바꿈된다. */
+.transcript-nav { display: flex; align-items: center; gap: 4px; flex: none; margin-left: auto; }
+.transcript-nav .match-count { font-size: 12px; color: var(--ink-600); min-width: 46px; text-align: center; }
+#md-match-prev svg { transform: rotate(-90deg); }
+#md-match-next svg { transform: rotate(90deg); }
 
 .msg-list { display: flex; flex-direction: column; gap: 2px; padding: 10px 20px 24px; }
 
@@ -607,6 +612,11 @@ dialog.modal::backdrop { background: rgba(15, 18, 34, 0.5); backdrop-filter: blu
 .msg-bubble--sent { background: linear-gradient(135deg, var(--bubble-sent-start), var(--bubble-sent-end)); color: var(--on-brand); border-bottom-right-radius: 4px; }
 .msg-text mark { background: var(--amber-100); color: var(--ink-950); border-radius: 3px; padding: 0 1px; }
 .msg-bubble--sent .msg-text mark { background: rgba(255,255,255,.55); color: var(--brand-900); }
+/* 현재 이동 중인 매치(1/131). `.msg-bubble--sent .msg-text mark`(0,2,1)를 이기려면
+   `.msg-text mark.is-active-match`(0,2,1) 로 쓰고 이 규칙들보다 뒤에 와야 한다. */
+.msg-text mark.is-active-match { background: var(--brand-600); color: var(--on-brand); box-shadow: 0 0 0 2px var(--brand-deep); }
+.msg-bubble--sent .msg-text mark.is-active-match { background: #fff; color: var(--brand-900); box-shadow: 0 0 0 2px var(--brand-900); }
+.msg-speaker mark.is-active-match { background: var(--brand-600); color: var(--on-brand); border-radius: 3px; }
 .msg-edited-tag { display: inline-block; font-size: 10px; font-weight: 700; opacity: .7; margin-left: 6px; vertical-align: middle; }
 .msg-confidence-tag { font-size: 10.5px; color: var(--amber-700); margin-top: 4px; font-weight: 700; padding: 0 2px; }
 .msg-row--right .msg-confidence-tag { text-align: right; }
@@ -986,6 +996,15 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   background: var(--brand-100); color: var(--brand-900);
   font-weight: 700; padding: 0 1px; border-radius: 3px;
 }
+/* 카드 제목 강조 — 전역 mark 규칙이 없어 그냥 두면 UA 기본 노랑이 된다. 스니펫과 같은 톤으로. */
+.list-item-title mark {
+  background: var(--brand-100); color: var(--brand-900);
+  font-weight: 700; padding: 0 1px; border-radius: 3px;
+}
+/* 활성 카드는 배경이 --brand-50 이라 --brand-100 마크가 묻힌다. 한 단계 진한 면으로 올린다.
+   --brand-500 은 --brand-900 과 3.66:1 이라 AA(4.5:1) 미달 → --brand-600(4.56:1)을 쓴다. */
+.list-item.is-active .list-item-title mark,
+.list-item.is-active .match-text mark { background: var(--brand-600); color: var(--brand-900); }
 
 /* ----------------------------------------------------------------------
    16. 파형 스크러버 + 북마크 마커
@@ -1205,6 +1224,31 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 /* ----------------------------------------------------------------------
    22. 홈 배너 (서브프로젝트 B)
    ------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------
+   23. 검색 칩 (최근 검색 · 추천 키워드 — 서브프로젝트 D)
+   ------------------------------------------------------------------- */
+.search-chips { display: flex; flex-direction: column; gap: 8px; padding: 0 18px 10px; flex: none; }
+.search-chips.is-hidden { display: none; }
+/* 상시 마운트된 목록이라 라우트 게이팅이 없으면 상세·달력·폴더·마이에서도 칩이 남는다
+   (홈 배너와 동일한 선례). is-hidden(0,2,0)보다 특이도가 높아 항상 이긴다. */
+.app-shell:not([data-route="list"]) .search-chips { display: none; }
+.search-chips-group { display: flex; flex-direction: column; gap: 5px; }
+.search-chips-label { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--ink-500); }
+.search-chips-clear { margin-left: auto; background: none; border: 0; padding: 0; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--ink-400); }
+.search-chips-clear:hover { color: var(--ink-700); text-decoration: underline; }
+/* 가로 스크롤 — .chip-row 는 flex-wrap:wrap 이라 세로로 불어나므로 재사용하지 않는다. */
+.search-chips-row { display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.search-chips-row::-webkit-scrollbar { display: none; }
+.search-chip {
+  flex: none; white-space: nowrap; cursor: pointer;
+  font-size: 12px; font-weight: 600; padding: 5px 11px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink-700);
+}
+.search-chip:hover { border-color: var(--brand-deep); }
+.search-chip:focus-visible, .search-chips-clear:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
+.search-chip--suggest { background: var(--brand-50); border-color: var(--brand-100); color: var(--brand-700); }
+.search-chip--suggest:hover { background: var(--brand-100); }
+
 .home-banner { margin: 4px 8px 12px; }
 /* 홈(`list`) 라우트에서만 표시. 다른 라우트에선 상시 목록(데스크톱)에 노드가 남아도 숨긴다
    — home→상세/달력/폴더/마이 이탈 시 배너 잔존 blocker의 실제 수정(적대적 리뷰 반영). */

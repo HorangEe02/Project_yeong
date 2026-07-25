@@ -167,11 +167,14 @@
 
   function debounce(fn, wait) {
     var t;
-    return function () {
+    function debounced() {
       var args = arguments;
       clearTimeout(t);
       t = setTimeout(function () { fn.apply(null, args); }, wait);
-    };
+    }
+    /* Enter 로 즉시 실행할 때 대기 중인 타이머를 취소해 같은 질의가 두 번 나가지 않게 한다. */
+    debounced.cancel = function () { clearTimeout(t); };
+    return debounced;
   }
 
   function colorFromString(str) {
@@ -210,15 +213,22 @@
     }).join('');
   }
 
+  /* 원문에서 찾고 조각별로 이스케이프한다(raw in → 이스케이프된 HTML out).
+     이스케이프 먼저 하면 esc 가 만든 엔티티 속을 검색어가 갈라버린다 —
+     예: 제목 "A&B" 에서 'a' 검색 시 &amp; 의 a 까지 <mark> 로 감싸 "A&amp;B" 가 그대로 보이고,
+     전사에서는 없던 매치가 생겨 1/131 카운트까지 부풀었다. */
   function highlightMatch(text, q) {
-    var escText = esc(text);
-    if (!q) return escText;
-    var escQ = esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    if (!escQ) return escText;
+    var s = String(text == null ? '' : text);
+    if (!q) return esc(s);
+    var escQ = String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (!escQ) return esc(s);
     try {
-      return escText.replace(new RegExp('(' + escQ + ')', 'ig'), '<mark>$1</mark>');
+      var parts = s.split(new RegExp('(' + escQ + ')', 'ig'));
+      return parts.map(function (part, i) {
+        return i % 2 ? '<mark>' + esc(part) + '</mark>' : esc(part);
+      }).join('');
     } catch (e) {
-      return escText;
+      return esc(s);
     }
   }
 
@@ -377,6 +387,9 @@
     },
     listMeetings: function (params) {
       return apiRequest('/meetings' + buildQuery(params), { method: 'GET' });
+    },
+    getKeywords: function () {
+      return apiRequest('/keywords', { method: 'GET' });
     },
     getCalendar: function (params) {
       return apiRequest('/meetings/calendar' + buildQuery(params), { method: 'GET' });
@@ -602,7 +615,8 @@
       '<div class="list-item' + (m.meeting_id === opts.activeId ? ' is-active' : '') + '" data-id="' + esc(m.meeting_id) + '" tabindex="0">' +
         '<div class="list-item-avatar" style="background:' + col.bg + ';color:' + col.fg + '">' + esc(title.charAt(0) || '회') + '</div>' +
         '<div class="list-item-main">' +
-          '<div class="list-item-top"><span class="list-item-title">' + esc(title) + '</span><span class="list-item-time mono">' + esc(shortDate(m.recorded_at)) + '</span></div>' +
+          /* 검색 중이면 제목의 일치 부분도 강조한다(highlightMatch 가 내부에서 esc 함 — 이중 이스케이프 금지). */
+          '<div class="list-item-top"><span class="list-item-title">' + (opts.query ? highlightMatch(title, opts.query) : esc(title)) + '</span><span class="list-item-time mono">' + esc(shortDate(m.recorded_at)) + '</span></div>' +
           '<div class="list-item-sub mono">' + esc(formatDateTime(m.recorded_at, { dateOnly: true })) + ' · ' + esc(formatDuration(m.duration_ms)) + '</div>' +
           '<div class="list-item-chips">' + itemChipsHtml(m) + '</div>' +
           ((m.matches && m.matches.length)
@@ -645,9 +659,12 @@
   }
 
   var ListColumn = (function () {
-    var scrollEl, searchInput, filterSelect, loadMoreWrap, loadMoreBtn, countEl;
+    var scrollEl, searchInput, filterSelect, loadMoreWrap, loadMoreBtn, countEl, chipsEl;
     var items = [];
     var nextCursor = null;
+    var suggestedKeywords = [];   // GET /keywords 결과(추천 칩). 실패하면 빈 배열로 남는다.
+    var RECENT_KEY = 'ln.recent-search';
+    var RECENT_MAX = 5;
     var lastQuery = '';   // 검색 결과 스니펫의 강조에 쓴다(itemHtml 이 fetchList 보다 먼저 정의돼 있어 별도 보관)
     var activeId = null;
 
@@ -671,6 +688,65 @@
     function homeBannerHtml() {
       var isFiltered = !!(searchInput.value.trim() || filterSelect.value);
       return isFiltered ? '' : renderHomeBanner();
+    }
+
+    /* ---- 최근 검색어 (localStorage) ----
+       프라이빗 모드 등에서 저장소가 막혀 있어도 검색 자체는 굴러가야 하므로 전부 try/catch. */
+    function readRecents() {
+      try {
+        var v = JSON.parse(window.localStorage.getItem(RECENT_KEY) || '[]');
+        return Array.isArray(v) ? v.filter(function (s) { return typeof s === 'string' && s; }) : [];
+      } catch (e) { return []; }
+    }
+    function writeRecents(list) {
+      try { window.localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) { /* 저장 불가 — 무시 */ }
+    }
+    /* 검색어는 '확정'된 순간에만 쌓는다(디바운스마다 저장하면 'ㄱ','가','감' 같은 조각이 남는다). */
+    function commitRecent(q) {
+      q = (q || '').trim();
+      if (!q) return;
+      var list = readRecents().filter(function (s) { return s !== q; });
+      list.unshift(q);
+      writeRecents(list.slice(0, RECENT_MAX));
+      renderChips();
+    }
+    function clearRecents() {
+      writeRecents([]);
+      renderChips();
+    }
+
+    function chipBtnHtml(text, kind) {
+      return '<button type="button" class="search-chip search-chip--' + kind + '" data-chip="' + esc(text) + '">' + esc(text) + '</button>';
+    }
+
+    /* 칩 스트립의 유일한 렌더/가시성 판정 지점. 인라인 style 은 쓰지 않는다 —
+       라우트 게이팅 CSS 를 이겨버리기 때문에 is-hidden 클래스로만 토글한다. */
+    function renderChips() {
+      if (!chipsEl) return;
+      var recents = readRecents();
+      var hasQuery = !!searchInput.value.trim();
+      if (hasQuery || (!recents.length && !suggestedKeywords.length)) {
+        chipsEl.classList.add('is-hidden');
+        chipsEl.innerHTML = '';
+        return;
+      }
+      var html = '';
+      if (recents.length) {
+        html += '<div class="search-chips-group" role="group" aria-label="최근 검색">' +
+          '<div class="search-chips-label">최근 검색' +
+            '<button type="button" class="search-chips-clear" data-chip-clear="1" aria-label="최근 검색 전체 삭제">지우기</button>' +
+          '</div>' +
+          '<div class="search-chips-row">' + recents.map(function (r) { return chipBtnHtml(r, 'recent'); }).join('') + '</div>' +
+        '</div>';
+      }
+      if (suggestedKeywords.length) {
+        html += '<div class="search-chips-group" role="group" aria-label="추천 키워드">' +
+          '<div class="search-chips-label">추천 키워드</div>' +
+          '<div class="search-chips-row">' + suggestedKeywords.map(function (k) { return chipBtnHtml(k, 'suggest'); }).join('') + '</div>' +
+        '</div>';
+      }
+      chipsEl.innerHTML = html;
+      chipsEl.classList.remove('is-hidden');
     }
 
     function renderItems(loading) {
@@ -730,6 +806,8 @@
             STATUS_FILTER_OPTIONS.map(function (o) { return '<option value="' + esc(o[0]) + '">' + esc(o[1]) + '</option>'; }).join('') +
           '</select>' +
         '</div>' +
+        /* 최근 검색 · 추천 키워드 칩. 홈(list) 라우트에서 쿼리가 비었을 때만 보인다(CSS 게이팅 + is-hidden). */
+        '<div class="search-chips" id="lc-chips"></div>' +
         '<div class="list-scroll" id="lc-scroll"></div>' +
         '<div class="list-load-more" id="lc-load-more" style="display:none"><button type="button" class="btn btn-ghost btn-sm" id="lc-load-more-btn">더 보기</button></div>';
 
@@ -739,8 +817,20 @@
       loadMoreWrap = containerEl.querySelector('#lc-load-more');
       loadMoreBtn = containerEl.querySelector('#lc-load-more-btn');
       countEl = containerEl.querySelector('#lc-count');
+      chipsEl = containerEl.querySelector('#lc-chips');
 
       containerEl.querySelector('#lc-compose').addEventListener('click', function () { navigate('#/new'); });
+
+      /* 칩: 탭하면 그 말로 검색하고 최근에 올린다. 지우기는 최근 전체 삭제. */
+      chipsEl.addEventListener('click', function (e) {
+        if (e.target.closest('[data-chip-clear]')) { clearRecents(); return; }
+        var chip = e.target.closest('[data-chip]');
+        if (!chip) return;
+        searchInput.value = chip.dataset.chip;
+        commitRecent(chip.dataset.chip);   /* 내부에서 renderChips() → 쿼리가 찼으니 숨겨진다 */
+        searchInput.focus();               /* 눌린 칩이 곧바로 사라지므로 포커스를 검색창으로 넘긴다 */
+        fetchList(true);
+      });
 
       scrollEl.addEventListener('click', function (e) {
         var delBtn = e.target.closest('[data-action="delete"]');
@@ -773,8 +863,28 @@
 
       var debouncedSearch = debounce(function () { fetchList(true); }, 350);
       searchInput.addEventListener('input', debouncedSearch);
+      /* 칩 숨김/표시는 디바운스와 별개로 즉시 반응해야 한다(350ms 늦으면 깜빡인다). */
+      searchInput.addEventListener('input', renderChips);
+      /* 최근 검색 확정 시점: Enter, 그리고 포커스를 뗄 때(change). */
+      searchInput.addEventListener('keydown', function (e) {
+        /* 한글 조합을 확정하는 Enter 는 무시한다(isComposing) — 안 그러면 검색이 두세 번 나간다. */
+        if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+        e.preventDefault();
+        debouncedSearch.cancel();
+        commitRecent(searchInput.value);
+        /* 디바운스가 이미 같은 질의를 처리했으면 다시 부르지 않는다(스켈레톤 깜빡임 방지). */
+        if ((searchInput.value.trim() || '') !== lastQuery) fetchList(true);
+      });
+      searchInput.addEventListener('change', function () { commitRecent(searchInput.value); });
       filterSelect.addEventListener('change', function () { fetchList(true); });
       loadMoreBtn.addEventListener('click', function () { fetchList(false); });
+
+      renderChips();
+      /* 추천 키워드는 실패해도 검색에 지장이 없으므로 조용히 생략한다. */
+      API.getKeywords().then(function (res) {
+        suggestedKeywords = ((res && res.keywords) || []).map(function (k) { return k.text; }).filter(Boolean);
+        renderChips();
+      }).catch(function () { /* 추천 칩 생략 */ });
 
       fetchList(true);
     }
@@ -1649,6 +1759,7 @@
     var dirty = false;
     var lastHighlightedId = null;
     var transcriptQuery = '';
+    var matchIndex = 0;   /* 검색 매치 이동(1/131)의 현재 위치. 노드 참조는 렌더마다 무효라 캐시하지 않는다. */
     var sideMode = { twoSpeaker: false, order: [] };
     var detailClickHandler = null;
     var detailFieldHandler = null;
@@ -1709,6 +1820,12 @@
         '<div class="msg-list-wrap">' +
           '<div class="transcript-search-row">' +
             '<div class="search-wrap">' + ICONS.search + '<input type="text" class="input" id="md-transcript-search" placeholder="발화 내용 또는 화자 검색" /></div>' +
+            /* 검색 매치 이동(1/131) — 쿼리가 있을 때만 보인다. */
+            '<div class="transcript-nav" id="md-match-nav">' +
+              '<button type="button" class="btn btn-ghost btn-icon" id="md-match-prev" aria-label="이전 검색 결과">' + ICONS.chevronRight + '</button>' +
+              '<span class="match-count mono" id="md-match-count" aria-live="polite"></span>' +
+              '<button type="button" class="btn btn-ghost btn-icon" id="md-match-next" aria-label="다음 검색 결과">' + ICONS.chevronRight + '</button>' +
+            '</div>' +
             '<span class="transcript-count text-sm" id="md-transcript-count"></span>' +
           '</div>' +
           '<div class="msg-list" id="md-segment-list"></div>' +
@@ -1908,6 +2025,10 @@
       var transcriptListEl = centerEl.querySelector('#md-segment-list');
       var transcriptSearchInput = centerEl.querySelector('#md-transcript-search');
       var transcriptCountEl = centerEl.querySelector('#md-transcript-count');
+      var matchNavEl = centerEl.querySelector('#md-match-nav');
+      var matchCountEl = centerEl.querySelector('#md-match-count');
+      var matchPrevBtn = centerEl.querySelector('#md-match-prev');
+      var matchNextBtn = centerEl.querySelector('#md-match-next');
 
       /* ---- 공통 엘리먼트 (오른쪽) ---- */
       var speakerListEl = rightEl.querySelector('#md-speaker-list');
@@ -2025,7 +2146,9 @@
         if (currentId !== lastHighlightedId) {
           lastHighlightedId = currentId;
           restoreHighlight();
-          if (currentId && transcriptListEl) {
+          /* 검색 중에는 재생 따라가기 스크롤을 멈춘다 — 매치 이동으로 옮겨둔 화면을
+             재생이 다시 낚아채면 1/131 네비가 무용지물이 된다. */
+          if (currentId && transcriptListEl && !transcriptQuery) {
             var row = transcriptListEl.querySelector('.msg-row[data-segment-id="' + cssEscapeId(currentId) + '"]');
             if (row) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
           }
@@ -2228,34 +2351,86 @@
         );
       }
 
+      /* 검색 매치 노드 목록. innerHTML 교체마다 참조가 무효라 그때그때 새로 뽑는다.
+         화자명 매치는 .msg-speaker 안이라 컨테이너로 자연히 제외되고,
+         사용자 하이라이트(mark.user-hl)도 클래스로 제외한다 — 1/131 은 발화 본문 기준. */
+      function matchNodes() {
+        /* 화자명(.msg-speaker)도 포함한다 — 플레이스홀더가 '발화 내용 또는 화자 검색'이라
+           화자명으로 찾은 결과가 0/0 으로 보이면 안 된다. querySelectorAll 은 문서 순서라
+           세그먼트 순서가 그대로 유지된다. */
+        return transcriptListEl ? transcriptListEl.querySelectorAll('.msg-text mark:not(.user-hl), .msg-speaker mark') : [];
+      }
+
+      /* 렌더 직후 매치/카운터/활성 표시를 DOM 기준으로 재동기화한다.
+         renderTranscriptTab 꼬리에서 부르므로 사용자 하이라이트 추가·삭제로 인한
+         재렌더에서도 카운터가 어긋나지 않는다. scroll 은 쿼리가 바뀐 순간에만 true. */
+      function syncMatches(scroll) {
+        var nodes = matchNodes();
+        var n = nodes.length;
+        if (!matchNavEl) return;
+        if (!transcriptQuery) {
+          matchNavEl.style.display = 'none';
+          return;
+        }
+        matchNavEl.style.display = '';
+        if (matchIndex > n - 1) matchIndex = n ? n - 1 : 0;
+        if (matchIndex < 0) matchIndex = 0;
+        matchCountEl.textContent = n ? (matchIndex + 1) + ' / ' + n : '0 / 0';
+        matchPrevBtn.disabled = matchNextBtn.disabled = !n;
+        matchPrevBtn.setAttribute('aria-disabled', n ? 'false' : 'true');
+        matchNextBtn.setAttribute('aria-disabled', n ? 'false' : 'true');
+        for (var i = 0; i < n; i++) nodes[i].classList.toggle('is-active-match', i === matchIndex);
+        if (scroll && n) nodes[matchIndex].scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+
+      /* 이전/다음 매치로 이동(랩어라운드). 재렌더 없이 클래스만 옮긴다. */
+      function gotoMatch(delta) {
+        var nodes = matchNodes();
+        if (!nodes.length) return;   /* 0 매치에서 Enter 를 눌러도 안전해야 한다 */
+        matchIndex = (matchIndex + delta + nodes.length) % nodes.length;
+        syncMatches(true);
+      }
+
       function renderTranscriptTab() {
         if (!segmentsState.length) {
           transcriptListEl.innerHTML = emptyStateHtml('전사 내용이 없습니다', '이 회의에는 아직 전사된 발화가 없습니다.');
           transcriptCountEl.textContent = '';
+          if (matchNavEl) matchNavEl.style.display = 'none';
           return;
         }
-        transcriptListEl.innerHTML = segmentsState.map(function (s) { return segmentRowHtml(s, ''); }).join('');
+        /* 검색 중에도 전체 세그먼트를 유지하고 매치만 인플레이스 하이라이트(클로바식). */
+        transcriptListEl.innerHTML = segmentsState.map(function (s) { return segmentRowHtml(s, transcriptQuery); }).join('');
         transcriptCountEl.textContent = segmentsState.length + '개 발화';
         restoreHighlight();
+        syncMatches(false);
       }
 
       function applyTranscriptSearch() {
         var q = (transcriptSearchInput.value || '').trim().toLowerCase();
+        var changed = q !== transcriptQuery;
         transcriptQuery = q;
         if (!segmentsState.length) return;
-        if (!q) { renderTranscriptTab(); return; }
-        var filtered = segmentsState.filter(function (seg) {
-          var name = (seg.speaker_name || seg.speaker_label || '').toLowerCase();
-          var text = ((seg.corrected_text || seg.text) || '').toLowerCase();
-          return name.indexOf(q) !== -1 || text.indexOf(q) !== -1;
-        });
-        transcriptListEl.innerHTML = filtered.length
-          ? filtered.map(function (s) { return segmentRowHtml(s, q); }).join('')
-          : emptyStateHtml('', '검색 결과가 없습니다.');
-        transcriptCountEl.textContent = filtered.length + ' / ' + segmentsState.length + '개 발화';
-        restoreHighlight();
+        renderTranscriptTab();
+        /* 쿼리가 바뀐 경우에만 첫 매치로 이동+스크롤. 편집·북마크發 재렌더는
+           renderTranscriptTab 안의 syncMatches(false) 가 인덱스를 보존한다. */
+        if (changed) { matchIndex = 0; syncMatches(true); }
       }
-      transcriptSearchInput.addEventListener('input', debounce(applyTranscriptSearch, 200));
+      var debouncedTranscriptSearch = debounce(applyTranscriptSearch, 200);
+      transcriptSearchInput.addEventListener('input', debouncedTranscriptSearch);
+      transcriptSearchInput.addEventListener('keydown', function (e) {
+        /* 한글 조합 확정 Enter 는 무시한다. */
+        if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
+        e.preventDefault();
+        debouncedTranscriptSearch.cancel();
+        /* 200ms 디바운스가 아직 안 돈 상태면 먼저 반영한다(첫 Enter 가 삼켜지지 않게). */
+        if ((transcriptSearchInput.value || '').trim().toLowerCase() !== transcriptQuery) {
+          applyTranscriptSearch();
+          return;
+        }
+        gotoMatch(e.shiftKey ? -1 : 1);
+      });
+      matchPrevBtn.addEventListener('click', function () { gotoMatch(-1); });
+      matchNextBtn.addEventListener('click', function () { gotoMatch(1); });
 
       function toggleEditArea(row, show) {
         if (!row) return;
