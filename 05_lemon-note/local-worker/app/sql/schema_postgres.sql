@@ -17,8 +17,12 @@ create table if not exists profiles (
   id uuid primary key default gen_random_uuid(),
   email text,
   display_name text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  settings jsonb
 );
+-- 기존 DB 수렴용: create table if not exists 는 '이미 있는' 테이블에 컬럼을 붙이지 않는다.
+-- 이 줄이 있어야 이 파일을 통째로 재적용해도 최신 스키마가 된다.
+alter table profiles add column if not exists settings jsonb;
 
 create table if not exists folders (
   id uuid primary key default gen_random_uuid(),
