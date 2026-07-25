@@ -236,6 +236,21 @@ CREATE INDEX IF NOT EXISTS transcript_highlights_segment_idx ON transcript_highl
 CREATE INDEX IF NOT EXISTS exports_meeting_idx ON exports(meeting_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS share_logs_meeting_idx ON share_logs(meeting_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS audit_logs_meeting_idx ON audit_logs(meeting_id, created_at DESC);
+
+/* 알림(서브프로젝트 F) — 인박스 본문은 audit_logs 에서 파생하고, 여기엔 항목별 상태만 둔다.
+   audit_id 에 FK 를 걸지 않는다: _purge_meeting 이 audit_logs 를 지울 때 삭제 순서 제약이
+   생기고, 그게 C1 에서 프로덕션 500 을 낼 뻔한 함정이다. 대신 purge 가 명시적으로 정리한다. */
+CREATE TABLE IF NOT EXISTS notification_states (
+  user_id TEXT NOT NULL,
+  audit_id TEXT NOT NULL,
+  read_at TEXT,
+  dismissed_at TEXT,
+  PRIMARY KEY (user_id, audit_id)
+);
+
+/* 인박스는 user_id 로 거르는데 audit_logs 에는 meeting_id 인덱스뿐이었다. */
+CREATE INDEX IF NOT EXISTS audit_logs_user_idx ON audit_logs(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS notif_states_user_idx ON notification_states(user_id, read_at);
 """
 
 

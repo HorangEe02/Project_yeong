@@ -666,6 +666,11 @@ def _purge_meeting(conn, meeting_id):
     for sv in svs:
         for tbl in ("summary_sections", "summary_decisions", "action_items", "calendar_candidates"):
             conn.execute(f"DELETE FROM {tbl} WHERE summary_version_id=?", (sv["id"],))
+    # 알림 상태(F): audit_id 로만 연결돼 있어 audit_logs 를 지우기 전에 정리해야 한다.
+    # 순서가 뒤집히면 서브쿼리가 아무것도 못 찾아 고아 행이 영구히 남는다.
+    conn.execute(
+        "DELETE FROM notification_states WHERE audit_id IN "
+        "(SELECT id FROM audit_logs WHERE meeting_id=?)", (meeting_id,))
     # meetings 의 직속 자식 전부
     # summary_versions 는 exports·share_logs 가 summary_version_id 로 참조하고(둘 다 no-cascade)
     # Postgres 는 즉시 FK 검사를 하므로 그 둘보다 뒤에 지운다(순서 어기면 프로덕션 500).
@@ -1423,6 +1428,12 @@ def read_shared(token: str, password: Optional[str] = Header(default=None, alias
         conn.execute("UPDATE share_links SET access_count=access_count+1, last_accessed_at=?, "
                      "failed_attempts=0 WHERE id=?", (db.now_iso(), share["id"]))
         conn.commit()
+        try:
+            # 알림용 — '내 공유 링크가 열렸다'. 공개 라우트라 기록 실패가 열람을 막으면 안 된다.
+            db.audit(conn, m["user_id"], share["meeting_id"], "share_accessed",
+                     {"access_count": (share["access_count"] or 0) + 1})
+        except Exception:  # noqa: BLE001
+            pass
         out = {"title": m["title"], "recorded_at": m["recorded_at"],
                "duration_ms": m["duration_ms"], "status": m["status"],
                "expires_at": share["expires_at"]}
@@ -1544,6 +1555,33 @@ def _clean_terms(raw, field: str, max_items: int, allow_comma: bool = True) -> l
     return out
 
 
+_NOTIFY_KEYS = ("summary", "failure", "share", "export")
+
+
+def _validate_notify(value) -> dict:
+    """알림 토글 — boolean 4개만. 2KB 설정 예산을 E 키와 공유하므로 중첩 1단으로 제한한다."""
+    if not isinstance(value, dict):
+        raise HTTPException(status_code=422, detail={"error": {
+            "code": "invalid_settings", "message": "알림 설정은 객체여야 합니다."}})
+    out = {}
+    for k, v in value.items():
+        if k not in _NOTIFY_KEYS:
+            raise HTTPException(status_code=422, detail={"error": {
+                "code": "invalid_settings", "message": f"알 수 없는 알림 항목입니다: {k}"}})
+        if not isinstance(v, bool):
+            raise HTTPException(status_code=422, detail={"error": {
+                "code": "invalid_settings", "message": f"{k} 는 true/false 여야 합니다."}})
+        out[k] = v
+    return out
+
+
+def _notify_prefs(settings: dict) -> dict:
+    """실효 토글값. 키가 없으면 켜짐으로 본다 — 기존 사용자에게 알림이 조용히 사라지면 안 된다."""
+    raw = (settings or {}).get("notify")
+    raw = raw if isinstance(raw, dict) else {}
+    return {k: bool(raw.get(k, True)) for k in _NOTIFY_KEYS}
+
+
 def _validate_settings(patch: dict) -> dict:
     """요청에 들어온 키만 검증한다. 저장된 blob 은 재검증하지 않는다 —
     F(알림)가 나중에 넣을 키를 E 시절 코드가 지우면 안 된다.
@@ -1559,6 +1597,8 @@ def _validate_settings(patch: dict) -> dict:
             out["hotwords"] = _clean_terms(value, "자주 쓰는 단어", _MAX_HOTWORDS, allow_comma=False)
         elif key == "interests":
             out["interests"] = _clean_terms(value, "관심 분야", _MAX_INTERESTS)
+        elif key == "notify":
+            out["notify"] = _validate_notify(value)
         else:
             # 무음 드롭 대신 명시적으로 거부한다(오타를 조용히 삼키지 않게).
             raise HTTPException(status_code=422, detail={"error": {
@@ -1669,6 +1709,146 @@ def get_usage():
             "storage": {"files": storage["n"], "bytes": storage["s"]},
             "this_month": {"count": this_month["n"], "duration_ms": this_month["s"]},
         }
+    finally:
+        conn.close()
+
+
+# --- 알림 인박스 (서브프로젝트 F1) ---
+# 본문은 audit_logs 에서 파생한다(중복 저장 없음). 항목별 읽음/숨김만 notification_states 에.
+# event_type -> (탭 카테고리, 표시 문구, 토글 키). 자기가 방금 한 행동
+# (meeting_created·meeting_deleted·summary_edited)은 알림으로선 소음이라 넣지 않는다.
+_NOTIF_KINDS = {
+    "transcription_completed": ("info", "전사가 끝났어요", "summary"),
+    "summary_created": ("info", "요약이 만들어졌어요", "summary"),
+    "pipeline_failed": ("info", "처리에 실패했어요", "failure"),
+    "share_link_created": ("notice", "공유 링크를 만들었어요", "share"),
+    "share_accessed": ("notice", "공유 링크가 열렸어요", "share"),
+    "shared_slack": ("notice", "Slack 으로 보냈어요", "share"),
+    "export_created": ("notice", "내보내기가 준비됐어요", "export"),
+}
+
+
+def _notif_kinds(tab: str, prefs: dict) -> list:
+    """탭 ∩ 켜진 토글. 빈 리스트면 호출측이 SQL 을 아예 타지 않아야 한다 —
+    postgres 는 `IN ()` 가 문법 오류다(sqlite 는 통과해서 로컬로는 안 잡힌다).
+    """
+    return [k for k, (cat, _label, toggle) in _NOTIF_KINDS.items()
+            if (tab in ("", "all") or cat == tab) and prefs.get(toggle, True)]
+
+
+def _notif_where(kinds: list) -> str:
+    marks = ",".join(["?"] * len(kinds))
+    return (" FROM audit_logs a "
+            " LEFT JOIN notification_states n ON n.audit_id=a.id AND n.user_id=? "
+            " JOIN meetings m ON m.id=a.meeting_id "
+            " WHERE a.user_id=? AND m.deleted_at IS NULL AND n.dismissed_at IS NULL "
+            f" AND a.event_type IN ({marks})")
+
+
+@app.get(P + "/notifications")
+def list_notifications(tab: str = "all", limit: int = 20, cursor: Optional[str] = None):
+    user_id = config.DEFAULT_USER_ID
+    limit = max(1, min(int(limit or 20), 100))
+    try:
+        offset = max(0, int(cursor)) if cursor else 0
+    except (TypeError, ValueError):
+        offset = 0
+    conn = db.connect()
+    try:
+        _row, settings = _read_profile(conn, user_id)
+        prefs = _notify_prefs(settings)
+        # 안읽음 배지는 탭과 무관하게 '켜진 것 전체' 기준이되, 목록과 같은 필터를 쓴다.
+        all_kinds = _notif_kinds("all", prefs)
+        kinds = _notif_kinds(tab, prefs)
+
+        unread = 0
+        if all_kinds:
+            unread = conn.execute(
+                "SELECT COUNT(*) AS n" + _notif_where(all_kinds) + " AND n.read_at IS NULL",
+                [user_id, user_id] + all_kinds).fetchone()["n"]
+        if not kinds:
+            # 토글을 끈 탓에 교집합이 빌 수 있다(예: info 탭인데 summary·failure 가 꺼짐).
+            return {"items": [], "next_cursor": None, "unread_count": unread, "notify": prefs}
+
+        rows = conn.execute(
+            "SELECT a.id AS id, a.event_type AS event_type, a.meeting_id AS meeting_id, "
+            "a.created_at AS created_at, m.title AS title, n.read_at AS read_at" +
+            _notif_where(kinds) + " ORDER BY a.created_at DESC LIMIT ? OFFSET ?",
+            [user_id, user_id] + kinds + [limit + 1, offset]).fetchall()
+        has_more = len(rows) > limit
+        rows = rows[:limit]
+        items = []
+        for r in rows:
+            cat, label, _toggle = _NOTIF_KINDS[r["event_type"]]
+            items.append({
+                "id": r["id"], "kind": r["event_type"], "category": cat, "label": label,
+                "title": r["title"], "meeting_id": r["meeting_id"],
+                "created_at": r["created_at"], "read": r["read_at"] is not None,
+            })
+        return {"items": items,
+                "next_cursor": str(offset + limit) if has_more else None,
+                "unread_count": unread, "notify": prefs}
+    finally:
+        conn.close()
+
+
+def _own_audit(conn, audit_id: str, user_id: str):
+    """본인 이벤트인지 확인. postgres 는 audit_logs.id 가 uuid 라 형식이 틀리면 예외가 나는데
+    (sqlite 는 타입이 없어 조용히 0행) 그걸 500 으로 흘리지 않고 404 로 만든다."""
+    try:
+        return conn.execute("SELECT 1 FROM audit_logs WHERE id=? AND user_id=?",
+                            (audit_id, user_id)).fetchone()
+    except Exception:  # noqa: BLE001
+        return None
+
+
+@app.patch(P + "/notifications/{audit_id}")
+def patch_notification(audit_id: str, body: dict = Body(...),
+                       user_id: str = Depends(require_user)):
+    if not isinstance(body, dict):
+        return _err(422, "invalid_body", "요청 본문이 올바르지 않습니다.")
+    read = bool(body.get("read"))
+    dismissed = bool(body.get("dismissed"))
+    if not read and not dismissed:
+        return _err(422, "invalid_body", "read 또는 dismissed 가 필요합니다.")
+    conn = db.connect()
+    try:
+        if _own_audit(conn, audit_id, user_id) is None:
+            return _err(404, "notification_not_found", "알림을 찾을 수 없습니다.")
+        now = db.now_iso()
+        conn.execute(
+            "INSERT INTO notification_states (user_id,audit_id,read_at,dismissed_at) "
+            "VALUES (?,?,?,?) ON CONFLICT (user_id,audit_id) DO UPDATE SET "
+            "read_at=COALESCE(excluded.read_at, notification_states.read_at), "
+            "dismissed_at=COALESCE(excluded.dismissed_at, notification_states.dismissed_at)",
+            (user_id, audit_id, now if read else None, now if dismissed else None))
+        conn.commit()
+        return {"ok": True}
+    finally:
+        conn.close()
+
+
+@app.post(P + "/notifications/read-all")
+def read_all_notifications(user_id: str = Depends(require_user)):
+    conn = db.connect()
+    try:
+        _row, settings = _read_profile(conn, user_id)
+        kinds = _notif_kinds("all", prefs=_notify_prefs(settings))
+        if not kinds:
+            return {"marked": 0}
+        rows = conn.execute(
+            "SELECT a.id AS id" + _notif_where(kinds) +
+            " AND n.read_at IS NULL ORDER BY a.created_at DESC LIMIT 100",
+            [user_id, user_id] + kinds).fetchall()
+        now = db.now_iso()
+        for r in rows:
+            conn.execute(
+                "INSERT INTO notification_states (user_id,audit_id,read_at) VALUES (?,?,?) "
+                "ON CONFLICT (user_id,audit_id) DO UPDATE SET "
+                "read_at=COALESCE(excluded.read_at, notification_states.read_at)",
+                (user_id, r["id"], now))
+        conn.commit()
+        return {"marked": len(rows)}
     finally:
         conn.close()
 
