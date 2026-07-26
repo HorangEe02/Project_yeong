@@ -336,13 +336,15 @@ def store_summary_version(conn, meeting_id, result, source, created_by=None,
                           raw_model_output=None):
     """summary_versions + 자식(decisions/action_items/calendar_candidates)을 새 버전으로 저장.
 
-    version은 (meeting_id) 기준 max+1 로 원자적으로 채번한다.
+    version 은 (meeting_id) 기준 max+1 로 채번한다. 채번과 INSERT 를 **한 문장**
+    (INSERT ... SELECT)으로 묶어 파이썬 레벨의 읽고-쓰기 창을 없앤다. 예전처럼
+    SELECT MAX+1 을 따로 하면 동시 저장이 같은 번호를 받아 한쪽이 UNIQUE 위반으로
+    터졌다(그리고 Postgres 에서는 그 예외가 트랜잭션을 aborted 로 만들어 호출측
+    파이프라인의 실패 기록까지 삼켰다).
+
+    잔여 창: 커밋 전인 동시 INSERT 는 서로의 MAX 를 못 보므로 같은 번호를 계산할 수
+    있다. 그때는 UNIQUE(meeting_id, version) 가 예외로 잡는다 — 조용한 유실은 없다.
     """
-    row = conn.execute(
-        "SELECT COALESCE(MAX(version),0)+1 AS v FROM summary_versions WHERE meeting_id=?",
-        (meeting_id,),
-    ).fetchone()
-    version = row["v"]
     sv_id = new_id("summary_")
     now = now_iso()
     # NOT NULL 텍스트 컬럼은 None→"" 로 방어 (LLM이 null 필드를 반환해도 저장 실패 금지)
@@ -351,11 +353,15 @@ def store_summary_version(conn, meeting_id, result, source, created_by=None,
     conn.execute(
         """INSERT INTO summary_versions
            (id,meeting_id,version,source,title,summary,raw_json,raw_model_output,created_by,created_at)
-           VALUES (?,?,?,?,?,?,?,?,?,?)""",
-        (sv_id, meeting_id, version, source, s(result.get("title")),
+           SELECT ?,?,COALESCE(MAX(version),0)+1,?,?,?,?,?,?,?
+             FROM summary_versions WHERE meeting_id=?""",
+        (sv_id, meeting_id, source, s(result.get("title")),
          s(result.get("summary")), database.enc_json(result),
-         raw_model_output, created_by, now),
+         raw_model_output, created_by, now, meeting_id),
     )
+    # 채번 결과는 되읽어 확인한다(호출측이 응답에 버전 번호를 쓴다).
+    version = conn.execute(
+        "SELECT version FROM summary_versions WHERE id=?", (sv_id,)).fetchone()["version"]
     for i, sec in enumerate(result.get("sections", []) or []):
         conn.execute(
             """INSERT INTO summary_sections

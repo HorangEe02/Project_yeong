@@ -123,5 +123,12 @@ class _PgConn:
     def commit(self):
         self._c.commit()
 
+    def rollback(self):
+        """오류 후 트랜잭션 복구용. Postgres 는 문장 하나가 실패하면 트랜잭션이
+        aborted 로 바뀌어 이후 모든 execute 가 InFailedSqlTransaction 으로 죽는다.
+        롤백 없이는 except 절에서 실패를 기록하려는 시도 자체가 실패해 조용히 사라진다
+        (sqlite3.Connection 에는 원래 있는 메서드라 상위 코드가 백엔드를 구분하지 않는다)."""
+        self._c.rollback()
+
     def close(self):
         self._c.close()
