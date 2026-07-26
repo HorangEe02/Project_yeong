@@ -178,6 +178,42 @@
     return debounced;
   }
 
+  /* 요청 순서 토큰. 같은 뷰에서 조회가 여러 번 겹칠 때(빠른 검색 입력·탭 전환·정렬 변경)
+     늦게 도착한 옛 응답이 최신 화면을 덮어쓰는 것을 막는다.
+     사용법: var my = seq.next(); ... .then(function(){ if (!seq.isCurrent(my)) return; ... })
+     라우트 이탈용 `cancelled` 플래그와는 층이 다르다 — 저건 뷰 밖으로 나갈 때,
+     이건 같은 뷰 안에서 조회끼리 경주할 때 쓴다. */
+  function seqGuard() {
+    var cur = 0;
+    return {
+      next: function () { cur += 1; return cur; },
+      isCurrent: function (t) { return t === cur; }
+    };
+  }
+
+  /* 같은 동작의 중복 발사를 막는다(버튼 연타 → 요청 2번). fn 이 promise 를 돌려주면
+     그게 끝날 때까지 잠근다. 잠겨 있으면 false 를 돌려주고 fn 을 호출하지 않는다. */
+  function inFlightLock() {
+    var busy = false;
+    return function (fn) {
+      if (busy) return false;
+      busy = true;
+      var p;
+      try {
+        p = fn();
+      } catch (e) {
+        busy = false;
+        throw e;
+      }
+      if (p && typeof p.then === 'function') {
+        p.then(function () { busy = false; }, function () { busy = false; });
+      } else {
+        busy = false;
+      }
+      return true;
+    };
+  }
+
   function colorFromString(str) {
     var s = String(str || '');
     var h = 0;
@@ -791,6 +827,7 @@
     var RECENT_MAX = 5;
     var lastQuery = '';   // 검색 결과 스니펫의 강조에 쓴다(itemHtml 이 fetchList 보다 먼저 정의돼 있어 별도 보관)
     var activeId = null;
+    var listSeq = seqGuard();   // 겹친 조회의 응답 역전 방지(fetchList)
 
     var STATUS_FILTER_OPTIONS = [
       ['', '전체 상태'],
@@ -898,12 +935,21 @@
         limit: 20,
         cursor: reset ? '' : (nextCursor || '')
       };
+      /* 순서 토큰: 빠르게 타이핑하거나 필터를 연달아 바꾸면 조회가 겹치고, 늦게 도착한
+         옛 응답이 items 를 통째로 덮어써 화면이 검색어와 어긋난 상태로 남는다.
+         '더 보기' 연타의 중복 삽입(같은 커서로 두 번 concat)도 이 가드가 막는다. */
+      var my = listSeq.next();
+      if (loadMoreBtn) loadMoreBtn.disabled = true;
       API.listMeetings(params).then(function (res) {
+        if (!listSeq.isCurrent(my)) return;   /* 더 새 조회가 이미 떠났다 */
+        if (loadMoreBtn) loadMoreBtn.disabled = false;
         items = reset ? (res.items || []) : items.concat(res.items || []);
         nextCursor = res.next_cursor || null;
         loadMoreWrap.style.display = nextCursor ? '' : 'none';
         renderItems(false);
       }).catch(function (err) {
+        if (!listSeq.isCurrent(my)) return;
+        if (loadMoreBtn) loadMoreBtn.disabled = false;
         scrollEl.innerHTML = emptyStateHtml('회의 목록을 불러오지 못했습니다', err.message || '');
         toast(err.message || '회의 목록을 불러오지 못했습니다.', 'error');
       });
@@ -971,6 +1017,12 @@
             if (!ok) return;
             API.deleteMeeting(id).then(function () {
               items = items.filter(function (it) { return it.meeting_id !== id; });
+              /* next_cursor 는 서버가 주는 offset 이다(str(offset+limit)). 목록에서 한 건을
+                 지우면 다음 페이지가 한 칸 밀려 한 건을 건너뛰므로 로컬에서 보정한다. */
+              if (nextCursor) {
+                var n = parseInt(nextCursor, 10);
+                if (!isNaN(n)) nextCursor = String(Math.max(0, n - 1));
+              }
               renderItems(false);
               toast('회의가 삭제되었습니다.', 'success');
               if (activeId === id) navigate('#/meetings');
@@ -1136,12 +1188,27 @@
        키가 아예 없는 설정({"language":"ko"} 처럼)도 있으므로 반드시 값 존재를 먼저 본다 —
        무가드로 .join() 하면 이 화면(기본 라우트)의 이벤트 바인딩 전체가 죽는다. */
     var prefillCancelled = false;
+    /* '값이 기본값이다'로는 사용자가 손댔는지 알 수 없다. 언어 기본값이 'ko' 라서,
+       사용자가 일부러 '한국어'를 고른 경우와 건드리지 않은 경우가 구별되지 않는다
+       → 늦게 도착한 settingsReady 가 그 선택을 저장된 언어로 되돌린다.
+       그래서 값이 아니라 '손댔는지'를 따로 기록한다. */
+    var prefillTouched = { lang: false, hotwords: false };
+    if (languageSelect) {
+      languageSelect.addEventListener('change', function () { prefillTouched.lang = true; });
+    }
+    if (hotwordsInput) {
+      hotwordsInput.addEventListener('input', function () { prefillTouched.hotwords = true; });
+    }
     function applySettingsPrefill() {
       if (prefillCancelled) return;
       var hw = userSettings && userSettings.hotwords;
-      if (hw && hw.length && !hotwordsInput.value) hotwordsInput.value = hw.join(', ');
+      if (hw && hw.length && !prefillTouched.hotwords && !hotwordsInput.value) {
+        hotwordsInput.value = hw.join(', ');
+      }
       var lang = userSettings && userSettings.language;
-      if (lang && languageSelect && languageSelect.value === 'ko') languageSelect.value = lang;
+      if (lang && languageSelect && !prefillTouched.lang && languageSelect.value === 'ko') {
+        languageSelect.value = lang;
+      }
     }
     applySettingsPrefill();
     if (settingsReady) settingsReady.then(applySettingsPrefill);
@@ -1179,6 +1246,11 @@
     var resultFile = null;
     var resultMime = null;
     var previewInfo = null; // { url, name, size, durationMs }
+    /* Storage 직접 업로드가 성공한 뒤 POST /jobs 가 실패하면, 오디오 객체는 이미 올라가
+       있는데 DB 행은 하나도 없다(회수 경로도 없는 고아 파일). 그 상태에서 사용자가 업로드를
+       다시 누르면 또 올려서 고아를 하나 더 만든다. 그래서 성공한 업로드를 기억해 두고
+       재시도 때는 /jobs 만 다시 부른다. 새 녹음/새 파일을 고르면 버린다. */
+    var pendingDirect = null;
     var pollTimer = null;
     var pollAttempts = 0;
     var MAX_POLL_ATTEMPTS = 240;
@@ -1370,6 +1442,7 @@
 
     function showPreview(info) {
       previewInfo = info;
+      pendingDirect = null;      // 새 파일이면 앞서 올려둔 객체는 쓸 수 없다
       previewCard.style.display = '';
       previewAudio.src = info.url;
       previewName.textContent = info.name;
@@ -1381,6 +1454,7 @@
       previewCard.style.display = 'none';
       if (previewInfo && previewInfo.url) URL.revokeObjectURL(previewInfo.url);
       previewInfo = null;
+      pendingDirect = null;
     }
 
     function resetAll() {
@@ -1403,6 +1477,8 @@
        presign 이 supported:false 를 주면(로컬 저장소) null 을 돌려 호출측이
        기존 multipart 로 되돌아간다. 실패해도 마찬가지 — 업로드 자체를 막지 않는다. */
     function tryDirectUpload(filePart, fileName) {
+      /* 앞선 시도에서 이미 올려둔 객체가 있으면 그걸 쓴다(재업로드 = 고아 하나 더). */
+      if (pendingDirect) return Promise.resolve(pendingDirect);
       return API.presignUpload(fileName).then(function (pre) {
         if (!pre || !pre.supported) return null;
         if (filePart.size > (pre.max_bytes || Infinity)) {
@@ -1420,7 +1496,8 @@
           xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
               uploadBtn.textContent = '처리 준비 중…';
-              resolve({ storage_path: pre.storage_path, meeting_id: pre.meeting_id });
+              pendingDirect = { storage_path: pre.storage_path, meeting_id: pre.meeting_id };
+              resolve(pendingDirect);
             } else {
               reject(new Error('업로드에 실패했습니다 (' + xhr.status + ').'));
             }
@@ -1472,10 +1549,14 @@
         }
         return API.createJob(fd);
       }).then(function (res) {
+        pendingDirect = null;          // 등록까지 끝났으니 재사용할 것이 없다
         ListColumn.refresh(true);
         startPolling(res.job_id, res.meeting_id);
       }).catch(function (err) {
-        toast(err.message || '업로드에 실패했습니다.', 'error');
+        /* 파일은 이미 올라가 있고 등록만 실패한 경우가 있어, 다시 눌러도 된다고 알린다
+           (재시도는 올려둔 객체를 재사용하므로 업로드가 두 번 일어나지 않는다). */
+        toast((err.message || '업로드에 실패했습니다.') +
+              (pendingDirect ? ' 파일은 보관돼 있으니 다시 눌러 주세요.' : ''), 'error');
         uploadBtn.disabled = false;
         resetBtn.disabled = false;
         uploadBtn.textContent = '업로드';
@@ -1483,6 +1564,11 @@
     }
 
     /* ---- 처리 상태 폴링 & 스테퍼 ---- */
+    /* 라우트를 떠나면 cleanup 이 pollTimer 를 지우지만, 그 순간 이미 날아간 getJob 응답은
+       그대로 도착한다. 그 응답이 ready_for_review 면 toast + navigate 로 **다른 화면에 있는
+       사용자를 강제로 끌고 가고**, 아니면 setTimeout 으로 루프를 되살린다.
+       타이머 취소만으로는 부족해서 응답 자체를 무시할 플래그가 필요하다. */
+    var viewGone = false;
     function startPolling(jobId, meetingId) {
       formWrap.style.display = 'none';
       stepperWrap.style.display = '';
@@ -1492,6 +1578,7 @@
       function poll() {
         pollAttempts++;
         API.getJob(jobId).then(function (job) {
+          if (viewGone) return;
           renderStepper(job);
           if (job.status === 'ready_for_review') {
             ListColumn.refresh(true);
@@ -1507,6 +1594,7 @@
           if (pollAttempts >= MAX_POLL_ATTEMPTS) { renderStepperTimeout(); return; }
           pollTimer = setTimeout(poll, 1500);
         }).catch(function () {
+          if (viewGone) return;
           if (pollAttempts >= MAX_POLL_ATTEMPTS) { renderStepperTimeout(); return; }
           pollTimer = setTimeout(poll, 2000);
         });
@@ -1592,6 +1680,7 @@
     return function cleanup() {
       prefillCancelled = true;   // 늦게 도착한 설정이 사라진 폼에 쓰지 않게
       recordingActive = false;   // 이 뷰를 떠나면 확인 대상도 사라진다
+      viewGone = true;           // in-flight 폴링 응답이 강제 이동시키지 못하게
       if (pollTimer) clearTimeout(pollTimer);
       if (timerRaf) cancelAnimationFrame(timerRaf);
       teardownLevelMeter();
@@ -1830,6 +1919,7 @@
     var notify = {};
     var unread = 0;
     var nextCursor = null;
+    var loadSeq = seqGuard();   // 탭 전환 시 응답 역전 방지
 
     load();
 
@@ -1837,8 +1927,11 @@
       var append = !!cursor;
       if (!append) centerEl.innerHTML = '<div class="col-center-scroll"><div class="notif-page view-fade">' +
         '<div class="list-empty"><p>불러오는 중…</p></div></div></div>';
+      /* 탭을 빠르게 바꾸면 조회가 겹친다. 순서 토큰이 없으면 옛 탭의 응답이 늦게 도착해
+         현재 탭 머리글 아래에 다른 탭의 목록이 그려진다(tab 은 클로저 변수라 최신 값). */
+      var my = loadSeq.next();
       API.listNotifications({ tab: tab, limit: 20, cursor: cursor || undefined }).then(function (res) {
-        if (cancelled) return;
+        if (cancelled || !loadSeq.isCurrent(my)) return;
         items = append ? items.concat(res.items || []) : (res.items || []);
         notify = res.notify || {};
         unread = res.unread_count || 0;
@@ -1846,7 +1939,7 @@
         setBadge(unread);
         paint();
       }).catch(function (err) {
-        if (cancelled) return;
+        if (cancelled || !loadSeq.isCurrent(my)) return;
         centerEl.innerHTML = '<div class="col-center-scroll"><div class="notif-page view-fade">' +
           emptyStateHtml('알림을 불러오지 못했습니다', err.message || '') + '</div></div>';
       });
@@ -2223,19 +2316,32 @@
       var btn = centerEl.querySelector('[data-action="mp-save"]');
       saving = true;
       if (btn) { btn.disabled = true; btn.setAttribute('aria-busy', 'true'); }
+      /* 저장 중에도 사용자는 계속 입력할 수 있다(비활성화되는 건 저장 버튼뿐).
+         응답으로 화면을 통째로 덮으면 그 사이 추가한 단어·토글이 조용히 사라지고
+         '저장했습니다' 토스트만 남는다. 그래서 보낼 때의 화면 값을 기억해 두고,
+         응답 시점에도 값이 그대로면(=사용자가 손대지 않았으면) 서버 값으로 갱신한다.
+         손댔으면 사용자 입력을 남기고, 다음 저장의 diff 가 그 변경을 잡는다. */
+      var sentLang = sel ? sel.value : null;
+      var sentHot = hotwords.slice();
+      var sentInt = interests.slice();
+      var sentNotify = curNotify;
       API.patchSettings(body).then(function (res) {
         if (cancelled) return;
         loaded = (res && res.settings) || {};
-        hotwords = (loaded.hotwords || []).slice();
-        interests = (loaded.interests || []).slice();
         userSettings = loaded;          // 새 회의 폼 프리필이 즉시 최신 값을 쓰게 한다
-        repaintChips('hotword');
-        repaintChips('interest');
-        if (sel) sel.value = loaded.language || 'ko';
+        if (hotwords.join(sep) === sentHot.join(sep)) {
+          hotwords = (loaded.hotwords || []).slice();
+          repaintChips('hotword');
+        }
+        if (interests.join(sep) === sentInt.join(sep)) {
+          interests = (loaded.interests || []).slice();
+          repaintChips('interest');
+        }
+        if (sel && sel.value === sentLang) sel.value = loaded.language || 'ko';
         notify = fillNotify(loaded.notify);
         NOTIFY_KEYS.forEach(function (kv) {
           var cb = centerEl.querySelector('#mp-notify-' + kv[0]);
-          if (cb) cb.checked = notify[kv[0]];
+          if (cb && cb.checked === sentNotify[kv[0]]) cb.checked = notify[kv[0]];
         });
         toast('설정을 저장했습니다.', 'success');
       }).catch(function (err) {
@@ -2398,20 +2504,46 @@
     // confirmDialog 패턴: 리스너 정리는 dialog 'close' 이벤트에서. ESC·closeOpenDialogs 의
     // 직접 dlg.close() 도 'close' 를 발생시키므로 리스너 누적/오노트 이동을 막는다.
     var moved = false;
+    var picking = inFlightLock();
+    var teardownDone = false;
+    /* 리스너 정리를 close 이벤트에만 맡기지 않는다. close 는 큐잉되는 비동기 이벤트라
+       일부 셸 환경(Electron 기반 브라우저)에서 발화하지 않고, 그러면 listEl 의 클릭
+       리스너가 남아 다음 번에 폴더를 한 번 눌러도 이동 요청이 두 번 나간다.
+       (confirmDialog 에서 같은 원인으로 Promise 가 영원히 대기하던 것과 같은 문제) */
+    var doneFired = false;
+    function teardown() {
+      if (teardownDone) return;
+      teardownDone = true;
+      listEl.removeEventListener('click', onPick);
+      cancelBtn.removeEventListener('click', onCancel);
+      dlg.removeEventListener('close', onClose);
+    }
+    /* onPick 성공과 onClose 양쪽에서 부를 수 있으니 한 번만 실행되게 잠근다. */
+    function fireDone() {
+      if (doneFired) return;
+      doneFired = true;
+      if (onDone) onDone();
+    }
     function onPick(e) {
       var btn = e.target.closest('[data-folder]');
       if (!btn) return;
       var fid = btn.dataset.folder === '__none__' ? null : btn.dataset.folder;
-      API.moveMeeting(meetingId, { folder_id: fid }).then(function () {
-        moved = true; toast('폴더로 이동했습니다.', 'success'); dlg.close();
-      }).catch(function (err) { toast(err.message || '이동 실패', 'error'); });
+      /* 연타로 다른 폴더를 두 번 고르면 이동 요청 두 개가 경합해 최종 폴더가
+         응답 순서에 좌우된다. 첫 요청이 끝날 때까지 잠근다. */
+      picking(function () {
+        return API.moveMeeting(meetingId, { folder_id: fid }).then(function () {
+          moved = true;
+          toast('폴더로 이동했습니다.', 'success');
+          teardown();
+          dlg.close();
+          fireDone();
+        }).catch(function (err) { toast(err.message || '이동 실패', 'error'); });
+      });
     }
-    function onCancel() { dlg.close(); }
+    function onCancel() { teardown(); dlg.close(); }
     function onClose() {
-      listEl.removeEventListener('click', onPick);
-      cancelBtn.removeEventListener('click', onCancel);
-      dlg.removeEventListener('close', onClose);
-      if (moved && onDone) onDone();
+      teardown();
+      if (moved) fireDone();
     }
     listEl.addEventListener('click', onPick);
     cancelBtn.addEventListener('click', onCancel);
@@ -2425,6 +2557,7 @@
     var cancelled = false;   // 라우트 이탈 시 in-flight 응답/토스트 억제(파일 관례)
     var isTrash = key === 'trash';
     var sort = 'recorded_at', status = '', title = FOLDER_TITLES[key] || '폴더';
+    var loadSeq = seqGuard();   // 정렬/상태 필터를 연달아 바꿀 때 응답 역전 방지
     function folderParam() {
       if (key === 'all') return undefined;      // 전체(폴더 파라미터 없음)
       if (key === 'unfiled') return 'null';
@@ -2435,14 +2568,15 @@
     function load() {
       var scroll = centerEl.querySelector('#fd-scroll');
       if (scroll) scroll.innerHTML = '<div class="folder-loading">불러오는 중…</div>';
+      var my = loadSeq.next();
       API.listMeetings({ folder: folderParam(), sort: sort, status: status, limit: 50 }).then(function (res) {
-        if (cancelled) return;
+        if (cancelled || !loadSeq.isCurrent(my)) return;
         var s = centerEl.querySelector('#fd-scroll');
         if (!s) return;
         if (!res.items.length) { s.innerHTML = '<div class="folder-empty">' + (isTrash ? '휴지통이 비어 있어요.' : '노트가 없어요.') + '</div>'; return; }
         s.innerHTML = res.items.map(function (m) { return renderNoteCard(m, { mode: isTrash ? 'trash' : 'folder' }); }).join('');
       }).catch(function (err) {
-        if (cancelled) return;
+        if (cancelled || !loadSeq.isCurrent(my)) return;
         var s = centerEl.querySelector('#fd-scroll'); if (s) s.innerHTML = '<div class="folder-empty">불러오지 못했습니다.</div>';
         toast(err.message || '불러오지 못했습니다.', 'error');
       });
@@ -2554,6 +2688,7 @@
     var sideMode = { twoSpeaker: false, order: [] };
     var detailClickHandler = null;
     var detailFieldHandler = null;
+    var selectEndHandler = null;   // centerEl 의 mouseup/touchend — cleanup 에서 반드시 떼야 한다
 
     Promise.all([
       API.getMeeting(meetingId),
@@ -2960,6 +3095,7 @@
         lastSelectAt = now;
         handleSelectionGesture(e);
       }
+      selectEndHandler = onSelectEnd;
       centerEl.addEventListener('mouseup', onSelectEnd);
       centerEl.addEventListener('touchend', onSelectEnd);
 
@@ -3042,9 +3178,17 @@
         shareList.innerHTML = html;
       }
 
+      /* 발급 직후 한 번만 보이는 평문 URL. 서버는 해시만 저장하므로 이 문자열을 잃으면
+         링크를 다시 알아낼 방법이 없다. 그런데 폐기 등 다른 이유로 목록을 새로 그리면
+         인자 없이 호출돼 그 URL 이 화면에서 사라졌다 → 기억해 두고 계속 같이 그린다. */
+      var freshShareUrl = null;
+      var shareSeq = seqGuard();
       function refreshShareList(freshUrl) {
+        if (freshUrl) freshShareUrl = freshUrl;
+        var my = shareSeq.next();
         API.listShareLinks(meetingId).then(function (res) {
-          renderShareList((res && res.items) || [], freshUrl);
+          if (!shareSeq.isCurrent(my)) return;   /* 발급·폐기 새로고침이 겹칠 때 역전 방지 */
+          renderShareList((res && res.items) || [], freshShareUrl);
         });
       }
 
@@ -3248,11 +3392,20 @@
         }).catch(function (err) { toast(err.message || '저장에 실패했습니다.', 'error'); });
       }
 
+      /* 세그먼트별 in-flight 잠금. 연타하면 PATCH 두 개가 경합하고, 응답 순서가
+         뒤바뀌면 서버는 켜짐인데 화면은 꺼짐으로 굳는다(응답을 버리므로 보정도 안 된다). */
+      var bmLocks = {};
       function toggleBookmark(seg) {
+        var key = String(seg.segment_id);
+        if (bmLocks[key]) return;
+        bmLocks[key] = true;
         var next = !seg.bookmarked;
         seg.bookmarked = next;
         applyTranscriptSearch();
-        API.updateSegment(meetingId, seg.segment_id, { bookmarked: next }).catch(function (err) {
+        API.updateSegment(meetingId, seg.segment_id, { bookmarked: next }).then(function () {
+          delete bmLocks[key];
+        }, function (err) {
+          delete bmLocks[key];
           seg.bookmarked = !next;
           applyTranscriptSearch();
           toast(err.message || '북마크 저장에 실패했습니다.', 'error');
@@ -3393,8 +3546,10 @@
       }
 
       /* ---- 변경 감지 & 저장 ---- */
+      var dirtyTick = 0;   // markDirty 호출 횟수. 저장 요청이 떠난 뒤 사용자가 또 고쳤는지 본다.
       function markDirty() {
         dirty = true;
+        dirtyTick += 1;   // 저장 중 수정 여부 판정용(아래 saveSummary)
         [summarySaveStatus, todoSaveStatus, calSaveStatus].forEach(function (el) {
           if (!el) return;
           el.classList.add('is-dirty');
@@ -3447,12 +3602,17 @@
           calendar_candidates: summaryState.calendar_candidates
         };
         [saveBtn1, saveBtn2, saveBtn3].forEach(function (b) { if (b) b.disabled = true; });
+        /* 저장 중에도 입력은 막히지 않는다(비활성화되는 건 저장 버튼뿐). 그래서 응답에서
+           무조건 markClean() 하면, 요청이 떠난 뒤 고친 내용은 서버에 없는데 화면은
+           '저장됨' 이 된다 — 사용자가 그대로 나가면 조용히 사라진다.
+           보낼 때의 수정 카운터를 기억해 두고, 그대로일 때만 깨끗하다고 표시한다. */
+        var sentTick = dirtyTick;
         API.updateSummary(meetingId, payload).then(function (res) {
           summaryState.summary_version_id = res.summary_version_id;
           summaryState.version = res.version;
           summaryState.source = res.source;
           updateSummaryVersionChip();
-          markClean();
+          if (dirtyTick === sentTick) markClean();
           ListColumn.refresh(true);
           toast('요약이 저장되었습니다. (v' + res.version + ')', 'success');
         }).catch(function (err) {
@@ -3674,6 +3834,14 @@
       if (detailFieldHandler) {
         rightEl.removeEventListener('input', detailFieldHandler);
         rightEl.removeEventListener('change', detailFieldHandler);
+      }
+      /* 선택 제스처 리스너도 반드시 떼야 한다. centerEl 은 라우트가 바뀌어도 살아있는
+         영속 요소(innerHTML 만 갈린다)라, 안 떼면 상세를 N번 방문하면 리스너가 N쌍 붙고
+         한 번 드래그에 하이라이트 POST 가 N번 나간다. 각 클로저가 자기 lastSelectAt 을
+         갖기 때문에 350ms 잠금으로는 막히지 않는다. */
+      if (selectEndHandler) {
+        centerEl.removeEventListener('mouseup', selectEndHandler);
+        centerEl.removeEventListener('touchend', selectEndHandler);
       }
     };
   }
