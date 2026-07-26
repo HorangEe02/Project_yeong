@@ -135,6 +135,16 @@ def run_pipeline(job_id: str, meeting_id: str) -> None:
         _set_status(conn, job_id, meeting_id, "ready_for_review", 1.0, None)
     except Exception as e:  # noqa: BLE001
         traceback.print_exc()
+        # 실패 기록 전에 반드시 롤백한다. DB 오류로 여기 들어왔다면 Postgres 트랜잭션이
+        # aborted 상태라, 롤백 없이는 아래 _set_status·db.audit 가 둘 다
+        # InFailedSqlTransaction 으로 죽고 그게 자기 except 에 삼켜진다
+        # → 상태가 중간값에 영구 고착하고 실패 알림도 안 생긴다(실패가 실패를 숨김).
+        # SQLite 에서는 재현되지 않아 로컬 검증으로 잡히지 않았던 결함이다.
+        # 덤으로 커밋 안 된 부분 전사(세그먼트 일부)도 함께 버려진다.
+        try:
+            conn.rollback()
+        except Exception:  # noqa: BLE001 - 롤백 실패가 아래 기록 시도를 막지 않는다
+            pass
         try:
             _set_status(conn, job_id, meeting_id, "failed", 0.0, None,
                         error_code="pipeline_error", error_message=str(e)[:500])

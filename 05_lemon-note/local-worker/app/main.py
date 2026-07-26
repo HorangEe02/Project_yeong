@@ -338,6 +338,25 @@ def retry_job(meeting_id: str, background: BackgroundTasks, body: dict = None):
         ).fetchone()
         if not job:
             return _err(404, "job_not_found", "job을 찾을 수 없습니다.")
+        # 먼저 job 을 원자적으로 '선점'한다. 이 UPDATE 를 아래 삭제보다 앞에 두고
+        # attempts 를 CAS 조건으로 쓰는 것이 핵심이다:
+        #  - attempts=? 는 방금 읽은 값과 비교하는 compare-and-swap 이라, 동시 retry
+        #    두 개 중 하나만 성공한다(먼저 커밋한 쪽이 attempts 를 올려 뒤쪽은 0행).
+        #  - status NOT IN (진행 중) 은 돌고 있는 파이프라인 위에 덮어쓰지 않게 막는다.
+        # 검사-후-사용(if job["status"] == ...)으로 짜면 두 요청이 같은 스냅샷을 보고
+        # 둘 다 통과해, 파이프라인 2개가 같은 회의에 세그먼트를 넣다가
+        # UNIQUE(meeting_id, segment_index) 를 위반한다. jobs_status_check 제약 때문에
+        # 새 상태값을 만들 수는 없어 attempts 를 잠금 토큰으로 쓴다.
+        claimed = conn.execute(
+            "UPDATE jobs SET status='uploaded', progress=0, current_stage=NULL, "
+            "error_code=NULL, error_message=NULL, attempts=attempts+1, updated_at=? "
+            "WHERE id=? AND attempts=? AND status NOT IN "
+            "('normalizing_audio','transcribing','summarizing')",
+            (db.now_iso(), job["id"], job["attempts"]),
+        )
+        if not claimed.rowcount:
+            return _err(409, "job_busy",
+                        "이미 재처리가 진행 중입니다. 끝난 뒤 다시 시도해 주세요.")
         # 재처리를 위해 기존 전사/요약 정리 (데모 단순화)
         conn.execute("DELETE FROM transcript_segments WHERE meeting_id=?", (meeting_id,))
         svs = conn.execute("SELECT id FROM summary_versions WHERE meeting_id=?", (meeting_id,)).fetchall()
@@ -346,11 +365,7 @@ def retry_job(meeting_id: str, background: BackgroundTasks, body: dict = None):
             conn.execute("DELETE FROM action_items WHERE summary_version_id=?", (sv["id"],))
             conn.execute("DELETE FROM calendar_candidates WHERE summary_version_id=?", (sv["id"],))
         conn.execute("DELETE FROM summary_versions WHERE meeting_id=?", (meeting_id,))
-        conn.execute(
-            "UPDATE jobs SET status='uploaded', progress=0, current_stage=NULL, "
-            "error_code=NULL, error_message=NULL, updated_at=? WHERE id=?",
-            (db.now_iso(), job["id"]),
-        )
+        # jobs 상태는 위 선점 UPDATE 가 이미 초기화했다(중복 UPDATE 금지 — 잠금 의미가 흐려진다).
         conn.execute("UPDATE meetings SET status='uploaded', updated_at=? WHERE id=?",
                      (db.now_iso(), meeting_id))
         conn.commit()
@@ -1145,13 +1160,20 @@ def create_export(meeting_id: str, body: ExportIn):
 
         export_id = db.new_id("export_")
         saved = storage.save_export(user_id, meeting_id, export_id, fmt, content)
-        conn.execute(
-            """INSERT INTO exports (id,meeting_id,summary_version_id,format,include_transcript,
-               storage_path,status,created_at) VALUES (?,?,?,?,?,?,?,?)""",
-            (export_id, meeting_id, body.summary_version_id, fmt,
-             database.enc_bool(body.include_transcript), saved["path"], "ready", db.now_iso()),
-        )
-        conn.commit()
+        try:
+            conn.execute(
+                """INSERT INTO exports (id,meeting_id,summary_version_id,format,include_transcript,
+                   storage_path,status,created_at) VALUES (?,?,?,?,?,?,?,?)""",
+                (export_id, meeting_id, body.summary_version_id, fmt,
+                 database.enc_bool(body.include_transcript), saved["path"], "ready", db.now_iso()),
+            )
+            conn.commit()
+        except Exception:  # noqa: BLE001
+            # 행이 안 남으면 이 파일은 어떤 경로로도 회수되지 않는다 —
+            # _purge_meeting 은 exports 행을 뒤져 파일을 지우므로 고아 파일이 영구 잔존한다.
+            # (동시 retry 가 summary_versions 를 지우면 여기서 FK 위반이 난다)
+            storage.delete(saved["path"])
+            raise
         db.audit(conn, user_id, meeting_id, "export_created", {"format": fmt})
         return {"export_id": export_id, "format": fmt, "status": "ready",
                 "download_url": f"{P}/exports/{export_id}/download"}
@@ -1406,11 +1428,23 @@ def _resolve_share(conn, token: str, password: Optional[str]):
     if row["password_hash"]:
         if not password:
             return None, _err(401, "password_required", "비밀번호가 필요합니다.")
+        # 검증 **전에** 시도 슬롯을 조건부 UPDATE 로 확보한다. 위쪽의
+        # failed_attempts >= _SHARE_MAX_FAILS 검사는 이미 잠긴 링크를 값싸게 걷어내는
+        # 빠른 경로일 뿐이고, 그것만으로는 병렬 요청이 전부 같은 스냅샷을 보고
+        # 통과한다(실측: 상한 10 인데 총 23 회 시도가 허용됐다).
+        # 영향 행 수가 0 이면 이미 상한에 도달한 것이다.
+        claimed = conn.execute(
+            "UPDATE share_links SET failed_attempts=failed_attempts+1 "
+            "WHERE id=? AND failed_attempts < ?", (row["id"], _SHARE_MAX_FAILS))
+        conn.commit()
+        if not claimed.rowcount:
+            return None, _err(429, "too_many_attempts",
+                              "비밀번호 시도가 너무 많습니다. 링크 소유자에게 재발급을 요청하세요.")
         if not _verify_password(password, row["password_hash"]):
-            conn.execute("UPDATE share_links SET failed_attempts=failed_attempts+1 WHERE id=?",
-                         (row["id"],))
-            conn.commit()
             return None, _err(401, "invalid_password", "비밀번호가 올바르지 않습니다.")
+        # 맞았으면 방금 선점한 슬롯을 돌려준다(호출측의 리셋과 중복이어도 무해하다).
+        conn.execute("UPDATE share_links SET failed_attempts=0 WHERE id=?", (row["id"],))
+        conn.commit()
     return row, None
 
 
@@ -1639,19 +1673,27 @@ def patch_me_settings(body: dict = Body(...), user_id: str = Depends(require_use
     conn = db.connect()
     try:
         _row, stored = _read_profile(conn, user_id)
-        merged = dict(stored)
-        merged.update(validated)
-        blob = json.dumps(merged, ensure_ascii=False)
-        if len(blob.encode("utf-8")) > _MAX_SETTINGS_BYTES:
+        # 크기 상한은 읽은 값 기준으로 본다. 경합해도 상한 근처에서 오차가 나는 정도라 해가 없다.
+        preview = dict(stored)
+        preview.update(validated)
+        if len(json.dumps(preview, ensure_ascii=False).encode("utf-8")) > _MAX_SETTINGS_BYTES:
             return _err(422, "settings_too_large", "설정이 너무 큽니다.")
+        # 병합을 파이썬이 아니라 DB 가 원자적으로 하게 한다. 예전처럼 읽은 blob 에
+        # 파이썬에서 머지해 통째로 되쓰면(settings = excluded.settings) SELECT~INSERT
+        # 사이에 다른 요청이 저장한 키가 사라진다. 공용 계정(DEFAULT_USER_ID)이라
+        # 동시 저장은 예외 상황이 아니라 기본 상황이다.
+        # 요청에 담긴 키(validated)만 보내고 나머지는 DB 의 현재 값을 유지한다.
+        merge_expr = ("coalesce(profiles.settings, '{}'::jsonb) || excluded.settings"
+                      if database.BACKEND == "postgres"
+                      else "json_patch(coalesce(profiles.settings, '{}'), excluded.settings)")
         try:
             # 프로필 행이 없을 수도 있어(프로덕션 시드는 best-effort) UPSERT 로 넣는다.
             # 단순 UPDATE 면 0 행 갱신인데 200 을 돌려줘 '저장됐다'고 거짓말하게 된다.
             conn.execute(
                 "INSERT INTO profiles (id,email,display_name,created_at,settings) VALUES (?,?,?,?,?) "
-                "ON CONFLICT (id) DO UPDATE SET settings = excluded.settings",
+                f"ON CONFLICT (id) DO UPDATE SET settings = {merge_expr}",
                 (user_id, config.DEFAULT_USER_EMAIL, config.DEFAULT_USER_NAME,
-                 db.now_iso(), database.enc_json(merged)),
+                 db.now_iso(), database.enc_json(validated)),
             )
             conn.commit()
         except Exception as exc:  # noqa: BLE001
@@ -1659,6 +1701,9 @@ def patch_me_settings(body: dict = Body(...), user_id: str = Depends(require_use
                 # 컬럼이 아직 없는 상태 — 읽기는 degrade 하지만 쓰기는 구분 가능한 코드로 알린다.
                 return _err(503, "settings_unavailable", "설정 저장소가 아직 준비되지 않았습니다.")
             raise
+        # 병합을 DB 가 했으니 실제 저장 결과를 되읽어 돌려준다(파이썬 머지 결과를 돌려주면
+        # 다른 요청이 같이 저장한 키가 응답에서 빠져 프런트가 낡은 상태를 붙잡는다).
+        _row2, merged = _read_profile(conn, user_id)
         return {"settings": merged}
     finally:
         conn.close()
