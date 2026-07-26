@@ -68,9 +68,13 @@
       <span>마이</span>
     </a>
   </nav>
-  <a href="#/new" class="tab-fab" aria-label="새 회의 녹음 또는 업로드">
+  <button type="button" class="tab-fab" id="tab-fab" aria-haspopup="menu" aria-expanded="false" aria-controls="fab-menu" aria-label="새 회의">
     <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-  </a>
+  </button>
+  <div class="fab-menu" id="fab-menu" role="menu" aria-labelledby="tab-fab" hidden>
+    <button type="button" class="fab-menu-item" role="menuitem" data-action="tt-fab-record">녹음 시작</button>
+    <button type="button" class="fab-menu-item" role="menuitem" data-action="tt-fab-upload">파일 업로드</button>
+  </div>
 
 </div>
 
