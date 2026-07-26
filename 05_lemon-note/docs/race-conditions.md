@@ -10,15 +10,31 @@
 같은 `user_id` 로 같은 행을 읽고 쓴다. 즉 "동시 사용자 두 명"은 예외 상황이 아니라
 기본 상황이다.
 
-그리고 `WRITE_PROTECTED=1` 이 모든 쓰기를 막지 않는다. `require_write` 가 걸린 라우트만
-401 이고, 다음 라우트에는 인증 의존성이 아예 없다:
+그리고 `WRITE_PROTECTED=1` 이 모든 쓰기를 막지는 않는다. `require_write` 가 걸린 라우트만 401 이다.
+아래 결함은 전부 게이트가 없던 경로를 통해 실제로 도달했다.
 
-- `POST /v1/jobs` (회의 생성 — 데모의 핵심 기능이라 의도된 것)
-- `POST /v1/meetings/{id}/retry` (재처리)
-- `POST /v1/meetings/{id}/exports` (내보내기)
-- `GET /v1/shared/{token}` (공개 열람)
+### 게이트 정리 (완료)
 
-아래 결함은 전부 이 경로들을 통해 실제로 도달한다.
+변경 라우트 26개를 전수 열거해 **게이트 없는 4개**를 찾아 정책에 맞춰 채웠다.
+정책은 `config.py` 에 이미 문서화돼 있던 것을 그대로 따랐다 — *"0 이면 읽기·업로드만 열리고
+수정·삭제는 401"*.
+
+| 라우트 | 이전 | 이후 | 근거 |
+|---|---|---|---|
+| `POST /v1/jobs` | 없음 | `require_user` | 업로드는 정책상 열린 예외. `require_write` 를 달면 **공개 데모에서 회의 생성 자체가 401** 이 되어 앱의 존재 이유가 사라진다 |
+| `POST /v1/uploads/presign` | 없음 | `require_user` | `jobs` 와 한 쌍인 대용량 업로드 경로 — 게이트가 달라지면 경로가 반쪽이 된다 |
+| `POST /v1/meetings/{id}/exports` | 없음 | `require_user` | 회의를 바꾸지 않는 파생 산출물이고 프런트 내보내기 버튼이 프로덕션에서 쓴다 |
+| `POST /v1/meetings/{id}/retry` | 없음 | **`require_write`** | 기존 전사·요약을 **삭제하고** 다시 만드는 파괴적 조작. 프런트는 호출하지 않는다 |
+
+`require_user` 는 `AUTH_ENABLED=false` 인 지금은 통과하지만(데모 동작 불변) 토큰이 설정되면
+인증을 요구하고 사용자 신원도 토큰에서 온다. 즉 지금 당장의 차단이 아니라 **신원 개념을 붙이는**
+변경이다. 실제 차단이 걸린 건 `retry` 하나다.
+
+`GET /v1/shared/{token}` 은 공유 링크의 목적 자체가 공개 열람이라 그대로 둔다(비밀번호 시도
+상한은 아래 3번에서 고쳤다).
+
+실측(`WRITE_PROTECTED=1`): `jobs` 422 `audio_required` · `presign` 201 · `exports` 201 ·
+`retry` **401 `write_disabled`** · (대조군) `DELETE /meetings/{id}`·`PATCH .../summary` 401.
 
 ## 수정한 결함
 
@@ -130,15 +146,13 @@ docker run -d --name lemon-race-pg -e POSTGRES_PASSWORD=postgres \
 CI 회귀 게이트로 그대로 쓸 수 있다.
 
 검사 항목: `abort-swallow`(1번, 두 백엔드 대조) · `retry-lock`(2번) ·
-`share-lockout`(3번) · `settings-merge`(4번) · `smoke`(5·6번 및 정상 경로 회귀).
+`share-lockout`(3번) · `settings-merge`(4번) · `smoke`(5·6번 및 정상 경로 회귀) ·
+`gates`(게이트 정리 — `WRITE_PROTECTED=1` 로 띄워 열려야 할 것과 401 이어야 할 것을 실측).
 
 정리: `docker rm -f lemon-race-pg`
 
 ## 아직 수정하지 않은 것
 
-- **무인증 변경 라우트를 그대로 둘지** 는 제품 결정이 필요하다. `POST /jobs` 는 데모의
-  핵심 기능이라 막을 수 없지만, `retry`·`exports` 가 `WRITE_PROTECTED` 를 우회하는 것이
-  의도인지 확인이 필요하다.
 - `_purge_meeting` / `empty_trash` 가 스토리지 파일을 DB 커밋보다 먼저 지운다 →
   중간 실패 시 파일만 사라진다. `require_write` 라 현재 프로덕션에서는 401 이다.
 - `share_slack` 이 외부 전송을 먼저 하고 기록을 나중에 커밋한다.
