@@ -252,6 +252,22 @@
   }
 
   /* ---- 토스트 ---- */
+  /* 범용 localStorage 헬퍼(서브프로젝트 G). ListColumn 안의 readRecents/writeRecents 는
+     그 IIFE 밖에서 못 쓰므로 별도로 둔다(기존 것은 건드리지 않는다).
+     프라이빗 모드에선 접근 자체가 예외라 전부 try/catch. */
+  function lsGet(key, fallback) {
+    try {
+      var v = window.localStorage.getItem(key);
+      return v === null ? fallback : v;
+    } catch (e) { return fallback; }
+  }
+  function lsSet(key, value) {
+    try { window.localStorage.setItem(key, value); return true; } catch (e) { return false; }
+  }
+  function lsRemove(key) {
+    try { window.localStorage.removeItem(key); } catch (e) { /* noop */ }
+  }
+
   function toast(message, type, opts) {
     type = type || 'info';
     opts = opts || {};
@@ -295,17 +311,26 @@
       okBtn.className = 'btn ' + (danger ? 'btn-danger' : 'btn-primary');
       cancelBtn.textContent = cancelLabel;
 
-      function onOk() { dlg.returnValue = 'ok'; dlg.close(); }
-      function onCancel() { dlg.returnValue = 'cancel'; dlg.close(); }
-      function onClose() {
+      // close 이벤트는 큐잉되는 비동기 이벤트라 일부 환경(Electron 셸 등)에서 누락된다.
+      // 버튼 핸들러에서 직접 확정하고, ESC/기타 경로만 close·cancel 이벤트로 받는다.
+      var settled = false;
+      function finish(ok) {
+        if (settled) return;
+        settled = true;
         okBtn.removeEventListener('click', onOk);
         cancelBtn.removeEventListener('click', onCancel);
         dlg.removeEventListener('close', onClose);
-        resolve(dlg.returnValue === 'ok');
+        dlg.removeEventListener('cancel', onEsc);
+        resolve(ok);
       }
+      function onOk() { dlg.returnValue = 'ok'; dlg.close(); finish(true); }
+      function onCancel() { dlg.returnValue = 'cancel'; dlg.close(); finish(false); }
+      function onEsc() { finish(false); }
+      function onClose() { finish(dlg.returnValue === 'ok'); }
       okBtn.addEventListener('click', onOk);
       cancelBtn.addEventListener('click', onCancel);
       dlg.addEventListener('close', onClose);
+      dlg.addEventListener('cancel', onEsc);
       dlg.returnValue = '';
       dlg.showModal();
     });
@@ -533,7 +558,71 @@
     return { name: 'new' };
   }
 
+  /* 녹음이 진행 중인지(서브프로젝트 G). 라우트를 떠나면 renderNewMeetingView 의 cleanup 이
+     트랙을 정지시켜 녹음이 조용히 사라지므로, 이탈 전에 확인을 받는다. */
+  var recordingActive = false;
+  /* 새 회의 화면에 넘길 의도. parseHash 가 파라미터를 안 받으므로 라우트 스키마를 늘리지 않고
+     모듈 변수로 전달하고 렌더 직후 소비한다. */
+  var pendingComposeIntent = null;
+  var pendingTour = false;
+
+  function closeFabMenu(focusBack) {
+    var menu = document.getElementById('fab-menu');
+    var fab = document.getElementById('tab-fab');
+    if (!menu || menu.hidden) return false;
+    menu.hidden = true;
+    if (fab) {
+      fab.setAttribute('aria-expanded', 'false');
+      if (focusBack) fab.focus();
+    }
+    return true;
+  }
+
+  function initFabMenu() {
+    var fab = document.getElementById('tab-fab');
+    var menu = document.getElementById('fab-menu');
+    if (!fab || !menu) return;
+    fab.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!menu.hidden) { closeFabMenu(true); return; }
+      menu.hidden = false;
+      fab.setAttribute('aria-expanded', 'true');
+      var first = menu.querySelector('.fab-menu-item');
+      if (first) first.focus();
+    });
+    menu.addEventListener('click', function (e) {
+      var item = e.target.closest('[data-action]');
+      if (!item) return;
+      closeFabMenu(false);
+      /* 자동으로 녹음을 시작하거나 파일 선택창을 열지 않는다 — 권한 프롬프트가 뜨고,
+         동의 체크 전에 캡처가 시작되며, hashchange 를 거치며 제스처 창을 벗어난다. */
+      if (item.dataset.action === 'tt-fab-upload') pendingComposeIntent = 'upload';
+      navigate('#/new');
+    });
+    document.addEventListener('click', function (e) {
+      if (menu.hidden) return;
+      if (e.target.closest('#fab-menu') || e.target.closest('#tab-fab')) return;
+      closeFabMenu(false);
+    });
+  }
+
+  function confirmLeaveRecording() {
+    return confirmDialog('녹음이 진행 중입니다. 지금 나가면 녹음이 중단됩니다.',
+                         { title: '녹음 중단', confirmLabel: '나가기', danger: true });
+  }
+
   function navigate(hash) {
+    /* 앵커뿐 아니라 JS 에서 부르는 이동(#lc-compose·#lc-bell·노트 행 등)도 여기를 지난다.
+       특히 같은 해시로 부르면 hashchange 없이 renderRoute 가 바로 돌아 cleanup 이 실행되므로
+       앵커만 가로채는 방식으로는 관측조차 안 된다. */
+    if (recordingActive) {
+      confirmLeaveRecording().then(function (ok) {
+        if (!ok) return;
+        recordingActive = false;
+        navigate(hash);
+      });
+      return;
+    }
     if (location.hash === hash) {
       renderRoute();
     } else {
@@ -582,6 +671,7 @@
     if (route.name === 'new') {
       document.title = '새 회의 — 회의녹음챗';
       currentCleanup = renderNewMeetingView(colCenterEl, colRightContentEl);
+      consumeComposePending(colCenterEl);
     } else if (route.name === 'list') {
       document.title = '홈 — 회의녹음챗';
       renderCenterEmpty(colCenterEl);
@@ -1102,6 +1192,9 @@
 
     function setState(s) {
       recState = s;
+      /* 녹음/일시정지 중에만 이탈 확인을 건다. 정지·대기로 돌아오면 즉시 해제해야
+         이후 내비게이션마다 확인창이 뜨지 않는다. */
+      recordingActive = (s === 'recording' || s === 'paused');
       if (dialEl) {
         dialEl.classList.remove('is-recording', 'is-paused', 'is-stopped');
         if (s === 'recording') dialEl.classList.add('is-recording');
@@ -1498,6 +1591,7 @@
 
     return function cleanup() {
       prefillCancelled = true;   // 늦게 도착한 설정이 사라진 폼에 쓰지 않게
+      recordingActive = false;   // 이 뷰를 떠나면 확인 대상도 사라진다
       if (pollTimer) clearTimeout(pollTimer);
       if (timerRaf) cancelAnimationFrame(timerRaf);
       teardownLevelMeter();
@@ -1507,6 +1601,24 @@
       }
       if (previewInfo && previewInfo.url) URL.revokeObjectURL(previewInfo.url);
     };
+  }
+
+  /* FAB '파일 업로드' 의도와 '튜토리얼 다시 보기' 요청을 렌더가 끝난 뒤에 소비한다.
+     hashchange 가 비동기라 navigate() 직후에 처리하면 아직 이 화면이 없다. */
+  function consumeComposePending(centerEl) {
+    if (pendingComposeIntent === 'upload') {
+      pendingComposeIntent = null;
+      var dz = centerEl.querySelector('#nm-dropzone');
+      if (dz) {
+        dz.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        var fi = centerEl.querySelector('#nm-file-input');
+        if (fi) fi.focus();   // 파일 선택창은 열지 않는다(제스처 창 이탈)
+      }
+    }
+    if (pendingTour) {
+      pendingTour = false;
+      startTour();
+    }
   }
 
 
@@ -1541,6 +1653,137 @@
   /* ==========================================================================
      8. 가운데 + 오른쪽 컬럼: 회의 상세
      ======================================================================= */
+
+  /* ==========================================================================
+     튜토리얼 온보딩 (서브프로젝트 G) — 최초 실행 코치마크
+     ======================================================================= */
+
+  var TOUR_KEY = 'ln.tour-seen';
+  /* 문구 출처는 renderRightTips 의 녹음 팁. 모바일 #/new 에선 우측 팁이 도달 불가라
+     투어가 그 자리를 대신한다(데스크톱은 우측에 이미 같은 내용이 보이므로 띄우지 않는다). */
+  var TOUR_STEPS = [
+    { sel: '#nm-consent', title: '먼저 동의를 확인해요', body: '참석자에게 녹음을 알렸는지 체크하면 녹음을 시작할 수 있어요.' },
+    { sel: '#nm-btn-start', title: '여기서 녹음을 시작해요', body: '녹음이 끝나면 전사와 요약이 자동으로 만들어져요.' },
+    { sel: '#nm-hotwords', title: '힌트 단어를 넣어보세요', body: '제품명·참석자 이름을 미리 적으면 전사 정확도가 올라가요.' },
+    { sel: '#nm-dropzone', title: '이미 있는 파일도 괜찮아요', body: '녹음 파일을 끌어다 놓거나 눌러서 올릴 수 있어요.' }
+  ];
+
+  var tourState = null;   // { i, steps, overlay, onScroll, onKey, prevFocus }
+
+  function tourActive() { return !!tourState; }
+
+  function tourVisible(el) {
+    if (!el) return false;
+    var r = el.getBoundingClientRect();
+    /* 라우트 게이팅으로 숨겨진 요소는 null 이 아니라 0-rect 를 돌려준다. */
+    return r.width > 0 && r.height > 0;
+  }
+
+  function startTour() {
+    if (tourState) return;
+    var steps = TOUR_STEPS.filter(function (s) { return tourVisible(document.querySelector(s.sel)); });
+    if (!steps.length) return;   // MediaRecorder 미지원 등 — 조용히 넘어간다(플래그도 안 쓴다)
+
+    var overlay = document.createElement('div');
+    overlay.className = 'tour-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.innerHTML = '<div class="tour-hole"></div>' +
+      '<div class="tour-bubble">' +
+        '<div class="tour-step mono"></div>' +
+        '<h2 class="tour-title"></h2>' +
+        '<p class="tour-body"></p>' +
+        '<div class="tour-actions">' +
+          '<button type="button" class="btn btn-ghost btn-sm" data-action="tt-skip">건너뛰기</button>' +
+          '<button type="button" class="btn btn-primary btn-sm" data-action="tt-next">다음</button>' +
+        '</div>' +
+      '</div>';
+    document.getElementById('app-shell').appendChild(overlay);
+
+    tourState = { i: 0, steps: steps, overlay: overlay, prevFocus: document.activeElement };
+
+    overlay.addEventListener('click', function (e) {
+      var el = e.target.closest('[data-action]');
+      if (!el) return;
+      if (el.dataset.action === 'tt-skip') endTour(true);
+      else if (el.dataset.action === 'tt-next') nextStep();
+    });
+    tourState.onScroll = function () { positionTour(); };
+    var scroller = document.querySelector('.col-center-scroll');
+    if (scroller) scroller.addEventListener('scroll', tourState.onScroll);
+    window.addEventListener('resize', tourState.onScroll);
+    tourState.scroller = scroller;
+    /* 라우트가 바뀌면 타깃이 사라지므로 종료. 이 경로는 '봤다'로 치지 않는다. */
+    tourState.onHash = function () { endTour(false); };
+    window.addEventListener('hashchange', tourState.onHash);
+
+    paintStep();
+  }
+
+  function paintStep() {
+    if (!tourState) return;
+    var s = tourState.steps[tourState.i];
+    var o = tourState.overlay;
+    o.querySelector('.tour-step').textContent = (tourState.i + 1) + ' / ' + tourState.steps.length;
+    o.querySelector('.tour-title').textContent = s.title;
+    o.querySelector('.tour-body').textContent = s.body;
+    o.querySelector('[data-action="tt-next"]').textContent =
+      tourState.i === tourState.steps.length - 1 ? '시작하기' : '다음';
+    positionTour();
+    var next = o.querySelector('[data-action="tt-next"]');
+    if (next) next.focus();
+  }
+
+  function positionTour() {
+    if (!tourState) return;
+    var s = tourState.steps[tourState.i];
+    var el = document.querySelector(s.sel);
+    if (!el) return;
+    var r = el.getBoundingClientRect();
+    var pad = 6;
+    var hole = tourState.overlay.querySelector('.tour-hole');
+    hole.style.top = (r.top - pad) + 'px';
+    hole.style.left = (r.left - pad) + 'px';
+    hole.style.width = (r.width + pad * 2) + 'px';
+    hole.style.height = (r.height + pad * 2) + 'px';
+    /* 말풍선은 구멍 아래, 화면을 벗어나면 위로. */
+    var bubble = tourState.overlay.querySelector('.tour-bubble');
+    var below = r.bottom + 12;
+    var fitsBelow = below + bubble.offsetHeight < window.innerHeight - 12;
+    bubble.style.top = fitsBelow ? below + 'px' : Math.max(12, r.top - bubble.offsetHeight - 12) + 'px';
+  }
+
+  function nextStep() {
+    if (!tourState) return;
+    if (tourState.i >= tourState.steps.length - 1) { endTour(true); return; }
+    tourState.i += 1;
+    var el = document.querySelector(tourState.steps[tourState.i].sel);
+    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    paintStep();
+  }
+
+  /* seen=true 인 종료(건너뛰기·완료·ESC)만 플래그를 남긴다.
+     라우트 이탈이나 '띄울 스텝이 없음'으로 끝난 경우까지 기록하면
+     MediaRecorder 미지원 사용자가 온보딩을 영영 못 보게 된다. */
+  function endTour(seen) {
+    if (!tourState) return;
+    var st = tourState;
+    tourState = null;
+    if (st.scroller && st.onScroll) st.scroller.removeEventListener('scroll', st.onScroll);
+    if (st.onScroll) window.removeEventListener('resize', st.onScroll);
+    if (st.onHash) window.removeEventListener('hashchange', st.onHash);
+    if (st.overlay && st.overlay.parentNode) st.overlay.parentNode.removeChild(st.overlay);
+    if (seen) lsSet(TOUR_KEY, '1');
+    if (st.prevFocus && st.prevFocus.focus) { try { st.prevFocus.focus(); } catch (e) {} }
+  }
+
+  function maybeStartTour() {
+    if (lsGet(TOUR_KEY, null)) return;
+    /* 데스크톱은 우측 팁(renderRightTips)이 같은 내용을 이미 보여준다 — 중복 오버레이 금지. */
+    if (window.innerWidth > 760) return;
+    var shell = document.getElementById('app-shell');
+    if (!shell || shell.dataset.route !== 'new') return;
+    startTour();
+  }
 
   /* 알림 인박스(서브프로젝트 F2) — 본문은 서버가 audit_logs 에서 파생해 내려준다.
      탭↔토글 매핑은 서버 _NOTIF_KINDS 의 category 열을 미러링한 것 —
@@ -1877,6 +2120,7 @@
           '<h2 class="mypage-h" id="mp-h-notify">알림</h2>' +
           '<p class="mypage-hint">이 데모는 앱 안에서만 알림을 보여줍니다(푸시·이메일 발송 없음).</p>' +
           '<a href="#/notifications" class="folder-row folder-row-link mypage-notif-link">알림함 열기</a>' +
+          '<button type="button" class="folder-row folder-row-link mypage-notif-link" data-action="tt-replay">튜토리얼 다시 보기</button>' +
           NOTIFY_KEYS.map(function (kv) {
             return '<label class="checkbox-row switch-row" for="mp-notify-' + kv[0] + '">' +
               '<span class="checkbox-row-label">' + esc(kv[1]) + '</span>' +
@@ -2010,6 +2254,15 @@
       var el = e.target.closest('[data-action]');
       if (!el || !centerEl.contains(el)) return;
       var action = el.dataset.action;
+      if (action === 'tt-replay') {
+        /* 플래그를 지우고 새 회의 화면으로 간 뒤 렌더가 끝나면 시작한다.
+           navigate 직후에 바로 startTour 하면 타깃이 아직 없고(전 스텝 0-rect 스킵),
+           뒤늦게 도착한 hashchange 가 투어를 종료시킨다. */
+        lsRemove(TOUR_KEY);
+        pendingTour = true;
+        navigate('#/new');
+        return;
+      }
       if (action === 'mp-save') save();
       else if (action === 'mp-add-hotword') addTerm('hotword');
       else if (action === 'mp-add-interest') addTerm('interest');
@@ -3717,7 +3970,30 @@
 
     drawerBackdropEl.addEventListener('click', closeDrawer);
     drawerCloseBtn.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (closeFabMenu(true)) return;   // 메뉴가 열려 있으면 그것만 닫는다
+      /* ESC 는 사용자가 의도적으로 닫은 것이라 '봤다'로 친다(안 그러면 매 로드마다 다시 뜬다).
+         반대로 라우트 이탈이나 '띄울 스텝이 없음'은 기록하지 않는다. */
+      if (tourActive()) { endTour(true); return; }
+      closeDrawer();
+    });
+
+    /* 해시 앵커(탭바·레일·rail-logo·폴더 행·마이 링크 등)는 기본 동작으로 이동하므로
+       navigate() 를 지나지 않는다. 녹음 중일 때만 가로챈다 —
+       평상시엔 즉시 return 해서 다른 위임 핸들러(C2·D·E2·F2)를 방해하지 않는다. */
+    document.addEventListener('click', function (e) {
+      if (!recordingActive) return;
+      var a = e.target.closest && e.target.closest('a[href^="#/"]');
+      if (!a) return;
+      e.preventDefault();
+      var href = a.getAttribute('href');
+      confirmLeaveRecording().then(function (ok) {
+        if (!ok) return;
+        recordingActive = false;
+        navigate(href);
+      });
+    });
 
     /* 사용자 설정을 부팅 시 1회 받아 새 회의 폼 프리필에 쓴다.
        await 하지 않는다 — /v1/me 가 느리거나 실패하면 앱 부팅 전체가 멈춘다.
@@ -3729,8 +4005,10 @@
       userSettings = {};
     });
 
+    initFabMenu();
     ListColumn.init(document.getElementById('col-list'));
     renderRoute();
+    maybeStartTour();   // 최초 실행 코치마크(모바일·#/new·플래그 없음일 때만)
   });
 
   window.addEventListener('hashchange', renderRoute);

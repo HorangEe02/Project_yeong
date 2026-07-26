@@ -1161,6 +1161,8 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
     width: 52px; height: 52px; border-radius: 50%;
     background: var(--brand-600); color: var(--on-brand);
     align-items: center; justify-content: center; text-decoration: none;
+    /* <a> 에서 <button> 으로 바뀌었다(G) — UA 기본 border(2px outset)와 cursor 를 되돌린다. */
+    border: 0; padding: 0; cursor: pointer; appearance: none; -webkit-appearance: none;
     box-shadow: var(--shadow-md);
     transition: transform .1s var(--ease), background-color .15s var(--ease);
   }
@@ -1171,7 +1173,9 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
      new 는 기본 랜딩이라 탭바를 남겨 내비 크롬 유지(스트랜딩 방지) — 현재 화면이 새 회의라 FAB 만 숨긴다. */
   .app-shell[data-route="detail"] .tab-bar { display: none; }
   .app-shell[data-route="new"] .tab-fab,
-  .app-shell[data-route="detail"] .tab-fab { display: none; }
+  .app-shell[data-route="detail"] .tab-fab,
+  .app-shell[data-route="new"] .fab-menu,
+  .app-shell[data-route="detail"] .fab-menu { display: none; }
 
   /* 콘텐츠가 탭바 뒤로 가리지 않게 하단 여백 확보(탭바 표시 라우트: list·folders·me·calendar·new) */
   .list-scroll { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
@@ -1387,3 +1391,48 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 @media (max-width: 760px) {
   .notif-page { padding: 18px 16px 32px; padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
+
+/* ----------------------------------------------------------------------
+   26. 튜토리얼 온보딩 · FAB 메뉴 (서브프로젝트 G)
+   ------------------------------------------------------------------- */
+/* FAB 위로 쌓이는 2액션 메뉴. 데스크톱엔 FAB 자체가 없으므로 모바일 블록에서만 배치한다. */
+.fab-menu { display: none; }
+@media (max-width: 760px) {
+  .fab-menu {
+    display: flex; flex-direction: column; gap: 8px;
+    position: fixed; right: 16px; z-index: 52;
+    bottom: calc(56px + 16px + 52px + 12px + env(safe-area-inset-bottom));
+  }
+  /* ⚠️ 클래스에 display 를 주면 UA 의 [hidden]{display:none} 을 이겨서 항상 열려 보인다. */
+  .fab-menu[hidden] { display: none; }
+}
+.fab-menu-item {
+  padding: 10px 16px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink-900);
+  font-size: 13px; font-weight: 700; box-shadow: var(--shadow-md);
+}
+.fab-menu-item:hover { background: var(--surface-alt); }
+
+/* 코치마크 — 구멍 뚫린 스포트라이트. 탭바(50)·FAB(51) 위, 드로어(60) 아래. */
+/* ⚠️ 이 요소에 transform 애니메이션을 걸지 말 것 — transform 이 걸린 조상은 position:fixed
+   자식의 컨테이닝 블록이 되어 구멍 좌표가 뷰포트 기준이 아니게 된다(viewIn 이 translateY 를 쓴다). */
+.tour-overlay { position: fixed; inset: 0; z-index: 57; }
+.tour-hole {
+  position: fixed; border-radius: var(--radius-md); pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(15, 18, 34, 0.55), 0 0 0 2px var(--brand-600);
+  /* top/left/width/height 에 transition 을 걸지 않는다 — 스크롤을 따라갈 때 구멍이 뒤처져
+     엉뚱한 곳을 비추고, 레이아웃 속성이라 애니메이션 비용도 크다. */
+}
+.tour-bubble {
+  position: fixed; left: 16px; right: 16px; max-width: 420px; margin: 0 auto;
+  animation: viewIn .18s var(--ease-out);
+  background: var(--surface); border-radius: var(--radius-lg); padding: 16px 18px;
+  box-shadow: var(--shadow-lg);
+}
+.tour-step { font-size: 11px; font-weight: 800; color: var(--ink-400); }
+.tour-title { font-size: 15px; font-weight: 800; color: var(--ink-900); margin-top: 4px; }
+.tour-body { font-size: 13px; color: var(--ink-600); line-height: 1.6; margin-top: 6px; }
+.tour-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+.fab-menu-item:focus-visible, .tour-actions .btn:focus-visible,
+.tab-fab:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
