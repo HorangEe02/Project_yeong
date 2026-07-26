@@ -166,10 +166,12 @@ async def create_job(
     recording_consent_confirmed: str = Form("false"),
     # 녹음 중 찍은 북마크(밀리초 배열 JSON). 웹 레코더가 보낸다.
     bookmarks: Optional[str] = Form(None),
+    # 업로드는 WRITE_PROTECTED 의 의도된 예외다(config.py: "읽기·업로드만 열리고
+    # 수정·삭제는 401"). require_write 를 달면 공개 데모에서 회의 생성 자체가 401 이
+    # 되어 앱의 존재 이유가 사라진다. 대신 require_user 로 걸어, 토큰이 설정되면
+    # (AUTH_ENABLED) 인증을 요구하고 사용자 신원도 토큰에서 온다.
+    user_id: str = Depends(require_user),
 ):
-    # 데모: 단일 로컬 사용자 (AUTH_ENABLED 시 별도 인증 레이어로 확장)
-    user_id = config.DEFAULT_USER_ID
-
     limited = _rate_limited()
     if limited:
         return limited
@@ -286,8 +288,11 @@ def _rate_limited():
 
 
 @app.post(P + "/uploads/presign", status_code=201)
-def presign_upload(body: dict):
+def presign_upload(body: dict, user_id: str = Depends(require_user)):
     """브라우저가 Storage 로 직접 올릴 1회용 URL 을 발급한다.
+
+    create_job 과 한 쌍인 업로드 경로라 게이트도 같다(require_user) —
+    require_write 면 대용량 업로드만 401 이 되어 경로가 반쪽이 된다.
 
     Vercel 서버리스는 요청 본문이 4.5MB 로 제한돼, 파일이 API 를 통과하는 구조로는
     2분 남짓 녹음도 못 올린다. 파일은 브라우저 → Storage 로 직행하고 서버는
@@ -327,8 +332,13 @@ def get_job(job_id: str, user_id: str = None):
 
 
 @app.post(P + "/meetings/{meeting_id}/retry")
-def retry_job(meeting_id: str, background: BackgroundTasks, body: dict = None):
-    user_id = config.DEFAULT_USER_ID
+def retry_job(meeting_id: str, background: BackgroundTasks, body: dict = None,
+              user_id: str = Depends(require_write)):
+    """재처리. 기존 전사·요약을 **삭제하고** 다시 만드는 파괴적 조작이라
+    config.py 의 정책("수정·삭제는 401")상 require_write 가 맞다.
+    프런트는 이 엔드포인트를 호출하지 않는다(재시도 버튼은 #/new 로 이동) → UI 영향 없음.
+    무인증으로 열려 있던 동안은 아무나 남의 회의 전사를 지울 수 있었고, 동시 호출로
+    파이프라인 2개를 붙여 상태를 고착시킬 수도 있었다."""
     conn = db.connect()
     try:
         _get_meeting(conn, meeting_id, user_id)
@@ -1142,8 +1152,11 @@ def _segments_for(conn, meeting_id):
 
 
 @app.post(P + "/meetings/{meeting_id}/exports", status_code=201)
-def create_export(meeting_id: str, body: ExportIn):
-    user_id = config.DEFAULT_USER_ID
+def create_export(meeting_id: str, body: ExportIn,
+                  user_id: str = Depends(require_user)):
+    """내보내기 파일 생성. 회의 내용을 바꾸지 않는 파생 산출물이고 프런트의
+    내보내기 버튼(web/app.js)이 프로덕션에서 쓰므로 require_write 는 달 수 없다
+    (401 이면 기능이 죽는다). require_user 로 걸어 토큰 설정 시 인증을 요구한다."""
     conn = db.connect()
     try:
         m = _get_meeting(conn, meeting_id, user_id)

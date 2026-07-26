@@ -87,7 +87,7 @@ def assert_local_url(url: str):
         die(f"비로컬 API 대상을 거부한다: {host!r}")
 
 
-def _env_for(backend: str, dsn: str, workdir: Path) -> dict:
+def _env_for(backend: str, dsn: str, workdir: Path, write_protected: str = "0") -> dict:
     """백엔드별 실행 환경. DATABASE_URL 을 항상 명시해 .env 유입을 차단한다."""
     env = dict(os.environ)
     env["DB_BACKEND"] = backend
@@ -98,7 +98,7 @@ def _env_for(backend: str, dsn: str, workdir: Path) -> dict:
     env["SUMMARY_PROVIDER"] = "stub"
     env["STUB_STAGE_DELAY"] = "0"
     env["SYNC_PIPELINE"] = "1"
-    env["WRITE_PROTECTED"] = "0"
+    env["WRITE_PROTECTED"] = write_protected
     env["HEALTH_DETAIL"] = "1"
     env["MAX_JOBS_PER_HOUR"] = "0"          # 레이트리밋이 재현을 방해하지 않게
     env["PYTHONPATH"] = str(REPO)
@@ -540,6 +540,72 @@ def scenario_smoke(backend: str, dsn: str, workdir: Path) -> dict:
 
 
 # --------------------------------------------------------------------------
+# 시나리오 6: 인증 게이트 (WRITE_PROTECTED=1 프로덕션 구성)
+# --------------------------------------------------------------------------
+
+def scenario_gates(backend: str, dsn: str, workdir: Path) -> dict:
+    """프로덕션과 같은 WRITE_PROTECTED=1 로 띄워 게이트를 실측한다.
+
+    정책(config.py): "읽기·업로드만 열리고 수정·삭제는 401".
+      업로드 계열(jobs·presign)과 파생 산출물(exports)은 **열려 있어야** 하고,
+      파괴적 재처리(retry)와 수정·삭제는 **401** 이어야 한다.
+    """
+    import httpx
+    config, database, db, pipeline = _load_app(backend, dsn, workdir)
+    mid, jid = _seed_meeting(config, database, db, title="게이트 확인용")
+    pipeline.run_pipeline(jid, mid)          # 내보내기에 요약이 필요하다
+
+    env = _env_for(backend, dsn, workdir, write_protected="1")
+    port = _free_port()
+    proc, base = _start_server(env, port)
+    assert_local_url(base)
+    try:
+        def code(method, path, **kw):
+            r = httpx.request(method, base + path, timeout=60.0, **kw)
+            body = {}
+            if r.headers.get("content-type", "").startswith("application/json"):
+                try:
+                    body = r.json()
+                except Exception:  # noqa: BLE001
+                    body = {}
+            err = ((body.get("detail") or {}).get("error") or body.get("error") or {})
+            return r.status_code, err.get("code")
+
+        # 열려 있어야 하는 것 (401 이면 데모가 죽는다)
+        must_open = {
+            "POST /jobs": code("POST", "/v1/jobs", data={"title": "x"}),
+            "POST /uploads/presign": code("POST", "/v1/uploads/presign",
+                                          json={"filename": "a.webm"}),
+            "POST /exports": code("POST", f"/v1/meetings/{mid}/exports",
+                                  json={"format": "md", "include_transcript": False}),
+        }
+        # 401 이어야 하는 것
+        must_block = {
+            "POST /retry": code("POST", f"/v1/meetings/{mid}/retry", json={}),
+            "DELETE /meetings/{id}": code("DELETE", f"/v1/meetings/{mid}"),   # 대조군
+            "PATCH /meetings/{id}/summary": code("PATCH", f"/v1/meetings/{mid}/summary",
+                                                 json={"summary": "x"}),
+        }
+        wrongly_blocked = {k: v for k, v in must_open.items() if v[0] == 401}
+        wrongly_open = {k: v for k, v in must_block.items() if v[0] != 401}
+        return {
+            "scenario": "gates (WRITE_PROTECTED=1)",
+            "backend": backend,
+            "must_stay_open": must_open,
+            "must_return_401": must_block,
+            "wrongly_blocked": wrongly_blocked,
+            "wrongly_open": wrongly_open,
+            "reproduced": bool(wrongly_blocked or wrongly_open),
+        }
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+# --------------------------------------------------------------------------
 
 def _report(res: dict) -> bool:
     print("\n" + "=" * 74)
@@ -576,7 +642,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("command", choices=["init-schema", "abort-swallow", "share-lockout",
-                                        "retry-lock", "settings-merge", "smoke", "all"])
+                                        "retry-lock", "settings-merge", "smoke",
+                                        "gates", "all"])
     ap.add_argument("--pg-dsn", default=os.getenv("REPRO_PG_DSN", ""),
                     help="로컬 Postgres DSN (비로컬은 거부됨)")
     ap.add_argument("--backend", choices=["postgres", "sqlite"], default="postgres")
@@ -610,6 +677,7 @@ def main():
             _run_child("settings-merge", "postgres", args),
             _run_child("smoke", "postgres", args),
             _run_child("smoke", "sqlite", args),
+            _run_child("gates", "postgres", args),
         ]
         any_repro = False
         for r in results:
@@ -637,6 +705,8 @@ def main():
             res = scenario_settings_merge(args.backend, args.pg_dsn, workdir, rounds=args.rounds)
         elif args.command == "smoke":
             res = scenario_smoke(args.backend, args.pg_dsn, workdir)
+        elif args.command == "gates":
+            res = scenario_gates(args.backend, args.pg_dsn, workdir)
         else:
             res = scenario_share_lockout(args.backend, args.pg_dsn, workdir, burst=args.burst)
         if args.json:
