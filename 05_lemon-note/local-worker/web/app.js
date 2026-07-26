@@ -75,7 +75,8 @@
     users: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5.5" r="2.3" stroke="currentColor" stroke-width="1.4"/><path d="M1.6 13c.5-2.4 2.3-3.8 4.4-3.8s3.9 1.4 4.4 3.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="6" r="1.8" stroke="currentColor" stroke-width="1.3"/><path d="M10.6 9.6c1.7.2 3 1.4 3.4 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
     back: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L4 8l6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     chevronRight: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    calendar: '<svg width="17" height="17" viewBox="0 0 19 19" fill="none"><rect x="2.5" y="4" width="14" height="12.5" rx="2.3" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.8h14" stroke="currentColor" stroke-width="1.5"/><path d="M6.3 2.2v3M12.7 2.2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="5.6" y="10.1" width="2.7" height="2.7" rx="0.6" fill="currentColor"/></svg>'
+    calendar: '<svg width="17" height="17" viewBox="0 0 19 19" fill="none"><rect x="2.5" y="4" width="14" height="12.5" rx="2.3" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 7.8h14" stroke="currentColor" stroke-width="1.5"/><path d="M6.3 2.2v3M12.7 2.2v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><rect x="5.6" y="10.1" width="2.7" height="2.7" rx="0.6" fill="currentColor"/></svg>',
+    bell: '<svg width="17" height="17" viewBox="0 0 19 19" fill="none" aria-hidden="true" focusable="false"><path d="M9.5 2.6a4.6 4.6 0 0 0-4.6 4.6c0 3.4-1.1 4.6-1.6 5.2-.2.2 0 .6.3.6h11.8c.3 0 .5-.4.3-.6-.5-.6-1.6-1.8-1.6-5.2A4.6 4.6 0 0 0 9.5 2.6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7.9 15.4a1.7 1.7 0 0 0 3.2 0" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'
   };
 
   /* ==========================================================================
@@ -400,6 +401,16 @@
     patchSettings: function (body) {
       return apiJson('/me/settings', 'PATCH', body);
     },
+    listNotifications: function (params) {
+      return apiRequest('/notifications' + buildQuery(params), { method: 'GET' });
+    },
+    patchNotification: function (id, body) {
+      /* 쓰기는 apiJson — apiRequest 에 body 를 넘기면 직렬화·Content-Type 이 안 붙어 422 가 난다. */
+      return apiJson('/notifications/' + encodeURIComponent(id), 'PATCH', body);
+    },
+    readAllNotifications: function () {
+      return apiJson('/notifications/read-all', 'POST', {});
+    },
     getCalendar: function (params) {
       return apiRequest('/meetings/calendar' + buildQuery(params), { method: 'GET' });
     },
@@ -518,6 +529,7 @@
     if (parts[0] === 'home') return { name: 'list' };
     if (parts[0] === 'folders') return { name: 'folders', key: parts[1] ? decodeURIComponent(parts[1]) : null };
     if (parts[0] === 'me') return { name: 'me' };
+    if (parts[0] === 'notifications') return { name: 'notifications' };
     return { name: 'new' };
   }
 
@@ -584,6 +596,10 @@
       document.title = '마이 — 회의녹음챗';
       currentCleanup = renderMyPageView(colCenterEl);
       renderRightTips(colRightContentEl, 'list');
+    } else if (route.name === 'notifications') {
+      document.title = '알림 — 회의녹음챗';
+      currentCleanup = renderNotificationsView(colCenterEl);
+      renderRightTips(colRightContentEl, 'list');
     } else if (route.name === 'calendar') {
       document.title = '녹음 달력 — 회의녹음챗';
       currentCleanup = renderCalendarView(colCenterEl, colRightContentEl, route.year, route.month);
@@ -591,6 +607,11 @@
       document.title = '회의 상세 — 회의녹음챗';
       currentCleanup = renderMeetingDetailView(colCenterEl, colRightContentEl, route.meetingId, route.tab);
     }
+
+    /* 안읽음 배지 갱신. updateNavActive 안에 두면 map 에 없는 라우트(new·notifications)에서
+       조기 return 하므로 기본 라우트인 부팅 화면에서 배지가 영영 안 뜬다.
+       인박스 라우트는 자기 목록 응답의 unread_count 로 세팅하므로 중복 호출하지 않는다. */
+    if (route.name !== 'notifications') refreshUnreadBadge();
   }
 
 
@@ -811,6 +832,8 @@
         '<div class="list-header">' +
           '<span class="list-header-title">회의 목록</span>' +
           '<span class="list-header-count mono" id="lc-count">0</span>' +
+          '<button type="button" class="list-bell-btn" id="lc-bell" title="알림" aria-label="알림">' + ICONS.bell +
+            '<span class="list-bell-dot mono" id="lc-bell-dot" hidden></span></button>' +
           '<button type="button" class="list-compose-btn" id="lc-compose" title="새 회의" aria-label="새 회의">' + ICONS.plus + '</button>' +
         '</div>' +
         '<div class="list-toolbar">' +
@@ -833,6 +856,7 @@
       chipsEl = containerEl.querySelector('#lc-chips');
 
       containerEl.querySelector('#lc-compose').addEventListener('click', function () { navigate('#/new'); });
+      containerEl.querySelector('#lc-bell').addEventListener('click', function () { navigate('#/notifications'); });
 
       /* 칩: 탭하면 그 말로 검색하고 최근에 올린다. 지우기는 최근 전체 삭제. */
       chipsEl.addEventListener('click', function (e) {
@@ -1518,10 +1542,203 @@
      8. 가운데 + 오른쪽 컬럼: 회의 상세
      ======================================================================= */
 
+  /* 알림 인박스(서브프로젝트 F2) — 본문은 서버가 audit_logs 에서 파생해 내려준다.
+     탭↔토글 매핑은 서버 _NOTIF_KINDS 의 category 열을 미러링한 것 —
+     서버에 새 이벤트 종류가 생기면 여기도 같이 고쳐야 한다. */
+  /* 벨 배지 — 폴링하지 않는다. 라우트가 바뀔 때와 인박스에서 상태가 바뀔 때만 갱신한다. */
+  function setBadge(n) {
+    var dot = document.getElementById('lc-bell-dot');
+    var bell = document.getElementById('lc-bell');
+    if (!dot) return;
+    if (!n) {
+      dot.hidden = true;
+      dot.textContent = '';
+    } else {
+      dot.hidden = false;
+      dot.textContent = n > 99 ? '99+' : String(n);
+    }
+    if (bell) bell.setAttribute('aria-label', n ? '알림 ' + n + '개 안 읽음' : '알림');
+  }
+
+  /* 방금 로컬에서 배지를 조정했으면 다음 라우트 갱신 1회를 건너뛴다.
+     알림 행을 눌러 회의로 이동하면 PATCH 가 아직 커밋되기 전에 renderRoute 의 GET 이
+     나가서 옛 값으로 되돌아가기 때문이다. */
+  var skipNextBadgeRefresh = false;
+
+  function refreshUnreadBadge() {
+    if (!document.getElementById('lc-bell-dot')) return;
+    if (skipNextBadgeRefresh) { skipNextBadgeRefresh = false; return; }
+    API.listNotifications({ limit: 1 }).then(function (res) {
+      setBadge((res && res.unread_count) || 0);
+    }).catch(function () { /* 배지는 실패해도 앱에 지장 없다 */ });
+  }
+
+  var NF_TABS = [['all', '전체'], ['notice', '안내'], ['info', '정보']];
+  var NF_TAB_TOGGLES = {
+    all: ['summary', 'failure', 'share', 'export'],
+    notice: ['share', 'export'],
+    info: ['summary', 'failure']
+  };
+
+  function renderNotificationsView(centerEl) {
+    var cancelled = false;
+    var tab = 'all';
+    var items = [];
+    var notify = {};
+    var unread = 0;
+    var nextCursor = null;
+
+    load();
+
+    function load(cursor) {
+      var append = !!cursor;
+      if (!append) centerEl.innerHTML = '<div class="col-center-scroll"><div class="notif-page view-fade">' +
+        '<div class="list-empty"><p>불러오는 중…</p></div></div></div>';
+      API.listNotifications({ tab: tab, limit: 20, cursor: cursor || undefined }).then(function (res) {
+        if (cancelled) return;
+        items = append ? items.concat(res.items || []) : (res.items || []);
+        notify = res.notify || {};
+        unread = res.unread_count || 0;
+        nextCursor = res.next_cursor ? parseInt(res.next_cursor, 10) : null;
+        setBadge(unread);
+        paint();
+      }).catch(function (err) {
+        if (cancelled) return;
+        centerEl.innerHTML = '<div class="col-center-scroll"><div class="notif-page view-fade">' +
+          emptyStateHtml('알림을 불러오지 못했습니다', err.message || '') + '</div></div>';
+      });
+    }
+
+    function emptyHtml() {
+      /* 토글로 꺼져서 빈 것과 원래 없는 것을 구분한다. data-empty 로 기계 검증도 가능하게. */
+      var off = (NF_TAB_TOGGLES[tab] || []).every(function (k) { return notify[k] === false; });
+      return off
+        ? '<div class="notif-empty" data-empty="off">' +
+            emptyStateHtml('이 알림이 꺼져 있어요', '마이 > 알림에서 다시 켤 수 있어요.',
+              '<a href="#/me" class="btn btn-ghost btn-sm">알림 설정 열기</a>') + '</div>'
+        : '<div class="notif-empty" data-empty="none">' +
+            emptyStateHtml('알림이 없습니다', '새 소식이 생기면 여기에 표시됩니다.') + '</div>';
+    }
+
+    function rowHtml(it) {
+      return '<li class="notif-row' + (it.read ? '' : ' is-unread') + '" data-id="' + esc(it.id) + '">' +
+        '<button type="button" class="notif-main" data-action="nf-open" data-id="' + esc(it.id) + '" ' +
+          'data-meeting="' + esc(it.meeting_id || '') + '" data-read="' + (it.read ? '1' : '0') + '">' +
+          '<span class="notif-dot"' + (it.read ? ' hidden' : '') + ' aria-hidden="true"></span>' +
+          '<span class="notif-body">' +
+            '<span class="notif-label">' + esc(it.label) + '</span>' +
+            '<span class="notif-sub">' + esc(it.title || '제목 없음') + '</span>' +
+          '</span>' +
+          '<span class="notif-time mono">' + esc(shortDate(it.created_at)) + '</span>' +
+        '</button>' +
+        '<button type="button" class="notif-x" data-action="nf-dismiss" data-id="' + esc(it.id) + '" ' +
+          'aria-label="' + esc(it.label) + ' 알림 숨기기">' + ICONS.close + '</button>' +
+      '</li>';
+    }
+
+    function paint() {
+      centerEl.innerHTML = '<div class="col-center-scroll"><div class="notif-page view-fade">' +
+        '<div class="notif-head">' +
+          '<h2 class="notif-title">알림</h2>' +
+          '<button type="button" class="btn btn-ghost btn-sm" data-action="nf-read-all"' +
+            (unread ? '' : ' disabled') + '>모두 읽음</button>' +
+        '</div>' +
+        '<div class="notif-tabs" role="group" aria-label="알림 분류">' +
+          NF_TABS.map(function (t) {
+            return '<button type="button" class="notif-tab' + (t[0] === tab ? ' is-active' : '') + '" ' +
+              'data-action="nf-tab" data-tab="' + t[0] + '"' + (t[0] === tab ? ' aria-current="true"' : '') + '>' +
+              esc(t[1]) + '</button>';
+          }).join('') +
+        '</div>' +
+        (items.length
+          ? '<ul class="notif-list" role="list">' + items.map(rowHtml).join('') + '</ul>' +
+            (nextCursor !== null
+              ? '<div class="notif-more"><button type="button" class="btn btn-ghost btn-sm" data-action="nf-more">더 보기</button></div>'
+              : '')
+          : emptyHtml()) +
+      '</div></div>';
+    }
+
+    /* 안읽음 수만 부분 갱신한다 — #col-center 가 aria-live 라서 전체 재렌더는 화면을 통째로 다시 읽는다. */
+    function applyUnread(delta) {
+      unread = Math.max(0, unread + delta);
+      setBadge(unread);
+      var btn = centerEl.querySelector('[data-action="nf-read-all"]');
+      if (btn) btn.disabled = !unread;
+    }
+
+    function onNotifClick(e) {
+      var el = e.target.closest('[data-action]');
+      if (!el || !centerEl.contains(el)) return;
+      var action = el.dataset.action;
+      if (action === 'nf-tab') {
+        if (el.dataset.tab === tab) return;
+        tab = el.dataset.tab;
+        nextCursor = null;
+        load();
+      } else if (action === 'nf-more') {
+        if (nextCursor !== null) load(String(nextCursor));
+      } else if (action === 'nf-open') {
+        var id = el.dataset.id;
+        var wasUnread = el.dataset.read === '0';
+        /* PATCH 는 fire-and-forget. 완료를 기다렸다 배지를 다시 읽으면 커밋 전 값을 볼 수 있다. */
+        API.patchNotification(id, { read: true }).catch(function () {});
+        if (wasUnread) { applyUnread(-1); skipNextBadgeRefresh = true; }
+        if (el.dataset.meeting) navigate('#/meetings/' + encodeURIComponent(el.dataset.meeting));
+      } else if (action === 'nf-dismiss') {
+        var did = el.dataset.id;
+        var row = centerEl.querySelector('.notif-row[data-id="' + cssEscapeId(did) + '"]');
+        var mainBtn = row && row.querySelector('[data-action="nf-open"]');
+        var wasUnread2 = mainBtn && mainBtn.dataset.read === '0';
+        API.patchNotification(did, { dismissed: true }).then(function () {
+          if (cancelled) return;
+          items = items.filter(function (it) { return it.id !== did; });
+          if (row) row.remove();
+          /* next_cursor 가 offset 이라 숨김이 생기면 결과 집합이 밀린다 → 다음 페이지가 한 건 건너뛴다. */
+          if (nextCursor !== null) nextCursor = Math.max(0, nextCursor - 1);
+          if (wasUnread2) applyUnread(-1);
+          if (!items.length) paint();
+        }).catch(function (err) {
+          if (cancelled) return;
+          toast(err.message || '숨기지 못했습니다.', 'error');
+        });
+      } else if (action === 'nf-read-all') {
+        el.disabled = true;
+        API.readAllNotifications().then(function (res) {
+          if (cancelled) return;
+          toast((res && res.marked ? res.marked + '건을 ' : '') + '읽음 처리했어요.', 'success');
+          load();
+        }).catch(function (err) {
+          if (cancelled) return;
+          el.disabled = false;
+          toast(err.message || '처리하지 못했습니다.', 'error');
+        });
+      }
+    }
+
+    centerEl.addEventListener('click', onNotifClick);
+    return function cleanup() {
+      cancelled = true;
+      centerEl.removeEventListener('click', onNotifClick);
+    };
+  }
+
   /* 마이페이지 — 프로필·사용량·설정(인식 언어·자주 쓰는 단어·관심 분야)·계정.
      설정 저장은 PATCH /v1/me/settings 이고 변경된 키만 보낸다(공용 계정에서 남의 저장을 덮지 않게). */
 
   var MP_LANGS = [['ko', '한국어'], ['en', 'English'], ['ja', '日本語'], ['zh', '中文'], ['auto', '자동 감지']];
+  var NOTIFY_KEYS = [['summary', '전사·요약 완료'], ['failure', '처리 실패'],
+                     ['share', '공유 활동'], ['export', '내보내기 완료']];
+
+  /* 서버 규칙(_notify_prefs)과 동일하게 '없는 키는 켜짐'을 채운다.
+     비교는 반드시 채운 값끼리 해야 한다 — 원본과 비교하면 notify 키가 없는 계정에서
+     언어만 바꿔도 notify 가 함께 저장된다(설정은 키 삭제가 불가능하다). */
+  function fillNotify(raw) {
+    raw = raw || {};
+    var out = {};
+    NOTIFY_KEYS.forEach(function (kv) { out[kv[0]] = raw[kv[0]] !== false; });
+    return out;
+  }
   var MP_MAX_HOTWORDS = 10;
   var MP_MAX_INTERESTS = 12;
 
@@ -1546,6 +1763,7 @@
     var hotwords = [];
     var interests = [];
     var suggests = [];
+    var notify = fillNotify(null);
     var saving = false;
 
     centerEl.innerHTML = '<div class="col-center-scroll"><div class="mypage-page view-fade">' +
@@ -1563,6 +1781,7 @@
       loaded = me.settings || {};
       hotwords = (loaded.hotwords || []).slice();
       interests = (loaded.interests || []).slice();
+      notify = fillNotify(loaded.notify);
       suggests = ((res[2] && res[2].keywords) || []).map(function (k) { return k.text; }).filter(Boolean);
       paint(me, usage);
     }).catch(function (err) {
@@ -1652,7 +1871,21 @@
             : '') +
         '</section>' +
 
-        /* 6. 계정 · 앱 정보 */
+        /* 6. 알림 — 인박스 진입점 겸 토글. 모바일에서 상시 목록(=벨)이 숨는 라우트가 많아
+           마이 탭이 항상 도달 가능한 진입점이 된다. */
+        '<section class="mypage-section" role="group" aria-labelledby="mp-h-notify">' +
+          '<h2 class="mypage-h" id="mp-h-notify">알림</h2>' +
+          '<p class="mypage-hint">이 데모는 앱 안에서만 알림을 보여줍니다(푸시·이메일 발송 없음).</p>' +
+          '<a href="#/notifications" class="folder-row folder-row-link mypage-notif-link">알림함 열기</a>' +
+          NOTIFY_KEYS.map(function (kv) {
+            return '<label class="checkbox-row switch-row" for="mp-notify-' + kv[0] + '">' +
+              '<span class="checkbox-row-label">' + esc(kv[1]) + '</span>' +
+              '<input type="checkbox" id="mp-notify-' + kv[0] + '"' + (notify[kv[0]] ? ' checked' : '') + ' />' +
+            '</label>';
+          }).join('') +
+        '</section>' +
+
+        /* 7. 계정 · 앱 정보 */
         '<section class="mypage-section" role="group" aria-labelledby="mp-h-acc">' +
           '<h2 class="mypage-h" id="mp-h-acc">계정</h2>' +
           '<p class="mypage-hint">이 데모는 단일 공용 계정이라 저장한 설정이 모든 방문자에게 적용됩니다.</p>' +
@@ -1730,6 +1963,17 @@
       if (sel && sel.value !== (loaded.language || 'ko')) body.language = sel.value;
       if (hotwords.join(sep) !== (loaded.hotwords || []).join(sep)) body.hotwords = hotwords;
       if (interests.join(sep) !== (loaded.interests || []).join(sep)) body.interests = interests;
+      /* notify 는 서버가 top-level 로만 머지하므로(부분 객체를 보내면 나머지 키가 지워져 ON 으로
+         되돌아간다) 보낼 때는 4개를 전부 담는다. 비교는 채운 값끼리. */
+      var baseNotify = fillNotify(loaded.notify);
+      var curNotify = {};
+      NOTIFY_KEYS.forEach(function (kv) {
+        var cb = centerEl.querySelector('#mp-notify-' + kv[0]);
+        curNotify[kv[0]] = cb ? cb.checked : baseNotify[kv[0]];
+      });
+      if (NOTIFY_KEYS.some(function (kv) { return curNotify[kv[0]] !== baseNotify[kv[0]]; })) {
+        body.notify = curNotify;
+      }
       if (!Object.keys(body).length) { toast('변경된 설정이 없습니다.'); return; }
 
       var btn = centerEl.querySelector('[data-action="mp-save"]');
@@ -1744,6 +1988,11 @@
         repaintChips('hotword');
         repaintChips('interest');
         if (sel) sel.value = loaded.language || 'ko';
+        notify = fillNotify(loaded.notify);
+        NOTIFY_KEYS.forEach(function (kv) {
+          var cb = centerEl.querySelector('#mp-notify-' + kv[0]);
+          if (cb) cb.checked = notify[kv[0]];
+        });
         toast('설정을 저장했습니다.', 'success');
       }).catch(function (err) {
         if (cancelled) return;
