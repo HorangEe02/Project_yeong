@@ -62,6 +62,9 @@ class SummaryPatch(BaseModel):
     decisions: List[DecisionIn] = []
     action_items: List[ActionItemIn] = []
     calendar_candidates: List[CalendarCandidateIn] = []
+    # 낙관적 잠금: 편집을 시작한 시점의 요약 버전. 그 사이 다른 탭·다른 방문자가
+    # 저장했으면 서버가 409 로 거부한다. 없으면(구 클라이언트) 검사하지 않는다.
+    base_version: Optional[int] = None
 
 
 class ExportIn(BaseModel):
