@@ -925,7 +925,8 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   .app-shell[data-route="detail"] .col-list,
   .app-shell[data-route="calendar"] .col-list,
   .app-shell[data-route="folders"] .col-list,
-  .app-shell[data-route="me"] .col-list { display: none; }
+  .app-shell[data-route="me"] .col-list,
+  .app-shell[data-route="notifications"] .col-list { display: none; }
   .app-shell[data-route="list"] .col-center { display: none; }
   .detail-back-btn { display: flex; }
   .msg-col { max-width: 84%; }
@@ -1312,4 +1313,77 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
   /* 단축 속성과 longhand 를 같은 블록에 둬서 뒤 블록이 padding-bottom 을 덮는 사고를 막는다. */
   .mypage-page { padding: 18px 16px 32px; padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
   .mypage-stats { grid-template-columns: 1fr; }
+}
+
+/* ----------------------------------------------------------------------
+   25. 알림 (서브프로젝트 F2)
+   ------------------------------------------------------------------- */
+/* 헤더 벨 — .list-compose-btn 이 margin-left:auto 를 갖고 있어서, 벨이 그 역할을 가져오고
+   compose 의 auto 를 0 으로 되돌린다(둘 다 auto 면 여백을 반씩 나눠 가진다). */
+.list-bell-btn {
+  position: relative; margin-left: auto; flex: none;
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 8px; background: none; color: var(--ink-600); cursor: pointer;
+}
+.list-bell-btn + .list-compose-btn { margin-left: 0; }
+.list-bell-btn:hover { background: var(--surface-alt); color: var(--ink-900); }
+.list-bell-dot {
+  position: absolute; top: 1px; right: 0; min-width: 15px; height: 15px; padding: 0 3px;
+  border-radius: 999px; background: var(--brand-600); color: var(--on-brand);
+  font-size: 9.5px; font-weight: 800; line-height: 15px; text-align: center;
+}
+
+.notif-page { padding: 26px 28px 40px; max-width: 640px; margin: 0 auto; width: 100%; }
+.notif-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.notif-title { font-size: 15px; font-weight: 800; color: var(--ink-900); }
+.notif-head .btn { margin-left: auto; }
+.notif-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.notif-tab {
+  padding: 6px 13px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 12.5px; font-weight: 700; color: var(--ink-600);
+}
+.notif-tab.is-active { background: var(--brand-100); border-color: var(--brand-100); color: var(--brand-900); }
+
+.notif-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.notif-row { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--border); }
+.notif-row:last-child { border-bottom: 0; }
+.notif-main {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 9px;
+  padding: 12px 4px; border: 0; background: none; cursor: pointer; text-align: left;
+}
+.notif-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--brand-600); }
+.notif-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.notif-label { font-size: 13px; font-weight: 700; color: var(--ink-900); }
+.notif-row:not(.is-unread) .notif-label { font-weight: 600; color: var(--ink-700); }
+.notif-sub { font-size: 12px; color: var(--ink-500); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.notif-time { flex: none; font-size: 11.5px; color: var(--ink-400); }
+.notif-x {
+  flex: none; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 50%; background: none; color: var(--ink-400); cursor: pointer;
+}
+.notif-x:hover { background: var(--surface-alt); color: var(--ink-700); }
+.notif-more { padding: 12px 0; text-align: center; }
+.mypage-notif-link { margin-bottom: 10px; }
+
+/* 알림 토글 — .checkbox-row 를 pill 스위치로. 체크 표시(회전 보더)를 원형 노브로 교체해야 한다. */
+.switch-row { justify-content: space-between; align-items: center; }
+.switch-row input[type="checkbox"] {
+  flex: none; width: 38px; height: 22px; border-radius: 999px; position: relative;
+}
+.switch-row input[type="checkbox"]::after {
+  content: ''; position: absolute; left: 3px; top: 3px;
+  width: 16px; height: 16px; border: 0; border-radius: 50%;
+  background: var(--ink-400); transform: none; transition: transform .15s ease, background .15s ease;
+}
+.switch-row input[type="checkbox"]:checked::after {
+  left: 3px; top: 3px; width: 16px; height: 16px; border: 0; border-radius: 50%;
+  background: var(--on-brand); transform: translateX(16px);
+}
+
+.notif-tab:focus-visible, .notif-x:focus-visible, .list-bell-btn:focus-visible,
+.notif-main:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .notif-page { padding: 18px 16px 32px; padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
