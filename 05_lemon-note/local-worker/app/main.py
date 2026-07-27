@@ -34,6 +34,21 @@ app.add_middleware(
 )
 
 
+@app.exception_handler(Exception)
+async def _invalid_id_handler(request: Request, exc: Exception):
+    """형식이 잘못된 id 를 404 로 돌려준다.
+
+    Postgres 는 uuid 컬럼에 'abc' 같은 문자열을 비교하면 InvalidTextRepresentation 을
+    던져 **500** 이 났다(SQLite 는 TEXT 라 그냥 0행이라 404 였다 — 백엔드가 갈리는 지점).
+    경로/본문의 id 는 클라이언트가 주는 값이고, 형식이 틀렸다는 건 그런 리소스가 없다는
+    뜻이므로 404 가 맞다. 다른 예외는 그대로 올려 500 으로 남긴다(진짜 버그를 숨기지 않게).
+    """
+    if database.is_invalid_id_error(exc):
+        return JSONResponse(status_code=404, content={"error": {
+            "code": "not_found", "message": "요청한 항목을 찾을 수 없습니다.", "details": {}}})
+    raise exc
+
+
 @app.middleware("http")
 async def _security_headers(request: Request, call_next):
     """기본 보안 헤더. 업로드된 파일을 브라우저가 HTML 로 해석하는 것을 막는 nosniff 가 핵심."""
@@ -676,16 +691,25 @@ def _get_deleted_meeting(conn, meeting_id, user_id):
 
 
 def _purge_meeting(conn, meeting_id):
-    """스토리지 파일 + 회의/자식 전부 하드삭제. 호출측이 soft-delete+본인 검증을 마친 상태여야.
+    """회의/자식 행을 하드삭제하고 **지워야 할 스토리지 경로 목록을 돌려준다**.
+    호출측이 soft-delete+본인 검증을 마친 상태여야 한다.
+
+    파일은 여기서 지우지 않는다. 예전에는 파일을 먼저 지웠는데, 뒤이은 DELETE 가
+    실패하면 커밋 없이 닫혀 **행은 전부 남고 음성 파일만 영구 소실**됐다(사용자에게는
+    회의가 목록에 그대로 있는데 재생만 깨진 상태). 순서를 뒤집어 DB 를 먼저 커밋하고
+    파일은 그 뒤에 지우면, 실패했을 때 남는 것은 참조 없는 고아 파일뿐이다 —
+    사용자에게 보이지 않고 되돌릴 것도 없다. 둘 중 나은 실패를 고른 것이다.
 
     ON DELETE CASCADE 에 의존하지 않고 자식을 명시 삭제한다:
     (a) SQLite 는 FK/CASCADE 가 아예 없어 DELETE FROM meetings 가 자식을 고아로 남기고,
     (b) Postgres 도 audit_logs.meeting_id 는 cascade 가 없어 FK 위반으로 500 이 난다.
     retry_job(main.py)의 수동 삭제 패턴과 동일한 접근. 테이블명은 상수라 인젝션 없음."""
-    # 스토리지: 녹음 원본 + 내보내기 파일 (경로가 없으면 storage.delete 가 무시)
+    # 스토리지 경로만 모아둔다(녹음 원본 + 내보내기 파일). 실제 삭제는 커밋 뒤 호출측이 한다.
+    paths = []
     for tbl in ("recording_files", "exports"):
         for r in conn.execute(f"SELECT storage_path FROM {tbl} WHERE meeting_id=?", (meeting_id,)).fetchall():
-            storage.delete(r["storage_path"])
+            if r["storage_path"]:
+                paths.append(r["storage_path"])
     # 요약 버전의 자식들(summary_version_id 로 연결)
     svs = conn.execute("SELECT id FROM summary_versions WHERE meeting_id=?", (meeting_id,)).fetchall()
     for sv in svs:
@@ -704,6 +728,17 @@ def _purge_meeting(conn, meeting_id):
                 "exports", "share_logs", "audit_logs", "summary_versions"):
         conn.execute(f"DELETE FROM {tbl} WHERE meeting_id=?", (meeting_id,))
     conn.execute("DELETE FROM meetings WHERE id=?", (meeting_id,))
+    return paths
+
+
+def _delete_storage(paths):
+    """커밋 뒤 호출한다. 개별 실패는 삼킨다 — 고아 파일이 남을 뿐 사용자 영향은 없고,
+    여기서 예외를 올리면 이미 커밋된 삭제를 되돌릴 수도 없다."""
+    for path in paths:
+        try:
+            storage.delete(path)
+        except Exception:  # noqa: BLE001
+            pass
 
 
 @app.post(P + "/meetings/{meeting_id}/restore")
@@ -727,8 +762,9 @@ def purge_meeting(meeting_id: str, _: str = Depends(require_write)):
     conn = db.connect()
     try:
         _get_deleted_meeting(conn, meeting_id, user_id)
-        _purge_meeting(conn, meeting_id)
-        conn.commit()
+        paths = _purge_meeting(conn, meeting_id)
+        conn.commit()          # DB 먼저 확정
+        _delete_storage(paths)  # 그 다음 파일 (실패해도 고아 파일만 남는다)
         return {"ok": True}
     finally:
         conn.close()
@@ -743,9 +779,11 @@ def empty_trash(_: str = Depends(require_write)):
         rows = conn.execute(
             "SELECT id FROM meetings WHERE user_id=? AND deleted_at IS NOT NULL",
             (user_id,)).fetchall()
+        paths = []
         for r in rows:
-            _purge_meeting(conn, r["id"])
-        conn.commit()
+            paths.extend(_purge_meeting(conn, r["id"]))
+        conn.commit()          # N 건을 한 트랜잭션으로 확정
+        _delete_storage(paths)  # 그 다음 파일 일괄 삭제
         return {"ok": True, "purged": len(rows)}
     finally:
         conn.close()
@@ -987,10 +1025,22 @@ def add_highlight(meeting_id: str, body: dict, _: str = Depends(require_user)):
         if e > len(body_text):
             return _err(422, "range_out_of_bounds", "하이라이트 범위가 발화 길이를 벗어납니다.")
         hl_id = db.new_id("hl_")
-        conn.execute(
+        # 겹치는 하이라이트는 거부한다. 예전에는 그냥 저장했는데, 프런트 렌더러가
+        # 겹친 뒤엣것을 건너뛰므로(web/app.js: `h.start_offset < pos` 면 skip)
+        # <mark> 가 안 그려지고, 그러면 **클릭해서 지울 수도 없는 영구 고아 행**이 됐다.
+        # 검사와 삽입을 한 문장으로 묶어(WHERE NOT EXISTS) 검사-후-사용 창을 만들지 않는다.
+        # 겹침 조건: 새 [s,e) 와 기존 [start,end) 가 교차 = start < e AND end > s.
+        cur = conn.execute(
             "INSERT INTO transcript_highlights "
-            "(id,meeting_id,segment_id,start_offset,end_offset,note,created_at) VALUES (?,?,?,?,?,?,?)",
-            (hl_id, meeting_id, seg_id, s, e, body.get("note"), db.now_iso()))
+            "(id,meeting_id,segment_id,start_offset,end_offset,note,created_at) "
+            "SELECT ?,?,?,?,?,?,? WHERE NOT EXISTS ("
+            "  SELECT 1 FROM transcript_highlights"
+            "   WHERE segment_id=? AND start_offset < ? AND end_offset > ?)",
+            (hl_id, meeting_id, seg_id, s, e, body.get("note"), db.now_iso(),
+             seg_id, e, s))
+        if not cur.rowcount:
+            return _err(409, "highlight_overlap",
+                        "이미 하이라이트된 부분과 겹칩니다. 기존 하이라이트를 먼저 해제해 주세요.")
         conn.commit()
         return {"id": hl_id, "segment_id": seg_id, "start_offset": s, "end_offset": e,
                 "note": body.get("note")}
@@ -1248,22 +1298,32 @@ def share_slack(meeting_id: str, body: SlackShareIn,
         m = _get_meeting(conn, meeting_id, user_id)
         summary = _load_summary_for(conn, meeting_id, body.summary_version_id)
         text = body.message_override or textbuild.build_slack_text(dict(m), summary)
-        result = slack.send_summary(text)
 
         sv = (conn.execute("SELECT * FROM summary_versions WHERE id=?",
                           (body.summary_version_id,)).fetchone()
               if body.summary_version_id else db.latest_summary_version_row(conn, meeting_id))
         share_id = db.new_id("share_")
         now = db.now_iso()
+        # 전송 **전에** pending 기록을 남기고 커밋한다. 예전에는 외부 전송을 먼저 하고
+        # 기록을 나중에 커밋해서, 그 사이 실패하면 '보냈는데 기록이 없는' 상태가 됐다
+        # (외부 부작용은 되돌릴 수 없으므로 기록 쪽을 먼저 확정하는 게 맞다).
+        # 반대 방향의 잔여 위험(기록만 남고 전송은 안 됨)은 pending 으로 남아 구분된다.
         conn.execute(
             """INSERT INTO share_logs (id,meeting_id,summary_version_id,provider,target_label,
                status,request_payload,response_status,response_body,sent_at,created_at)
                VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
             (share_id, meeting_id, sv["id"] if sv else None, "slack_webhook",
-             body.channel_label, result["status"],
-             database.enc_json({"text": text}),
-             result.get("http_status"), (result.get("body") or "")[:500],
-             now if result["status"] == "sent" else None, now),
+             body.channel_label, "pending", database.enc_json({"text": text}),
+             None, None, None, now),
+        )
+        conn.commit()
+
+        result = slack.send_summary(text)
+
+        conn.execute(
+            "UPDATE share_logs SET status=?, response_status=?, response_body=?, sent_at=? WHERE id=?",
+            (result["status"], result.get("http_status"), (result.get("body") or "")[:500],
+             db.now_iso() if result["status"] == "sent" else None, share_id),
         )
         conn.commit()
         db.audit(conn, user_id, meeting_id, "shared_slack", {"status": result["status"]})
@@ -1383,23 +1443,31 @@ def create_share_link(meeting_id: str, body: dict, _: str = Depends(require_user
     try:
         if _get_meeting(conn, meeting_id, config.DEFAULT_USER_ID) is None:
             return _err(404, "meeting_not_found", "회의를 찾을 수 없습니다.")
-        active = conn.execute(
-            "SELECT COUNT(*) AS n FROM share_links WHERE meeting_id=? AND revoked_at IS NULL",
-            (meeting_id,)).fetchone()
-        if (active["n"] if active else 0) >= 20:
-            return _err(429, "too_many_links",
-                        "유효한 공유 링크가 너무 많습니다. 쓰지 않는 링크를 폐기해 주세요.")
         token = secrets.token_urlsafe(32)
         pw = (body.get("password") or "").strip()
         link_id = db.new_id("shr_")
         expires = datetime.now(timezone.utc) + timedelta(days=days)
-        conn.execute(
+        # 같은 회의에 대한 링크 생성을 직렬화한다. 아래 상한 검사를 INSERT 와 한 문장으로
+        # 묶어도 서브쿼리는 **커밋된** 상태만 보므로, 진짜 동시 생성은 서로를 못 보고
+        # 둘 다 통과한다(실측: 25개 병렬 → 21개 생성). 요약 버전처럼 UNIQUE 로 잡아줄
+        # 제약도 없어서 잠금이 필요하다.
+        # SQLite 는 쓰기가 전역 직렬화되므로 불필요하고 FOR UPDATE 문법도 없다.
+        if database.BACKEND == "postgres":
+            conn.execute("SELECT id FROM meetings WHERE id=? FOR UPDATE", (meeting_id,))
+        # 개수 상한 검사를 INSERT 와 한 문장으로 묶는다. COUNT 를 따로 읽고 비교하면
+        # 병렬 생성이 모두 통과한다(검사-후-사용).
+        cur = conn.execute(
             "INSERT INTO share_links (id,meeting_id,token_hash,password_hash,include_transcript,"
-            "expires_at,created_at) VALUES (?,?,?,?,?,?,?)",
+            "expires_at,created_at) "
+            "SELECT ?,?,?,?,?,?,? WHERE ("
+            "  SELECT COUNT(*) FROM share_links WHERE meeting_id=? AND revoked_at IS NULL) < 20",
             (link_id, meeting_id, _hash_token(token),
              _hash_password(pw) if pw else None,
              database.enc_bool(bool(body.get("include_transcript", True))),
-             expires, db.now_iso()))
+             expires, db.now_iso(), meeting_id))
+        if not cur.rowcount:
+            return _err(429, "too_many_links",
+                        "유효한 공유 링크가 너무 많습니다. 쓰지 않는 링크를 폐기해 주세요.")
         conn.commit()
         db.audit(conn, config.DEFAULT_USER_ID, meeting_id, "share_link_created",
                  {"expires_in_days": days, "password": bool(pw)})

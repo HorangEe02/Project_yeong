@@ -103,6 +103,22 @@ def is_unique_violation(exc) -> bool:
     return isinstance(exc, sqlite3.IntegrityError)
 
 
+def is_invalid_id_error(exc) -> bool:
+    """'형식이 잘못된 id' 로 인한 DB 오류인지 판정한다.
+
+    postgres: uuid 컬럼에 uuid 가 아닌 문자열을 비교하면 InvalidTextRepresentation.
+    sqlite: id 가 TEXT 라 이런 오류가 없다(그냥 0행 → 404) — 그래서 이 차이는
+    로컬 검증으로 드러나지 않고 프로덕션에서만 500 으로 보였다.
+    """
+    if BACKEND != "postgres":
+        return False
+    try:
+        import psycopg
+        return isinstance(exc, psycopg.errors.InvalidTextRepresentation)
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def connect():
     if BACKEND == "postgres":
         import psycopg
