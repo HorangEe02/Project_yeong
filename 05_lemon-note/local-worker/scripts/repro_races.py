@@ -92,7 +92,7 @@ def assert_local_url(url: str):
 
 
 def _env_for(backend: str, dsn: str, workdir: Path, write_protected: str = "0",
-             max_jobs: str = "0") -> dict:
+             max_jobs: str = "0", stub_delay: str = "0") -> dict:
     """백엔드별 실행 환경. DATABASE_URL 을 항상 명시해 .env 유입을 차단한다."""
     env = dict(os.environ)
     env["DB_BACKEND"] = backend
@@ -101,7 +101,7 @@ def _env_for(backend: str, dsn: str, workdir: Path, write_protected: str = "0",
     env["LOCAL_STORAGE_ROOT"] = str(workdir / "storage")
     env["ASR_PROVIDER"] = "stub"
     env["SUMMARY_PROVIDER"] = "stub"
-    env["STUB_STAGE_DELAY"] = "0"
+    env["STUB_STAGE_DELAY"] = stub_delay    # 기본 0=즉시(대부분의 시나리오는 빠를수록 좋다)
     env["SYNC_PIPELINE"] = "1"
     env["WRITE_PROTECTED"] = write_protected
     env["HEALTH_DETAIL"] = "1"
@@ -384,7 +384,13 @@ def scenario_retry_lock(backend: str, dsn: str, workdir: Path) -> dict:
     mid, jid = _seed_meeting(config, database, db, title="retry 선점 재현용")
     pipeline.run_pipeline(jid, mid)                  # 종료 상태로 만든다(재처리 가능 상태)
 
-    env = _env_for(backend, dsn, workdir)
+    # 두 요청을 그냥 동시에 쏘면 **겹치지 않을 수 있다**. 그러면 뒤 요청은 앞 요청이 끝난 뒤
+    # 갱신된 attempts 를 읽어 CAS 를 정상 통과하고(순차 재처리는 허용된다) 2×200 이 나온다.
+    # 실제로 CI 러너에서 그렇게 됐다 — 제품 회귀가 아니라 시나리오가 타이밍 운에 기댄 것이었다.
+    # 그래서 파이프라인을 느리게(단계당 1초) 만들어 '진행 중' 창을 초 단위로 벌리고,
+    # 두 번째 요청을 그 창 안에 확실히 넣는다. 이때 막는 것은 CAS 의
+    # status NOT IN ('normalizing_audio','transcribing','summarizing') 조건이다.
+    env = _env_for(backend, dsn, workdir, stub_delay="1.0")
     port = _free_port()
     proc, base = _start_server(env, port)
     assert_local_url(base)
@@ -392,14 +398,17 @@ def scenario_retry_lock(backend: str, dsn: str, workdir: Path) -> dict:
     try:
         def one(_i):
             try:
-                r = httpx.post(url, json={}, timeout=60.0)
+                r = httpx.post(url, json={}, timeout=120.0)
                 body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
                 return r.status_code, (body.get("error") or {}).get("code")
             except Exception as e:  # noqa: BLE001
                 return None, type(e).__name__
 
         with ThreadPoolExecutor(max_workers=2) as ex:
-            results = list(ex.map(one, range(2)))
+            first = ex.submit(one, 0)
+            time.sleep(1.5)          # 1단계(1초)를 지나 파이프라인이 확실히 '진행 중'일 때
+            second = ex.submit(one, 1)
+            results = [first.result(), second.result()]
 
         ok = sum(1 for c, _ in results if c == 200)
         busy = sum(1 for c, code in results if c == 409 and code == "job_busy")
