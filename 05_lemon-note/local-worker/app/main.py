@@ -875,6 +875,23 @@ def patch_folder(folder_id: str, body: FolderPatch, _: str = Depends(require_wri
     try:
         _get_folder(conn, folder_id, user_id)
         if body.parent_id is not None:
+            # 사이클 검사는 '읽기'라 그것만으로는 동시 이동을 못 막는다. A→B 와 B→A 가
+            # 동시에 오면 서로의 커밋 전 상태를 못 봐 **둘 다 통과**하고 순환이 생긴다
+            # (실측: 20쌍 교차 이동 → postgres 26개·sqlite 14개 폴더가 순환에 빠졌다).
+            # 순환에 빠진 서브트리는 루트에서 도달할 수 없어 폴더 화면에서 사라진다.
+            #
+            # 단일 문장(WHERE NOT EXISTS ...)으로도 못 막는다 — 두 요청이 서로 **다른 행**을
+            # 갱신하므로 행 잠금이 충돌하지 않고, 서브쿼리는 커밋된 상태만 보기 때문이다.
+            # 그래서 검사 **전에** 이 사용자의 폴더 트리를 잠가 이동을 직렬화한다.
+            if database.BACKEND == "postgres":
+                # ORDER BY 로 잠금 순서를 고정한다(두 요청이 서로를 물어 교착되지 않게).
+                conn.execute("SELECT id FROM folders WHERE user_id=? ORDER BY id FOR UPDATE",
+                             (user_id,))
+            else:
+                # sqlite 에는 FOR UPDATE 가 없다. 무해한 UPDATE 로 쓰기 트랜잭션을 먼저 열면
+                # (WAL 은 동시 쓰기가 하나) 뒤 요청은 여기서 대기했다가, 앞 요청이 커밋한
+                # 상태를 보고 검사하게 된다.
+                conn.execute("UPDATE folders SET updated_at=updated_at WHERE user_id=?", (user_id,))
             # 사이클 금지: 새 부모가 자기 자신 또는 자손이면 거부
             if body.parent_id:
                 _get_folder(conn, body.parent_id, user_id)
