@@ -16,6 +16,10 @@
         (main.py:1403 이 1396 에서 읽은 값을 본다) 병렬 요청이 모두 검사를
         통과한다 → 상한을 버스트 크기만큼 초과. 공개 무인증 경로다.
 
+의존성
+  requirements.txt + httpx (하니스 전용). requirements-dev.txt 로 한 번에 설치:
+    python -m pip install -r requirements.txt -r requirements-dev.txt
+
 안전장치 (프로덕션 오염 방지)
   - DB 호스트가 127.0.0.1/localhost/::1 이 아니면 **거부**한다.
   - DSN 에 supabase/pooler 문자열이 있으면 **거부**한다.
@@ -268,7 +272,8 @@ def _free_port() -> int:
 
 def _start_server(env: dict, port: int):
     proc = subprocess.Popen(
-        [str(REPO / ".venv" / "bin" / "python"), "-m", "uvicorn", "app.main:app",
+        # sys.executable 을 쓴다 — .venv 경로를 박아두면 CI 처럼 venv 없이 돌리는 환경에서 깨진다.
+        [sys.executable, "-m", "uvicorn", "app.main:app",
          "--host", "127.0.0.1", "--port", str(port), "--log-level", "warning"],
         cwd=str(REPO), env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     import httpx

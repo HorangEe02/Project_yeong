@@ -143,7 +143,14 @@ docker run -d --name lemon-race-pg -e POSTGRES_PASSWORD=postgres \
 ```
 
 종료 코드: `0` 경합 미검출 · `1` 재현됨(결함 존재) · `2` 오류 또는 안전장치 거부.
-CI 회귀 게이트로 그대로 쓸 수 있다.
+
+**CI 에 연결돼 있다** — `.github/workflows/05-lemon-note-races.yml`. `05_lemon-note/local-worker/**`
+가 바뀐 PR·push 에서 Postgres 서비스 컨테이너를 띄우고 두 백엔드를 대조한다.
+이 앱의 경합 결함 상당수가 Postgres 에서만 나타나므로(트랜잭션 aborted, uuid 캐스팅,
+쓰기 직렬화 차이) SQLite 만으로 도는 CI 는 의미가 없다.
+워크플로는 본 실행 전에 **안전장치가 원격 DSN 을 거부하는지도 확인**한다(종료코드 2).
+
+의존성: `requirements.txt` + `httpx`(하니스 전용) → `requirements-dev.txt` 로 한 번에 설치.
 
 검사 항목: `abort-swallow`(1번, 두 백엔드 대조) · `retry-lock`(2번) ·
 `share-lockout`(3번) · `settings-merge`(4번) · `smoke`(5·6번 및 정상 경로 회귀) · `summary-lock`(낙관적 잠금, 두 백엔드) ·

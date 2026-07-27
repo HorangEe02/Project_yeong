@@ -1,0 +1,116 @@
+name: lemon-note — 경합·부분쓰기 회귀
+
+# 재현 하니스(05_lemon-note/local-worker/scripts/repro_races.py)를 회귀 게이트로 돌린다.
+# 종료코드: 0 미검출 / 1 재현됨(결함) / 2 실행 오류·안전장치 거부.
+#
+# 왜 필요한가: 이 앱의 경합 결함 상당수가 **Postgres 에서만** 나타난다
+# (트랜잭션 aborted, uuid 캐스팅, 쓰기 직렬화 차이). 개발은 SQLite 로 하므로
+# 로컬 검증만으로는 잡히지 않아, CI 에서 두 백엔드를 대조해야 의미가 있다.
+# 그래서 이 잡은 Postgres 서비스 컨테이너를 띄운다.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '05_lemon-note/local-worker/**'
+      - '.github/workflows/05-lemon-note-races.yml'
+  push:
+    branches: [main]
+    paths:
+      - '05_lemon-note/local-worker/**'
+      - '.github/workflows/05-lemon-note-races.yml'
+  workflow_dispatch:        # 수동 실행(수정 검증용)
+
+# 리포 기본값은 설정 하나로 write-all 이 될 수 있어 워크플로에 명시한다.
+permissions:
+  contents: read
+
+# 같은 PR 에 연속 푸시하면 앞 실행을 취소한다(하니스가 수 분 걸린다).
+concurrency:
+  group: lemon-note-races-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: 05_lemon-note/local-worker
+
+jobs:
+  races:
+    name: 재현 하니스 (postgres + sqlite 대조)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        # 프로덕션(Supabase)과 같은 메이저 버전. 하니스의 안전장치가 비로컬 DB 를
+        # 거부하므로, 여기서도 반드시 localhost 로 노출된 컨테이너여야 한다.
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: lemonrace
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d lemonrace"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      # localhost 이므로 하니스의 로컬 전용 가드를 통과한다.
+      # (원격 호스트나 supabase/pooler 문자열이면 종료코드 2 로 거부된다)
+      REPRO_PG_DSN: postgresql://postgres:postgres@localhost:5432/lemonrace
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            05_lemon-note/local-worker/requirements.txt
+            05_lemon-note/local-worker/requirements-dev.txt
+
+      - name: 의존성 설치
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Postgres 스키마 적용
+        # postgres 백엔드는 init_db() 가 DDL 을 돌리지 않는다(Supabase 에 이미 적용돼 있다는 전제).
+        # 그래서 빈 DB 에는 schema_postgres.sql 을 수동 적용해야 한다.
+        run: python scripts/repro_races.py init-schema --pg-dsn "$REPRO_PG_DSN"
+
+      - name: 안전장치 확인 (원격 DSN 을 거부하는지)
+        # 이 하니스는 로컬 전용이고, 그 전제가 깨지면 프로덕션 DB 를 건드릴 수 있다.
+        # 가드가 살아있는지 먼저 확인한다 — 거부는 종료코드 2 여야 한다.
+        run: |
+          set +e
+          python scripts/repro_races.py abort-swallow --backend postgres \
+            --pg-dsn "postgresql://u:p@db.example.com:5432/x" >/dev/null 2>&1
+          code=$?
+          set -e
+          if [ "$code" -ne 2 ]; then
+            echo "::error::안전장치가 원격 DSN 을 거부하지 않았다 (종료코드 $code, 2 여야 함)"
+            exit 1
+          fi
+          echo "원격 DSN 거부 확인 (종료코드 2)"
+
+      - name: 전체 시나리오 실행
+        # burst 는 병렬 요청 수. 러너 코어가 적어 로컬보다 낮춰 잡는다 —
+        # 결함이 되살아나면 이 크기로도 초과가 잡힌다(수정 전 burst 60 에서 +10 이었다).
+        run: python scripts/repro_races.py all --pg-dsn "$REPRO_PG_DSN" --burst 40
+
+      - name: 실패 시 안내
+        if: failure()
+        run: |
+          echo "::notice::경합/부분쓰기 회귀가 감지됐다."
+          echo "배경과 각 시나리오의 의미: 05_lemon-note/docs/race-conditions.md"
+          echo "로컬 재현:"
+          echo "  cd 05_lemon-note/local-worker"
+          echo "  docker run -d --name lemon-race-pg -e POSTGRES_PASSWORD=postgres \\"
+          echo "      -e POSTGRES_DB=lemonrace -p 55432:5432 postgres:16"
+          echo "  python -m pip install -r requirements-dev.txt"
+          echo "  python scripts/repro_races.py init-schema --pg-dsn postgresql://postgres:postgres@127.0.0.1:55432/lemonrace"
+          echo "  python scripts/repro_races.py all       --pg-dsn postgresql://postgres:postgres@127.0.0.1:55432/lemonrace"

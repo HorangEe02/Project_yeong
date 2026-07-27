@@ -1,0 +1,4 @@
+# 개발·검증 전용 의존성 (프로덕션 배포에는 포함하지 않는다 — Vercel 은 requirements.txt 만 쓴다).
+-r requirements.txt
+
+httpx==0.28.1        # scripts/repro_races.py 가 HTTP 시나리오에 쓴다
