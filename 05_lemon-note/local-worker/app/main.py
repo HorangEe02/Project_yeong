@@ -263,11 +263,35 @@ async def create_job(
             (rec_id, meeting_id, user_id, "original", saved["path"],
              _safe_mime(ext), saved["size"], duration_ms, saved["checksum"], now),
         )
-        conn.execute(
-            """INSERT INTO jobs (id,meeting_id,status,progress,created_at,updated_at)
-               VALUES (?,?,?,?,?,?)""",
-            (job_id, meeting_id, "uploaded", 0.0, now, now),
-        )
+        # 상한을 **jobs INSERT 와 같은 문장**에서 강제한다. 위 _rate_limited() 는 큰 파일을
+        # 받기 전에 값싸게 걷어내는 사전 검사일 뿐이고, 그것만으로는 검사~INSERT 사이에
+        # 업로드 전체가 들어가는 넓은 창이 남는다(실측: 상한 5 에 6~11건 생성).
+        if config.MAX_JOBS_PER_HOUR > 0:
+            if database.BACKEND == "postgres":
+                # 조건부 INSERT 의 서브쿼리도 커밋된 상태만 본다 → 동시 요청이 서로를 못 보면
+                # 둘 다 통과한다. '세고 넣는' 구간만 전역 잠금으로 직렬화한다(업로드는 이미
+                # 끝나 밀리초). sqlite 는 위 meetings INSERT 로 쓰기 트랜잭션이 이미 열려
+                # 전역 직렬화 상태라 불필요하다.
+                conn.execute("SELECT pg_advisory_xact_lock(?)", (_RATE_LIMIT_LOCK_KEY,))
+            claimed = conn.execute(
+                "INSERT INTO jobs (id,meeting_id,status,progress,created_at,updated_at) "
+                "SELECT ?,?,?,?,?,? WHERE ("
+                "  SELECT COUNT(*) FROM jobs WHERE created_at > ?) < ?",
+                (job_id, meeting_id, "uploaded", 0.0, now, now,
+                 datetime.now(timezone.utc) - timedelta(hours=1), config.MAX_JOBS_PER_HOUR),
+            )
+            if not claimed.rowcount:
+                # 커밋하지 않으므로 meetings·recording_files 는 롤백되지만, 스토리지 객체는
+                # 이미 올라가 있어 남는다 → 지운다(#44 의 내보내기와 같은 이유).
+                storage.delete(saved["path"])
+                return _err(429, "rate_limited",
+                            "지금은 업로드가 몰려 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.")
+        else:
+            conn.execute(
+                """INSERT INTO jobs (id,meeting_id,status,progress,created_at,updated_at)
+                   VALUES (?,?,?,?,?,?)""",
+                (job_id, meeting_id, "uploaded", 0.0, now, now),
+            )
         for at_ms in _parse_bookmarks(bookmarks):
             conn.execute(
                 "INSERT INTO meeting_bookmarks (id,meeting_id,at_ms,label,created_at) VALUES (?,?,?,?,?)",
@@ -285,8 +309,21 @@ async def create_job(
 
 
 
+# 레이트리밋의 '세고 넣는' 구간을 직렬화할 postgres advisory 잠금 키(임의 상수).
+# xact 잠금이라 트랜잭션이 끝나면 자동 해제된다.
+_RATE_LIMIT_LOCK_KEY = 8240119
+
+
 def _rate_limited():
-    """시간당 업로드 상한. 직접 업로드 경로(presign)와 기존 multipart 가 함께 쓴다."""
+    """시간당 업로드 상한의 **사전 검사**(값싼 빠른 거부).
+
+    큰 파일을 다 받은 뒤 거절하지 않으려고 앞단에서 한 번 본다. 이것만으로는 상한이
+    지켜지지 않는다 — 검사와 jobs INSERT 사이에 업로드 전체가 들어가는 넓은 창이 있고,
+    병렬 요청이 모두 상한 미달을 보고 통과한다(실측: 상한 5 에 6~11건 생성).
+    실제 강제는 create_job 의 조건부 INSERT + 잠금이 한다.
+    presign 경로는 job 을 만들지 않으므로 여기까지가 전부이고, 진짜 상한은
+    이어지는 create_job 에서 걸린다.
+    """
     if config.MAX_JOBS_PER_HOUR <= 0:
         return None
     conn = db.connect()

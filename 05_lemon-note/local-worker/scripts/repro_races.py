@@ -91,7 +91,8 @@ def assert_local_url(url: str):
         die(f"비로컬 API 대상을 거부한다: {host!r}")
 
 
-def _env_for(backend: str, dsn: str, workdir: Path, write_protected: str = "0") -> dict:
+def _env_for(backend: str, dsn: str, workdir: Path, write_protected: str = "0",
+             max_jobs: str = "0") -> dict:
     """백엔드별 실행 환경. DATABASE_URL 을 항상 명시해 .env 유입을 차단한다."""
     env = dict(os.environ)
     env["DB_BACKEND"] = backend
@@ -104,7 +105,7 @@ def _env_for(backend: str, dsn: str, workdir: Path, write_protected: str = "0") 
     env["SYNC_PIPELINE"] = "1"
     env["WRITE_PROTECTED"] = write_protected
     env["HEALTH_DETAIL"] = "1"
-    env["MAX_JOBS_PER_HOUR"] = "0"          # 레이트리밋이 재현을 방해하지 않게
+    env["MAX_JOBS_PER_HOUR"] = max_jobs     # 기본 0=끔(다른 시나리오를 방해하지 않게)
     env["PYTHONPATH"] = str(REPO)
     env.pop("LOCAL_API_TOKEN", None)         # 인증 비활성(데모와 동일)
     return env
@@ -545,6 +546,109 @@ def scenario_smoke(backend: str, dsn: str, workdir: Path) -> dict:
 
 
 # --------------------------------------------------------------------------
+# 시나리오 10: 업로드 레이트리밋 (검사-후-사용)
+# --------------------------------------------------------------------------
+
+_RL_CAP = 5
+
+
+def scenario_rate_limit(backend: str, dsn: str, workdir: Path, burst: int = 32) -> dict:
+    """MAX_JOBS_PER_HOUR=5 로 띄우고 회의 생성을 병렬로 20건 쏜다.
+
+    상한 검사가 별도 커넥션에서 세고 닫은 뒤 **업로드 전체를 사이에 두고** INSERT 하면,
+    병렬 요청이 모두 상한 미달을 보고 통과해 상한을 넘긴다.
+    거부된 요청의 스토리지 파일이 정리되는지도 함께 본다(고아 파일).
+    """
+    import httpx
+    config, database, db, _pipeline = _load_app(backend, dsn, workdir)
+
+    # postgres 는 DB 를 재사용하므로 앞선 시나리오의 jobs 가 상한 계산에 섞인다. 비우고 시작한다.
+    conn = db.connect()
+    try:
+        for tbl in ("summary_sections", "summary_decisions", "action_items", "calendar_candidates"):
+            conn.execute(f"DELETE FROM {tbl}")
+        conn.execute("DELETE FROM notification_states")
+        for tbl in ("jobs", "recording_files", "transcript_segments", "speaker_aliases",
+                    "transcript_highlights", "share_links", "meeting_bookmarks",
+                    "exports", "share_logs", "audit_logs", "summary_versions"):
+            conn.execute(f"DELETE FROM {tbl}")
+        conn.execute("DELETE FROM meetings")
+        conn.commit()
+    finally:
+        conn.close()
+
+    env = _env_for(backend, dsn, workdir, max_jobs=str(_RL_CAP))
+    port = _free_port()
+    proc, base = _start_server(env, port)
+    assert_local_url(base)
+    try:
+        # 창을 실제 크기로 만든다. 프로덕션은 파일이 네트워크로 Supabase Storage 까지
+        # 가므로 검사~INSERT 사이가 수백 ms~초다. 로컬에서 4KB 를 쓰면 마이크로초라
+        # 창이 사실상 없어져 결함이 드러나지 않는다(실측: 4KB 로는 재현 안 됨).
+        blob = b"x" * (6 * 1024 * 1024)
+
+        def create(i):
+            try:
+                r = httpx.post(f"{base}/v1/jobs", timeout=120.0,
+                               files={"audio_file": (f"a{i}.webm", blob, "audio/webm")},
+                               data={"title": f"rl-{i}", "duration_ms": "180000",
+                                     "recording_consent_confirmed": "true"})
+                body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+                err = ((body.get("detail") or {}).get("error") or body.get("error") or {})
+                return r.status_code, err.get("code")
+            except Exception as e:  # noqa: BLE001
+                return None, type(e).__name__
+
+        with ThreadPoolExecutor(max_workers=burst) as ex:
+            results = list(ex.map(create, range(burst)))
+
+        created = _count(db, "SELECT COUNT(*) AS n FROM jobs", ())
+        meetings = _count(db, "SELECT COUNT(*) AS n FROM meetings", ())
+        recs = _count(db, "SELECT COUNT(*) AS n FROM recording_files", ())
+        ok = sum(1 for c, _ in results if c == 201)
+        limited = sum(1 for c, code in results if c == 429 and code == "rate_limited")
+        other = [r for r in results if r[0] not in (201, 429)]
+
+        # 거부된 업로드의 파일이 남았는지 — 로컬 저장소 파일 수는 수락된 건수와 같아야 한다.
+        storage_root = workdir / "storage"
+        files = [f for f in storage_root.rglob("*") if f.is_file()] if storage_root.exists() else []
+
+        problems = []
+        if created != _RL_CAP:
+            problems.append(f"jobs 행 {created}건 (상한 {_RL_CAP} 이어야 함)")
+        if ok != _RL_CAP:
+            problems.append(f"201 응답 {ok}건 (상한 {_RL_CAP} 이어야 함)")
+        if meetings != _RL_CAP or recs != _RL_CAP:
+            problems.append(f"거부된 요청의 행이 남았다: meetings={meetings} recording_files={recs}")
+        if len(files) != _RL_CAP:
+            problems.append(f"고아 스토리지 파일: {len(files)}개 (수락 {_RL_CAP}건과 같아야 함)")
+        if other:
+            problems.append(f"예상 밖 응답: {other[:3]}")
+
+        return {
+            "scenario": "rate-limit (상한 검사-후-사용)",
+            "backend": backend,
+            "cap": _RL_CAP,
+            "burst": burst,
+            "http_201": ok,
+            "http_429": limited,
+            "other": other[:3],
+            "jobs_rows": created,
+            "meetings_rows": meetings,
+            "recording_files_rows": recs,
+            "storage_files": len(files),
+            "problems": problems,
+            "reproduced": bool(problems),
+        }
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+# --------------------------------------------------------------------------
 # 시나리오 9: 폴더 이동 사이클 (교차 이동 경합)
 # --------------------------------------------------------------------------
 
@@ -944,7 +1048,7 @@ def main():
     ap.add_argument("command", choices=["init-schema", "abort-swallow", "share-lockout",
                                         "retry-lock", "settings-merge", "smoke",
                                         "gates", "summary-lock", "misc",
-                                        "folder-cycle", "all"])
+                                        "folder-cycle", "rate-limit", "all"])
     ap.add_argument("--pg-dsn", default=os.getenv("REPRO_PG_DSN", ""),
                     help="로컬 Postgres DSN (비로컬은 거부됨)")
     ap.add_argument("--backend", choices=["postgres", "sqlite"], default="postgres")
@@ -985,6 +1089,8 @@ def main():
             _run_child("misc", "sqlite", args),
             _run_child("folder-cycle", "postgres", args),
             _run_child("folder-cycle", "sqlite", args),
+            _run_child("rate-limit", "postgres", args),
+            _run_child("rate-limit", "sqlite", args),
         ]
         any_repro = False
         for r in results:
@@ -1020,6 +1126,8 @@ def main():
             res = scenario_misc(args.backend, args.pg_dsn, workdir)
         elif args.command == "folder-cycle":
             res = scenario_folder_cycle(args.backend, args.pg_dsn, workdir)
+        elif args.command == "rate-limit":
+            res = scenario_rate_limit(args.backend, args.pg_dsn, workdir)
         else:
             res = scenario_share_lockout(args.backend, args.pg_dsn, workdir, burst=args.burst)
         if args.json:
