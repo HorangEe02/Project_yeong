@@ -385,10 +385,11 @@
      3. API 레이어
      ======================================================================= */
 
-  function ApiError(message, code, status) {
+  function ApiError(message, code, status, details) {
     var err = new Error(message);
     err.code = code;
     err.status = status;
+    err.details = details || {};   // 서버 _err 의 details (예: 요약 충돌 시 current_version)
     return err;
   }
 
@@ -408,7 +409,8 @@
           throw ApiError(
             (errObj && errObj.message) || ('요청이 실패했습니다. (HTTP ' + res.status + ')'),
             (errObj && errObj.code) || 'unknown_error',
-            res.status
+            res.status,
+            errObj && errObj.details
           );
         }
         return data;
@@ -3599,7 +3601,11 @@
           summary: summaryState.summary,
           decisions: summaryState.decisions,
           action_items: summaryState.action_items,
-          calendar_candidates: summaryState.calendar_candidates
+          calendar_candidates: summaryState.calendar_candidates,
+          /* 낙관적 잠금: 편집을 시작한(= 마지막으로 받은) 버전. 그 사이 다른 탭이나
+             다른 방문자가 저장했으면 서버가 409 로 거부한다. 공용 계정이라 남의 편집을
+             통째로 덮어쓰는 일이 실제로 생긴다. 요약이 아직 없으면 0. */
+          base_version: summaryState.version || 0
         };
         [saveBtn1, saveBtn2, saveBtn3].forEach(function (b) { if (b) b.disabled = true; });
         /* 저장 중에도 입력은 막히지 않는다(비활성화되는 건 저장 버튼뿐). 그래서 응답에서
@@ -3616,6 +3622,15 @@
           ListColumn.refresh(true);
           toast('요약이 저장되었습니다. (v' + res.version + ')', 'success');
         }).catch(function (err) {
+          if (err && err.code === 'summary_conflict') {
+            /* 사용자의 편집은 절대 버리지 않는다. 화면은 그대로 두고 충돌만 알린다.
+               dirty 표시도 유지돼야 '저장됨' 으로 오해하지 않는다. */
+            var cur = (err.details && err.details.current_version) || 0;
+            toast('다른 곳에서 요약이 먼저 저장됐습니다(현재 v' + cur + ').' +
+                  ' 내 편집은 그대로 두었어요 — 최신 내용을 확인한 뒤 다시 저장해 주세요.',
+                  'error', { duration: 9000 });
+            return;
+          }
           toast(err.message || '요약 저장에 실패했습니다.', 'error');
         }).finally(function () {
           [saveBtn1, saveBtn2, saveBtn3].forEach(function (b) { if (b) b.disabled = false; });

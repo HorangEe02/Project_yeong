@@ -333,7 +333,7 @@ def audit(conn, user_id, meeting_id, event_type, metadata=None) -> None:
 
 
 def store_summary_version(conn, meeting_id, result, source, created_by=None,
-                          raw_model_output=None):
+                          raw_model_output=None, expect_version=None):
     """summary_versions + 자식(decisions/action_items/calendar_candidates)을 새 버전으로 저장.
 
     version 은 (meeting_id) 기준 max+1 로 채번한다. 채번과 INSERT 를 **한 문장**
@@ -344,21 +344,33 @@ def store_summary_version(conn, meeting_id, result, source, created_by=None,
 
     잔여 창: 커밋 전인 동시 INSERT 는 서로의 MAX 를 못 보므로 같은 번호를 계산할 수
     있다. 그때는 UNIQUE(meeting_id, version) 가 예외로 잡는다 — 조용한 유실은 없다.
+
+    expect_version 을 주면 **낙관적 잠금**이다. 현재 최신 버전이 그 값일 때만 저장한다.
+    검사를 파이썬으로 하면(먼저 MAX 를 읽고 비교) 그 사이 다른 저장이 끼어드는
+    검사-후-사용 창이 생기므로, HAVING 으로 같은 INSERT 문 안에서 판정한다.
+    조건이 어긋나면 0 행이 삽입되고 (None, None) 을 돌려준다 — 호출측이 409 로 옮긴다.
+    거부된 시도는 버전 번호도 소비하지 않는다.
     """
     sv_id = new_id("summary_")
     now = now_iso()
     # NOT NULL 텍스트 컬럼은 None→"" 로 방어 (LLM이 null 필드를 반환해도 저장 실패 금지)
     def s(v):
         return v if isinstance(v, str) else ("" if v is None else str(v))
-    conn.execute(
-        """INSERT INTO summary_versions
+    sql = ("""INSERT INTO summary_versions
            (id,meeting_id,version,source,title,summary,raw_json,raw_model_output,created_by,created_at)
            SELECT ?,?,COALESCE(MAX(version),0)+1,?,?,?,?,?,?,?
-             FROM summary_versions WHERE meeting_id=?""",
-        (sv_id, meeting_id, source, s(result.get("title")),
-         s(result.get("summary")), database.enc_json(result),
-         raw_model_output, created_by, now, meeting_id),
-    )
+             FROM summary_versions WHERE meeting_id=?""")
+    params = [sv_id, meeting_id, source, s(result.get("title")),
+              s(result.get("summary")), database.enc_json(result),
+              raw_model_output, created_by, now, meeting_id]
+    if expect_version is not None:
+        # 집계 질의(GROUP BY 없음)라 한 행이 나오고, HAVING 이 그 행을 거른다.
+        # sqlite·postgres 양쪽에서 같은 의미로 동작하는 것을 실측 확인했다.
+        sql += "\n             HAVING COALESCE(MAX(version),0) = ?"
+        params.append(int(expect_version))
+    cur = conn.execute(sql, tuple(params))
+    if expect_version is not None and not cur.rowcount:
+        return None, None       # 그 사이 다른 저장이 있었다 → 호출측이 409
     # 채번 결과는 되읽어 확인한다(호출측이 응답에 버전 번호를 쓴다).
     version = conn.execute(
         "SELECT version FROM summary_versions WHERE id=?", (sv_id,)).fetchone()["version"]

@@ -85,6 +85,24 @@ def _local_timezone() -> str:
     return f"{sign}{total // 3600:02d}:{(total % 3600) // 60:02d}"
 
 
+def is_unique_violation(exc) -> bool:
+    """UNIQUE 제약 위반인지 백엔드 무관하게 판정한다.
+
+    낙관적 잠금(HAVING)은 **커밋된** 상태만 본다. Postgres 에서 두 저장이 동시에
+    들어오면 서로의 커밋 전 행을 못 봐 둘 다 HAVING 을 통과하고, 진 쪽이
+    UNIQUE(meeting_id, version) 에 걸린다. 그 예외를 500 이 아니라 409 로 옮기려면
+    여기서 종류를 구분해야 한다(SQLite 는 쓰기가 직렬화돼 HAVING 단계에서 걸러진다).
+    """
+    if BACKEND == "postgres":
+        try:
+            import psycopg
+            return isinstance(exc, psycopg.errors.UniqueViolation)
+        except Exception:  # noqa: BLE001 - psycopg 부재 시 판정 불가
+            return False
+    import sqlite3
+    return isinstance(exc, sqlite3.IntegrityError)
+
+
 def connect():
     if BACKEND == "postgres":
         import psycopg

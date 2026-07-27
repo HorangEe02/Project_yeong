@@ -1126,8 +1126,27 @@ def patch_summary(meeting_id: str, body: SummaryPatch,
             "action_items": [a.model_dump() for a in body.action_items],
             "calendar_candidates": [c.model_dump() for c in body.calendar_candidates],
         }
-        sv_id, version = db.store_summary_version(
-            conn, meeting_id, result, source="user", created_by=user_id)
+        try:
+            sv_id, version = db.store_summary_version(
+                conn, meeting_id, result, source="user", created_by=user_id,
+                expect_version=body.base_version)
+        except Exception as exc:  # noqa: BLE001
+            # HAVING 은 커밋된 상태만 본다. Postgres 에서 동시 저장 두 개가 서로의 커밋 전
+            # 행을 못 보면 둘 다 통과하고 진 쪽이 UNIQUE(meeting_id, version) 에 걸린다.
+            # 그건 500 이 아니라 충돌이다.
+            if body.base_version is None or not database.is_unique_violation(exc):
+                raise
+            # 실패한 문장이 트랜잭션을 aborted 로 만들었으므로, 아래 조회 전에 되돌린다.
+            conn.rollback()
+            sv_id = None
+        if sv_id is None:
+            # 낙관적 잠금 충돌: 편집을 시작한 뒤 다른 탭·다른 방문자가 먼저 저장했다.
+            # 덮어쓰지 않고 거부한다(공용 계정이라 남의 편집을 지우는 일이 실제로 생긴다).
+            latest = db.latest_summary_version_row(conn, meeting_id)
+            return _err(409, "summary_conflict",
+                        "다른 곳에서 요약이 먼저 저장됐습니다. 최신 내용을 확인한 뒤 다시 저장해 주세요.",
+                        {"current_version": latest["version"] if latest else 0,
+                         "your_base_version": body.base_version})
         db.audit(conn, user_id, meeting_id, "summary_edited", {"version": version})
         return {"summary_version_id": sv_id, "version": version, "source": "user"}
     finally:

@@ -540,6 +540,82 @@ def scenario_smoke(backend: str, dsn: str, workdir: Path) -> dict:
 
 
 # --------------------------------------------------------------------------
+# 시나리오 7: 요약 저장 낙관적 잠금
+# --------------------------------------------------------------------------
+
+def scenario_summary_lock(backend: str, dsn: str, workdir: Path) -> dict:
+    """같은 base_version 으로 두 개의 요약 저장을 동시에 쏜다.
+
+    낙관적 잠금이 있으면 하나만 200 이고 나머지는 409 summary_conflict 여야 한다.
+    둘 다 200 이면 나중 것이 앞 편집을 덮어쓴 것이다(공용 계정이라 남의 편집이 사라진다).
+    base_version 없이 보내면 예전처럼 통과해야 한다(구 클라이언트 호환).
+    """
+    import httpx
+    config, database, db, pipeline = _load_app(backend, dsn, workdir)
+    mid, jid = _seed_meeting(config, database, db, title="요약 잠금 재현용")
+    pipeline.run_pipeline(jid, mid)          # v1(ai) 생성
+
+    env = _env_for(backend, dsn, workdir)
+    port = _free_port()
+    proc, base = _start_server(env, port)
+    assert_local_url(base)
+    url = f"{base}/v1/meetings/{mid}/summary"
+    try:
+        cur = httpx.get(f"{base}/v1/meetings/{mid}/summary", timeout=30.0)
+        start_version = (cur.json() or {}).get("version") if cur.status_code == 200 else None
+
+        def save(tag, base_version):
+            body = {"title": f"제목-{tag}", "summary": f"본문-{tag}",
+                    "decisions": [], "action_items": [], "calendar_candidates": []}
+            if base_version is not None:
+                body["base_version"] = base_version
+            try:
+                r = httpx.patch(url, json=body, timeout=60.0)
+                d = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+                err = (d.get("error") or {})
+                return {"tag": tag, "status": r.status_code,
+                        "code": err.get("code"), "version": d.get("version"),
+                        "current_version": (err.get("details") or {}).get("current_version")}
+            except Exception as e:  # noqa: BLE001
+                return {"tag": tag, "status": None, "code": type(e).__name__}
+
+        # 두 '탭'이 같은 base 에서 동시에 저장
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            results = list(ex.map(lambda t: save(t, start_version), ["A", "B"]))
+        ok = [r for r in results if r["status"] == 200]
+        conflict = [r for r in results if r["status"] == 409 and r["code"] == "summary_conflict"]
+
+        # 최신 버전 = 이긴 쪽의 내용이어야 한다(진 쪽이 덮어쓰지 못했는지)
+        after = httpx.get(f"{base}/v1/meetings/{mid}/summary", timeout=30.0).json()
+        winner = ok[0]["tag"] if len(ok) == 1 else None
+        stored_matches_winner = (winner is not None
+                                 and (after.get("title") or "").endswith(winner))
+
+        # 구 클라이언트 호환: base_version 없이 보내면 통과
+        legacy = save("LEGACY", None)
+
+        return {
+            "scenario": "summary-lock (낙관적 잠금)",
+            "backend": backend,
+            "start_version": start_version,
+            "concurrent": results,
+            "http_200": len(ok),
+            "http_409_conflict": len(conflict),
+            "stored_title_after": after.get("title"),
+            "stored_matches_winner": stored_matches_winner,
+            "legacy_no_base_version": legacy,
+            "reproduced": not (len(ok) == 1 and len(conflict) == 1
+                               and stored_matches_winner and legacy["status"] == 200),
+        }
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+# --------------------------------------------------------------------------
 # 시나리오 6: 인증 게이트 (WRITE_PROTECTED=1 프로덕션 구성)
 # --------------------------------------------------------------------------
 
@@ -643,7 +719,7 @@ def main():
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("command", choices=["init-schema", "abort-swallow", "share-lockout",
                                         "retry-lock", "settings-merge", "smoke",
-                                        "gates", "all"])
+                                        "gates", "summary-lock", "all"])
     ap.add_argument("--pg-dsn", default=os.getenv("REPRO_PG_DSN", ""),
                     help="로컬 Postgres DSN (비로컬은 거부됨)")
     ap.add_argument("--backend", choices=["postgres", "sqlite"], default="postgres")
@@ -678,6 +754,8 @@ def main():
             _run_child("smoke", "postgres", args),
             _run_child("smoke", "sqlite", args),
             _run_child("gates", "postgres", args),
+            _run_child("summary-lock", "postgres", args),
+            _run_child("summary-lock", "sqlite", args),
         ]
         any_repro = False
         for r in results:
@@ -707,6 +785,8 @@ def main():
             res = scenario_smoke(args.backend, args.pg_dsn, workdir)
         elif args.command == "gates":
             res = scenario_gates(args.backend, args.pg_dsn, workdir)
+        elif args.command == "summary-lock":
+            res = scenario_summary_lock(args.backend, args.pg_dsn, workdir)
         else:
             res = scenario_share_lockout(args.backend, args.pg_dsn, workdir, burst=args.burst)
         if args.json:
