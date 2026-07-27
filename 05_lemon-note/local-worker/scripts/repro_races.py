@@ -540,6 +540,126 @@ def scenario_smoke(backend: str, dsn: str, workdir: Path) -> dict:
 
 
 # --------------------------------------------------------------------------
+# 시나리오 8: 나머지 수정 묶음 (겹침 하이라이트 · 공유링크 상한 · 비uuid id · purge 순서)
+# --------------------------------------------------------------------------
+
+def scenario_misc(backend: str, dsn: str, workdir: Path) -> dict:
+    """P1 잔여 항목들의 회귀 확인.
+
+    - 겹치는 하이라이트는 409 로 거부돼야 한다(예전엔 저장되고 렌더에서 스킵돼
+      UI 로 지울 수 없는 고아 행이 됐다).
+    - 공유 링크 20개 상한은 병렬 생성에서도 지켜져야 한다(검사-후-사용 → 단일 문장).
+    - 형식이 잘못된 id 는 404 여야 한다(postgres 에서 500 이었다).
+    - purge 는 DB 커밋 뒤 파일을 지운다 — 정상 경로에서 둘 다 사라져야 한다.
+    """
+    import httpx
+    config, database, db, pipeline = _load_app(backend, dsn, workdir)
+    mid, jid = _seed_meeting(config, database, db, title="잔여 수정 확인용")
+    pipeline.run_pipeline(jid, mid)          # 세그먼트 12개 생성
+
+    env = _env_for(backend, dsn, workdir)
+    port = _free_port()
+    proc, base = _start_server(env, port)
+    assert_local_url(base)
+    try:
+        def code(method, path, **kw):
+            r = httpx.request(method, base + path, timeout=60.0, **kw)
+            body = {}
+            if r.headers.get("content-type", "").startswith("application/json"):
+                try:
+                    body = r.json()
+                except Exception:  # noqa: BLE001
+                    body = {}
+            err = ((body.get("detail") or {}).get("error") or body.get("error") or {})
+            return r.status_code, err.get("code"), body
+
+        # --- 겹치는 하이라이트 ---
+        segs = httpx.get(f"{base}/v1/meetings/{mid}/segments", timeout=30.0)
+        seg_id, seg_len = None, 0
+        if segs.status_code == 200:
+            items = (segs.json() or {}).get("items") or []
+            # 오프셋이 본문 길이를 넘으면 422 라, 충분히 긴 발화를 고른다.
+            for it in items:
+                text = it.get("corrected_text") or it.get("text") or ""
+                if len(text) >= 10:
+                    seg_id, seg_len = it["segment_id"], len(text)
+                    break
+        hl = {}
+        if seg_id:
+            hl["first"] = code("POST", f"/v1/meetings/{mid}/highlights",
+                               json={"segment_id": seg_id, "start_offset": 0, "end_offset": 5})[:2]
+            hl["overlap"] = code("POST", f"/v1/meetings/{mid}/highlights",
+                                 json={"segment_id": seg_id, "start_offset": 3, "end_offset": 8})[:2]
+            hl["adjacent_ok"] = code("POST", f"/v1/meetings/{mid}/highlights",
+                                     json={"segment_id": seg_id, "start_offset": 5, "end_offset": 9})[:2]
+
+        # --- 공유 링크 상한: 25개 병렬 생성 → 정확히 20개만 ---
+        def mk(_i):
+            return code("POST", f"/v1/meetings/{mid}/share-links", json={"expires_in_days": 30})[0]
+        with ThreadPoolExecutor(max_workers=25) as ex:
+            codes = list(ex.map(mk, range(25)))
+        created = _count(
+            db, "SELECT COUNT(*) AS n FROM share_links WHERE meeting_id=? AND revoked_at IS NULL",
+            (mid,))
+
+        # --- 형식이 잘못된 id ---
+        bad = {
+            "GET /meetings/<bad>": code("GET", "/v1/meetings/not-a-uuid")[0],
+            "POST /exports/<bad>": code("POST", "/v1/meetings/not-a-uuid/exports",
+                                        json={"format": "md", "include_transcript": False})[0],
+        }
+
+        # --- purge: soft-delete 후 영구삭제하면 행도 파일도 사라져야 한다 ---
+        files_before = _count(
+            db, "SELECT COUNT(*) AS n FROM recording_files WHERE meeting_id=?", (mid,))
+        code("DELETE", f"/v1/meetings/{mid}")            # soft delete
+        purge = code("DELETE", f"/v1/meetings/{mid}/purge")[0]
+        rows_after = _count(db, "SELECT COUNT(*) AS n FROM meetings WHERE id=?", (mid,))
+        seg_after = _count(
+            db, "SELECT COUNT(*) AS n FROM transcript_segments WHERE meeting_id=?", (mid,))
+
+        problems = []
+        if seg_id:
+            if hl["first"][0] != 201:
+                problems.append(f"첫 하이라이트가 201 이 아님: {hl['first']}")
+            if not (hl["overlap"][0] == 409 and hl["overlap"][1] == "highlight_overlap"):
+                problems.append(f"겹침이 409 로 거부되지 않음: {hl['overlap']}")
+            if hl["adjacent_ok"][0] != 201:
+                problems.append(f"인접(비겹침)이 거부됨: {hl['adjacent_ok']}")
+        else:
+            problems.append("10자 이상 발화를 못 찾아 하이라이트 검사를 못 함")
+        if created != 20:
+            problems.append(f"공유 링크 상한 초과/미달: {created} (20 이어야 함)")
+        for k, v in bad.items():
+            if v == 500:
+                problems.append(f"{k} 가 500 (404 여야 함)")
+        if purge != 200 or rows_after != 0 or seg_after != 0:
+            problems.append(f"purge 정상 경로 실패: status={purge} rows={rows_after} seg={seg_after}")
+
+        return {
+            "scenario": "misc (P1 잔여 수정)",
+            "backend": backend,
+            "highlight": hl,
+            "segment_text_len": seg_len,
+            "share_link_parallel_25_created": created,
+            "share_link_status_codes": {str(c): codes.count(c) for c in set(codes)},
+            "invalid_id_status": bad,
+            "recording_files_before_purge": files_before,
+            "purge_status": purge,
+            "rows_after_purge": rows_after,
+            "segments_after_purge": seg_after,
+            "problems": problems,
+            "reproduced": bool(problems),
+        }
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+# --------------------------------------------------------------------------
 # 시나리오 7: 요약 저장 낙관적 잠금
 # --------------------------------------------------------------------------
 
@@ -719,7 +839,7 @@ def main():
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("command", choices=["init-schema", "abort-swallow", "share-lockout",
                                         "retry-lock", "settings-merge", "smoke",
-                                        "gates", "summary-lock", "all"])
+                                        "gates", "summary-lock", "misc", "all"])
     ap.add_argument("--pg-dsn", default=os.getenv("REPRO_PG_DSN", ""),
                     help="로컬 Postgres DSN (비로컬은 거부됨)")
     ap.add_argument("--backend", choices=["postgres", "sqlite"], default="postgres")
@@ -756,6 +876,8 @@ def main():
             _run_child("gates", "postgres", args),
             _run_child("summary-lock", "postgres", args),
             _run_child("summary-lock", "sqlite", args),
+            _run_child("misc", "postgres", args),
+            _run_child("misc", "sqlite", args),
         ]
         any_repro = False
         for r in results:
@@ -787,6 +909,8 @@ def main():
             res = scenario_gates(args.backend, args.pg_dsn, workdir)
         elif args.command == "summary-lock":
             res = scenario_summary_lock(args.backend, args.pg_dsn, workdir)
+        elif args.command == "misc":
+            res = scenario_misc(args.backend, args.pg_dsn, workdir)
         else:
             res = scenario_share_lockout(args.backend, args.pg_dsn, workdir, burst=args.burst)
         if args.json:

@@ -649,6 +649,15 @@
                          { title: '녹음 중단', confirmLabel: '나가기', danger: true });
   }
 
+  /* 저장하지 않은 요약 편집이 있는지(회의 상세). 녹음 가드와 같은 층에서 이탈을 막는다.
+     상세 뷰의 dirty 는 클로저 변수라 navigate 에서 못 보므로 여기에 미러링한다.
+     상세 cleanup 과 저장 성공 시 반드시 false 로 돌린다. */
+  var summaryDirty = false;
+  function confirmLeaveUnsavedSummary() {
+    return confirmDialog('저장하지 않은 요약 편집이 있습니다. 지금 나가면 사라집니다.',
+                         { title: '저장하지 않음', confirmLabel: '나가기', danger: true });
+  }
+
   function navigate(hash) {
     /* 앵커뿐 아니라 JS 에서 부르는 이동(#lc-compose·#lc-bell·노트 행 등)도 여기를 지난다.
        특히 같은 해시로 부르면 hashchange 없이 renderRoute 가 바로 돌아 cleanup 이 실행되므로
@@ -657,6 +666,14 @@
       confirmLeaveRecording().then(function (ok) {
         if (!ok) return;
         recordingActive = false;
+        navigate(hash);
+      });
+      return;
+    }
+    if (summaryDirty) {
+      confirmLeaveUnsavedSummary().then(function (ok) {
+        if (!ok) return;
+        summaryDirty = false;
         navigate(hash);
       });
       return;
@@ -3551,6 +3568,7 @@
       var dirtyTick = 0;   // markDirty 호출 횟수. 저장 요청이 떠난 뒤 사용자가 또 고쳤는지 본다.
       function markDirty() {
         dirty = true;
+        summaryDirty = true;   // navigate 가 볼 수 있게 모듈 레벨로 미러링
         dirtyTick += 1;   // 저장 중 수정 여부 판정용(아래 saveSummary)
         [summarySaveStatus, todoSaveStatus, calSaveStatus].forEach(function (el) {
           if (!el) return;
@@ -3560,6 +3578,7 @@
       }
       function markClean() {
         dirty = false;
+        summaryDirty = false;
         [summarySaveStatus, todoSaveStatus, calSaveStatus].forEach(function (el) {
           if (!el) return;
           el.classList.remove('is-dirty');
@@ -3858,6 +3877,9 @@
         centerEl.removeEventListener('mouseup', selectEndHandler);
         centerEl.removeEventListener('touchend', selectEndHandler);
       }
+      /* 이 뷰를 떠나면 가드 대상도 사라진다. 남겨두면 다른 화면에서 이동할 때마다
+         '저장하지 않은 요약' 확인이 뜬다(녹음 가드의 recordingActive 와 같은 이유). */
+      summaryDirty = false;
     };
   }
 
