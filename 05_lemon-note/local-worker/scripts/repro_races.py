@@ -545,6 +545,105 @@ def scenario_smoke(backend: str, dsn: str, workdir: Path) -> dict:
 
 
 # --------------------------------------------------------------------------
+# 시나리오 9: 폴더 이동 사이클 (교차 이동 경합)
+# --------------------------------------------------------------------------
+
+def scenario_folder_cycle(backend: str, dsn: str, workdir: Path, pairs: int = 20) -> dict:
+    """A→B 와 B→A 이동을 동시에 쏜다.
+
+    사이클 검사가 읽기 기반이면 두 요청이 서로의 커밋 전 상태를 못 봐 **둘 다 통과**하고,
+    A.parent=B / B.parent=A 인 순환이 생긴다. 그 서브트리는 루트에서 도달할 수 없어
+    폴더 화면에서 영원히 사라진다(_folder_descendant_ids 는 순환에 안전해 서버는 안 죽는다).
+
+    창이 좁아 한 쌍으로는 잘 안 걸리므로 여러 쌍을 동시에 돌린다.
+    """
+    import httpx
+    config, database, db, _pipeline = _load_app(backend, dsn, workdir)
+
+    # 깨끗한 상태에서 시작한다. sqlite 는 실행마다 새 임시 DB 라 상관없지만 postgres 는
+    # 같은 DB 를 재사용해서, 앞선 실행이 남긴 순환 폴더가 이번 판정에 섞여 들어온다
+    # (실제로 수정 후에도 '재현됨' 으로 오판했다 — 하니스 쪽 거짓 양성이었다).
+    conn = db.connect()
+    try:
+        conn.execute("UPDATE meetings SET folder_id=NULL WHERE user_id=?", (config.DEFAULT_USER_ID,))
+        conn.execute("DELETE FROM folders WHERE user_id=?", (config.DEFAULT_USER_ID,))
+        conn.commit()
+    finally:
+        conn.close()
+
+    env = _env_for(backend, dsn, workdir)
+    port = _free_port()
+    proc, base = _start_server(env, port)
+    assert_local_url(base)
+    try:
+        def mkfolder(name):
+            r = httpx.post(f"{base}/v1/folders", json={"name": name}, timeout=30.0)
+            return (r.json() or {}).get("id") if r.status_code in (200, 201) else None
+
+        couples = []
+        for i in range(pairs):
+            a, b = mkfolder(f"A{i}"), mkfolder(f"B{i}")
+            if a and b:
+                couples.append((a, b))
+
+        def move(args):
+            fid, parent = args
+            try:
+                r = httpx.patch(f"{base}/v1/folders/{fid}", json={"parent_id": parent}, timeout=30.0)
+                body = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+                err = ((body.get("detail") or {}).get("error") or body.get("error") or {})
+                return r.status_code, err.get("code")
+            except Exception as e:  # noqa: BLE001
+                return None, type(e).__name__
+
+        # 각 쌍의 두 이동을 동시에. 쌍끼리도 동시에 돌려 창을 넓힌다.
+        jobs = []
+        for a, b in couples:
+            jobs.append((a, b))
+            jobs.append((b, a))
+        with ThreadPoolExecutor(max_workers=min(32, len(jobs) or 1)) as ex:
+            results = list(ex.map(move, jobs))
+
+        # 사이클 검출: parent 를 따라 올라가다 자기 자신을 다시 만나면 순환이다.
+        conn = db.connect()
+        try:
+            rows = conn.execute("SELECT id, parent_id FROM folders WHERE user_id=?",
+                                (config.DEFAULT_USER_ID,)).fetchall()
+        finally:
+            conn.close()
+        parent = {str(r["id"]): (str(r["parent_id"]) if r["parent_id"] else None) for r in rows}
+        cycles = set()
+        for fid in parent:
+            seen, cur = set(), fid
+            while cur is not None:
+                if cur in seen:
+                    cycles.add(cur)
+                    break
+                seen.add(cur)
+                cur = parent.get(cur)
+
+        ok = sum(1 for c, _ in results if c == 200)
+        conflict = sum(1 for c, code in results if c == 409 and code == "folder_cycle")
+        return {
+            "scenario": "folder-cycle (교차 이동)",
+            "backend": backend,
+            "pairs": len(couples),
+            "moves_sent": len(jobs),
+            "http_200": ok,
+            "http_409_folder_cycle": conflict,
+            "other": [r for r in results if r[0] not in (200, 409)][:5],
+            "folders_in_cycle": len(cycles),
+            "reproduced": bool(cycles),
+        }
+    finally:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+# --------------------------------------------------------------------------
 # 시나리오 8: 나머지 수정 묶음 (겹침 하이라이트 · 공유링크 상한 · 비uuid id · purge 순서)
 # --------------------------------------------------------------------------
 
@@ -844,7 +943,8 @@ def main():
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("command", choices=["init-schema", "abort-swallow", "share-lockout",
                                         "retry-lock", "settings-merge", "smoke",
-                                        "gates", "summary-lock", "misc", "all"])
+                                        "gates", "summary-lock", "misc",
+                                        "folder-cycle", "all"])
     ap.add_argument("--pg-dsn", default=os.getenv("REPRO_PG_DSN", ""),
                     help="로컬 Postgres DSN (비로컬은 거부됨)")
     ap.add_argument("--backend", choices=["postgres", "sqlite"], default="postgres")
@@ -883,6 +983,8 @@ def main():
             _run_child("summary-lock", "sqlite", args),
             _run_child("misc", "postgres", args),
             _run_child("misc", "sqlite", args),
+            _run_child("folder-cycle", "postgres", args),
+            _run_child("folder-cycle", "sqlite", args),
         ]
         any_repro = False
         for r in results:
@@ -916,6 +1018,8 @@ def main():
             res = scenario_summary_lock(args.backend, args.pg_dsn, workdir)
         elif args.command == "misc":
             res = scenario_misc(args.backend, args.pg_dsn, workdir)
+        elif args.command == "folder-cycle":
+            res = scenario_folder_cycle(args.backend, args.pg_dsn, workdir)
         else:
             res = scenario_share_lockout(args.backend, args.pg_dsn, workdir, burst=args.burst)
         if args.json:
