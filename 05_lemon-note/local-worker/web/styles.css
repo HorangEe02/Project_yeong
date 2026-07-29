@@ -1155,10 +1155,12 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
   .tab-btn svg { width: 22px; height: 22px; }
   .tab-btn.is-active { color: var(--brand-700); }
 
+  /* 녹음이 이 앱의 주 동작이라 엄지 도달 범위 가운데에 둔다(우측 하단 → 하단 중앙).
+     translateX(-50%) 로 가운데 정렬하므로 :active 의 scale 도 같은 transform 에 합쳐야 한다. */
   .tab-fab {
-    display: flex; position: fixed; right: 16px; z-index: 51;
+    display: flex; position: fixed; left: 50%; transform: translateX(-50%); z-index: 51;
     bottom: calc(56px + 16px + env(safe-area-inset-bottom));
-    width: 52px; height: 52px; border-radius: 50%;
+    width: 64px; height: 64px; border-radius: 50%;
     background: var(--brand-600); color: var(--on-brand);
     align-items: center; justify-content: center; text-decoration: none;
     /* <a> 에서 <button> 으로 바뀌었다(G) — UA 기본 border(2px outset)와 cursor 를 되돌린다. */
@@ -1167,7 +1169,7 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
     transition: transform .1s var(--ease), background-color .15s var(--ease);
   }
   .tab-fab:hover { background: var(--brand-500); }
-  .tab-fab:active { transform: scale(0.94); }
+  .tab-fab:active { transform: translateX(-50%) scale(0.94); }
 
   /* detail = 풀스크린: 탭바 숨김(상단 .detail-back-btn 로 이탈).
      new 는 기본 랜딩이라 탭바를 남겨 내비 크롬 유지(스트랜딩 방지) — 현재 화면이 새 회의라 FAB 만 숨긴다. */
@@ -1177,9 +1179,13 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
   .app-shell[data-route="new"] .fab-menu,
   .app-shell[data-route="detail"] .fab-menu { display: none; }
 
-  /* 콘텐츠가 탭바 뒤로 가리지 않게 하단 여백 확보(탭바 표시 라우트: list·folders·me·calendar·new) */
-  .list-scroll { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
-  .cal-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  /* 콘텐츠가 탭바 뒤로 가리지 않게 하단 여백 확보(탭바 표시 라우트: list·folders·me·calendar·new)
+     FAB 가 뜨는 라우트는 그 위로도 비워야 한다 — 탭바 56 + 간격 16 + FAB 64 + 여유 16 = 152.
+     FAB 를 하단 중앙으로 옮기면서 필요해졌다. 우측 하단일 때는 항목의 오른쪽 끝(길이 텍스트)만
+     살짝 가렸지만, 가운데에서는 제목·날짜를 덮는다.
+     new 는 FAB 가 숨는 라우트(위 display:none)라 탭바 몫만 비운다. */
+  .list-scroll { padding-bottom: calc(152px + env(safe-area-inset-bottom)); }
+  .cal-page { padding-bottom: calc(152px + env(safe-area-inset-bottom)); }
   .compose-scroll { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
 }
 
@@ -1216,7 +1222,8 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 .folder-picker-row:hover { background: var(--surface-alt); }
 
 @media (max-width: 760px) {
-  .folder-page { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  /* 152 = 탭바 56 + 간격 16 + FAB 64 + 여유 16. FAB 가 뜨는 라우트라 그 위까지 비운다. */
+  .folder-page { padding-bottom: calc(152px + env(safe-area-inset-bottom)); }
 }
 
 /* ----------------------------------------------------------------------
@@ -1315,7 +1322,7 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 
 @media (max-width: 760px) {
   /* 단축 속성과 longhand 를 같은 블록에 둬서 뒤 블록이 padding-bottom 을 덮는 사고를 막는다. */
-  .mypage-page { padding: 18px 16px 32px; padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .mypage-page { padding: 18px 16px 32px; padding-bottom: calc(152px + env(safe-area-inset-bottom)); }
   .mypage-stats { grid-template-columns: 1fr; }
 }
 
@@ -1389,7 +1396,7 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 .notif-main:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
 
 @media (max-width: 760px) {
-  .notif-page { padding: 18px 16px 32px; padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  .notif-page { padding: 18px 16px 32px; padding-bottom: calc(152px + env(safe-area-inset-bottom)); }
 }
 
 /* ----------------------------------------------------------------------
@@ -1398,10 +1405,12 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 /* FAB 위로 쌓이는 2액션 메뉴. 데스크톱엔 FAB 자체가 없으므로 모바일 블록에서만 배치한다. */
 .fab-menu { display: none; }
 @media (max-width: 760px) {
+  /* FAB 를 하단 중앙으로 옮겼으므로 메뉴도 따라간다. bottom 의 64px 은 FAB 높이라
+     FAB 크기를 바꾸면 여기도 같이 바꿔야 한다. */
   .fab-menu {
     display: flex; flex-direction: column; gap: 8px;
-    position: fixed; right: 16px; z-index: 52;
-    bottom: calc(56px + 16px + 52px + 12px + env(safe-area-inset-bottom));
+    position: fixed; left: 50%; transform: translateX(-50%); z-index: 52;
+    bottom: calc(56px + 16px + 64px + 12px + env(safe-area-inset-bottom));
   }
   /* ⚠️ 클래스에 display 를 주면 UA 의 [hidden]{display:none} 을 이겨서 항상 열려 보인다. */
   .fab-menu[hidden] { display: none; }

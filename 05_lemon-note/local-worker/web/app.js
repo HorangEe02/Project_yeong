@@ -795,8 +795,10 @@
         '<div class="list-item-avatar" style="background:' + col.bg + ';color:' + col.fg + '">' + esc(title.charAt(0) || '회') + '</div>' +
         '<div class="list-item-main">' +
           /* 검색 중이면 제목의 일치 부분도 강조한다(highlightMatch 가 내부에서 esc 함 — 이중 이스케이프 금지). */
-          '<div class="list-item-top"><span class="list-item-title">' + (opts.query ? highlightMatch(title, opts.query) : esc(title)) + '</span><span class="list-item-time mono">' + esc(shortDate(m.recorded_at)) + '</span></div>' +
-          '<div class="list-item-sub mono">' + esc(formatDateTime(m.recorded_at, { dateOnly: true })) + ' · ' + esc(formatDuration(m.duration_ms)) + '</div>' +
+          /* 우측은 녹음 길이. 예전엔 shortDate 였는데 바로 아래 줄에도 같은 날짜가 있어 중복이었다.
+             길이는 항목마다 다른 정보라 목록에서 훑을 때 값어치가 크다(음성 메모 앱들의 관행). */
+          '<div class="list-item-top"><span class="list-item-title">' + (opts.query ? highlightMatch(title, opts.query) : esc(title)) + '</span><span class="list-item-time mono">' + esc(formatDuration(m.duration_ms)) + '</span></div>' +
+          '<div class="list-item-sub mono">' + esc(formatDateTime(m.recorded_at, { dateOnly: true })) + '</div>' +
           '<div class="list-item-chips">' + itemChipsHtml(m) + '</div>' +
           ((m.matches && m.matches.length)
             ? '<div class="match-list">' + m.matches.map(function (mt) {
