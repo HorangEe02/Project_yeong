@@ -486,6 +486,11 @@
     deleteMeeting: function (id) {
       return apiRequest('/meetings/' + encodeURIComponent(id), { method: 'DELETE' });
     },
+    /* 선택 모드의 일괄 삭제. 서버가 한 트랜잭션으로 처리하므로 여기서 N 번 부르지 않는다.
+       apiRequest 에 body 를 그냥 넘기면 직렬화·Content-Type 이 안 붙어 422 다 — apiJson 을 쓴다. */
+    bulkDeleteMeetings: function (ids) {
+      return apiJson('/meetings/bulk-delete', 'POST', { ids: ids });
+    },
     listFolders: function () {
       return apiRequest('/folders', { method: 'GET' });
     },
@@ -791,7 +796,12 @@
         '<button type="button" class="list-item-delete" data-action="delete" title="삭제" aria-label="회의 삭제">' + ICONS.trash + '</button>';
     }
     return (
-      '<div class="list-item' + (m.meeting_id === opts.activeId ? ' is-active' : '') + '" data-id="' + esc(m.meeting_id) + '" tabindex="0">' +
+      '<div class="list-item' + (m.meeting_id === opts.activeId ? ' is-active' : '')
+        + (opts.selectMode && opts.checked ? ' is-checked' : '') + '" data-id="' + esc(m.meeting_id) + '"'
+        + (opts.selectMode ? ' role="checkbox" aria-checked="' + (opts.checked ? 'true' : 'false') + '"' : '')
+        + ' tabindex="0">' +
+        /* 선택 모드에서만 체크 표시를 아바타 앞에 끼운다. */
+        (opts.selectMode ? '<span class="list-item-check" aria-hidden="true"></span>' : '') +
         '<div class="list-item-avatar" style="background:' + col.bg + ';color:' + col.fg + '">' + esc(title.charAt(0) || '회') + '</div>' +
         '<div class="list-item-main">' +
           /* 검색 중이면 제목의 일치 부분도 강조한다(highlightMatch 가 내부에서 esc 함 — 이중 이스케이프 금지). */
@@ -849,6 +859,10 @@
     var lastQuery = '';   // 검색 결과 스니펫의 강조에 쓴다(itemHtml 이 fetchList 보다 먼저 정의돼 있어 별도 보관)
     var activeId = null;
     var listSeq = seqGuard();   // 겹친 조회의 응답 역전 방지(fetchList)
+    var selectMode = false;
+    var selected = {};          // id -> true. 선택 모드에서만 채운다.
+    var selectBarEl, selCountEl, selAllBtn, selDeleteBtn, selectBtn;
+    var bulkLock = inFlightLock();   // 삭제 연타로 같은 요청이 두 번 나가는 것을 막는다
 
     var STATUS_FILTER_OPTIONS = [
       ['', '전체 상태'],
@@ -861,7 +875,79 @@
     ];
 
     function itemHtml(m) {
-      return renderNoteCard(m, { activeId: activeId, query: lastQuery, mode: 'list' });
+      return renderNoteCard(m, {
+        activeId: activeId, query: lastQuery, mode: 'list',
+        selectMode: selectMode, checked: !!selected[m.meeting_id]
+      });
+    }
+
+    /* ── 선택 모드 ──────────────────────────────────────────────
+       목록에서 여러 건을 골라 한 번에 휴지통으로 보낸다. 삭제는 단건과 같은
+       soft delete 라 휴지통에서 되돌릴 수 있다. */
+    function selectedIds() {
+      return items.map(function (m) { return m.meeting_id; })
+                  .filter(function (id) { return selected[id]; });
+    }
+
+    function syncSelectUI() {
+      var n = selectedIds().length;
+      if (selCountEl) selCountEl.textContent = n + '개 선택';
+      if (selDeleteBtn) selDeleteBtn.disabled = n === 0;
+      if (selAllBtn) selAllBtn.textContent = (n > 0 && n === items.length) ? '선택 해제' : '전체 선택';
+      if (selectBarEl) selectBarEl.hidden = !selectMode;
+      if (selectBtn) selectBtn.hidden = selectMode;
+      document.body.classList.toggle('is-select-mode', selectMode);
+    }
+
+    function setSelectMode(on) {
+      selectMode = !!on;
+      if (!selectMode) selected = {};
+      syncSelectUI();
+      renderItems(false);
+    }
+
+    function toggleSelect(id) {
+      if (selected[id]) delete selected[id]; else selected[id] = true;
+      var row = scrollEl.querySelector('.list-item[data-id="' + id + '"]');
+      if (row) row.classList.toggle('is-checked', !!selected[id]);
+      syncSelectUI();
+    }
+
+    function bulkDelete() {
+      var ids = selectedIds();
+      if (!ids.length) return;
+      confirmDialog(
+        ids.length + '개 회의를 삭제하시겠습니까? 휴지통으로 이동하며 나중에 되돌릴 수 있습니다.',
+        { title: '회의 삭제', confirmLabel: '삭제', danger: true }
+      ).then(function (ok) {
+        if (!ok) return;
+        /* 확인 다이얼로그를 여는 사이에 목록이 갱신될 수 있어 여기서 다시 뽑는다. */
+        var target = selectedIds();
+        if (!target.length) return;
+        bulkLock(function () {
+          if (selDeleteBtn) selDeleteBtn.disabled = true;
+          return API.bulkDeleteMeetings(target).then(function (res) {
+            var gone = {};
+            target.forEach(function (id) { gone[id] = true; });
+            items = items.filter(function (it) { return !gone[it.meeting_id]; });
+            /* next_cursor 는 offset 이다. 지운 건수만큼 당겨야 다음 페이지가 밀리지 않는다. */
+            if (nextCursor) {
+              var n = parseInt(nextCursor, 10);
+              if (!isNaN(n)) nextCursor = String(Math.max(0, n - target.length));
+            }
+            setSelectMode(false);
+            var msg = (res && res.deleted != null ? res.deleted : target.length) + '개 회의를 휴지통으로 옮겼습니다.';
+            if (res && res.skipped && res.skipped.length) {
+              msg += ' ' + res.skipped.length + '개는 이미 삭제돼 건너뛰었습니다.';
+            }
+            toast(msg, 'success');
+          }).catch(function (err) {
+            toast(err.message || '삭제하지 못했습니다.', 'error');
+          }).then(function () {
+            syncSelectUI();
+          });
+        });
+      });
     }
 
     /* 검색/필터가 없을 때 배너를 노트 앞에 prepend(함께 스크롤). 홈 라우트에서만 보이게 하는 것은
@@ -933,6 +1019,14 @@
 
     function renderItems(loading) {
       if (countEl) countEl.textContent = items.length;
+      /* 목록이 갱신되면(검색·필터·새로고침) 더 이상 없는 항목의 선택이 남아 있을 수 있다.
+         그대로 두면 '3개 선택'인데 화면엔 2개만 보이거나, 이미 사라진 id 로 삭제를 부른다. */
+      if (selectMode) {
+        var alive = {};
+        items.forEach(function (m) { if (selected[m.meeting_id]) alive[m.meeting_id] = true; });
+        selected = alive;
+        syncSelectUI();
+      }
       if (loading && items.length === 0) {
         scrollEl.innerHTML = Array.from({ length: 6 }).map(function () { return '<div class="list-skeleton-row"></div>'; }).join('');
         return;
@@ -991,7 +1085,15 @@
           '<span class="list-header-count mono" id="lc-count">0</span>' +
           '<button type="button" class="list-bell-btn" id="lc-bell" title="알림" aria-label="알림">' + ICONS.bell +
             '<span class="list-bell-dot mono" id="lc-bell-dot" hidden></span></button>' +
+          '<button type="button" class="list-select-btn" id="lc-select">선택</button>' +
           '<button type="button" class="list-compose-btn" id="lc-compose" title="새 회의" aria-label="새 회의">' + ICONS.plus + '</button>' +
+        '</div>' +
+        /* 선택 모드 액션 바. 하단은 탭바가 쓰므로 헤더 아래에 둔다. */
+        '<div class="list-select-bar" id="lc-select-bar" hidden>' +
+          '<button type="button" class="btn btn-ghost btn-sm" id="lc-sel-cancel">취소</button>' +
+          '<span class="list-select-count mono" id="lc-sel-count">0개 선택</span>' +
+          '<button type="button" class="btn btn-ghost btn-sm" id="lc-sel-all">전체 선택</button>' +
+          '<button type="button" class="btn btn-danger btn-sm" id="lc-sel-delete" disabled>삭제</button>' +
         '</div>' +
         '<div class="list-toolbar">' +
           '<div class="list-search-wrap">' + ICONS.search + '<input type="text" class="input" id="lc-search" placeholder="제목 · 전사 · 요약 전체 검색" /></div>' +
@@ -1015,6 +1117,22 @@
       containerEl.querySelector('#lc-compose').addEventListener('click', function () { navigate('#/new'); });
       containerEl.querySelector('#lc-bell').addEventListener('click', function () { navigate('#/notifications'); });
 
+      selectBtn = containerEl.querySelector('#lc-select');
+      selectBarEl = containerEl.querySelector('#lc-select-bar');
+      selCountEl = containerEl.querySelector('#lc-sel-count');
+      selAllBtn = containerEl.querySelector('#lc-sel-all');
+      selDeleteBtn = containerEl.querySelector('#lc-sel-delete');
+      selectBtn.addEventListener('click', function () { setSelectMode(true); });
+      containerEl.querySelector('#lc-sel-cancel').addEventListener('click', function () { setSelectMode(false); });
+      selDeleteBtn.addEventListener('click', bulkDelete);
+      selAllBtn.addEventListener('click', function () {
+        var all = selectedIds().length === items.length && items.length > 0;
+        selected = {};
+        if (!all) items.forEach(function (m) { selected[m.meeting_id] = true; });
+        syncSelectUI();
+        renderItems(false);
+      });
+
       /* 칩: 탭하면 그 말로 검색하고 최근에 올린다. 지우기는 최근 전체 삭제. */
       chipsEl.addEventListener('click', function (e) {
         if (e.target.closest('[data-chip-clear]')) { clearRecents(); return; }
@@ -1031,6 +1149,8 @@
         var rowEl = e.target.closest('[data-id]');
         if (!rowEl) return;
         var id = rowEl.dataset.id;
+        /* 선택 모드에서는 행을 눌러도 상세로 가지 않고 선택만 토글한다. */
+        if (selectMode) { e.preventDefault(); e.stopPropagation(); toggleSelect(id); return; }
         if (delBtn) {
           e.stopPropagation();
           var m = items.find(function (it) { return it.meeting_id === id; });
@@ -1058,7 +1178,9 @@
       scrollEl.addEventListener('keydown', function (e) {
         if (e.key !== 'Enter') return;
         var rowEl = e.target.closest('[data-id]');
-        if (rowEl) navigate('#/meetings/' + encodeURIComponent(rowEl.dataset.id));
+        if (!rowEl) return;
+        if (selectMode) { e.preventDefault(); toggleSelect(rowEl.dataset.id); return; }
+        navigate('#/meetings/' + encodeURIComponent(rowEl.dataset.id));
       });
 
       var debouncedSearch = debounce(function () { fetchList(true); }, 350);

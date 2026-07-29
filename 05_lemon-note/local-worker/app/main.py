@@ -7,6 +7,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import urllib.parse
 from datetime import datetime, timedelta, timezone
@@ -19,7 +20,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from . import config, database, db, pipeline, textbuild
-from .models import (ExportIn, FolderCreate, FolderMoveIn, FolderPatch,
+from .models import (BulkDeleteIn, ExportIn, FolderCreate, FolderMoveIn, FolderPatch,
                      MeetingPatch, SegmentPatch, SlackShareIn,
                      SpeakerPatch, SummaryPatch)
 from .providers import slack
@@ -697,6 +698,52 @@ def move_meeting(meeting_id: str, body: FolderMoveIn, _: str = Depends(require_w
                      (body.folder_id, db.now_iso(), meeting_id))
         conn.commit()
         return {"ok": True}
+    finally:
+        conn.close()
+
+
+BULK_DELETE_MAX = 200
+# postgres 의 meetings.id 는 uuid 다. sqlite 는 'mtg_' + hex 라 형식이 다르므로
+# 백엔드별로 다르게 검사한다.
+_UUID_RE = re.compile(r"\A[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
+                      r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\Z")
+
+
+@app.post(P + "/meetings/bulk-delete")
+def bulk_delete_meetings(body: BulkDeleteIn, _: str = Depends(require_write)):
+    """선택 모드의 일괄 삭제. 단건과 같은 soft delete(휴지통행)라 복원할 수 있다.
+
+    단건 DELETE 를 N 번 부르면 중간에 실패했을 때 일부만 지워진 채로 남고, 사용자는
+    무엇이 지워졌는지 알 수 없다. 한 트랜잭션으로 묶어 전부 되거나 전부 안 되게 한다.
+    """
+    user_id = config.DEFAULT_USER_ID
+    ids = list(dict.fromkeys(body.ids or []))          # 중복 제거(순서 유지)
+    if not ids:
+        return {"ok": True, "deleted": 0, "skipped": []}
+    if len(ids) > BULK_DELETE_MAX:
+        return _err(400, "too_many",
+                    f"한 번에 {BULK_DELETE_MAX}건까지만 삭제할 수 있습니다.")
+    # 형식이 어긋난 id 하나가 Postgres 트랜잭션을 aborted 로 만들어, 앞서 성공한
+    # UPDATE 까지 전부 날린다(SQLite 에선 재현되지 않는다). SQL 을 치기 전에 막는다.
+    if database.BACKEND == "postgres" and any(not _UUID_RE.match(i or "") for i in ids):
+        return _err(400, "invalid_id", "잘못된 회의 id 가 포함돼 있습니다.")
+
+    conn = db.connect()
+    try:
+        now = db.now_iso()
+        deleted, skipped = [], []
+        for mid in ids:
+            # 조건부 UPDATE + rowcount. 남의 것이나 이미 휴지통에 있는 것은 0 건이라
+            # 조용히 건너뛴다 — 연타로 같은 요청이 두 번 와도 두 번째는 아무것도 안 지운다.
+            cur = conn.execute(
+                "UPDATE meetings SET deleted_at=?, updated_at=? "
+                "WHERE id=? AND user_id=? AND deleted_at IS NULL",
+                (now, now, mid, user_id))
+            (deleted if cur.rowcount else skipped).append(mid)
+        conn.commit()
+        for mid in deleted:
+            db.audit(conn, user_id, mid, "meeting_deleted", {"bulk": True})
+        return {"ok": True, "deleted": len(deleted), "skipped": skipped}
     finally:
         conn.close()
 
