@@ -1154,7 +1154,10 @@
         if (delBtn) {
           e.stopPropagation();
           var m = items.find(function (it) { return it.meeting_id === id; });
-          confirmDialog('"' + (m ? (m.title || '제목 없음') : id) + '" 회의를 삭제하시겠습니까? 목록에서 제거되며 되돌릴 수 없습니다.', { title: '회의 삭제', confirmLabel: '삭제', danger: true }).then(function (ok) {
+          /* deleteMeeting 은 soft delete 다 — 휴지통으로 가고 restore 로 되돌릴 수 있다.
+             '되돌릴 수 없습니다' 는 사실과 달라 필요 이상으로 겁을 준다.
+             진짜 되돌릴 수 없는 것은 휴지통 비우기·영구 삭제 두 곳뿐이다. */
+          confirmDialog('"' + (m ? (m.title || '제목 없음') : id) + '" 회의를 삭제하시겠습니까? 휴지통으로 이동하며 나중에 되돌릴 수 있습니다.', { title: '회의 삭제', confirmLabel: '삭제', danger: true }).then(function (ok) {
             if (!ok) return;
             API.deleteMeeting(id).then(function () {
               items = items.filter(function (it) { return it.meeting_id !== id; });
@@ -1165,7 +1168,7 @@
                 if (!isNaN(n)) nextCursor = String(Math.max(0, n - 1));
               }
               renderItems(false);
-              toast('회의가 삭제되었습니다.', 'success');
+              toast('회의를 휴지통으로 옮겼습니다.', 'success');
               if (activeId === id) navigate('#/meetings');
             }).catch(function (err) {
               toast(err.message || '삭제에 실패했습니다.', 'error');
@@ -3149,10 +3152,11 @@
       infoToggleBtn.addEventListener('click', function () { openDrawer(); });
 
       deleteBtn.addEventListener('click', function () {
-        confirmDialog('"' + (meeting.title || '제목 없음') + '" 회의를 삭제하시겠습니까? 목록에서 제거되며 되돌릴 수 없습니다.', { title: '회의 삭제', confirmLabel: '삭제', danger: true }).then(function (ok) {
+        /* 목록 쪽과 같은 이유 — soft delete 라 휴지통에서 되돌릴 수 있다. */
+        confirmDialog('"' + (meeting.title || '제목 없음') + '" 회의를 삭제하시겠습니까? 휴지통으로 이동하며 나중에 되돌릴 수 있습니다.', { title: '회의 삭제', confirmLabel: '삭제', danger: true }).then(function (ok) {
           if (!ok) return;
           API.deleteMeeting(meetingId).then(function () {
-            toast('회의가 삭제되었습니다.', 'success');
+            toast('회의를 휴지통으로 옮겼습니다.', 'success');
             ListColumn.refresh(true);
             navigate('#/meetings');
           }).catch(function (err) { toast(err.message || '삭제에 실패했습니다.', 'error'); });
