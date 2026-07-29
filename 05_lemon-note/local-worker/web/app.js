@@ -3983,6 +3983,16 @@
       /* ---- 초기 오른쪽 탭 적용 ---- */
       var initialRightTab = (initialTab && RIGHT_TAB_SLUGS.indexOf(initialTab) !== -1) ? initialTab : 'summary';
       switchRightTab(initialRightTab);
+
+      /* ≤980px 에서 col-right 는 오프캔버스 드로어다. URL 이 우측 패널 탭을 가리키는데
+         (#/meetings/{id}/summary 등) 전사만 보이면 주소와 화면이 어긋난다 — 요약 링크로
+         들어와도 요약이 안 보였다. 탭이 명시된 경우에만 열고, #/meetings/{id} 는 그대로
+         전사부터 보여준다(전사가 이 화면의 주 콘텐츠라는 기존 판단은 유지).
+         renderRoute() 가 시작에서 closeDrawer() 를 부르므로 그 뒤인 여기서 연다. */
+      if (initialTab && RIGHT_TAB_SLUGS.indexOf(initialTab) !== -1
+          && window.matchMedia('(max-width: 980px)').matches) {
+        openDrawer();
+      }
     }
 
     return function cleanup() {
