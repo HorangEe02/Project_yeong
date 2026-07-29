@@ -237,6 +237,34 @@ body {
   display: flex; align-items: center; justify-content: center;
   font-weight: 800; font-size: 15px;
 }
+/* 선택 모드 — 목록에서 여러 건을 골라 한 번에 휴지통으로 보낸다. */
+.list-select-btn {
+  flex: none; margin-left: auto; padding: 5px 12px; border-radius: var(--radius-full);
+  border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink-700);
+  font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.list-select-btn:hover { background: var(--surface-alt); }
+.list-select-bar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+  border-bottom: 1px solid var(--border); background: var(--surface-alt);
+}
+.list-select-bar[hidden] { display: none; }
+.list-select-count { flex: 1; font-size: 12px; font-weight: 700; color: var(--ink-700); }
+.list-item-check {
+  flex: none; width: 20px; height: 20px; border-radius: 50%; align-self: center;
+  border: 1.5px solid var(--border-strong); background: var(--surface);
+  position: relative; transition: background-color .12s var(--ease), border-color .12s var(--ease);
+}
+/* 체크 표시는 회전한 보더로 그린다(아이콘 의존 없이 상태만으로 바뀌게). */
+.list-item.is-checked .list-item-check { background: var(--brand-600); border-color: var(--brand-deep); }
+.list-item.is-checked .list-item-check::after {
+  content: ""; position: absolute; left: 6px; top: 2.5px; width: 5px; height: 9px;
+  border: solid var(--on-brand); border-width: 0 2px 2px 0; transform: rotate(40deg);
+}
+.list-item.is-checked { background: var(--brand-50); }
+/* 선택 중에는 행별 삭제 버튼을 감춘다 — 단건 삭제와 일괄 삭제가 섞이면 무엇이 지워질지 모호하다. */
+body.is-select-mode .list-item-delete { display: none; }
+
 .list-item-main { min-width: 0; flex: 1; }
 .list-item-top { display: flex; align-items: baseline; gap: 8px; }
 .list-item-title { font-weight: 700; font-size: 14px; color: var(--ink-950); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }

@@ -77,3 +77,8 @@ class SlackShareIn(BaseModel):
     summary_version_id: Optional[str] = None
     channel_label: Optional[str] = None
     message_override: Optional[str] = None
+
+
+class BulkDeleteIn(BaseModel):
+    """선택 모드의 일괄 삭제 대상."""
+    ids: List[str] = []
