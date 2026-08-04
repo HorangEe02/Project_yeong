@@ -993,9 +993,10 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   white-space: nowrap;
 }
 
-/* ol 인데 display:flex 라 마커가 안 그려진다 — UA 기본 padding-left:40px 만 죽은 여백으로 남는다.
-   전역 리스트 리셋이 없어서 명시적으로 0 으로 둔다(.detail-summary-list 도 같다). */
-.sec-list { display: flex; flex-direction: column; gap: 2px; padding-left: 0; }
+/* ol 인데 display:flex 라 마커가 안 그려진다 — UA 기본값(padding-left 40px, margin-block 1em)만
+   남는다. 전역 리스트 리셋이 없어서 명시적으로 0 으로 둔다(.detail-summary-list 도 같다).
+   margin 을 안 지우면 1em(14.5px)이 이웃의 margin 과 상쇄돼 지정한 간격을 이긴다. */
+.sec-list { display: flex; flex-direction: column; gap: 2px; padding-left: 0; margin: 0; }
 .sec-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; }
 .sec-item + .sec-item { border-top: 1px solid var(--border); }
 .sec-time {
@@ -1019,14 +1020,14 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   background: var(--surface); border-bottom: 1px solid var(--border);
 }
 .detail-summary-head { font-size: 12.5px; font-weight: 800; color: var(--ink-900); margin-bottom: 8px; }
-.detail-summary-list { display: flex; flex-direction: column; gap: 6px; padding-left: 0; }
+.detail-summary-list { display: flex; flex-direction: column; gap: 6px; padding-left: 0; margin: 0; }
 .detail-summary-item { display: flex; gap: 10px; align-items: flex-start; }
 .detail-summary-text {
   font-size: 12.5px; color: var(--ink-600); line-height: 1.55; overflow-wrap: anywhere;
   padding-top: 2px;
 }
 .ai-disclaimer {
-  display: flex; align-items: center; gap: 5px; margin-top: 10px;
+  display: flex; align-items: center; gap: 5px; margin: 10px 0 0;
   font-size: 11px; color: var(--ink-400);
 }
 .ai-disclaimer svg { flex: none; width: 13px; height: 13px; }
