@@ -55,6 +55,8 @@
 
   var ICONS = {
     search: '<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+    /* 토스트에도 같은 모양이 있지만 그쪽은 type 키로 고르는 지역 맵이라 공유하지 않는다. */
+    info: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.6"/><path d="M8 7.2v3.8M8 5.2h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
     folderMove: '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M2.5 6A1.5 1.5 0 014 4.5h3l1.6 2h5.9A1.5 1.5 0 0116 8v6.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 014 14.5V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>',
     share: '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="12" cy="4" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="4" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M5.7 7L10.3 5M5.7 9l4.6 2" stroke="currentColor" stroke-width="1.5"/></svg>',
     check: '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7.2l3 3 6-6.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -604,49 +606,18 @@
   /* 녹음이 진행 중인지(서브프로젝트 G). 라우트를 떠나면 renderNewMeetingView 의 cleanup 이
      트랙을 정지시켜 녹음이 조용히 사라지므로, 이탈 전에 확인을 받는다. */
   var recordingActive = false;
-  /* 새 회의 화면에 넘길 의도. parseHash 가 파라미터를 안 받으므로 라우트 스키마를 늘리지 않고
-     모듈 변수로 전달하고 렌더 직후 소비한다. */
-  var pendingComposeIntent = null;
+  /* 렌더 직후에 소비할 요청. parseHash 가 파라미터를 안 받으므로 라우트 스키마를 늘리지 않고
+     모듈 변수로 전달한다. */
   var pendingTour = false;
 
-  function closeFabMenu(focusBack) {
-    var menu = document.getElementById('fab-menu');
+  /* FAB 는 2항목 메뉴(녹음 시작·파일 업로드)였는데, 두 항목 모두 하는 일이 `#/new` 이동뿐이었다
+     — 자동으로 녹음을 시작하거나 파일 선택창을 열 수 없기 때문이다(권한 프롬프트, 동의 체크 전
+     캡처, hashchange 로 제스처 창 이탈). 아이콘을 녹음 점으로 바꾸면서 메뉴를 없앴다.
+     파일 업로드는 이동한 화면의 드롭존에 그대로 있다. */
+  function initFab() {
     var fab = document.getElementById('tab-fab');
-    if (!menu || menu.hidden) return false;
-    menu.hidden = true;
-    if (fab) {
-      fab.setAttribute('aria-expanded', 'false');
-      if (focusBack) fab.focus();
-    }
-    return true;
-  }
-
-  function initFabMenu() {
-    var fab = document.getElementById('tab-fab');
-    var menu = document.getElementById('fab-menu');
-    if (!fab || !menu) return;
-    fab.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (!menu.hidden) { closeFabMenu(true); return; }
-      menu.hidden = false;
-      fab.setAttribute('aria-expanded', 'true');
-      var first = menu.querySelector('.fab-menu-item');
-      if (first) first.focus();
-    });
-    menu.addEventListener('click', function (e) {
-      var item = e.target.closest('[data-action]');
-      if (!item) return;
-      closeFabMenu(false);
-      /* 자동으로 녹음을 시작하거나 파일 선택창을 열지 않는다 — 권한 프롬프트가 뜨고,
-         동의 체크 전에 캡처가 시작되며, hashchange 를 거치며 제스처 창을 벗어난다. */
-      if (item.dataset.action === 'tt-fab-upload') pendingComposeIntent = 'upload';
-      navigate('#/new');
-    });
-    document.addEventListener('click', function (e) {
-      if (menu.hidden) return;
-      if (e.target.closest('#fab-menu') || e.target.closest('#tab-fab')) return;
-      closeFabMenu(false);
-    });
+    if (!fab) return;
+    fab.addEventListener('click', function () { navigate('#/new'); });
   }
 
   function confirmLeaveRecording() {
@@ -731,7 +702,7 @@
     if (route.name === 'new') {
       document.title = '새 회의 — 회의녹음챗';
       currentCleanup = renderNewMeetingView(colCenterEl, colRightContentEl);
-      consumeComposePending(colCenterEl);
+      consumeComposePending();
     } else if (route.name === 'list') {
       document.title = '홈 — 회의녹음챗';
       renderCenterEmpty(colCenterEl);
@@ -1080,13 +1051,19 @@
 
     function init(containerEl) {
       containerEl.innerHTML =
+        /* 두 줄 헤더(LN 09 P-01). 모바일에서 제목을 large title 로 키우면 벨·선택·＋ 와 한 행에
+           둘 수 없어 액션을 윗줄로 뺐다. 데스크톱(≥761px)은 CSS 로 다시 한 줄로 합친다. */
         '<div class="list-header">' +
-          '<span class="list-header-title">회의 목록</span>' +
-          '<span class="list-header-count mono" id="lc-count">0</span>' +
-          '<button type="button" class="list-bell-btn" id="lc-bell" title="알림" aria-label="알림">' + ICONS.bell +
-            '<span class="list-bell-dot mono" id="lc-bell-dot" hidden></span></button>' +
-          '<button type="button" class="list-select-btn" id="lc-select">선택</button>' +
-          '<button type="button" class="list-compose-btn" id="lc-compose" title="새 회의" aria-label="새 회의">' + ICONS.plus + '</button>' +
+          '<div class="list-header-actions">' +
+            '<button type="button" class="list-bell-btn" id="lc-bell" title="알림" aria-label="알림">' + ICONS.bell +
+              '<span class="list-bell-dot mono" id="lc-bell-dot" hidden></span></button>' +
+            '<button type="button" class="list-select-btn" id="lc-select">선택</button>' +
+            '<button type="button" class="list-compose-btn" id="lc-compose" title="새 회의" aria-label="새 회의">' + ICONS.plus + '</button>' +
+          '</div>' +
+          '<div class="list-header-titlerow">' +
+            '<span class="list-header-title">회의 목록</span>' +
+            '<span class="list-header-count mono" id="lc-count">0</span>' +
+          '</div>' +
         '</div>' +
         /* 선택 모드 액션 바. 하단은 탭바가 쓰므로 헤더 아래에 둔다. */
         '<div class="list-select-bar" id="lc-select-bar" hidden>' +
@@ -1838,18 +1815,10 @@
     };
   }
 
-  /* FAB '파일 업로드' 의도와 '튜토리얼 다시 보기' 요청을 렌더가 끝난 뒤에 소비한다.
-     hashchange 가 비동기라 navigate() 직후에 처리하면 아직 이 화면이 없다. */
-  function consumeComposePending(centerEl) {
-    if (pendingComposeIntent === 'upload') {
-      pendingComposeIntent = null;
-      var dz = centerEl.querySelector('#nm-dropzone');
-      if (dz) {
-        dz.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        var fi = centerEl.querySelector('#nm-file-input');
-        if (fi) fi.focus();   // 파일 선택창은 열지 않는다(제스처 창 이탈)
-      }
-    }
+  /* '튜토리얼 다시 보기' 요청을 렌더가 끝난 뒤에 소비한다.
+     hashchange 가 비동기라 navigate() 직후에 처리하면 아직 이 화면이 없다.
+     (FAB '파일 업로드' 의도도 여기서 소비했는데, FAB 메뉴가 없어지며 함께 걷어냈다.) */
+  function consumeComposePending() {
     if (pendingTour) {
       pendingTour = false;
       startTour();
@@ -2876,10 +2845,13 @@
           '<button type="button" class="detail-back-btn" id="md-back-btn" aria-label="회의 목록으로">' + ICONS.back + '</button>' +
           '<div class="detail-topbar-main">' +
             '<input type="text" class="title-edit-input" id="md-title-input" value="' + esc(meeting.title || '') + '" aria-label="회의 제목" />' +
+            /* 화자 수·발화 수는 전사가 로드된 뒤에야 알 수 있어 renderSpeakerList 에서 채운다. */
             '<div class="detail-meta">' +
               '<span id="md-status-badge">' + statusChipHtml(meeting.status) + '</span>' +
-              '<span class="mono">' + esc(formatDateTime(meeting.recorded_at)) + '</span>' +
+              '<span class="mono" id="md-meta-speakers" hidden></span>' +
               '<span class="mono">' + esc(formatDuration(meeting.duration_ms)) + '</span>' +
+              '<span class="mono" id="md-meta-segments" hidden></span>' +
+              '<span class="mono">' + esc(formatDateTime(meeting.recorded_at)) + '</span>' +
             '</div>' +
           '</div>' +
           '<div class="detail-topbar-actions">' +
@@ -2888,6 +2860,26 @@
             '<button type="button" class="btn btn-ghost btn-icon" id="md-delete-btn" title="삭제" aria-label="회의 삭제">' + ICONS.trash + '</button>' +
           '</div>' +
         '</div>' +
+
+        /* 상세 요약을 전사 위로(LN 09 P-02). 데이터는 드로어 요약 탭이 쓰는 summaryState.sections
+           그대로고, 시각 칩도 같은 data-action="seek-section" 이라 centerEl 의 handleAction 이 받는다.
+           buildDetailUI 는 getSummary 가 끝난 뒤 호출되므로 여기서 바로 그려도 된다. */
+        (summaryState.sections.length
+          ? '<section class="detail-summary" aria-label="상세 요약">' +
+              '<div class="detail-summary-head">상세 요약</div>' +
+              '<ol class="detail-summary-list">' +
+                summaryState.sections.map(function (s) {
+                  return '<li class="detail-summary-item">' +
+                    '<button type="button" class="sec-time mono" data-action="seek-section" data-start="' + (s.start_ms || 0) + '">' +
+                      '<span>' + formatDuration(s.start_ms || 0) + '</span>' +
+                    '</button>' +
+                    '<span class="detail-summary-text">' + esc(s.text) + '</span>' +
+                  '</li>';
+                }).join('') +
+              '</ol>' +
+              '<p class="ai-disclaimer">' + ICONS.info + '<span>AI 가 자동 생성한 정보로 정확하지 않을 수 있어요.</span></p>' +
+            '</section>'
+          : '') +
 
         '<div class="msg-list-wrap">' +
           '<div class="transcript-search-row">' +
@@ -3578,6 +3570,11 @@
       function renderSpeakerList() {
         var order = sideMode.order;
         if (speakerCountEl) speakerCountEl.textContent = order.length;
+        /* 제목 아래 한 줄에 화자 수·발화 수를 채운다(길이는 빌드 시점에 이미 넣었다). */
+        var spEl = document.getElementById('md-meta-speakers');
+        if (spEl) { spEl.textContent = '화자 ' + order.length + '명'; spEl.hidden = !order.length; }
+        var sgEl = document.getElementById('md-meta-segments');
+        if (sgEl) { sgEl.textContent = segmentsState.length + '개 발화'; sgEl.hidden = !segmentsState.length; }
         if (!order.length) { speakerListEl.innerHTML = '<p class="text-muted text-sm">참석자 정보가 없습니다.</p>'; return; }
         speakerListEl.innerHTML = order.map(function (label) {
           var seg = segmentsState.find(function (s) { return s.speaker_label === label; });
@@ -4315,7 +4312,6 @@
     drawerCloseBtn.addEventListener('click', closeDrawer);
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
-      if (closeFabMenu(true)) return;   // 메뉴가 열려 있으면 그것만 닫는다
       /* ESC 는 사용자가 의도적으로 닫은 것이라 '봤다'로 친다(안 그러면 매 로드마다 다시 뜬다).
          반대로 라우트 이탈이나 '띄울 스텝이 없음'은 기록하지 않는다. */
       if (tourActive()) { endTour(true); return; }
@@ -4348,7 +4344,7 @@
       userSettings = {};
     });
 
-    initFabMenu();
+    initFab();
     ListColumn.init(document.getElementById('col-list'));
     renderRoute();
     maybeStartTour();   // 최초 실행 코치마크(모바일·#/new·플래그 없음일 때만)

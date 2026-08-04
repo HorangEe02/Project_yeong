@@ -191,10 +191,14 @@ body {
   min-height: 0;
   overflow: hidden;
 }
+/* 마크업은 액션 → 제목 순인데(모바일 2줄에서 액션이 윗줄), 데스크톱은 제목이 먼저다.
+   DOM 순서를 바꾸는 대신 order 로 뒤집는다 — 모바일에서 그대로 쓰면 되기 때문이다. */
 .list-header {
   display: flex; align-items: center; gap: 10px;
   padding: 20px 18px 4px;
 }
+.list-header-titlerow { order: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.list-header-actions { order: 2; display: flex; align-items: center; gap: 10px; margin-left: auto; flex: none; }
 .list-header-title { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink-950); }
 .list-header-count {
   display: inline-flex; align-items: center; justify-content: center;
@@ -203,7 +207,7 @@ body {
   font-size: 11.5px; font-weight: 700; font-family: var(--font-mono);
 }
 .list-compose-btn {
-  margin-left: auto; flex: none;
+  flex: none;
   width: 34px; height: 34px; border-radius: 50%; border: none;
   background: var(--brand-600); color: var(--on-brand); cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -239,7 +243,7 @@ body {
 }
 /* 선택 모드 — 목록에서 여러 건을 골라 한 번에 휴지통으로 보낸다. */
 .list-select-btn {
-  flex: none; margin-left: auto; padding: 5px 12px; border-radius: var(--radius-full);
+  flex: none; padding: 5px 12px; border-radius: var(--radius-full);
   border: 1px solid var(--border-strong); background: var(--surface); color: var(--ink-700);
   font-size: 12px; font-weight: 700; cursor: pointer;
 }
@@ -958,7 +962,11 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   .app-shell[data-route="list"] .col-center { display: none; }
   .detail-back-btn { display: flex; }
   .msg-col { max-width: 84%; }
-  .list-header-title { font-size: 17px; }
+  /* iOS large title 관례 — 액션을 윗줄로 올리고 제목은 자기 줄에서 크게(LN 09 P-01). */
+  .list-header { flex-direction: column; align-items: stretch; gap: 2px; padding: 10px 18px 4px; }
+  .list-header-actions { order: 1; justify-content: flex-end; margin-left: 0; }
+  .list-header-titlerow { order: 2; align-items: baseline; }
+  .list-header-title { font-size: 34px; letter-spacing: -0.03em; }
   .compose-scroll { padding: 18px 16px 32px; }
   .stepper-label { font-size: 10px; }
   .record-dial { width: 108px; height: 108px; }
@@ -1000,6 +1008,26 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
 .sec-body { min-width: 0; }
 .sec-heading { font-size: 12.5px; font-weight: 800; color: var(--ink-900); margin-bottom: 2px; }
 .sec-text { font-size: 13px; color: var(--ink-600); line-height: 1.6; overflow-wrap: anywhere; }
+
+/* 전사 위 상세 요약(LN 09 P-02). 드로어 요약 탭의 '구간 요약'과 같은 데이터를 쓰지만
+   여기서는 편집 없이 읽기용이라 .field 껍데기 없이 납작하게 둔다.
+   .sec-time 은 드로어와 공유한다 — 시각 칩 모양을 두 곳에서 따로 관리하지 않기 위해서다. */
+.detail-summary {
+  flex: none; padding: 12px 20px 14px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.detail-summary-head { font-size: 12.5px; font-weight: 800; color: var(--ink-900); margin-bottom: 8px; }
+.detail-summary-list { display: flex; flex-direction: column; gap: 6px; }
+.detail-summary-item { display: flex; gap: 10px; align-items: flex-start; }
+.detail-summary-text {
+  font-size: 12.5px; color: var(--ink-600); line-height: 1.55; overflow-wrap: anywhere;
+  padding-top: 2px;
+}
+.ai-disclaimer {
+  display: flex; align-items: center; gap: 5px; margin-top: 10px;
+  font-size: 11px; color: var(--ink-400);
+}
+.ai-disclaimer svg { flex: none; width: 13px; height: 13px; }
 
 /* ----------------------------------------------------------------------
    15. 전역 검색 결과 — 매치 스니펫 + 출처 라벨
@@ -1203,9 +1231,7 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
      new 는 기본 랜딩이라 탭바를 남겨 내비 크롬 유지(스트랜딩 방지) — 현재 화면이 새 회의라 FAB 만 숨긴다. */
   .app-shell[data-route="detail"] .tab-bar { display: none; }
   .app-shell[data-route="new"] .tab-fab,
-  .app-shell[data-route="detail"] .tab-fab,
-  .app-shell[data-route="new"] .fab-menu,
-  .app-shell[data-route="detail"] .fab-menu { display: none; }
+  .app-shell[data-route="detail"] .tab-fab { display: none; }
 
   /* 콘텐츠가 탭바 뒤로 가리지 않게 하단 여백 확보(탭바 표시 라우트: list·folders·me·calendar·new)
      FAB 가 뜨는 라우트는 그 위로도 비워야 한다 — 탭바 56 + 간격 16 + FAB 64 + 여유 16 = 152.
@@ -1357,14 +1383,13 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 /* ----------------------------------------------------------------------
    25. 알림 (서브프로젝트 F2)
    ------------------------------------------------------------------- */
-/* 헤더 벨 — .list-compose-btn 이 margin-left:auto 를 갖고 있어서, 벨이 그 역할을 가져오고
-   compose 의 auto 를 0 으로 되돌린다(둘 다 auto 면 여백을 반씩 나눠 가진다). */
+/* 벨·선택·＋ 는 .list-header-actions 로 묶였다. 우측 정렬은 그 컨테이너가 하므로
+   여기서 margin-left:auto 를 쓰면 안 된다(액션 안에서 벨만 밀려난다). */
 .list-bell-btn {
-  position: relative; margin-left: auto; flex: none;
+  position: relative; flex: none;
   width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
   border: 0; border-radius: 8px; background: none; color: var(--ink-600); cursor: pointer;
 }
-.list-bell-btn + .list-compose-btn { margin-left: 0; }
 .list-bell-btn:hover { background: var(--surface-alt); color: var(--ink-900); }
 .list-bell-dot {
   position: absolute; top: 1px; right: 0; min-width: 15px; height: 15px; padding: 0 3px;
@@ -1430,25 +1455,6 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 /* ----------------------------------------------------------------------
    26. 튜토리얼 온보딩 · FAB 메뉴 (서브프로젝트 G)
    ------------------------------------------------------------------- */
-/* FAB 위로 쌓이는 2액션 메뉴. 데스크톱엔 FAB 자체가 없으므로 모바일 블록에서만 배치한다. */
-.fab-menu { display: none; }
-@media (max-width: 760px) {
-  /* FAB 를 하단 중앙으로 옮겼으므로 메뉴도 따라간다. bottom 의 64px 은 FAB 높이라
-     FAB 크기를 바꾸면 여기도 같이 바꿔야 한다. */
-  .fab-menu {
-    display: flex; flex-direction: column; gap: 8px;
-    position: fixed; left: 50%; transform: translateX(-50%); z-index: 52;
-    bottom: calc(56px + 16px + 64px + 12px + env(safe-area-inset-bottom));
-  }
-  /* ⚠️ 클래스에 display 를 주면 UA 의 [hidden]{display:none} 을 이겨서 항상 열려 보인다. */
-  .fab-menu[hidden] { display: none; }
-}
-.fab-menu-item {
-  padding: 10px 16px; border-radius: 999px; cursor: pointer; white-space: nowrap;
-  border: 1px solid var(--border); background: var(--surface); color: var(--ink-900);
-  font-size: 13px; font-weight: 700; box-shadow: var(--shadow-md);
-}
-.fab-menu-item:hover { background: var(--surface-alt); }
 
 /* 코치마크 — 구멍 뚫린 스포트라이트. 탭바(50)·FAB(51) 위, 드로어(60) 아래. */
 /* ⚠️ 이 요소에 transform 애니메이션을 걸지 말 것 — transform 이 걸린 조상은 position:fixed
@@ -1471,5 +1477,5 @@ body.share-body { overflow: auto; background: var(--surface-alt); }
 .tour-body { font-size: 13px; color: var(--ink-600); line-height: 1.6; margin-top: 6px; }
 .tour-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
 
-.fab-menu-item:focus-visible, .tour-actions .btn:focus-visible,
+.tour-actions .btn:focus-visible,
 .tab-fab:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
