@@ -2890,7 +2890,9 @@
               '<span class="match-count mono" id="md-match-count" aria-live="polite"></span>' +
               '<button type="button" class="btn btn-ghost btn-icon" id="md-match-next" aria-label="다음 검색 결과">' + ICONS.chevronRight + '</button>' +
             '</div>' +
-            '<span class="transcript-count text-sm" id="md-transcript-count"></span>' +
+            /* 발화 수는 제목 아래 .detail-meta 가 화자 수·길이와 함께 보여준다.
+               상단바와 검색 행은 둘 다 항상 보이는 자리라 여기 두면 같은 값이 두 번 나온다.
+               검색 중 피드백은 위 .transcript-nav(1/131)가 담당하므로 이 자리는 비운다. */
           '</div>' +
           '<div class="msg-list" id="md-segment-list"></div>' +
         '</div>' +
@@ -3088,7 +3090,6 @@
 
       var transcriptListEl = centerEl.querySelector('#md-segment-list');
       var transcriptSearchInput = centerEl.querySelector('#md-transcript-search');
-      var transcriptCountEl = centerEl.querySelector('#md-transcript-count');
       var matchNavEl = centerEl.querySelector('#md-match-nav');
       var matchCountEl = centerEl.querySelector('#md-match-count');
       var matchPrevBtn = centerEl.querySelector('#md-match-prev');
@@ -3468,13 +3469,11 @@
       function renderTranscriptTab() {
         if (!segmentsState.length) {
           transcriptListEl.innerHTML = emptyStateHtml('전사 내용이 없습니다', '이 회의에는 아직 전사된 발화가 없습니다.');
-          transcriptCountEl.textContent = '';
           if (matchNavEl) matchNavEl.style.display = 'none';
           return;
         }
         /* 검색 중에도 전체 세그먼트를 유지하고 매치만 인플레이스 하이라이트(클로바식). */
         transcriptListEl.innerHTML = segmentsState.map(function (s) { return segmentRowHtml(s, transcriptQuery); }).join('');
-        transcriptCountEl.textContent = segmentsState.length + '개 발화';
         restoreHighlight();
         syncMatches(false);
       }
