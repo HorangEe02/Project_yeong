@@ -993,7 +993,9 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   white-space: nowrap;
 }
 
-.sec-list { display: flex; flex-direction: column; gap: 2px; }
+/* ol 인데 display:flex 라 마커가 안 그려진다 — UA 기본 padding-left:40px 만 죽은 여백으로 남는다.
+   전역 리스트 리셋이 없어서 명시적으로 0 으로 둔다(.detail-summary-list 도 같다). */
+.sec-list { display: flex; flex-direction: column; gap: 2px; padding-left: 0; }
 .sec-item { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; }
 .sec-item + .sec-item { border-top: 1px solid var(--border); }
 .sec-time {
@@ -1017,7 +1019,7 @@ input[type="range"].audio-seek::-moz-range-track { height: 4px; border-radius: v
   background: var(--surface); border-bottom: 1px solid var(--border);
 }
 .detail-summary-head { font-size: 12.5px; font-weight: 800; color: var(--ink-900); margin-bottom: 8px; }
-.detail-summary-list { display: flex; flex-direction: column; gap: 6px; }
+.detail-summary-list { display: flex; flex-direction: column; gap: 6px; padding-left: 0; }
 .detail-summary-item { display: flex; gap: 10px; align-items: flex-start; }
 .detail-summary-text {
   font-size: 12.5px; color: var(--ink-600); line-height: 1.55; overflow-wrap: anywhere;
