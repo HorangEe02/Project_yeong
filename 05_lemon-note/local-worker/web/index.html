@@ -68,13 +68,11 @@
       <span>마이</span>
     </a>
   </nav>
-  <button type="button" class="tab-fab" id="tab-fab" aria-haspopup="menu" aria-expanded="false" aria-controls="fab-menu" aria-label="새 회의">
-    <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  <!-- ＋ → 녹음 점(LN 09 제안). 여기서 녹음을 바로 시작하지는 않는다 — 권한 프롬프트가 뜨고
+       동의 체크 전에 캡처가 시작되므로 녹음 화면으로 보낸다. 파일 업로드는 그 화면의 드롭존에 있다. -->
+  <button type="button" class="tab-fab" id="tab-fab" aria-label="새 회의 녹음">
+    <svg width="24" height="24" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6" fill="currentColor"/></svg>
   </button>
-  <div class="fab-menu" id="fab-menu" role="menu" aria-labelledby="tab-fab" hidden>
-    <button type="button" class="fab-menu-item" role="menuitem" data-action="tt-fab-record">녹음 시작</button>
-    <button type="button" class="fab-menu-item" role="menuitem" data-action="tt-fab-upload">파일 업로드</button>
-  </div>
 
 </div>
 
